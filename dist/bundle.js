@@ -1,8 +1,6 @@
 var Incremancer;
 (() => {
-    "use strict";
     var e = {};
-    //hahahah
     function t(e, t) {
         return Math.sqrt(e * e + t * t)
     }
@@ -5648,4 +5646,3 @@ var Incremancer;
         }
     }]), Incremancer = e
 })();
-//# sourceMappingURL=bundle.js.map
