@@ -69,7 +69,7 @@ var Incremancer;
     );
   }
   /**
-   * figure out correct typing for this, esp. {{@argument s}} which uses {{@link se.currentRank}}
+   * figure out correct typing for this, esp. {{@argument s}} which uses {{@link Factory.currentRank}}
    * gameModel.persistentData.blood|parts|bones|brains;
    * */
 
@@ -81,18 +81,18 @@ var Incremancer;
         );
   }
 
-  function l(e, t, s, i) {
-    return 1 == t
-      ? e * i
-      : e * ((Math.pow(t, s) * (Math.pow(t, i) - 1)) / (t - 1));
+  function l(basePrice, multiplier, currentRank, maxAffordableUpgrades) {
+    return 1 == multiplier
+      ? basePrice * maxAffordableUpgrades
+      : basePrice * ((Math.pow(multiplier, currentRank) * (Math.pow(multiplier, maxAffordableUpgrades) - 1)) / (multiplier - 1));
   }
 
   function d(e, t) {
     // @ts-ignore ts(2531) - Object is possibly 'null'
-    const s = document.getElementById("champ-hold").getBoundingClientRect();
-    let i = e.clientX - s.x;
-    const a = e.clientY - s.y;
-    i > s.width / 2 &&
+    const champHoldRect: DOMRect = document.getElementById("champ-hold").getBoundingClientRect();
+    let i = e.clientX - champHoldRect.x;
+    const a = e.clientY - champHoldRect.y;
+    i > champHoldRect.width / 2 &&
       (i -= t
         .getElementsByClassName("tooltip")[0]
         .getBoundingClientRect().width),
@@ -550,7 +550,7 @@ var Incremancer;
         (this.cooldownLeft = 0);
     }
   }
-  class q {
+  class spells {
     constructor() {
       if (
         ((this.cooldownReduction = 0),
@@ -612,10 +612,10 @@ var Incremancer;
             8,
             69,
             function () {
-              new q().zombies.detonate = true;
+              new spells().zombies.detonate = true;
             },
             function () {
-              new q().zombies.detonate = false;
+              new spells().zombies.detonate = false;
             }
           ),
           new W(
@@ -627,10 +627,10 @@ var Incremancer;
             15,
             75,
             function () {
-              new q().humans.frozen = true;
+              new spells().humans.frozen = true;
             },
             function () {
-              new q().humans.frozen = false;
+              new spells().humans.frozen = false;
             }
           ),
           new W(
@@ -642,10 +642,10 @@ var Incremancer;
             5,
             100,
             function () {
-              new q().zombies.super = true;
+              new spells().zombies.super = true;
             },
             function () {
-              new q().zombies.super = false;
+              new spells().zombies.super = false;
             }
           ),
           new W(
@@ -657,7 +657,7 @@ var Incremancer;
             10,
             10,
             function () {
-              new q().skeleton.incinerate(), (this.timer = 1);
+              new spells().skeleton.incinerate(), (this.timer = 1);
             },
             function () {}
           ),
@@ -670,10 +670,10 @@ var Incremancer;
             20,
             10,
             function () {
-              new q().humans.pandemic = true;
+              new spells().humans.pandemic = true;
             },
             function () {
-              new q().humans.pandemic = false;
+              new spells().humans.pandemic = false;
             }
           ),
           new W(
@@ -685,17 +685,17 @@ var Incremancer;
             15,
             10,
             function () {
-              new se().storm = true;
+              new Factory().storm = true;
             },
             function () {
-              new se().storm = false;
+              new Factory().storm = false;
             }
           ),
         ]),
-        q.instance)
+        spells.instance)
       )
-        return q.instance;
-      (q.instance = this),
+        return spells.instance;
+      (spells.instance = this),
         this.spells.forEach((e) => this.spellMap.set(e.id, e));
     }
     lockAllSpells() {
@@ -1610,7 +1610,7 @@ var Incremancer;
       (this.x = false), (this.y = false), (this.validX = 0), (this.validY = 0);
     }
   }
-  class se {
+  class Factory {
     constructor() {
       if (
         ((this.storm = false),
@@ -1682,10 +1682,10 @@ var Incremancer;
             "An astounding contraption that produces 512 parts every 12 seconds"
           ),
         ]),
-        se.instance)
+        Factory.instance)
       )
-        return se.instance;
-      se.instance = this;
+        return Factory.instance;
+      Factory.instance = this;
     }
     factoryStats() {
       let e = 0,
@@ -2228,8 +2228,8 @@ var Incremancer;
           (ne.instance.creatures = new Ue()),
           (ne.instance.boneCollectors = new Ve()),
           (ne.instance.graveyard = new Oe()),
-          (ne.instance.spells = new q()),
-          (ne.instance.partFactory = new se()),
+          (ne.instance.spells = new spells()),
+          (ne.instance.partFactory = new Factory()),
           (ne.instance.skeleton = new Xe()),
           (ne.instance.upgrades = new oe()),
           (ne.instance.zombies = new Ae()),
@@ -2996,9 +2996,9 @@ var Incremancer;
     constructor() {
       if (
         ((this.gameModel = ne.getInstance()),
-        (this.spells = new q()),
+        (this.spells = new spells()),
         (this.skeleton = new Xe()),
-        (this.partFactory = new se()),
+        (this.partFactory = new Factory()),
         (this.types = {
           energyRate: "energyRate",
           energyCap: "energyCap",
@@ -5125,8 +5125,8 @@ var Incremancer;
       }
       return 0 != e.cap ? Math.min(s, e.cap - t) : s;
     }
-    upgradeMaxPrice(e, t) {
-      return l(e.basePrice, e.multiplier, this.currentRank(e), t);
+    upgradeMaxPrice(e, maxAffordableUpgrades) {
+      return l(e.basePrice, e.multiplier, this.currentRank(e), maxAffordableUpgrades);
     }
     canAffordUpgrade(e) {
       if (e.cap > 0 && this.currentRank(e) >= e.cap) {
@@ -8284,13 +8284,13 @@ var Incremancer;
         (this.graveyard = new Oe()),
         (this.exclamations = new it()),
         (this.bullets = new rt()),
-        (this.spells = new q()),
+        (this.spells = new spells()),
         (this.smoke = new ot()),
         (this.upgrades = new oe()),
         (this.humans = new Se()),
         (this.zombies = new Ae()),
         (this.prestigePoints = new Je()),
-        (this.partFactory = new se()),
+        (this.partFactory = new Factory()),
         (this.bones = new tt()),
         (this.blasts = new nt()),
         (this.blood = new _e()),
@@ -8689,8 +8689,8 @@ var Incremancer;
       }
       return t + " " + s;
     }
-    getLootClass(e) {
-      switch (e.r) {
+    getLootClass(item) {
+      switch (item.r /* rarity */) {
         case this.rarity.common:
           return "common";
         case this.rarity.rare:
@@ -10831,7 +10831,7 @@ var Incremancer;
     ct = new Ae(),
     ut = new Ue(),
     pt = new ae(),
-    gt = new q(),
+    gt = new spells(),
     mt = "Golem Mastery",
     bt = "Zombie Mastery",
     ft = "Skeleton Mastery",
@@ -11136,202 +11136,200 @@ var Incremancer;
         "$document",
         function (e, t, s) {
           const i = new Xe(),
-            a = new q(),
-            r = new se(),
+            factory = new Factory(),
             o = new ae(),
             h = new oe(),
             l = new de(),
-            c = this;
 
           function u() {
             const e = new Date().getTime();
             !(function (e, t) {
-              c.model.update(e, t),
-                c.updateMessages(e),
-                c.sidePanels.factory && (c.factoryStats = r.factoryStats());
-            })(Math.min(1e3, Math.max(e - c.lastUpdate, 0)) / 1e3, e),
-              (c.lastUpdate = e);
+              this.model.update(e, t),
+                this.updateMessages(e),
+                this.sidePanels.factory && (this.factoryStats = factory.factoryStats());
+            })(Math.min(1e3, Math.max(e - this.lastUpdate, 0)) / 1e3, e),
+              (this.lastUpdate = e);
           }
-          (c.model = ne.getInstance()),
-            (c.skeleton = function () {
+          (this.model = ne.getInstance()),
+            (this.skeleton = function () {
               return i.persistent;
             }),
-            (c.spells = a),
-            (c.keysPressed = Y),
-            (c.files = []),
-            (c.messageTimer = 4),
-            (c.message = false),
-            (c.lastUpdate = 0),
-            (c.sidePanels = {}),
-            (c.upgrades = []),
-            (c.currentShopFilter = "blood"),
-            (c.currentConstructionFilter = "available"),
-            (c.graveyardTab = "minions"),
-            (c.trophyTab = "all"),
-            (c.factoryTab = "parts"),
-            (c.factoryStats = {}),
-            (c.moveTooltip = d),
-            (c.confirmMessage = ""),
-            (c.confirmCancel = function () {
-              c.confirmCallback = false;
+            (this.spells = new spells()),
+            (this.keysPressed = Y),
+            (this.files = []),
+            (this.messageTimer = 4),
+            (this.message = false),
+            (this.lastUpdate = 0),
+            (this.sidePanels = {}),
+            (this.upgrades = []),
+            (this.currentShopFilter = "blood"),
+            (this.currentConstructionFilter = "available"),
+            (this.graveyardTab = "minions"),
+            (this.trophyTab = "all"),
+            (this.factoryTab = "parts"),
+            (this.factoryStats = {}),
+            (this.moveTooltip = d),
+            (this.confirmMessage = ""),
+            (this.confirmCancel = function () {
+              this.confirmCallback = false;
             }),
-            (c.closeSidePanels = function () {
-              (c.currentShopFilter = "blood"),
-                (c.currentConstructionFilter = "available"),
-                (c.graveyardTab = "minions"),
-                (c.factoryTab = "parts"),
-                (c.sidePanels.options = false),
-                (c.sidePanels.graveyard = false),
-                (c.sidePanels.runesmith = false),
-                (c.sidePanels.prestige = false),
-                (c.sidePanels.construction = false),
-                (c.sidePanels.shop = false),
-                (c.sidePanels.open = false),
-                (c.sidePanels.factory = false),
-                (c.levelSelect.shown = false);
+            (this.closeSidePanels = function () {
+              (this.currentShopFilter = "blood"),
+                (this.currentConstructionFilter = "available"),
+                (this.graveyardTab = "minions"),
+                (this.factoryTab = "parts"),
+                (this.sidePanels.options = false),
+                (this.sidePanels.graveyard = false),
+                (this.sidePanels.runesmith = false),
+                (this.sidePanels.prestige = false),
+                (this.sidePanels.construction = false),
+                (this.sidePanels.shop = false),
+                (this.sidePanels.open = false),
+                (this.sidePanels.factory = false),
+                (this.levelSelect.shown = false);
             }),
-            (c.openSidePanel = function (e) {
-              switch ((c.closeSidePanels(), e)) {
+            (this.openSidePanel = function (e) {
+              switch ((this.closeSidePanels(), e)) {
                 case "shop":
-                  c.filterShop(c.currentShopFilter), (c.sidePanels.shop = true);
+                  this.filterShop(this.currentShopFilter), (this.sidePanels.shop = true);
                   break;
                 case "construction":
-                  c.filterConstruction(c.currentConstructionFilter),
-                    (c.sidePanels.construction = true);
+                  this.filterConstruction(this.currentConstructionFilter),
+                    (this.sidePanels.construction = true);
                   break;
                 case "graveyard":
-                  (c.sidePanels.graveyard = true),
-                    (c.graveyardTab = "minions"),
-                    (c.trophyTab = "all");
+                  (this.sidePanels.graveyard = true),
+                    (this.graveyardTab = "minions"),
+                    (this.trophyTab = "all");
                   break;
                 case "runesmith":
-                  c.sidePanels.runesmith = true;
+                  this.sidePanels.runesmith = true;
                   break;
                 case "factory":
-                  (c.sidePanels.factory = true),
-                    (c.upgrades = r.generators),
-                    (c.factoryStats = r.factoryStats()),
-                    c.factory.updateDelays();
+                  (this.sidePanels.factory = true),
+                    (this.upgrades = factory.generators),
+                    (this.factoryStats = factory.factoryStats()),
+                    this.factory.updateDelays();
                   break;
                 case "prestige":
-                  (c.upgrades = h.prestigeUpgrades.filter(
-                    (e) => 0 == e.cap || c.currentRank(e) < e.cap
+                  (this.upgrades = h.prestigeUpgrades.filter(
+                    (e) => 0 == e.cap || this.currentRank(e) < e.cap
                   )),
-                    c.upgrades.push(
+                    this.upgrades.push(
                       ...h.prestigeUpgrades.filter(
-                        (e) => 0 !== e.cap && c.currentRank(e) >= e.cap
+                        (e) => 0 !== e.cap && this.currentRank(e) >= e.cap
                       )
                     ),
-                    (c.upgrades = c.upgrades.filter((e) => 115 !== e.id)),
-                    (c.sidePanels.prestige = true);
+                    (this.upgrades = this.upgrades.filter((e) => 115 !== e.id)),
+                    (this.sidePanels.prestige = true);
                   break;
                 case "options":
-                  (c.sidePanels.options = true), c.model.downloadSaveGame();
+                  (this.sidePanels.options = true), this.model.downloadSaveGame();
               }
-              c.sidePanels.open = true;
+              this.sidePanels.open = true;
             }),
-            (c.graveyardTabSelect = function (e) {
-              (c.graveyardTab = e),
+            (this.graveyardTabSelect = function (e) {
+              (this.graveyardTab = e),
                 "trophies" == e &&
-                  ((c.trophies = l.getTrophyList()), (c.trophyTab = "all"));
+                  ((this.trophies = l.getTrophyList()), (this.trophyTab = "all"));
             }),
-            (c.trophyTabSelect = function (e) {
-              switch (((c.trophyTab = e), e)) {
+            (this.trophyTabSelect = function (e) {
+              switch (((this.trophyTab = e), e)) {
                 case "all":
-                  c.trophies = l.getTrophyList();
+                  this.trophies = l.getTrophyList();
                   break;
                 case "collected":
-                  c.trophies = l.getTrophyList().filter((e) => e.owned);
+                  this.trophies = l.getTrophyList().filter((e) => e.owned);
                   break;
                 case "uncollected":
-                  c.trophies = l.getTrophyList().filter((e) => !e.owned);
+                  this.trophies = l.getTrophyList().filter((e) => !e.owned);
                   break;
                 case "totals":
-                  c.trophies = l.getTrophyTotals();
+                  this.trophies = l.getTrophyTotals();
               }
             }),
-            (c.filterShop = function (e) {
-              (c.currentShopFilter = e), (c.upgrades = h.getUpgrades(e));
+            (this.filterShop = function (e) {
+              (this.currentShopFilter = e), (this.upgrades = h.getUpgrades(e));
             }),
-            (c.filterConstruction = function (e) {
-              switch (((c.currentConstructionFilter = e), e)) {
+            (this.filterConstruction = function (e) {
+              switch (((this.currentConstructionFilter = e), e)) {
                 case "available":
-                  c.upgrades = h.getAvailableConstructions();
+                  this.upgrades = h.getAvailableConstructions();
                   break;
                 case "completed":
-                  c.upgrades = h.getCompletedConstructions();
+                  this.upgrades = h.getCompletedConstructions();
               }
             }),
-            (c.resetGame = function () {
-              (c.confirmMessage =
+            (this.resetGame = function () {
+              (this.confirmMessage =
                 "Are you sure you want to reset everything? If you have a cloud save it will also be deleted. Make sure you export your save game first."),
-                (c.confirmCallback = function () {
-                  c.model.resetData(), (c.confirmCallback = false);
+                (this.confirmCallback = function () {
+                  this.model.resetData(), (this.confirmCallback = false);
                 });
             }),
-            (c.addBoneCollector = function () {
-              c.model.getEnergyRate() >= 1 &&
-                c.model.persistentData.boneCollectors++;
+            (this.addBoneCollector = function () {
+              this.model.getEnergyRate() >= 1 &&
+                this.model.persistentData.boneCollectors++;
             }),
-            (c.subtractBoneCollector = function () {
-              c.model.persistentData.boneCollectors > 0 &&
-                c.model.persistentData.boneCollectors--;
+            (this.subtractBoneCollector = function () {
+              this.model.persistentData.boneCollectors > 0 &&
+                this.model.persistentData.boneCollectors--;
             }),
-            (c.maxBoneCollectors = function () {
+            (this.maxBoneCollectors = function () {
               return Math.floor(
-                c.model.getEnergyRate() + c.model.persistentData.boneCollectors
+                this.model.getEnergyRate() + this.model.persistentData.boneCollectors
               );
             }),
-            (c.setBoneCollectors = function (e) {
+            (this.setBoneCollectors = function (e) {
               e >= 0 &&
-                c.model.getEnergyRate() >=
-                  e - c.model.persistentData.boneCollectors &&
-                (c.model.persistentData.boneCollectors = e);
+                this.model.getEnergyRate() >=
+                  e - this.model.persistentData.boneCollectors &&
+                (this.model.persistentData.boneCollectors = e);
             }),
-            (c.setHarpies = function (e) {
-              ((e >= 0 && e < c.model.persistentData.harpies) ||
-                (c.model.getEnergyRate() >= 1 && e > 0)) &&
-                (c.model.persistentData.harpies = e);
+            (this.setHarpies = function (e) {
+              ((e >= 0 && e < this.model.persistentData.harpies) ||
+                (this.model.getEnergyRate() >= 1 && e > 0)) &&
+                (this.model.persistentData.harpies = e);
             }),
-            (c.maxHarpies = function () {
+            (this.maxHarpies = function () {
               return Math.floor(
-                c.model.getEnergyRate() + c.model.persistentData.harpies
+                this.model.getEnergyRate() + this.model.persistentData.harpies
               );
             }),
-            (c.setGraveyardZombies = function (e) {
-              e <= c.maxGraveyardZombies() &&
+            (this.setGraveyardZombies = function (e) {
+              e <= this.maxGraveyardZombies() &&
                 e >= 0 &&
-                (c.model.persistentData.graveyardZombies = e);
+                (this.model.persistentData.graveyardZombies = e);
             }),
-            (c.maxGraveyardZombies = function () {
-              return Math.floor(c.model.energyMax / c.model.zombieCost);
+            (this.maxGraveyardZombies = function () {
+              return Math.floor(this.model.energyMax / this.model.zombieCost);
             }),
-            (c.upgradePrice = function (e) {
-              return c.sidePanels.factory && "prestigePoints" != e.costType
-                ? r.purchasePrice(e)
+            (this.upgradePrice = function (e) {
+              return this.sidePanels.factory && "prestigePoints" != e.costType
+                ? factory.purchasePrice(e)
                 : h.upgradePrice(e);
             }),
-            (c.factory = {
+            (this.factory = {
               delays: [],
               changeFactoryTab(e) {
-                (c.factoryTab = e),
+                (this.factoryTab = e),
                   "parts" == e
-                    ? ((c.upgrades = r.generators), this.updateDelays())
-                    : (c.upgrades = o.creatures);
+                    ? ((this.upgrades = factory.generators), this.updateDelays())
+                    : (this.upgrades = o.creatures);
               },
               buyGenerator(e) {
-                c.keysPressed.shift
-                  ? r.purchaseMaxGenerators(e)
-                  : r.purchaseGenerator(e),
-                  (c.factoryStats = r.factoryStats());
+                this.keysPressed.shift
+                  ? factory.purchaseMaxGenerators(e)
+                  : factory.purchaseGenerator(e),
+                  (this.factoryStats = factory.factoryStats());
               },
-              generatorPrice: (e) => r.purchasePrice(e),
+              generatorPrice: (e) => factory.purchasePrice(e),
               creaturePrice: (e) => o.purchasePrice(e),
               creatureLevelPrice: (e) => o.levelPrice(e),
               creaturePercent(e) {
                 return Math.min(
                   Math.round(
-                    (c.model.persistentData.parts / this.creaturePrice(e)) * 100
+                    (this.model.persistentData.parts / this.creaturePrice(e)) * 100
                   ),
                   100
                 );
@@ -11339,7 +11337,7 @@ var Incremancer;
               creatureLevelPercent(e) {
                 return Math.min(
                   Math.round(
-                    (c.model.persistentData.parts /
+                    (this.model.persistentData.parts /
                       this.creatureLevelPrice(e)) *
                       100
                   ),
@@ -11352,7 +11350,7 @@ var Incremancer;
                 return e.building
                   ? "Building..."
                   : this.creatureTooExpensive(e)
-                  ? formatWhole(this.creaturePrice(e) - c.model.persistentData.parts) +
+                  ? formatWhole(this.creaturePrice(e) - this.model.persistentData.parts) +
                     " parts required"
                   : "Build (" + formatWhole(this.creaturePrice(e)) + " parts)";
               },
@@ -11364,20 +11362,20 @@ var Incremancer;
                       formatWhole(this.creatureLevelPrice(e)) +
                       " parts)"
                   : formatWhole(
-                      this.creatureLevelPrice(e) - c.model.persistentData.parts
+                      this.creatureLevelPrice(e) - this.model.persistentData.parts
                     ) + " parts required";
               },
               canBuildCreature(e) {
                 return (
                   !this.creatureTooExpensive(e) &&
                   !e.building &&
-                  o.creaturesBuildingCount() + c.model.creatureCount <
-                    c.model.creatureLimit
+                  o.creaturesBuildingCount() + this.model.creatureCount <
+                    this.model.creatureLimit
                 );
               },
               canLevelCreature(e) {
                 return (
-                  this.creatureLevelPrice(e) < c.model.persistentData.parts
+                  this.creatureLevelPrice(e) < this.model.persistentData.parts
                 );
               },
               levelCreature(e) {
@@ -11385,33 +11383,33 @@ var Incremancer;
               },
               autoBuild(e, t) {
                 e.autobuild + t >= 0 &&
-                  e.autobuild + t <= c.model.creatureLimit &&
+                  e.autobuild + t <= this.model.creatureLimit &&
                   o.creatureAutoBuildNumber(e, t);
               },
               creatureStats: (e) => o.creatureStats(e),
               updateDelays() {
                 this.delays = [];
-                for (let e = 0; e < r.generatorsApplied.length; e++)
-                  this.delays[r.generatorsApplied[e].id] = (
+                for (let e = 0; e < factory.generatorsApplied.length; e++)
+                  this.delays[factory.generatorsApplied[e].id] = (
                     -1 *
-                    (r.generatorsApplied[e].time -
-                      r.generatorsApplied[e].timeLeft)
+                    (factory.generatorsApplied[e].time -
+                      factory.generatorsApplied[e].timeLeft)
                   ).toFixed(2);
               },
             }),
-            (c.levelSelect = {
+            (this.levelSelect = {
               shown: false,
               levelsPerPage: 50,
               levels: [],
               levelRanges: [],
               start: 1,
-              showButton: () => c.model.persistentData.allTimeHighestLevel > 1,
+              showButton: () => this.model.persistentData.allTimeHighestLevel > 1,
               show() {
                 this.shown
                   ? (this.shown = false)
-                  : (c.closeSidePanels(),
+                  : (this.closeSidePanels(),
                     (this.shown = true),
-                    (this.level = c.model.levelInfo(c.model.level)),
+                    (this.level = this.model.levelInfo(this.model.level)),
                     (this.start =
                       Math.floor((this.level.level - 1) / this.levelsPerPage) *
                         this.levelsPerPage +
@@ -11425,14 +11423,14 @@ var Incremancer;
                     this.levelRanges.push(this.start - this.levelsPerPage),
                   this.levelRanges.push(this.start),
                   this.start + this.levelsPerPage <=
-                    c.model.persistentData.allTimeHighestLevel + 1 &&
+                    this.model.persistentData.allTimeHighestLevel + 1 &&
                     this.levelRanges.push(this.start + this.levelsPerPage);
                 for (
                   let e = this.start;
                   e < this.start + this.levelsPerPage;
                   e++
                 )
-                  this.levels.push(c.model.levelInfo(e));
+                  this.levels.push(this.model.levelInfo(e));
               },
               selectRange(e) {
                 (this.start = e), this.populate();
@@ -11441,44 +11439,44 @@ var Incremancer;
                 this.level = e;
               },
               startLevel() {
-                c.model.startLevel(this.level.level), (this.shown = false);
+                this.model.startLevel(this.level.level), (this.shown = false);
               },
             }),
-            (c.addToHomeScreen = function () {
-              c.model.deferredPrompt;
+            (this.addToHomeScreen = function () {
+              this.model.deferredPrompt;
             }),
-            (c.constructionPercent = function () {
-              if (c.model.persistentData.currentConstruction) {
+            (this.constructionPercent = function () {
+              if (this.model.persistentData.currentConstruction) {
                 const e =
-                  c.model.persistentData.currentConstruction.time -
-                  c.model.persistentData.currentConstruction.timeRemaining;
+                  this.model.persistentData.currentConstruction.time -
+                  this.model.persistentData.currentConstruction.timeRemaining;
                 return Math.round(
-                  (e / c.model.persistentData.currentConstruction.time) * 100
+                  (e / this.model.persistentData.currentConstruction.time) * 100
                 );
               }
               return 0;
             }),
-            (c.updateConstructionUpgrades = function () {
-              1 == c.sidePanels.construction &&
-                (c.upgrades = h.getAvailableConstructions());
+            (this.updateConstructionUpgrades = function () {
+              1 == this.sidePanels.construction &&
+                (this.upgrades = h.getAvailableConstructions());
             }),
-            (c.startConstruction = function (e) {
+            (this.startConstruction = function (e) {
               h.startConstruction(e),
-                (c.upgrades = h.getAvailableConstructions());
+                (this.upgrades = h.getAvailableConstructions());
             }),
-            (c.playPauseConstruction = function () {
+            (this.playPauseConstruction = function () {
               h.playPauseConstruction();
             }),
-            (c.cancelConstruction = function () {
-              (c.confirmMessage =
+            (this.cancelConstruction = function () {
+              (this.confirmMessage =
                 "Are you sure you want to cancel construction? Used materials will not be refunded"),
-                (c.confirmCallback = function () {
+                (this.confirmCallback = function () {
                   h.cancelConstruction(),
-                    (c.upgrades = h.getAvailableConstructions()),
-                    (c.confirmCallback = false);
+                    (this.upgrades = h.getAvailableConstructions()),
+                    (this.confirmCallback = false);
                 });
             }),
-            (c.upgradeSubtitle = function (e) {
+            (this.upgradeSubtitle = function (e) {
               switch (e.type) {
                 case h.types.energyRate:
                   return "+" + e.effect + " energy per second";
@@ -11581,162 +11579,162 @@ var Incremancer;
               }
               return "";
             }),
-            (c.currentRank = function (e) {
-              return c.sidePanels.factory ? r.currentRank(e) : h.currentRank(e);
+            (this.currentRank = function (e) {
+              return this.sidePanels.factory ? factory.currentRank(e) : h.currentRank(e);
             }),
-            (c.currentRankConstruction = function (e) {
+            (this.currentRankConstruction = function (e) {
               return h.currentRankConstruction(e);
             }),
-            (c.upgradeTooExpensive = function (e) {
-              return c.sidePanels.factory
-                ? !r.canAffordGenerator(e)
+            (this.upgradeTooExpensive = function (e) {
+              return this.sidePanels.factory
+                ? !factory.canAffordGenerator(e)
                 : !h.canAffordUpgrade(e) ||
                     (0 != e.cap && h.currentRank(e) >= e.cap);
             }),
-            (c.requiredForUpgrade = function (e) {
-              const t = c.upgradePrice(e);
+            (this.requiredForUpgrade = function (e) {
+              const t = this.upgradePrice(e);
               switch (e.costType) {
                 case h.costs.energy:
-                  return formatWhole(t - c.model.energy) + " energy required";
+                  return formatWhole(t - this.model.energy) + " energy required";
                 case h.costs.blood:
-                case r.costs.blood:
+                case factory.costs.blood:
                   return (
-                    formatWhole(t - c.model.persistentData.blood) + " blood required"
+                    formatWhole(t - this.model.persistentData.blood) + " blood required"
                   );
                 case h.costs.brains:
                   return (
-                    formatWhole(t - c.model.persistentData.brains) + " brains required"
+                    formatWhole(t - this.model.persistentData.brains) + " brains required"
                   );
                 case h.costs.bones:
                   return (
-                    formatWhole(t - c.model.persistentData.bones) + " bones required"
+                    formatWhole(t - this.model.persistentData.bones) + " bones required"
                   );
                 case h.costs.prestigePoints:
                   return (
-                    formatWhole(t - c.model.persistentData.prestigePointsToSpend) +
+                    formatWhole(t - this.model.persistentData.prestigePointsToSpend) +
                     " prestige points required"
                   );
-                case r.costs.parts:
+                case factory.costs.parts:
                   return (
-                    formatWhole(t - c.model.persistentData.parts) + " parts required"
+                    formatWhole(t - this.model.persistentData.parts) + " parts required"
                   );
               }
             }),
-            (c.purchaseText = function (e) {
-              if (c.keysPressed.shift) {
-                if (c.sidePanels.factory) {
-                  const t = r.upgradeMaxAffordable(e);
+            (this.purchaseText = function (e) {
+              if (this.keysPressed.shift) {
+                if (this.sidePanels.factory) {
+                  const maxAffordableUpgrades = factory.upgradeMaxAffordable(e);
                   return (
                     "Purchase " +
-                    t +
+                    maxAffordableUpgrades +
                     " (" +
-                    formatWhole(r.upgradeMaxPrice(e, t)) +
+                    formatWhole(factory.upgradeMaxPrice(e, maxAffordableUpgrades)) +
                     " " +
-                    c.costTranslate(e.costType) +
+                    this.costTranslate(e.costType) +
                     ")"
                   );
                 }
                 {
-                  const t = h.upgradeMaxAffordable(e);
+                  const maxAffordableUpgrades = h.upgradeMaxAffordable(e);
                   return (
                     "Purchase " +
-                    t +
+                    maxAffordableUpgrades +
                     " (" +
-                    formatWhole(h.upgradeMaxPrice(e, t)) +
+                    formatWhole(h.upgradeMaxPrice(e, maxAffordableUpgrades)) +
                     " " +
-                    c.costTranslate(e.costType) +
+                    this.costTranslate(e.costType) +
                     ")"
                   );
                 }
               }
               return (
                 "Purchase (" +
-                formatWhole(c.upgradePrice(e)) +
+                formatWhole(this.upgradePrice(e)) +
                 " " +
-                c.costTranslate(e.costType) +
+                this.costTranslate(e.costType) +
                 ")"
               );
             }),
-            (c.costTranslate = function (e) {
+            (this.costTranslate = function (e) {
               return e == h.costs.prestigePoints ? "points" : e;
             }),
-            (c.buyUpgrade = function (e) {
-              c.keysPressed.shift
+            (this.buyUpgrade = function (e) {
+              this.keysPressed.shift
                 ? h.purchaseMaxUpgrades(e)
                 : h.purchaseUpgrade(e);
             }),
-            (c.destroyUpgrade = function (e) {
+            (this.destroyUpgrade = function (e) {
               h.removeUpgrade(e);
             }),
-            (c.upgradeStatInfo = function (e) {
+            (this.upgradeStatInfo = function (e) {
               return h.displayStatValue(e);
             }),
-            (c.startGame = function () {
-              c.model.startGame();
+            (this.startGame = function () {
+              this.model.startGame();
             }),
-            (c.nextLevel = function () {
-              c.model.nextLevel();
+            (this.nextLevel = function () {
+              this.model.nextLevel();
             }),
-            (c.toggleAutoStart = function () {
-              c.model.persistentData.autoStart
-                ? (c.model.persistentData.autoStart = false)
-                : (c.model.persistentData.autoStart = true);
+            (this.toggleAutoStart = function () {
+              this.model.persistentData.autoStart
+                ? (this.model.persistentData.autoStart = false)
+                : (this.model.persistentData.autoStart = true);
             }),
-            (c.toggleAutoStartWait = function () {
-              c.model.persistentData.autoStartWait
-                ? (c.model.persistentData.autoStartWait = false)
-                : (c.model.persistentData.autoStartWait = true);
+            (this.toggleAutoStartWait = function () {
+              this.model.persistentData.autoStartWait
+                ? (this.model.persistentData.autoStartWait = false)
+                : (this.model.persistentData.autoStartWait = true);
             }),
-            (c.toggleAutoSellGear = function () {
-              c.model.persistentData.autoSellGear
-                ? (c.model.persistentData.autoSellGear = false)
-                : (c.model.persistentData.autoSellGear = true);
+            (this.toggleAutoSellGear = function () {
+              this.model.persistentData.autoSellGear
+                ? (this.model.persistentData.autoSellGear = false)
+                : (this.model.persistentData.autoSellGear = true);
             }),
-            (c.toggleAutoSellGearLegendary = function () {
-              c.model.persistentData.autoSellGearLegendary
-                ? (c.model.persistentData.autoSellGearLegendary = false)
-                : (c.model.persistentData.autoSellGearLegendary = true);
+            (this.toggleAutoSellGearLegendary = function () {
+              this.model.persistentData.autoSellGearLegendary
+                ? (this.model.persistentData.autoSellGearLegendary = false)
+                : (this.model.persistentData.autoSellGearLegendary = true);
             }),
-            (c.toggleResolution = function (e) {
-              (c.model.persistentData.resolution = e),
-                c.model.setResolution(c.model.persistentData.resolution);
+            (this.toggleResolution = function (e) {
+              (this.model.persistentData.resolution = e),
+                this.model.setResolution(this.model.persistentData.resolution);
             }),
-            (c.getResolution = function () {
-              return c.model.persistentData.resolution || 1;
+            (this.getResolution = function () {
+              return this.model.persistentData.resolution || 1;
             }),
-            (c.toggleZoomButtons = function () {
-              c.model.persistentData.zoomButtons =
-                !c.model.persistentData.zoomButtons;
+            (this.toggleZoomButtons = function () {
+              this.model.persistentData.zoomButtons =
+                !this.model.persistentData.zoomButtons;
             }),
-            (c.zoom = function (e) {
-              c.model.zoom(e);
+            (this.zoom = function (e) {
+              this.model.zoom(e);
             }),
-            (c.resetZoom = function () {
-              c.model.centerGameContainer(true);
+            (this.resetZoom = function () {
+              this.model.centerGameContainer(true);
             }),
-            (c.toggleShowFps = function () {
-              c.model.persistentData.showfps = !c.model.persistentData.showfps;
+            (this.toggleShowFps = function () {
+              this.model.persistentData.showfps = !this.model.persistentData.showfps;
             }),
-            (c.toggleParticles = function () {
-              c.model.persistentData.particles =
-                !c.model.persistentData.particles;
+            (this.toggleParticles = function () {
+              this.model.persistentData.particles =
+                !this.model.persistentData.particles;
             }),
-            (c.isShowPrestige = function () {
+            (this.isShowPrestige = function () {
               return (
-                void 0 !== c.model.persistentData.prestigePointsEarned &&
-                c.model.persistentData.allTimeHighestLevel > 5
+                void 0 !== this.model.persistentData.prestigePointsEarned &&
+                this.model.persistentData.allTimeHighestLevel > 5
               );
             }),
-            (c.doPrestige = function () {
-              (c.confirmMessage = "Are you sure you want to prestige now?"),
-                (c.confirmCallback = function () {
-                  c.model.prestige(), (c.confirmCallback = false);
+            (this.doPrestige = function () {
+              (this.confirmMessage = "Are you sure you want to prestige now?"),
+                (this.confirmCallback = function () {
+                  this.model.prestige(), (this.confirmCallback = false);
                 });
             }),
-            (c.constructionLeadsTo = function (e) {
+            (this.constructionLeadsTo = function (e) {
               return h.constructionLeadsTo(e);
             }),
-            (c.howToPlay = [
+            (this.howToPlay = [
               "This started as Chalice's Mod, expanded by CirusDane (called Danemancer), for incremancer - We hope you enjoy the qol changes!",
               "Energy refills over time. You need 10 energy to spawn a zombie by clicking on the ground.",
               "Hold shift or control to spawn multiple zombies with a single click.",
@@ -11747,101 +11745,101 @@ var Incremancer;
               "The world can be dragged with the mouse to explore it. Or by using the WASD or arrow keys.",
               "You can zoom in and out using your mouse wheel. Pinch to zoom on mobile.",
             ]),
-            (c.updateMessages = function (e) {
-              c.message
-                ? ((c.messageTimer -= e),
-                  c.model.messageQueue.length > 0 && (c.messageTimer -= e),
-                  c.messageTimer < 0 &&
-                    ((c.message = false), (c.messageTimer = 4)))
-                : c.model.messageQueue.length > 0 &&
-                  ((c.message = c.model.messageQueue.shift()),
-                  (c.messageTimer = 4));
+            (this.updateMessages = function (e) {
+              this.message
+                ? ((this.messageTimer -= e),
+                  this.model.messageQueue.length > 0 && (this.messageTimer -= e),
+                  this.messageTimer < 0 &&
+                    ((this.message = false), (this.messageTimer = 4)))
+                : this.model.messageQueue.length > 0 &&
+                  ((this.message = this.model.messageQueue.shift()),
+                  (this.messageTimer = 4));
             }),
-            (c.infusionAmount = 1e3),
-            (c.infusionMax = false),
-            (c.infuseRune = function (e, t) {
-              if (c.infusionMax)
+            (this.infusionAmount = 1e3),
+            (this.infusionMax = false),
+            (this.infuseRune = function (e, t) {
+              if (this.infusionMax)
                 switch (t) {
                   case "blood":
-                    h.infuseRune(e, t, c.model.persistentData.blood);
+                    h.infuseRune(e, t, this.model.persistentData.blood);
                     break;
                   case "brains":
-                    h.infuseRune(e, t, c.model.persistentData.brains);
+                    h.infuseRune(e, t, this.model.persistentData.brains);
                     break;
                   case "bones":
-                    h.infuseRune(e, t, c.model.persistentData.bones);
+                    h.infuseRune(e, t, this.model.persistentData.bones);
                 }
-              else h.infuseRune(e, t, c.infusionAmount);
+              else h.infuseRune(e, t, this.infusionAmount);
             }),
-            (c.shatterPercent = function (e) {
+            (this.shatterPercent = function (e) {
               return h.shatterPercent(e);
             }),
-            (c.shatterBloodCost = function (e) {
+            (this.shatterBloodCost = function (e) {
               return h.shatterBloodCost(e);
             }),
-            (c.shatterSatiate = function (e, t) {
+            (this.shatterSatiate = function (e, t) {
               h.infuseRune(e, "blood", this.shatterBloodCost(t));
             }),
-            (c.canShatter = function () {
+            (this.canShatter = function () {
               return h.canShatter();
             }),
-            (c.doShatter = function () {
+            (this.doShatter = function () {
               h.doShatter();
             }),
-            (c.shatterEffect = function () {
+            (this.shatterEffect = function () {
               return 100 * h.shatterEffect();
             }),
-            (c.infuseButtonText = function () {
-              return c.infusionMax ? "Max" : formatWhole(c.infusionAmount);
+            (this.infuseButtonText = function () {
+              return this.infusionMax ? "Max" : formatWhole(this.infusionAmount);
             }),
-            (c.energyPercent = function () {
+            (this.energyPercent = function () {
               return Math.min(
-                Math.round((c.model.energy / c.model.energyMax) * 100),
+                Math.round((this.model.energy / this.model.energyMax) * 100),
                 100
               );
             }),
-            (c.bloodPercent = function () {
+            (this.bloodPercent = function () {
               return Math.min(
                 Math.round(
-                  (c.model.persistentData.blood / c.model.bloodMax) * 100
+                  (this.model.persistentData.blood / this.model.bloodMax) * 100
                 ),
                 100
               );
             }),
-            (c.brainsPercent = function () {
+            (this.brainsPercent = function () {
               return Math.min(
                 Math.round(
-                  (c.model.persistentData.brains / c.model.brainsMax) * 100
+                  (this.model.persistentData.brains / this.model.brainsMax) * 100
                 ),
                 100
               );
             }),
-            (c.costAboveCap = function (e, t) {
+            (this.costAboveCap = function (e, t) {
               switch (e.costType) {
                 case "blood":
-                  if (t > c.model.bloodMax) return "Blood capacity too low";
+                  if (t > this.model.bloodMax) return "Blood capacity too low";
                   break;
                 case "brains":
-                  if (t > c.model.brainsMax) return "Brains capacity too low";
+                  if (t > this.model.brainsMax) return "Brains capacity too low";
               }
               return false;
             }),
-            (c.upgradeButtonText = function (e) {
-              if (0 != e.cap && c.currentRank(e) >= e.cap) return "Sold Out";
-              const t = c.upgradePrice(e);
-              if (c.upgradeTooExpensive(e)) {
-                return c.costAboveCap(e, t) || c.requiredForUpgrade(e);
+            (this.upgradeButtonText = function (e) {
+              if (0 != e.cap && this.currentRank(e) >= e.cap) return "Sold Out";
+              const t = this.upgradePrice(e);
+              if (this.upgradeTooExpensive(e)) {
+                return this.costAboveCap(e, t) || this.requiredForUpgrade(e);
               }
-              return c.purchaseText(e, t);
+              return this.purchaseText(e, t);
             }),
-            (c.upgradePercent = function (e) {
+            (this.upgradePercent = function (e) {
               switch (e.costType) {
                 case "blood":
                   return Math.round(
                     100 *
                       Math.min(
                         1,
-                        c.model.persistentData.blood / c.upgradePrice(e)
+                        this.model.persistentData.blood / this.upgradePrice(e)
                       )
                   );
                 case "brains":
@@ -11849,7 +11847,7 @@ var Incremancer;
                     100 *
                       Math.min(
                         1,
-                        c.model.persistentData.brains / c.upgradePrice(e)
+                        this.model.persistentData.brains / this.upgradePrice(e)
                       )
                   );
                 case "bones":
@@ -11857,7 +11855,7 @@ var Incremancer;
                     100 *
                       Math.min(
                         1,
-                        c.model.persistentData.bones / c.upgradePrice(e)
+                        this.model.persistentData.bones / this.upgradePrice(e)
                       )
                   );
                 case "parts":
@@ -11865,7 +11863,7 @@ var Incremancer;
                     100 *
                       Math.min(
                         1,
-                        c.model.persistentData.parts / c.upgradePrice(e)
+                        this.model.persistentData.parts / this.upgradePrice(e)
                       )
                   );
                 case "prestigePoints":
@@ -11873,16 +11871,16 @@ var Incremancer;
                     100 *
                       Math.min(
                         1,
-                        c.model.persistentData.prestigePointsToSpend /
-                          c.upgradePrice(e)
+                        this.model.persistentData.prestigePointsToSpend /
+                          this.upgradePrice(e)
                       )
                   );
               }
             }),
-            (c.skeletonTimer = function () {
+            (this.skeletonTimer = function () {
               return i.skeletonTimer();
             }),
-            (c.skeletonMenu = {
+            (this.skeletonMenu = {
               isShown: false,
               isNewGearSetShown: false,
               showFilters: false,
@@ -12060,7 +12058,7 @@ var Incremancer;
               },
               anotherOffer: () =>
                 i.persistent.skeletons > 0 &&
-                c.model.persistentData.trophies.length >=
+                this.model.persistentData.trophies.length >=
                   (i.persistent.xpRate < 4
                     ? 20 * i.persistent.xpRate
                     : i.persistent.xpRate < 8
@@ -12089,7 +12087,7 @@ var Incremancer;
                         10),
               trophies: () =>
                 i.persistent.skeletons > 0
-                  ? ` - ${c.model.persistentData.trophies.length} / ${
+                  ? ` - ${this.model.persistentData.trophies.length} / ${
                       i.persistent.xpRate < 4
                         ? 20 * i.persistent.xpRate
                         : i.persistent.xpRate < 8
@@ -12136,12 +12134,12 @@ var Incremancer;
               },
               xpPercent: () =>
                 Math.round(
-                  100 * Math.min(1, c.skeleton().xp / i.xpForNextLevel())
+                  100 * Math.min(1, this.skeleton().xp / i.xpForNextLevel())
                 ),
               xpForNextLevel: () => i.xpForNextLevel(),
               xpRate: () => 100 * i.persistent.xpRate,
               prestigePointsPerKill: () =>
-                1.00025 ** c.skeleton().level * c.skeleton().level,
+                1.00025 ** this.skeleton().level * this.skeleton().level,
               isAlive: () => i.isAlive(),
               timer: () => Math.ceil(i.skeletonTimer()),
               updateEquippedItems() {
@@ -12357,17 +12355,17 @@ var Incremancer;
                   });
               },
               trashAll() {
-                (c.confirmMessage =
+                (this.confirmMessage =
                   "Are you sure you want to destroy all non-equipped items? You will earn " +
                   formatWhole(i.xpTotal()) +
                   " xp"),
-                  (c.confirmCallback = function () {
-                    (c.confirmCallback = false), i.destroyAllItems();
+                  (this.confirmCallback = function () {
+                    (this.confirmCallback = false), i.destroyAllItems();
                   });
               },
             }),
             s.ready(function () {
-              (e.updatePromise = t(u, 200)), (h.angularModel = c), kt();
+              (e.updatePromise = t(u, 200)), (h.angularModel = this), kt();
             });
         },
       ])
