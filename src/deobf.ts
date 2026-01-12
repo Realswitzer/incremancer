@@ -1,6 +1,6 @@
-import {default as PIXI} from 'pixi.js';
-import LZString from 'lz-string';
-import {angular} from './lib/angular'
+import { default as PIXI } from "pixi.js";
+import LZString from "lz-string";
+import { angular } from "./lib/angular";
 
 var Incremancer;
 (() => {
@@ -18,7 +18,7 @@ var Incremancer;
    * Finds distance between two points
    *
    * Desmos: `f\left(a,b,c,d\right)=\sqrt{\left(a-c\right)^{2}-\left(b-d\right)^{2}}`
-   * 
+   *
    * Simplified: `sqrt((a-c)^2 + (b-d)^2)`
    */
   function distance(x1: number, y1: number, x2: number, y2: number): number {
@@ -28,7 +28,12 @@ var Incremancer;
   /**
    * Uses mixture of manhattan and euclidian distance for pathfinding
    */
-  function weighted_hybrid_distance(x1: number, y1: number, x2: number, y2: number): number {
+  function weighted_hybrid_distance(
+    x1: number,
+    y1: number,
+    x2: number,
+    y2: number
+  ): number {
     const p = Math.abs(x1 - x2),
       q = Math.abs(y1 - y2);
     return 0.4 * (p + q) + 0.56 * Math.max(p, q);
@@ -77,19 +82,26 @@ var Incremancer;
     return 1 == multiplier
       ? Math.floor(i / price)
       : Math.floor(
-          Math.log((i * (multiplier - 1)) / (price * Math.pow(multiplier, s)) + 1) / Math.log(multiplier)
+          Math.log(
+            (i * (multiplier - 1)) / (price * Math.pow(multiplier, s)) + 1
+          ) / Math.log(multiplier)
         );
   }
 
   function l(basePrice, multiplier, currentRank, maxAffordableUpgrades) {
     return 1 == multiplier
       ? basePrice * maxAffordableUpgrades
-      : basePrice * ((Math.pow(multiplier, currentRank) * (Math.pow(multiplier, maxAffordableUpgrades) - 1)) / (multiplier - 1));
+      : basePrice *
+          ((Math.pow(multiplier, currentRank) *
+            (Math.pow(multiplier, maxAffordableUpgrades) - 1)) /
+            (multiplier - 1));
   }
 
   function d(e, t) {
     // @ts-ignore ts(2531) - Object is possibly 'null'
-    const champHoldRect: DOMRect = document.getElementById("champ-hold").getBoundingClientRect();
+    const champHoldRect: DOMRect = document
+      .getElementById("champ-hold")
+      .getBoundingClientRect();
     let i = e.clientX - champHoldRect.x;
     const a = e.clientY - champHoldRect.y;
     i > champHoldRect.width / 2 &&
@@ -533,24 +545,49 @@ var Incremancer;
       }
       return false;
     });
-  class W {
-    constructor(e, t, s, i, a, r, n, o, h) {
-      (this.id = e),
-        (this.name = t),
-        (this.tooltip = s),
-        (this.itemText = i),
-        (this.cooldown = a),
-        (this.duration = r),
-        (this.energyCost = n),
-        (this.start = o),
-        (this.end = h),
-        (this.timer = 0),
-        (this.onCooldown = false),
-        (this.active = false),
-        (this.cooldownLeft = 0);
+  class Spell {
+    id: number;
+    name: string;
+    tooltip: string;
+    itemText: string;
+    cooldown: number;
+    duration: number;
+    energyCost: number;
+    start: Function;
+    end: Function;
+    timer: number;
+    onCooldown: boolean;
+    active: boolean;
+
+    constructor(
+      id: number,
+      name: string,
+      tooltip: string,
+      itemText: string,
+      cooldown: number,
+      duration: number,
+      energyCost: number,
+      start: Function,
+      end: Function
+    ) {
+      this.id = id;
+      this.name = name;
+      this.tooltip = tooltip;
+      this.itemText = itemText;
+      this.cooldown = cooldown;
+      this.duration = duration;
+      this.energyCost = energyCost;
+      this.start = start;
+      this.end = end;
+      this.timer = 0;
+      this.onCooldown = false;
+      this.active = false;
+      this.cooldown = 0;
     }
   }
-  class spells {
+  class Spells {
+    spells: Spell[];
+    
     constructor() {
       if (
         ((this.cooldownReduction = 0),
@@ -561,7 +598,7 @@ var Incremancer;
         (this.humans = new Se()),
         (this.spellMap = new Map()),
         (this.spells = [
-          new W(
+          new Spell(
             1,
             "Time Warp",
             "Speed up the flow of time for 30 seconds",
@@ -576,7 +613,7 @@ var Incremancer;
               ne.getInstance().gameSpeed = 1;
             }
           ),
-          new W(
+          new Spell(
             2,
             "Energy Charge",
             "5x Energy rate for 20 seconds, cost 50 energy",
@@ -603,7 +640,7 @@ var Incremancer;
               }
             }
           ),
-          new W(
+          new Spell(
             3,
             "Detonate",
             "Turns your zombies into fast moving living bombs, cost 69 energy... nice",
@@ -612,13 +649,13 @@ var Incremancer;
             8,
             69,
             function () {
-              new spells().zombies.detonate = true;
+              new Spells().zombies.detonate = true;
             },
             function () {
-              new spells().zombies.detonate = false;
+              new Spells().zombies.detonate = false;
             }
           ),
-          new W(
+          new Spell(
             4,
             "Earth Freeze",
             "Freeze all humans in place preventing them from moving for 15 seconds, cost 75 energy",
@@ -627,13 +664,13 @@ var Incremancer;
             15,
             75,
             function () {
-              new spells().humans.frozen = true;
+              new Spells().humans.frozen = true;
             },
             function () {
-              new spells().humans.frozen = false;
+              new Spells().humans.frozen = false;
             }
           ),
-          new W(
+          new Spell(
             5,
             "Gigazombies",
             "For 5 seconds any zombies spawned will be giants with 10x health and attack damage, cost 100 energy",
@@ -642,13 +679,13 @@ var Incremancer;
             5,
             100,
             function () {
-              new spells().zombies.super = true;
+              new Spells().zombies.super = true;
             },
             function () {
-              new spells().zombies.super = false;
+              new Spells().zombies.super = false;
             }
           ),
-          new W(
+          new Spell(
             6,
             "Incinerate",
             "Burns humans near the skeleton champion",
@@ -657,11 +694,11 @@ var Incremancer;
             10,
             10,
             function () {
-              new spells().skeleton.incinerate(), (this.timer = 1);
+              new Spells().skeleton.incinerate(), (this.timer = 1);
             },
             function () {}
           ),
-          new W(
+          new Spell(
             7,
             "Pandemic",
             "Causes plague to spread",
@@ -670,13 +707,13 @@ var Incremancer;
             20,
             10,
             function () {
-              new spells().humans.pandemic = true;
+              new Spells().humans.pandemic = true;
             },
             function () {
-              new spells().humans.pandemic = false;
+              new Spells().humans.pandemic = false;
             }
           ),
-          new W(
+          new Spell(
             8,
             "Part Storm",
             "Doubles parts",
@@ -692,14 +729,15 @@ var Incremancer;
             }
           ),
         ]),
-        spells.instance)
+        Spells.instance)
       )
-        return spells.instance;
-      (spells.instance = this),
+        return Spells.instance;
+      (Spells.instance = this),
         this.spells.forEach((e) => this.spellMap.set(e.id, e));
     }
     lockAllSpells() {
-      for (let e = 0; e < this.spells.length; e++) this.spells[e].unlocked = false;
+      for (let e = 0; e < this.spells.length; e++)
+        this.spells[e].unlocked = false;
     }
     unlockSpell(e) {
       this.spellMap.get(e).unlocked = true;
@@ -738,7 +776,8 @@ var Incremancer;
         const s = this.spells[t];
         s.onCooldown &&
           !s.active &&
-          ((s.cooldownLeft -= e), s.cooldownLeft <= 0 && (s.onCooldown = false)),
+          ((s.cooldownLeft -= e),
+          s.cooldownLeft <= 0 && (s.onCooldown = false)),
           s.active &&
             ((s.timer -= e), s.timer <= 0 && ((s.active = false), s.end()));
       }
@@ -1246,7 +1285,8 @@ var Incremancer;
             for (let e = 0; e < this.buildings.length; e++) {
               const i = this.buildings[e],
                 o =
-                  distance(a, t, i.x + i.width / 2, i.y + i.height / 2) - i.width / 2;
+                  distance(a, t, i.x + i.width / 2, i.y + i.height / 2) -
+                  i.width / 2;
               o < n && ((n = o), (r = i));
             }
             this.buildingMap[e * this.mapCols + i] = r;
@@ -2228,7 +2268,7 @@ var Incremancer;
           (ne.instance.creatures = new Ue()),
           (ne.instance.boneCollectors = new Ve()),
           (ne.instance.graveyard = new Oe()),
-          (ne.instance.spells = new spells()),
+          (ne.instance.spells = new Spells()),
           (ne.instance.partFactory = new Factory()),
           (ne.instance.skeleton = new Xe()),
           (ne.instance.upgrades = new oe()),
@@ -2996,7 +3036,7 @@ var Incremancer;
     constructor() {
       if (
         ((this.gameModel = ne.getInstance()),
-        (this.spells = new spells()),
+        (this.spells = new Spells()),
         (this.skeleton = new Xe()),
         (this.partFactory = new Factory()),
         (this.types = {
@@ -4823,7 +4863,11 @@ var Incremancer;
     displayStatValue(e) {
       switch (e.type) {
         case this.types.energyRate:
-          return "Energy rate: " + formatDecimal(this.gameModel.energyRate) + " per second";
+          return (
+            "Energy rate: " +
+            formatDecimal(this.gameModel.energyRate) +
+            " per second"
+          );
         case this.types.energyCap:
           return "Maximum energy: " + formatWhole(this.gameModel.energyMax);
         case this.types.bloodCap:
@@ -4835,7 +4879,9 @@ var Incremancer;
         case this.types.speed:
           return "Zombie speed: " + formatWhole(this.gameModel.zombieSpeed);
         case this.types.health:
-          return "Zombie maximum health: " + formatWhole(this.gameModel.zombieHealth);
+          return (
+            "Zombie maximum health: " + formatWhole(this.gameModel.zombieHealth)
+          );
         case this.types.brainRecoverChance:
           return (
             Math.round(100 * this.gameModel.brainRecoverChance) +
@@ -4872,27 +4918,39 @@ var Incremancer;
           );
         case this.types.bonesGainPC:
           return (
-            "Bones: " + formatWhole(Math.round(100 * this.gameModel.bonesPCMod)) + "%"
+            "Bones: " +
+            formatWhole(Math.round(100 * this.gameModel.bonesPCMod)) +
+            "%"
           );
         case this.types.partsGainPC:
           return (
-            "Parts: " + formatWhole(Math.round(100 * this.gameModel.partsPCMod)) + "%"
+            "Parts: " +
+            formatWhole(Math.round(100 * this.gameModel.partsPCMod)) +
+            "%"
           );
         case this.types.bloodGainPC:
           return (
-            "Blood: " + formatWhole(Math.round(100 * this.gameModel.bloodPCMod)) + "%"
+            "Blood: " +
+            formatWhole(Math.round(100 * this.gameModel.bloodPCMod)) +
+            "%"
           );
         case this.types.bloodStoragePC:
           return (
-            "Blood Storage: " + formatWhole(100 * this.gameModel.bloodStorePCMod) + "%"
+            "Blood Storage: " +
+            formatWhole(100 * this.gameModel.bloodStorePCMod) +
+            "%"
           );
         case this.types.brainsGainPC:
           return (
-            "Brains: " + formatWhole(Math.round(100 * this.gameModel.brainsPCMod)) + "%"
+            "Brains: " +
+            formatWhole(Math.round(100 * this.gameModel.brainsPCMod)) +
+            "%"
           );
         case this.types.brainsStoragePC:
           return (
-            "Brains Storage: " + formatWhole(100 * this.gameModel.brainsStorePCMod) + "%"
+            "Brains Storage: " +
+            formatWhole(100 * this.gameModel.brainsStorePCMod) +
+            "%"
           );
         case this.types.zombieDmgPC:
           return (
@@ -5126,7 +5184,12 @@ var Incremancer;
       return 0 != e.cap ? Math.min(s, e.cap - t) : s;
     }
     upgradeMaxPrice(e, maxAffordableUpgrades) {
-      return l(e.basePrice, e.multiplier, this.currentRank(e), maxAffordableUpgrades);
+      return l(
+        e.basePrice,
+        e.multiplier,
+        this.currentRank(e),
+        maxAffordableUpgrades
+      );
     }
     canAffordUpgrade(e) {
       if (e.cap > 0 && this.currentRank(e) >= e.cap) {
@@ -5261,7 +5324,8 @@ var Incremancer;
           (this.gameModel.persistentData.currentConstruction.shortfall.parts =
             true)),
         !!t &&
-          ((this.gameModel.persistentData.currentConstruction.shortfall = false),
+          ((this.gameModel.persistentData.currentConstruction.shortfall =
+            false),
           e.energy && (this.gameModel.energy -= e.energy),
           e.blood && (this.gameModel.persistentData.blood -= e.blood),
           e.brains && (this.gameModel.persistentData.brains -= e.brains),
@@ -5302,7 +5366,8 @@ var Incremancer;
     updateAutoUpgrades() {
       if (this.gameModel.autoUpgrades) {
         for (let e = 0; e < this.upgrades.length; e++)
-          this.upgrades[e].auto && this.purchaseUpgrade(this.upgrades[e], false);
+          this.upgrades[e].auto &&
+            this.purchaseUpgrade(this.upgrades[e], false);
         if (this.gameModel.constructions.factory)
           for (let e = 0; e < this.partFactory.generators.length; e++)
             this.partFactory.generators[e].auto &&
@@ -5706,7 +5771,11 @@ var Incremancer;
       const e = [];
       for (let t = 0; t < this.gameModel.persistentData.trophies.length; t++)
         e.push(
-          this.createTrophy(this.gameModel.persistentData.trophies[t], true, false)
+          this.createTrophy(
+            this.gameModel.persistentData.trophies[t],
+            true,
+            false
+          )
         );
       return e;
     }
@@ -6544,7 +6613,12 @@ var Incremancer;
           (!this.police[a].zombieTarget ||
             this.police[a].zombieTarget.flags.dead)
         ) {
-          const r = weighted_hybrid_distance(e.x, e.y, this.police[a].x, this.police[a].y);
+          const r = weighted_hybrid_distance(
+            e.x,
+            e.y,
+            this.police[a].x,
+            this.police[a].y
+          );
           r < s && ((t = this.police[a]), (s = r));
         }
       t &&
@@ -6579,8 +6653,12 @@ var Incremancer;
               this.changeState(e, ue.walking));
           break;
         case ue.walking:
-          weighted_hybrid_distance(e.position.x, e.position.y, e.target.x, e.target.y) <
-          this.moveTargetDistance
+          weighted_hybrid_distance(
+            e.position.x,
+            e.position.y,
+            e.target.x,
+            e.target.y
+          ) < this.moveTargetDistance
             ? ((e.target = false),
               (e.zombieTarget = null),
               (e.timer.standing = this.humans.randomSecondsToStand()),
@@ -6641,8 +6719,12 @@ var Incremancer;
             break;
           }
           (e.target = e.owner),
-            weighted_hybrid_distance(e.position.x, e.position.y, e.target.x, e.target.y) <
-            this.moveTargetDistance
+            weighted_hybrid_distance(
+              e.position.x,
+              e.position.y,
+              e.target.x,
+              e.target.y
+            ) < this.moveTargetDistance
               ? ((e.followTimer = 3 * Math.random()), e.gotoAndStop(0))
               : ((e.followTimer -= t),
                 e.followTimer < 0 && (e.play(), this.updateDogSpeed(e, t)));
@@ -6673,8 +6755,12 @@ var Incremancer;
             e.timer.scan < 0 &&
             (this.humans.scanForZombies(e, s),
             e.zombieTarget && (e.policeState = ue.attacking)),
-            weighted_hybrid_distance(e.position.x, e.position.y, e.target.x, e.target.y) <
-            this.moveTargetDistance
+            weighted_hybrid_distance(
+              e.position.x,
+              e.position.y,
+              e.target.x,
+              e.target.y
+            ) < this.moveTargetDistance
               ? ((e.target = {
                   x: Math.random() * P.x,
                   y: Math.random() * P.y,
@@ -6865,7 +6951,12 @@ var Incremancer;
       if (e.graveYardTarget || (e.zombieTarget && !e.zombieTarget.flags.dead)) {
         e.target =
           null !== (t = e.graveYardTarget) && void 0 !== t ? t : e.zombieTarget;
-        const s = weighted_hybrid_distance(e.position.x, e.position.y, e.target.x, e.target.y);
+        const s = weighted_hybrid_distance(
+          e.position.x,
+          e.position.y,
+          e.target.x,
+          e.target.y
+        );
         if (s > this.shootDistance && !e.rocketlauncher)
           return void this.changeState(e, pe.running);
         if (s > 1.2 * this.shootDistance && e.rocketlauncher)
@@ -6924,8 +7015,12 @@ var Incremancer;
               this.changeState(e, pe.walking));
           break;
         case pe.walking:
-          weighted_hybrid_distance(e.position.x, e.position.y, e.target.x, e.target.y) <
-          this.moveTargetDistance
+          weighted_hybrid_distance(
+            e.position.x,
+            e.position.y,
+            e.target.x,
+            e.target.y
+          ) < this.moveTargetDistance
             ? ((e.target = null),
               (e.zombieTarget = null),
               (e.timer.standing = this.humans.randomSecondsToStand()),
@@ -7234,8 +7329,12 @@ var Incremancer;
       ) {
         case ge.patrolling:
           e.target || (e.target = this.map.randomPositionInBuilding(null)),
-            weighted_hybrid_distance(e.position.x, e.position.y, e.target.x, e.target.y) <
-            this.moveTargetDistance
+            weighted_hybrid_distance(
+              e.position.x,
+              e.position.y,
+              e.target.x,
+              e.target.y
+            ) < this.moveTargetDistance
               ? ((e.target = false), (e.zombieTarget = null))
               : this.humans.updateHumanSpeed(e, t);
           break;
@@ -7294,8 +7393,12 @@ var Incremancer;
             null !== (t = e.graveYardTarget) && void 0 !== t
               ? t
               : e.zombieTarget),
-          weighted_hybrid_distance(e.position.x, e.position.y, e.target.x, e.target.y) >
-            this.shootDistance)
+          weighted_hybrid_distance(
+            e.position.x,
+            e.position.y,
+            e.target.x,
+            e.target.y
+          ) > this.shootDistance)
         )
           return void this.changeState(e, ge.attacking);
         this.changeState(e, ge.shooting);
@@ -8284,7 +8387,7 @@ var Incremancer;
         (this.graveyard = new Oe()),
         (this.exclamations = new it()),
         (this.bullets = new rt()),
-        (this.spells = new spells()),
+        (this.spells = new Spells()),
         (this.smoke = new ot()),
         (this.upgrades = new oe()),
         (this.humans = new Se()),
@@ -9745,7 +9848,9 @@ var Incremancer;
           e.boneList.push(i), (i.collector = true), (t = i.x), (s = i.y);
         }
       }
-      e.boneList.length > 0 ? (e.target = e.boneList.shift()) : (e.target = false);
+      e.boneList.length > 0
+        ? (e.target = e.boneList.shift())
+        : (e.target = false);
     }
     updateBoneCollector(e, t) {
       switch (
@@ -9942,8 +10047,7 @@ var Incremancer;
               this.model.isBossStage(this.model.level) &&
               this.tanks.aliveTanks.length > 0
             )
-              (e.target = sample(this.tanks.aliveTanks)),
-                (e.bomb.fire = true);
+              (e.target = sample(this.tanks.aliveTanks)), (e.bomb.fire = true);
             else {
               for (
                 let t = 0;
@@ -10220,7 +10324,8 @@ var Incremancer;
     }
     newPlagueSplatter(e, t) {
       if (this.container.visible)
-        for (let s = 0; s < this.partsPerSplatter; s++) this.newPart(e, t, true);
+        for (let s = 0; s < this.partsPerSplatter; s++)
+          this.newPart(e, t, true);
     }
   }
   class et extends J {
@@ -10505,7 +10610,9 @@ var Incremancer;
       if (this.sprites.length < this.maxParts)
         for (let e = 0; e < this.maxParts; e++) {
           const e = new at(this.texture);
-          (e.scale.x = e.scale.y = 2), (e.visible = false), this.sprites.push(e);
+          (e.scale.x = e.scale.y = 2),
+            (e.visible = false),
+            this.sprites.push(e);
         }
       this.discardedSprites = this.sprites.slice();
     }
@@ -10544,7 +10651,9 @@ var Incremancer;
           ? (e.alpha -= this.fadeSpeed * t * 0.4)
           : (e.alpha -= this.fadeSpeed * t),
         e.alpha < 0 &&
-          ((e.visible = false), this.discardedSprites.push(e), g.removeChild(e));
+          ((e.visible = false),
+          this.discardedSprites.push(e),
+          g.removeChild(e));
     }
     newBullet(e, t, s, i = false, a = false, r = false, n = false) {
       let o;
@@ -10831,7 +10940,7 @@ var Incremancer;
     ct = new Ae(),
     ut = new Ue(),
     pt = new ae(),
-    gt = new spells(),
+    gt = new Spells(),
     mt = "Golem Mastery",
     bt = "Zombie Mastery",
     ft = "Skeleton Mastery",
@@ -11139,14 +11248,15 @@ var Incremancer;
             factory = new Factory(),
             o = new ae(),
             h = new oe(),
-            l = new de(),
+            l = new de();
 
           function u() {
             const e = new Date().getTime();
             !(function (e, t) {
               this.model.update(e, t),
                 this.updateMessages(e),
-                this.sidePanels.factory && (this.factoryStats = factory.factoryStats());
+                this.sidePanels.factory &&
+                  (this.factoryStats = factory.factoryStats());
             })(Math.min(1e3, Math.max(e - this.lastUpdate, 0)) / 1e3, e),
               (this.lastUpdate = e);
           }
@@ -11154,7 +11264,7 @@ var Incremancer;
             (this.skeleton = function () {
               return i.persistent;
             }),
-            (this.spells = new spells()),
+            (this.spells = new Spells()),
             (this.keysPressed = Y),
             (this.files = []),
             (this.messageTimer = 4),
@@ -11191,7 +11301,8 @@ var Incremancer;
             (this.openSidePanel = function (e) {
               switch ((this.closeSidePanels(), e)) {
                 case "shop":
-                  this.filterShop(this.currentShopFilter), (this.sidePanels.shop = true);
+                  this.filterShop(this.currentShopFilter),
+                    (this.sidePanels.shop = true);
                   break;
                 case "construction":
                   this.filterConstruction(this.currentConstructionFilter),
@@ -11224,14 +11335,16 @@ var Incremancer;
                     (this.sidePanels.prestige = true);
                   break;
                 case "options":
-                  (this.sidePanels.options = true), this.model.downloadSaveGame();
+                  (this.sidePanels.options = true),
+                    this.model.downloadSaveGame();
               }
               this.sidePanels.open = true;
             }),
             (this.graveyardTabSelect = function (e) {
               (this.graveyardTab = e),
                 "trophies" == e &&
-                  ((this.trophies = l.getTrophyList()), (this.trophyTab = "all"));
+                  ((this.trophies = l.getTrophyList()),
+                  (this.trophyTab = "all"));
             }),
             (this.trophyTabSelect = function (e) {
               switch (((this.trophyTab = e), e)) {
@@ -11277,7 +11390,8 @@ var Incremancer;
             }),
             (this.maxBoneCollectors = function () {
               return Math.floor(
-                this.model.getEnergyRate() + this.model.persistentData.boneCollectors
+                this.model.getEnergyRate() +
+                  this.model.persistentData.boneCollectors
               );
             }),
             (this.setBoneCollectors = function (e) {
@@ -11314,7 +11428,8 @@ var Incremancer;
               changeFactoryTab(e) {
                 (this.factoryTab = e),
                   "parts" == e
-                    ? ((this.upgrades = factory.generators), this.updateDelays())
+                    ? ((this.upgrades = factory.generators),
+                      this.updateDelays())
                     : (this.upgrades = o.creatures);
               },
               buyGenerator(e) {
@@ -11329,7 +11444,8 @@ var Incremancer;
               creaturePercent(e) {
                 return Math.min(
                   Math.round(
-                    (this.model.persistentData.parts / this.creaturePrice(e)) * 100
+                    (this.model.persistentData.parts / this.creaturePrice(e)) *
+                      100
                   ),
                   100
                 );
@@ -11350,8 +11466,9 @@ var Incremancer;
                 return e.building
                   ? "Building..."
                   : this.creatureTooExpensive(e)
-                  ? formatWhole(this.creaturePrice(e) - this.model.persistentData.parts) +
-                    " parts required"
+                  ? formatWhole(
+                      this.creaturePrice(e) - this.model.persistentData.parts
+                    ) + " parts required"
                   : "Build (" + formatWhole(this.creaturePrice(e)) + " parts)";
               },
               creatureLevelButtonText(e) {
@@ -11362,7 +11479,8 @@ var Incremancer;
                       formatWhole(this.creatureLevelPrice(e)) +
                       " parts)"
                   : formatWhole(
-                      this.creatureLevelPrice(e) - this.model.persistentData.parts
+                      this.creatureLevelPrice(e) -
+                        this.model.persistentData.parts
                     ) + " parts required";
               },
               canBuildCreature(e) {
@@ -11403,7 +11521,8 @@ var Incremancer;
               levels: [],
               levelRanges: [],
               start: 1,
-              showButton: () => this.model.persistentData.allTimeHighestLevel > 1,
+              showButton: () =>
+                this.model.persistentData.allTimeHighestLevel > 1,
               show() {
                 this.shown
                   ? (this.shown = false)
@@ -11534,11 +11653,15 @@ var Incremancer;
                   return "+" + e.effect + " bone collector capacity";
                 case h.types.zombieDmgPC:
                   return (
-                    "+" + formatWhole(Math.round(100 * e.effect)) + "% zombie damage"
+                    "+" +
+                    formatWhole(Math.round(100 * e.effect)) +
+                    "% zombie damage"
                   );
                 case h.types.zombieHealthPC:
                   return (
-                    "+" + formatWhole(Math.round(100 * e.effect)) + "% zombie health"
+                    "+" +
+                    formatWhole(Math.round(100 * e.effect)) +
+                    "% zombie health"
                   );
                 case h.types.bonesRate:
                   return "+" + e.effect + " bones per second";
@@ -11580,7 +11703,9 @@ var Incremancer;
               return "";
             }),
             (this.currentRank = function (e) {
-              return this.sidePanels.factory ? factory.currentRank(e) : h.currentRank(e);
+              return this.sidePanels.factory
+                ? factory.currentRank(e)
+                : h.currentRank(e);
             }),
             (this.currentRankConstruction = function (e) {
               return h.currentRankConstruction(e);
@@ -11595,28 +11720,35 @@ var Incremancer;
               const t = this.upgradePrice(e);
               switch (e.costType) {
                 case h.costs.energy:
-                  return formatWhole(t - this.model.energy) + " energy required";
+                  return (
+                    formatWhole(t - this.model.energy) + " energy required"
+                  );
                 case h.costs.blood:
                 case factory.costs.blood:
                   return (
-                    formatWhole(t - this.model.persistentData.blood) + " blood required"
+                    formatWhole(t - this.model.persistentData.blood) +
+                    " blood required"
                   );
                 case h.costs.brains:
                   return (
-                    formatWhole(t - this.model.persistentData.brains) + " brains required"
+                    formatWhole(t - this.model.persistentData.brains) +
+                    " brains required"
                   );
                 case h.costs.bones:
                   return (
-                    formatWhole(t - this.model.persistentData.bones) + " bones required"
+                    formatWhole(t - this.model.persistentData.bones) +
+                    " bones required"
                   );
                 case h.costs.prestigePoints:
                   return (
-                    formatWhole(t - this.model.persistentData.prestigePointsToSpend) +
-                    " prestige points required"
+                    formatWhole(
+                      t - this.model.persistentData.prestigePointsToSpend
+                    ) + " prestige points required"
                   );
                 case factory.costs.parts:
                   return (
-                    formatWhole(t - this.model.persistentData.parts) + " parts required"
+                    formatWhole(t - this.model.persistentData.parts) +
+                    " parts required"
                   );
               }
             }),
@@ -11628,7 +11760,9 @@ var Incremancer;
                     "Purchase " +
                     maxAffordableUpgrades +
                     " (" +
-                    formatWhole(factory.upgradeMaxPrice(e, maxAffordableUpgrades)) +
+                    formatWhole(
+                      factory.upgradeMaxPrice(e, maxAffordableUpgrades)
+                    ) +
                     " " +
                     this.costTranslate(e.costType) +
                     ")"
@@ -11713,7 +11847,8 @@ var Incremancer;
               this.model.centerGameContainer(true);
             }),
             (this.toggleShowFps = function () {
-              this.model.persistentData.showfps = !this.model.persistentData.showfps;
+              this.model.persistentData.showfps =
+                !this.model.persistentData.showfps;
             }),
             (this.toggleParticles = function () {
               this.model.persistentData.particles =
@@ -11748,7 +11883,8 @@ var Incremancer;
             (this.updateMessages = function (e) {
               this.message
                 ? ((this.messageTimer -= e),
-                  this.model.messageQueue.length > 0 && (this.messageTimer -= e),
+                  this.model.messageQueue.length > 0 &&
+                    (this.messageTimer -= e),
                   this.messageTimer < 0 &&
                     ((this.message = false), (this.messageTimer = 4)))
                 : this.model.messageQueue.length > 0 &&
@@ -11790,7 +11926,9 @@ var Incremancer;
               return 100 * h.shatterEffect();
             }),
             (this.infuseButtonText = function () {
-              return this.infusionMax ? "Max" : formatWhole(this.infusionAmount);
+              return this.infusionMax
+                ? "Max"
+                : formatWhole(this.infusionAmount);
             }),
             (this.energyPercent = function () {
               return Math.min(
@@ -11809,7 +11947,8 @@ var Incremancer;
             (this.brainsPercent = function () {
               return Math.min(
                 Math.round(
-                  (this.model.persistentData.brains / this.model.brainsMax) * 100
+                  (this.model.persistentData.brains / this.model.brainsMax) *
+                    100
                 ),
                 100
               );
@@ -11820,7 +11959,8 @@ var Incremancer;
                   if (t > this.model.bloodMax) return "Blood capacity too low";
                   break;
                 case "brains":
-                  if (t > this.model.brainsMax) return "Brains capacity too low";
+                  if (t > this.model.brainsMax)
+                    return "Brains capacity too low";
               }
               return false;
             }),
