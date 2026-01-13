@@ -1,0 +1,7 @@
+a ? b() : c ? d() : e()	->
+if (a) b(); else if (c) d(); else e();
+
+cond ? (x=1, y=2) : z=3	->
+if (cond) { x=1; y=2; } else { z=3; }
+
+a && b() -> if (a) b();
