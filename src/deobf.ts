@@ -1832,7 +1832,7 @@ var Incremancer;
       }
       return true;
     }
-    
+
     populateTrees() {
       if (this.treeSprites.length > 0) {
         for (let e = 0; e < this.treeSprites.length; e++) {
@@ -1847,36 +1847,36 @@ var Incremancer;
         this.armyTextures.push(PIXI.Texture.from("sandbags.png"));
       }
       let e = Math.round(P.x / 50);
-    
+
       if (this.gameModel.isBossStage(this.gameModel.level)) {
         e = Math.round(1.5 * e);
       }
-    
+
       let t = 0;
-    
+
       while (e > 0) {
         let s;
         let i = false;
         let r = 1000; /* 1e3 */
         const n = 8;
         const o = 2;
-    
+
         while (!i && r > 0) {
           r--;
-    
+
           s = {
             x: n + Math.random() * (P.x - 2 * n),
             y: n + Math.random() * (P.y - 2 * n),
             width: o,
             height: o,
           };
-    
+
           i = this.isValidTreePosition(s);
         }
-    
+
         if (i) {
           let e = 0.4 + 0.6 * Math.random();
-    
+
           if (this.gameModel.constructions.graveyard) {
             e = Math.min(
               (this.fastDistance(
@@ -1890,23 +1890,23 @@ var Incremancer;
               1
             );
           }
-    
+
           let i;
-    
+
           let r =
             this.treeTextures[
               this.treeTextures.length -
                 1 -
                 Math.round((this.treeTextures.length - 1) * e)
             ];
-    
+
           if (
             this.gameModel.isBossStage(this.gameModel.level) &&
             Math.random() > 0.7
           ) {
             r = sample(this.armyTextures);
           }
-    
+
           if (this.treeSprites.length > t) {
             i = this.treeSprites[t];
             i.texture = r;
@@ -1916,7 +1916,7 @@ var Incremancer;
             this.treeSprites.push(i);
             g.addChild(i);
           }
-    
+
           t++;
           i.anchor.set(0.5, 1);
           i.x = s.x;
@@ -1929,7 +1929,6 @@ var Incremancer;
         e--;
       }
     }
-    
   }
   class te {
     constructor() {
@@ -1939,19 +1938,19 @@ var Incremancer;
       this.validY = 0;
     }
   }
-  
+
   class PartFactory {
     constructor() {
       this.storm = false;
       this.gameModel = GameModel.getInstance();
-  
+
       this.costs = {
         blood: "blood",
         parts: "parts",
       };
-  
+
       this.generatorsApplied = [];
-  
+
       this.generators = [
         new ie(
           1,
@@ -2014,11 +2013,11 @@ var Incremancer;
           "An astounding contraption that produces 512 parts every 12 seconds"
         ),
       ];
-  
+
       if (PartFactory.instance) {
         return PartFactory.instance;
       }
-  
+
       PartFactory.instance = this;
     }
     factoryStats() {
@@ -2036,13 +2035,13 @@ var Incremancer;
     update(e) {
       for (let t = 0; t < this.generatorsApplied.length; t++) {
         this.generatorsApplied[t].timeLeft -= e;
-  
+
         if (this.generatorsApplied[t].timeLeft <= 0) {
-          (this.generatorsApplied[t].timeLeft = this.generatorsApplied[t].time),
-            (this.gameModel.persistentData.parts +=
-              this.generatorsApplied[t].total *
-              this.gameModel.partsPCMod *
-              (this.storm ? 2 : 1));
+          this.generatorsApplied[t].timeLeft = this.generatorsApplied[t].time;
+          this.gameModel.persistentData.parts +=
+            this.generatorsApplied[t].total *
+            this.gameModel.partsPCMod *
+            (this.storm ? 2 : 1);
         }
       }
     }
@@ -2050,7 +2049,8 @@ var Incremancer;
       let t = 0;
       for (let s = 0; s < this.generatorsApplied.length; s++) {
         t +=
-          this.generatorsApplied[s].total * (e / this.generatorsApplied[s].time);
+          this.generatorsApplied[s].total *
+          (e / this.generatorsApplied[s].time);
       }
       return t * this.gameModel.partsPCMod;
     }
@@ -2060,7 +2060,7 @@ var Incremancer;
           return s.rank;
         }
       }
-  
+
       return 0;
     }
     purchasePrice(e) {
@@ -2119,36 +2119,37 @@ var Incremancer;
           t++
         ) {
           if (e.id == this.gameModel.persistentData.generators[t].id) {
-            (s = this.gameModel.persistentData.generators[t]), s.rank++;
+            s = this.gameModel.persistentData.generators[t];
+            s.rank++;
           }
         }
-  
+
         if (!s) {
           this.gameModel.persistentData.generators.push({
             id: e.id,
             rank: 1,
           });
         }
-  
+
         if (t) {
           this.gameModel.saveData();
         }
-  
+
         this.applyGenerators();
       }
     }
+
     applyGenerator(e, t) {
       let s = false;
       for (let i = 0; i < this.generatorsApplied.length; i++) {
         if (this.generatorsApplied[i].id == e.id) {
-          (s = true),
-            (this.generatorsApplied[i].rank = t),
-            (this.generatorsApplied[i].total =
-              this.generatorsApplied[i].produces *
-              this.generatorsApplied[i].rank);
+          s = true;
+          this.generatorsApplied[i].rank = t;
+          this.generatorsApplied[i].total =
+            this.generatorsApplied[i].produces * this.generatorsApplied[i].rank;
         }
       }
-  
+
       if (!s) {
         this.generatorsApplied.push({
           id: e.id,
@@ -2160,107 +2161,121 @@ var Incremancer;
         });
       }
     }
+
     applyGenerators() {
       for (let e = 0; e < this.generators.length; e++) {
         const t = this.currentRank(this.generators[e]);
-  
+
         if (t > 0) {
           this.applyGenerator(this.generators[e], t);
         }
       }
     }
   }
-  
+
   class ie {
     constructor(e, t, s, i, a, r, n, o) {
-      (this.id = e),
-        (this.name = t),
-        (this.costType = s),
-        (this.basePrice = i),
-        (this.multi = a),
-        (this.produces = r),
-        (this.time = n),
-        (this.description = o),
-        (this.cap = 0);
+      this.id = e;
+      this.name = t;
+      this.costType = s;
+      this.basePrice = i;
+      this.multi = a;
+      this.produces = r;
+      this.time = n;
+      this.description = o;
+      this.cap = 0;
     }
   }
+
   class CreatureFactory {
     constructor() {
-      if (
-        ((this.gameModel = GameModel.getInstance()),
-        (this.spawnedSavedCreatures = false),
-        (this.types = {
-          earthGolem: 1,
-          airGolem: 2,
-          fireGolem: 3,
-          waterGolem: 4,
-        }),
-        (this.creatures = [
-          new re(
-            1,
-            this.types.earthGolem,
-            "Earth Golem",
-            3e3,
-            75,
-            30,
-            800,
-            "A golem born from rocks and mud, able to take a lot of punishment and taunt enemies to attack it"
-          ),
-          new re(
-            2,
-            this.types.airGolem,
-            "Air Golem",
-            1200,
-            110,
-            45,
-            900,
-            "A fast moving golem able to cover large distances and chase targets down"
-          ),
-          new re(
-            3,
-            this.types.fireGolem,
-            "Fire Golem",
-            1200,
-            130,
-            32,
-            1e3,
-            "A fireball spewing golem that ignites everything it touches"
-          ),
-          new re(
-            4,
-            this.types.waterGolem,
-            "Water Golem",
-            1500,
-            90,
-            30,
-            1100,
-            "A calming golem that restores health to nearby units"
-          ),
-        ]),
-        (this.creatureScaling = 1.75),
-        (this.creatureCostScaling = 1.9),
-        (this.creatureCostReduction = 1),
-        CreatureFactory.instance)
-      )
+      this.gameModel = GameModel.getInstance();
+      this.spawnedSavedCreatures = false;
+
+      this.types = {
+        earthGolem: 1,
+        airGolem: 2,
+        fireGolem: 3,
+        waterGolem: 4,
+      };
+
+      this.creatures = [
+        new Golem(
+          1,
+          this.types.earthGolem,
+          "Earth Golem",
+          3000 /* 3e3 */,
+          75,
+          30,
+          800,
+          "A golem born from rocks and mud, able to take a lot of punishment and taunt enemies to attack it"
+        ),
+        new Golem(
+          2,
+          this.types.airGolem,
+          "Air Golem",
+          1200,
+          110,
+          45,
+          900,
+          "A fast moving golem able to cover large distances and chase targets down"
+        ),
+        new Golem(
+          3,
+          this.types.fireGolem,
+          "Fire Golem",
+          1200,
+          130,
+          32,
+          1000 /* 1e3 */,
+          "A fireball spewing golem that ignites everything it touches"
+        ),
+        new Golem(
+          4,
+          this.types.waterGolem,
+          "Water Golem",
+          1500,
+          90,
+          30,
+          1100,
+          "A calming golem that restores health to nearby units"
+        ),
+      ];
+
+      this.creatureScaling = 1.75;
+      this.creatureCostScaling = 1.9;
+      this.creatureCostReduction = 1;
+
+      if (CreatureFactory.instance) {
         return CreatureFactory.instance;
+      }
+
       CreatureFactory.instance = this;
     }
     update(e) {
       const t = new Creatures().creatureCount;
-      for (let s = 0; s < this.creatures.length; s++)
-        this.creatures[s].building
-          ? ((this.creatures[s].timeLeft -= e),
-            this.creatures[s].timeLeft < 0 &&
-              (this.spawnCreature(this.creatures[s]),
-              (this.creatures[s].building = false)))
-          : void 0 !== t[this.creatures[s].type] &&
-            t[this.creatures[s].type] < this.creatures[s].autobuild &&
-            this.startBuilding(this.creatures[s]),
-          this.gameModel.persistentData.creatureLevels[this.creatures[s].id] &&
-            (this.creatures[s].level =
-              this.gameModel.persistentData.creatureLevels[
-                this.creatures[s].id
-              ]);
+      for (let s = 0; s < this.creatures.length; s++) {
+        if (this.creatures[s].building) {
+          this.creatures[s].timeLeft -= e;
+
+          if (this.creatures[s].timeLeft < 0) {
+            this.spawnCreature(this.creatures[s]),
+              (this.creatures[s].building = false);
+          }
+        } else if (
+          t[this.creatures[s].type] !== undefined &&
+          t[this.creatures[s].type] < this.creatures[s].autobuild
+        ) {
+          this.startBuilding(this.creatures[s]);
+        }
+
+        if (
+          this.gameModel.persistentData.creatureLevels[this.creatures[s].id]
+        ) {
+          this.creatures[s].level =
+            this.gameModel.persistentData.creatureLevels[this.creatures[s].id];
+        }
+      }
     }
     refundParts(e, t) {
       this.gameModel.persistentData.parts += e.price * t;
@@ -2268,69 +2283,90 @@ var Incremancer;
     purchasePrice(e) {
       return (
         e.baseCost *
-        Math.pow(this.creatureCostScaling, e.level - 1) *
+        this.creatureCostScaling ** (e.level - 1) *
         this.creatureCostReduction
       );
     }
     levelPrice(e) {
       return (
         e.baseCost *
-        Math.pow(this.creatureCostScaling, e.level) *
+        this.creatureCostScaling ** e.level *
         5 *
         this.creatureCostReduction
       );
     }
     levelCreature(e) {
-      this.levelPrice(e) < this.gameModel.persistentData.parts &&
-        ((this.gameModel.persistentData.parts -= this.levelPrice(e)),
-        e.level++,
-        (this.gameModel.persistentData.creatureLevels[e.id] = e.level));
+      if (this.levelPrice(e) < this.gameModel.persistentData.parts) {
+        this.gameModel.persistentData.parts -= this.levelPrice(e);
+        e.level++;
+        this.gameModel.persistentData.creatureLevels[e.id] = e.level;
+      }
     }
     canAffordCreature(e) {
       return this.purchasePrice(e) < this.gameModel.persistentData.parts;
     }
     creaturesBuildingCount() {
       let e = 0;
-      for (let t = 0; t < this.creatures.length; t++)
-        this.creatures[t].building && e++;
+      for (let t = 0; t < this.creatures.length; t++) {
+        if (this.creatures[t].building) {
+          e++;
+        }
+      }
       return e;
     }
     startBuilding(e) {
-      e.building ||
-        (this.canAffordCreature(e) &&
-          (this.creaturesBuildingCount() + this.gameModel.creatureCount >=
-            this.gameModel.creatureLimit ||
-            ((e.building = true),
-            (e.timeLeft = e.time),
-            (this.gameModel.persistentData.parts -= this.purchasePrice(e)))));
+      if (
+        !e.building &&
+        this.canAffordCreature(e) &&
+        this.creaturesBuildingCount() + this.gameModel.creatureCount <
+          this.gameModel.creatureLimit
+      ) {
+        e.building = true;
+        e.timeLeft = e.time;
+        this.gameModel.persistentData.parts -= this.purchasePrice(e);
+      }
     }
+
     creatureAutoBuildNumber(e, t) {
-      e.autobuild + t >= 0 &&
-        ((e.autobuild += t),
-        (this.gameModel.persistentData.creatureAutobuild[e.id] = e.autobuild));
+      if (e.autobuild + t >= 0) {
+        e.autobuild += t;
+        this.gameModel.persistentData.creatureAutobuild[e.id] = e.autobuild;
+      }
     }
     updateAutoBuild() {
-      for (let e = 0; e < this.creatures.length; e++)
+      for (let e = 0; e < this.creatures.length; e++) {
         this.creatures[e].autobuild =
           this.gameModel.persistentData.creatureAutobuild[
             this.creatures[e].id
           ] || 0;
+      }
     }
     resetLevels() {
-      for (let e = 0; e < this.creatures.length; e++)
+      for (let e = 0; e < this.creatures.length; e++) {
         this.creatures[e].level = 1;
+      }
     }
     spawnCreature(e) {
-      const t = new Creatures(),
-        s =
-          e.baseHealth *
-          Math.pow(this.creatureScaling, e.level - 1) *
-          this.gameModel.golemHealthPCMod,
-        i =
-          e.baseDamage *
-          Math.pow(this.creatureScaling, e.level - 1) *
-          this.gameModel.golemDamagePCMod;
-      t.spawnCreature(s, i, e.speed, e.type, e.level, this.purchasePrice(e));
+      const creatures = new Creatures();
+
+      const health =
+        e.baseHealth *
+        this.creatureScaling ** (e.level - 1) *
+        this.gameModel.golemHealthPCMod;
+
+      const damage =
+        e.baseDamage *
+        this.creatureScaling ** (e.level - 1) *
+        this.gameModel.golemDamagePCMod;
+
+      creatures.spawnCreature(
+        health,
+        damage,
+        e.speed,
+        e.type,
+        e.level,
+        this.purchasePrice(e)
+      );
     }
     spawnSavedCreatures() {
       if (!this.spawnedSavedCreatures) {
@@ -2339,12 +2375,18 @@ var Incremancer;
           let t = 0;
           t < this.gameModel.persistentData.savedCreatures.length;
           t++
-        )
-          if ((e++, e <= this.gameModel.creatureLimit)) {
-            const e = this.gameModel.persistentData.savedCreatures[t],
-              s = this.creatures.filter((t) => t.type == e.t)[0];
-            (s.level = e.l), this.spawnCreature(s);
+        ) {
+          e++;
+
+          if (e <= this.gameModel.creatureLimit) {
+            const e = this.gameModel.persistentData.savedCreatures[t];
+
+            const s = this.creatures.filter((t) => t.type == e.t)[0];
+
+            s.level = e.l;
+            this.spawnCreature(s);
           }
+        }
         this.spawnedSavedCreatures = true;
       }
     }
@@ -2354,46 +2396,66 @@ var Incremancer;
           level: e.level,
           health:
             e.baseHealth *
-            Math.pow(this.creatureScaling, e.level - 1) *
+            this.creatureScaling ** (e.level - 1) *
             this.gameModel.golemHealthPCMod,
           damage:
             e.baseDamage *
-            Math.pow(this.creatureScaling, e.level - 1) *
+            this.creatureScaling ** (e.level - 1) *
             this.gameModel.golemDamagePCMod,
-          cost: e.baseCost * Math.pow(this.creatureCostScaling, e.level - 1),
+          cost: e.baseCost * this.creatureCostScaling ** (e.level - 1),
         },
         nextLevel: {
           level: e.level + 1,
           health:
             e.baseHealth *
-            Math.pow(this.creatureScaling, e.level) *
+            this.creatureScaling ** e.level *
             this.gameModel.golemHealthPCMod,
           damage:
             e.baseDamage *
-            Math.pow(this.creatureScaling, e.level) *
+            this.creatureScaling ** e.level *
             this.gameModel.golemDamagePCMod,
-          cost: e.baseCost * Math.pow(this.creatureCostScaling, e.level),
+          cost: e.baseCost * this.creatureCostScaling ** e.level,
         },
       };
     }
   }
-  class re {
-    constructor(e, t, s, i, a, r, n, o) {
-      (this.id = e),
-        (this.type = t),
-        (this.name = s),
-        (this.baseHealth = i),
-        (this.baseDamage = a),
-        (this.speed = r),
-        (this.baseCost = n),
-        (this.description = o),
-        (this.time = 3),
-        (this.building = false),
-        (this.timeLeft = 10),
-        (this.autobuild = 0),
-        (this.level = 1);
+
+  class Golem {
+    id: number;
+    /** {@link CreatureFactory.types} Enum*/
+    type: number;
+    name: string;
+    baseHealth: number;
+    baseDamage: number;
+    speed: number;
+    baseCost: number;
+    description: string;
+    constructor(
+      id: number,
+      type: number,
+      name: string,
+      baseHealth: number,
+      baseDamage: number,
+      speed: number,
+      baseCost: number,
+      description: string
+    ) {
+      this.id = id;
+      this.type = type;
+      this.name = name;
+      this.baseHealth = baseHealth;
+      this.baseDamage = baseDamage;
+      this.speed = speed;
+      this.baseCost = baseCost;
+      this.description = description;
+      this.time = 3;
+      this.building = false;
+      this.timeLeft = 10;
+      this.autobuild = 0;
+      this.level = 1;
     }
   }
+
   class GameModel {
     constructor() {
       this.storageName = "ZombieData";
@@ -2668,39 +2730,63 @@ var Incremancer;
       if (isNaN(this.persistentData.blood)) {
         this.persistentData.blood = 0;
       }
-      isNaN(e) ||
-        ((this.persistentData.blood += e * this.bloodPCMod),
-        this.persistentData.blood > this.bloodMax &&
-          ((this.persistentData.blood = this.bloodMax),
-          this.constructions.runesmith &&
-            this.runicSyphon.percentage > 0 &&
-            (this.runicSyphon.blood += e * this.bloodPCMod)),
-        this.runicSyphon.percentage > 0 &&
-          (this.runicSyphon.blood +=
-            e * this.bloodPCMod * this.runicSyphon.percentage));
+
+      if (!isNaN(e)) {
+        this.persistentData.blood += e * this.bloodPCMod;
+
+        if (this.persistentData.blood > this.bloodMax) {
+          this.persistentData.blood = this.bloodMax;
+
+          if (this.constructions.runesmith && this.runicSyphon.percentage > 0) {
+            this.runicSyphon.blood += e * this.bloodPCMod;
+          }
+        }
+
+        if (this.runicSyphon.percentage > 0) {
+          this.runicSyphon.blood +=
+            e * this.bloodPCMod * this.runicSyphon.percentage;
+        }
+      }
     }
+
     addBrains(e) {
-      isNaN(this.persistentData.brains) && (this.persistentData.brains = 0),
-        isNaN(e) ||
-          ((this.persistentData.brains += e * this.brainsPCMod),
-          this.persistentData.brains > this.brainsMax &&
-            ((this.persistentData.brains = this.brainsMax),
+      if (isNaN(this.persistentData.brains)) {
+        this.persistentData.brains = 0;
+      }
+
+      if (!isNaN(e)) {
+        this.persistentData.brains += e * this.brainsPCMod;
+
+        if (this.persistentData.brains > this.brainsMax) {
+          (this.persistentData.brains = this.brainsMax),
             this.constructions.runesmith &&
               this.runicSyphon.percentage > 0 &&
-              (this.runicSyphon.brains += e * this.brainsPCMod)),
-          this.runicSyphon.percentage > 0 &&
-            (this.runicSyphon.brains +=
-              e * this.brainsPCMod * this.runicSyphon.percentage));
+              (this.runicSyphon.brains += e * this.brainsPCMod);
+        }
+
+        if (this.runicSyphon.percentage > 0) {
+          this.runicSyphon.brains +=
+            e * this.brainsPCMod * this.runicSyphon.percentage;
+        }
+      }
     }
+
     addBones(e) {
-      isNaN(this.persistentData.bones) && (this.persistentData.bones = 0),
-        isNaN(e) ||
-          ((this.persistentData.bones += e * this.bonesPCMod),
-          (this.persistentData.bonesTotal += e * this.bonesPCMod),
-          this.runicSyphon.percentage > 0 &&
-            (this.runicSyphon.bones +=
-              e * this.bonesPCMod * this.runicSyphon.percentage));
+      if (isNaN(this.persistentData.bones)) {
+        this.persistentData.bones = 0;
+      }
+
+      if (!isNaN(e)) {
+        this.persistentData.bones += e * this.bonesPCMod;
+        this.persistentData.bonesTotal += e * this.bonesPCMod;
+
+        if (this.runicSyphon.percentage > 0) {
+          this.runicSyphon.bones +=
+            e * this.bonesPCMod * this.runicSyphon.percentage;
+        }
+      }
     }
+
     getHumanCount() {
       return this.humanCount;
     }
@@ -2720,92 +2806,152 @@ var Incremancer;
       ) {
         this.startTimer = 0;
       }
-      this.spells.updateSpells(e),
-        (e *= this.gameSpeed),
-        this.hidden && U(e, this.app),
-        this.partFactory.update(e),
-        this.autoRemoveCollectorsHarpies(),
-        this.addEnergy(this.getEnergyRate() * e),
-        this.currentState == this.states.playingLevel &&
-          (this.addBones(this.bonesRate * e),
-          this.addBrains(this.brainsRate * e),
-          this.upgrades.updateRunicSyphon(this.runicSyphon),
-          this.lastSave + 3e4 < t && (this.saveData(), (this.lastSave = t)),
-          this.lastPlayFabSave + 12e5 < t && this.saveToPlayFab(),
-          this.getHumanCount() <= 0 &&
-            (this.endLevelTimer < 0
-              ? (this.isBossStage(this.level) &&
-                  this.trophies.doesLevelHaveTrophy(this.level) &&
-                  this.trophies.trophyAquired(this.level),
-                (this.prestigePointsEarned = this.prestigePointsForLevel(
-                  this.level
-                )),
-                (this.currentState = this.states.levelCompleted),
-                (this.levelResourcesAdded = false),
-                this.calculateEndLevelBones(),
-                this.calculateEndLevelZombieCages(),
-                this.persistentData.levelsCompleted.includes(this.level) ||
-                  (this.addPrestigePoints(
-                    this.prestigePointsForLevel(this.level)
-                  ),
-                  this.persistentData.levelsCompleted.push(this.level)),
-                (this.persistentData.levelUnlocked = this.level + 1),
-                (!this.persistentData.allTimeHighestLevel ||
-                  this.level > this.persistentData.allTimeHighestLevel) &&
-                  ((this.persistentData.allTimeHighestLevel = this.level),
-                  window.kongregate &&
-                    window.kongregate.stats.submit(
-                      "level",
-                      this.persistentData.allTimeHighestLevel
-                    )))
-              : (this.endLevelTimer -= e)),
-          this.upgrades.updateConstruction(e),
-          this.upgrades.updateAutoUpgrades(),
-          this.creatureFactory.update(e)),
-        this.currentState == this.states.levelCompleted &&
-          (this.startTimer -= e);
-      this.startTimer < 0 &&
-        this.persistentData.autoStart &&
+      this.spells.updateSpells(e);
+      e *= this.gameSpeed;
+
+      if (this.hidden) {
+        U(e, this.app);
+      }
+
+      this.partFactory.update(e);
+      this.autoRemoveCollectorsHarpies();
+      this.addEnergy(this.getEnergyRate() * e);
+
+      if (this.currentState == this.states.playingLevel) {
+        this.addBones(this.bonesRate * e);
+        this.addBrains(this.brainsRate * e);
+        this.upgrades.updateRunicSyphon(this.runicSyphon);
+
+        if (this.lastSave + 30000 /* 3e4 */ < t) {
+          this.saveData();
+          this.lastSave = t;
+        }
+
+        if (this.lastPlayFabSave + 1200000 /* 12e5 */ < t) {
+          this.saveToPlayFab();
+        }
+
+        if (this.getHumanCount() <= 0) {
+          if (this.endLevelTimer < 0) {
+            if (
+              this.isBossStage(this.level) &&
+              this.trophies.doesLevelHaveTrophy(this.level)
+            ) {
+              this.trophies.trophyAquired(this.level);
+            }
+
+            this.prestigePointsEarned = this.prestigePointsForLevel(this.level);
+            this.currentState = this.states.levelCompleted;
+            this.levelResourcesAdded = false;
+            this.calculateEndLevelBones();
+            this.calculateEndLevelZombieCages();
+
+            if (!this.persistentData.levelsCompleted.includes(this.level)) {
+              this.addPrestigePoints(this.prestigePointsForLevel(this.level));
+              this.persistentData.levelsCompleted.push(this.level);
+            }
+
+            this.persistentData.levelUnlocked = this.level + 1;
+
+            if (
+              !this.persistentData.allTimeHighestLevel ||
+              this.level > this.persistentData.allTimeHighestLevel
+            ) {
+              this.persistentData.allTimeHighestLevel = this.level;
+
+              if (window.kongregate) {
+                window.kongregate.stats.submit(
+                  "level",
+                  this.persistentData.allTimeHighestLevel
+                );
+              }
+            }
+          } else {
+            this.endLevelTimer -= e;
+          }
+        }
+
+        this.upgrades.updateConstruction(e);
+        this.upgrades.updateAutoUpgrades();
+        this.creatureFactory.update(e);
+      }
+
+      if (this.currentState == this.states.levelCompleted) {
+        this.startTimer -= e;
+      }
+
+      if (this.startTimer < 0 && this.persistentData.autoStart) {
         this.startLevel(this.level);
-      this.currentState == this.states.levelCompleted &&
-        this.startTimer < 0 &&
-        this.nextLevel(),
-        this.currentState == this.states.failed &&
-          ((this.startTimer -= e),
-          this.startTimer < 0 &&
-            this.persistentData.autoStart &&
-            this.startLevel(this.level)),
-        this.currentState == this.states.failed &&
-          ((this.startTimer -= e),
-          this.startTimer < 0 && this.startLevel(this.level - 1)),
-        this.updateStats();
+      }
+
+      if (
+        this.currentState == this.states.levelCompleted &&
+        this.startTimer < 0
+      ) {
+        this.nextLevel();
+      }
+
+      if (this.currentState == this.states.failed) {
+        this.startTimer -= e;
+
+        if (this.startTimer < 0 && this.persistentData.autoStart) {
+          this.startLevel(this.level);
+        }
+      }
+
+      if (this.currentState == this.states.failed) {
+        this.startTimer -= e;
+
+        if (this.startTimer < 0) {
+          this.startLevel(this.level - 1);
+        }
+      }
+
+      this.updateStats();
     }
+
     calculateEndLevelBones() {
-      (this.endLevelBones = 0),
-        this.persistentData.boneCollectors > 0 &&
-          this.bones.uncollected &&
-          ((this.endLevelBones = this.bones.uncollected
-            .map((e) => e.value)
-            .reduce((e, t) => e + t, 0)),
-          this.addBones(this.endLevelBones));
+      this.endLevelBones = 0;
+
+      if (this.persistentData.boneCollectors > 0 && this.bones.uncollected) {
+        (this.endLevelBones = this.bones.uncollected
+          .map((e) => e.value)
+          .reduce((e, t) => e + t, 0)),
+          this.addBones(this.endLevelBones);
+      }
     }
+
     calculateEndLevelZombieCages() {
-      this.zombieCages > 0 &&
-        ((this.zombiesInCages += this.zombieCount),
-        this.zombiesInCages > this.zombieCages &&
-          (this.zombiesInCages = this.zombieCages));
+      if (this.zombieCages > 0) {
+        this.zombiesInCages += this.zombieCount;
+
+        if (this.zombiesInCages > this.zombieCages) {
+          this.zombiesInCages = this.zombieCages;
+        }
+      }
     }
+
     autoRemoveCollectorsHarpies() {
       if (this.getEnergyRate() < 0) {
         const e = this.getEnergyRate();
-        this.persistentData.harpies > 0 &&
-          ((this.persistentData.harpies -= Math.ceil(Math.abs(e))),
-          this.persistentData.harpies < 0 && (this.persistentData.harpies = 0)),
+
+        if (this.persistentData.harpies > 0) {
+          this.persistentData.harpies -= Math.ceil(Math.abs(e));
+
+          if (this.persistentData.harpies < 0) {
+            this.persistentData.harpies = 0;
+          }
+        }
+
+        if (
           this.getEnergyRate() < 0 &&
-            this.persistentData.boneCollectors > 0 &&
-            this.persistentData.boneCollectors--;
+          this.persistentData.boneCollectors > 0
+        ) {
+          this.persistentData.boneCollectors--;
+        }
       }
     }
+
     releaseCagedZombies() {
       if (this.currentState == this.states.playingLevel) {
         for (let e = 0; e < this.zombiesInCages; e++)
@@ -2817,11 +2963,12 @@ var Incremancer;
       }
     }
     sacrificeCagedZombies() {
-      this.addBlood(this.cagedZombieSacrificeValue().blood),
-        this.addBrains(this.cagedZombieSacrificeValue().brains),
-        this.addBones(this.cagedZombieSacrificeValue().bones),
-        (this.zombiesInCages = 0);
+      this.addBlood(this.cagedZombieSacrificeValue().blood);
+      this.addBrains(this.cagedZombieSacrificeValue().brains);
+      this.addBones(this.cagedZombieSacrificeValue().bones);
+      this.zombiesInCages = 0;
     }
+
     cagedZombieSacrificeValue() {
       return {
         blood: this.zombiesInCages * this.zombieHealth * 0.5,
@@ -2831,42 +2978,54 @@ var Incremancer;
     }
     setMaxHarpies() {
       let e = Math.floor(this.getEnergyRate() + this.persistentData.harpies);
-      ((e >= 0 && e < this.persistentData.harpies) ||
-        (this.getEnergyRate() >= 1 && e > 0)) &&
-        (this.persistentData.harpies = e);
+
+      if (
+        (e >= 0 && e < this.persistentData.harpies) ||
+        (this.getEnergyRate() >= 1 && e > 0)
+      ) {
+        this.persistentData.harpies = e;
+      }
     }
+
     startLevel(e) {
-      (this.level = e), this.startGame();
+      this.level = e;
+      this.startGame();
     }
     startGame() {
-      (this.currentState = this.states.playingLevel),
-        this.setupLevel(),
-        this.updatePlayingLevel(),
-        this.persistentData.autoRelease && this.releaseCagedZombies();
+      this.currentState = this.states.playingLevel;
+      this.setupLevel();
+      this.updatePlayingLevel();
+      if (this.persistentData.autoRelease) {
+        this.releaseCagedZombies();
+      }
     }
     nextLevel() {
-      this.level++,
-        (this.currentState = this.states.playingLevel),
-        this.setupLevel(),
-        this.updatePlayingLevel(),
-        this.persistentData.autoRelease && this.releaseCagedZombies();
+      this.level++;
+
+      this.currentState = this.states.playingLevel;
+      this.setupLevel();
+      this.updatePlayingLevel();
+      if (this.persistentData.autoRelease) {
+        this.releaseCagedZombies();
+      }
     }
     setupLevel() {
-      (this.endLevelTimer = this.endLevelDelay),
-        N(),
-        this.particles.initialize(),
-        this.humans.populate(),
-        this.zombies.populate(),
-        this.graveyard.initialize(),
-        setTimeout(centerGameContainer, 10),
-        this.upgrades.applyUpgrades(),
-        this.upgrades.updateRuneEffects(),
-        this.partFactory.applyGenerators(),
-        this.creatures.populate(),
-        this.skeleton.populate(),
-        this.addStartLevelResources(),
-        this.populateStats();
+      this.endLevelTimer = this.endLevelDelay;
+      N();
+      this.particles.initialize();
+      this.humans.populate();
+      this.zombies.populate();
+      this.graveyard.initialize();
+      setTimeout(centerGameContainer, 10);
+      this.upgrades.applyUpgrades();
+      this.upgrades.updateRuneEffects();
+      this.partFactory.applyGenerators();
+      this.creatures.populate();
+      this.skeleton.populate();
+      this.addStartLevelResources();
+      this.populateStats();
     }
+
     populateStats() {
       this.stats = {
         skeleton: {
@@ -2900,99 +3059,124 @@ var Incremancer;
       };
     }
     updateStats() {
-      this.stats &&
-        ((this.stats.zombie.health = this.zombieHealth),
-        (this.stats.zombie.damage = this.zombieDamage),
-        (this.stats.zombie.speed = this.zombieSpeed),
-        (this.stats.zombie.count = this.zombieCount),
-        (this.stats.skeleton.health = 10 * this.zombieHealth),
-        (this.stats.skeleton.damage = 10 * this.zombieDamage),
-        (this.stats.skeleton.speed = this.skeleton.moveSpeed));
+      if (this.stats) {
+        (this.stats.zombie.health = this.zombieHealth),
+          (this.stats.zombie.damage = this.zombieDamage),
+          (this.stats.zombie.speed = this.zombieSpeed),
+          (this.stats.zombie.count = this.zombieCount),
+          (this.stats.skeleton.health = 10 * this.zombieHealth),
+          (this.stats.skeleton.damage = 10 * this.zombieDamage),
+          (this.stats.skeleton.speed = this.skeleton.moveSpeed);
+      }
     }
+
     vipEscaped() {
-      this.persistentData.vipEscaped || (this.persistentData.vipEscaped = []),
-        this.persistentData.vipEscaped.push(this.level),
-        this.saveData();
+      if (!this.persistentData.vipEscaped) {
+        this.persistentData.vipEscaped = [];
+      }
+
+      this.persistentData.vipEscaped.push(this.level);
+      this.saveData();
     }
+
     updatePlayingLevel() {
       this.saveData();
     }
+
     addStartLevelResources() {
-      (this.energy = this.energyMax),
-        this.levelResourcesAdded ||
-          ((this.persistentData.blood += 500 * this.startingResources),
-          this.persistentData.blood > this.bloodMax &&
-            (this.persistentData.blood = this.bloodMax),
-          (this.persistentData.brains += 50 * this.startingResources),
-          this.persistentData.brains > this.brainsMax &&
-            (this.persistentData.brains = this.brainsMax),
-          (this.persistentData.bones += 200 * this.startingResources),
-          (this.persistentData.bonesTotal += 200 * this.startingResources),
-          (this.levelResourcesAdded = true));
+      this.energy = this.energyMax;
+
+      if (!this.levelResourcesAdded) {
+        this.persistentData.blood += 500 * this.startingResources;
+
+        if (this.persistentData.blood > this.bloodMax) {
+          this.persistentData.blood = this.bloodMax;
+        }
+
+        this.persistentData.brains += 50 * this.startingResources;
+
+        if (this.persistentData.brains > this.brainsMax) {
+          this.persistentData.brains = this.brainsMax;
+        }
+
+        this.persistentData.bones += 200 * this.startingResources;
+        this.persistentData.bonesTotal += 200 * this.startingResources;
+        this.levelResourcesAdded = true;
+      }
     }
+
     onReady() {
       this.upgrades.upgradeIdCheck();
     }
     addPrestigePoints(e) {
-      void 0 === this.persistentData.prestigePointsEarned &&
-        ((this.persistentData.prestigePointsEarned = 0),
-        (this.persistentData.prestigePointsToSpend = 0)),
-        (this.persistentData.prestigePointsEarned += e);
+      if (this.persistentData.prestigePointsEarned === undefined) {
+        this.persistentData.prestigePointsEarned = 0;
+        this.persistentData.prestigePointsToSpend = 0;
+      }
+
+      this.persistentData.prestigePointsEarned += e;
     }
+
     prestige() {
       if (this.persistentData.prestigePointsEarned > 0) {
-        (this.persistentData.levelUnlocked = 1),
-          (this.persistentData.autoUpgrades = []),
-          (this.persistentData.blood = 0),
-          (this.persistentData.brains = 0),
-          (this.persistentData.bones = 0),
-          (this.persistentData.parts = 0),
-          (this.persistentData.generators = []),
-          (this.persistentData.bonesTotal = 0),
-          (this.persistentData.upgrades = this.persistentData.upgrades.filter(
-            (e) => e.costType == this.upgrades.costs.prestigePoints
-          )),
-          (this.persistentData.constructions = []),
-          (this.persistentData.boneCollectors = 0),
-          (this.persistentData.currentConstruction = false),
-          (this.persistentData.harpies = 0),
-          (this.persistentData.graveyardZombies = 1),
-          (this.persistentData.prestigePointsToSpend +=
-            this.persistentData.prestigePointsEarned),
-          (this.persistentData.prestigePointsEarned = 0),
-          (this.persistentData.runes = {
-            life: { blood: 0, brains: 0, bones: 0 },
-            death: { blood: 0, brains: 0, bones: 0 },
-          }),
-          (this.persistentData.vipEscaped = []),
-          (this.persistentData.creatureLevels = []),
-          (this.persistentData.creatureAutobuild = []),
-          (this.persistentData.levelsCompleted = []),
-          (this.persistentData.runeshatter = 0),
-          (this.zombiesInCages = 0),
-          (this.autoconstruction = false),
-          (this.levelResourcesAdded = false),
-          (this.gigazombies = false),
-          (this.runeEffects = {
-            attackSpeed: 1,
-            critChance: 0,
-            critDamage: 0,
-            damageReduction: 1,
-            healthRegen: 0,
-            damageReflection: 0,
-          }),
-          this.boneCollectors.update(0.1),
-          (this.partFactory.generatorsApplied = []),
-          this.creatureFactory.updateAutoBuild(),
-          this.creatureFactory.resetLevels(),
-          (this.level = 1),
-          (this.currentState = this.states.prestiged),
-          (this.skeleton.persistent.talentReset = true),
-          this.setupLevel(),
-          this.saveData();
+        this.persistentData.levelUnlocked = 1;
+        this.persistentData.autoUpgrades = [];
+        this.persistentData.blood = 0;
+        this.persistentData.brains = 0;
+        this.persistentData.bones = 0;
+        this.persistentData.parts = 0;
+        this.persistentData.generators = [];
+        this.persistentData.bonesTotal = 0;
+
+        this.persistentData.upgrades = this.persistentData.upgrades.filter(
+          (e) => e.costType == this.upgrades.costs.prestigePoints
+        );
+
+        this.persistentData.constructions = [];
+        this.persistentData.boneCollectors = 0;
+        this.persistentData.currentConstruction = false;
+        this.persistentData.harpies = 0;
+        this.persistentData.graveyardZombies = 1;
+        this.persistentData.prestigePointsToSpend +=
+          this.persistentData.prestigePointsEarned;
+        this.persistentData.prestigePointsEarned = 0;
+
+        this.persistentData.runes = {
+          life: { blood: 0, brains: 0, bones: 0 },
+          death: { blood: 0, brains: 0, bones: 0 },
+        };
+
+        this.persistentData.vipEscaped = [];
+        this.persistentData.creatureLevels = [];
+        this.persistentData.creatureAutobuild = [];
+        this.persistentData.levelsCompleted = [];
+        this.persistentData.runeshatter = 0;
+        this.zombiesInCages = 0;
+        this.autoconstruction = false;
+        this.levelResourcesAdded = false;
+        this.gigazombies = false;
+
+        this.runeEffects = {
+          attackSpeed: 1,
+          critChance: 0,
+          critDamage: 0,
+          damageReduction: 1,
+          healthRegen: 0,
+          damageReflection: 0,
+        };
+
+        this.boneCollectors.update(0.1);
+        this.partFactory.generatorsApplied = [];
+        this.creatureFactory.updateAutoBuild();
+        this.creatureFactory.resetLevels();
+        this.level = 1;
+        this.currentState = this.states.prestiged;
+        this.skeleton.persistent.talentReset = true;
+        this.setupLevel();
+        this.saveData();
       }
     }
-    //o
+
     saveData() {
       this.persistentData.dateOfSave = Date.now();
       try {
@@ -3014,41 +3198,43 @@ var Incremancer;
     }
     loadData() {
       try {
-        null !== localStorage.getItem(this.storageName) &&
-          ((this.persistentData = JSON.parse(
+        if (localStorage.getItem(this.storageName) !== null) {
+          (this.persistentData = JSON.parse(
             localStorage.getItem(this.storageName)
           )),
-          (this.level = this.persistentData.levelUnlocked),
-          null !== localStorage.getItem(this.skeleton.storageName)
-            ? ((this.skeleton.persistent = JSON.parse(
-                localStorage.getItem(this.skeleton.storageName)
-              )),
-              !("gearSetEquipped" in this.skeleton.persistent) &&
-                (this.skeleton.persistent.gearSetEquipped = -1),
-              !("gearSets" in this.skeleton.persistent) &&
-                (this.skeleton.persistent.gearSets = []))
-            : (this.skeleton.persistent = {
-                xpRate: 0,
-                skeletons: 0,
-                level: 1,
-                xp: 0,
-                items: [],
-                gearSetEquipped: -1,
-                gearSets: [],
-                currItemId: 0,
-                talentReset: false,
-              }),
-          null !== localStorage.getItem(this.skeleton.talentsStorageName)
-            ? (this.skeleton.talents = JSON.parse(
-                localStorage.getItem(this.skeleton.talentsStorageName)
-              ))
-            : (this.skeleton.talents = []),
-          this.updatePersistentData(),
-          this.calcOfflineProgress());
+            (this.level = this.persistentData.levelUnlocked),
+            localStorage.getItem(this.skeleton.storageName) !== null
+              ? ((this.skeleton.persistent = JSON.parse(
+                  localStorage.getItem(this.skeleton.storageName)
+                )),
+                !("gearSetEquipped" in this.skeleton.persistent) &&
+                  (this.skeleton.persistent.gearSetEquipped = -1),
+                !("gearSets" in this.skeleton.persistent) &&
+                  (this.skeleton.persistent.gearSets = []))
+              : (this.skeleton.persistent = {
+                  xpRate: 0,
+                  skeletons: 0,
+                  level: 1,
+                  xp: 0,
+                  items: [],
+                  gearSetEquipped: -1,
+                  gearSets: [],
+                  currItemId: 0,
+                  talentReset: false,
+                }),
+            localStorage.getItem(this.skeleton.talentsStorageName) !== null
+              ? (this.skeleton.talents = JSON.parse(
+                  localStorage.getItem(this.skeleton.talentsStorageName)
+                ))
+              : (this.skeleton.talents = []),
+            this.updatePersistentData(),
+            this.calcOfflineProgress();
+        }
       } catch (e) {
         console.log(e);
       }
     }
+
     calcOfflineProgress() {
       if (
         (this.upgrades.applyUpgrades(),
