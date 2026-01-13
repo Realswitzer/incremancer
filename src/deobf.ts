@@ -1440,29 +1440,35 @@ var Incremancer;
     }
 
     populateBuildingMap() {
-      if (
-        ((this.buildingMap = []),
-        (this.mapCols = Math.ceil(P.x / 10)),
-        (this.mapRows = Math.ceil(P.y / 10)),
-        0 != this.buildings.length)
-      )
+      this.buildingMap = [];
+      this.mapCols = Math.ceil(P.x / 10);
+      this.mapRows = Math.ceil(P.y / 10);
+
+      if (this.buildings.length != 0) {
         for (let e = 0; e < this.mapRows; e++) {
           const t = 10 * e;
           for (let i = 0; i < this.mapCols; i++) {
             const a = 10 * i;
-            let r,
-              n = 1e4;
-            for (let e = 0; e < this.buildings.length; e++) {
-              const i = this.buildings[e],
-                o =
-                  distance(a, t, i.x + i.width / 2, i.y + i.height / 2) -
-                  i.width / 2;
-              o < n && ((n = o), (r = i));
+            let r;
+            let n = 10000; /* 1e4 */
+
+            for (const i of this.buildings) {
+              const o =
+                distance(a, t, i.x + i.width / 2, i.y + i.height / 2) -
+                i.width / 2;
+
+              if (o < n) {
+                n = o;
+                r = i;
+              }
             }
+
             this.buildingMap[e * this.mapCols + i] = r;
           }
         }
+      }
     }
+
     getBuildingFromMap(e, t) {
       return this.buildingMap[
         Math.round(t / 10) * this.mapCols + Math.round(e / 10)
@@ -1498,182 +1504,245 @@ var Incremancer;
       );
     }
     checkWall(e, t, s, i) {
-      t.y > e.collisionY &&
-        t.y < e.collisionY + e.collisionHeight &&
-        (t.x < e.collisionX - this.wallCollisionBuffer &&
-          s.x > e.collisionX - this.wallCollisionBuffer &&
-          ((i.x = true),
-          (i.validX = e.collisionX - this.wallCollisionBuffer - 1)),
-        t.x > e.collisionX + e.collisionWidth + this.wallCollisionBuffer &&
-          s.x < e.collisionX + e.collisionWidth + this.wallCollisionBuffer &&
-          ((i.x = true),
-          (i.validX =
-            e.collisionX + e.collisionWidth + this.wallCollisionBuffer + 1))),
-        t.x > e.collisionX &&
-          t.x < e.collisionX + e.collisionWidth &&
-          (t.y < e.collisionY - this.wallCollisionBuffer &&
-            s.y > e.collisionY - this.wallCollisionBuffer &&
-            ((i.y = true),
-            (i.validY = e.collisionY - this.wallCollisionBuffer - 1)),
+      if (t.y > e.collisionY && t.y < e.collisionY + e.collisionHeight) {
+        if (
+          t.x < e.collisionX - this.wallCollisionBuffer &&
+          s.x > e.collisionX - this.wallCollisionBuffer
+        ) {
+          i.x = true;
+          i.validX = e.collisionX - this.wallCollisionBuffer - 1;
+        }
+
+        if (
+          t.x > e.collisionX + e.collisionWidth + this.wallCollisionBuffer &&
+          s.x < e.collisionX + e.collisionWidth + this.wallCollisionBuffer
+        ) {
+          i.x = true;
+          i.validX =
+            e.collisionX + e.collisionWidth + this.wallCollisionBuffer + 1;
+        }
+      }
+
+      if (t.x > e.collisionX && t.x < e.collisionX + e.collisionWidth) {
+        if (
+          t.y < e.collisionY - this.wallCollisionBuffer &&
+          s.y > e.collisionY - this.wallCollisionBuffer
+        ) {
+          i.y = true;
+          i.validY = e.collisionY - this.wallCollisionBuffer - 1;
+        }
+
+        if (
           t.y > e.collisionY + e.collisionHeight + this.wallCollisionBuffer &&
-            s.y < e.collisionY + e.collisionHeight + this.wallCollisionBuffer &&
-            ((i.y = true),
-            (i.validY =
-              e.collisionY +
-              e.collisionHeight +
-              this.wallCollisionBuffer +
-              1)));
+          s.y < e.collisionY + e.collisionHeight + this.wallCollisionBuffer
+        ) {
+          i.y = true;
+          i.validY =
+            e.collisionY + e.collisionHeight + this.wallCollisionBuffer + 1;
+        }
+      }
     }
+
     checkGraveyard(e, t) {
       const s = new te();
-      return (
-        this.graveyardCollision &&
-          this.checkWall(this.graveyardCollision, e, t, s),
-        s.x || s.y ? s : null
-      );
+
+      if (this.graveyardCollision) {
+        this.checkWall(this.graveyardCollision, e, t, s);
+      }
+
+      return s.x || s.y ? s : null;
     }
+
     checkCollisions(e, t) {
       const s = this.findBuilding(e);
-      if (!s) return this.checkGraveyard(e, t);
+      if (!s) {
+        return this.checkGraveyard(e, t);
+      }
       const i = new te();
-      for (let a = 0; a < s.walls.length; a++)
+      for (let a = 0; a < s.walls.length; a++) {
         this.checkWall(s.walls[a], e, t, i);
+      }
       return i;
     }
+
     pathStepCalc(e, t) {
-      const s = t.x - e.x,
-        i = t.y - e.y,
-        a = Math.abs(s),
-        r = Math.abs(i);
-      if (0 == Math.max(a, r)) return;
+      const s = t.x - e.x;
+      const i = t.y - e.y;
+      const a = Math.abs(s);
+      const r = Math.abs(i);
+      if (Math.max(a, r) == 0) {
+        return;
+      }
       let n = 1 / Math.max(a, r);
-      return (
-        (n *= 1.29289 - (a + r) * n * 0.29289),
-        {
-          x: s * n * this.pathFindStepSize,
-          y: i * n * this.pathFindStepSize,
-        }
-      );
+      n *= 1.29289 - (a + r) * n * 0.29289;
+
+      return {
+        x: s * n * this.pathFindStepSize,
+        y: i * n * this.pathFindStepSize,
+      };
     }
+
     findBuilding(e) {
       return this.getBuildingFromMap(e.x, e.y);
     }
     normalizeVector(e) {
-      if (0 == e.x && 0 == e.y) return e;
+      if (e.x == 0 && e.y == 0) {
+        return e;
+      }
       const t = Math.sqrt(e.x * e.x + e.y * e.y);
-      return (e.x /= t), (e.y /= t), e;
+      e.x /= t;
+      e.y /= t;
+      return e;
     }
+
     modifyVectorForCollision(e, t, s) {
-      if (!t && !this.graveyardCollision) return this.normalizeVector(e);
-      const i = new te(),
-        a = {
-          x: s.x + (e.x > 0 ? 1 : -1),
-          y: s.y + (e.y > 0 ? 1 : -1),
-        };
-      if (t)
-        for (let e = 0; e < t.walls.length; e++)
+      if (!t && !this.graveyardCollision) {
+        return this.normalizeVector(e);
+      }
+      const i = new te();
+
+      const a = {
+        x: s.x + (e.x > 0 ? 1 : -1),
+        y: s.y + (e.y > 0 ? 1 : -1),
+      };
+
+      if (t) {
+        for (let e = 0; e < t.walls.length; e++) {
           this.checkWall(t.walls[e], s, a, i);
-      return (
-        this.graveyardCollision &&
-          this.checkWall(this.graveyardCollision, s, a, i),
-        i.x && (e.x = 0),
-        i.y && (e.y = 0),
-        this.normalizeVector(e)
-      );
+        }
+      }
+
+      if (this.graveyardCollision) {
+        this.checkWall(this.graveyardCollision, s, a, i);
+      }
+
+      if (i.x) {
+        e.x = 0;
+      }
+
+      if (i.y) {
+        e.y = 0;
+      }
+
+      return this.normalizeVector(e);
     }
+
     willVectorHitBuilding(e, t, s, i) {
-      if (
-        ((this.dx = t.x - e.x),
-        (this.dy = t.y - e.y),
-        this.dx < 0 && e.x < s.x - 4)
-      )
+      this.dx = t.x - e.x;
+      this.dy = t.y - e.y;
+
+      if (this.dx < 0 && e.x < s.x - 4) {
         return false;
-      if (this.dx > 0 && e.x > s.x + s.width + 4) return false;
-      if (this.dy < 0 && e.y < s.y - 4) return false;
-      if (this.dy > 0 && e.y > s.y + s.width + 4) return false;
+      }
+
+      if (this.dx > 0 && e.x > s.x + s.width + 4) {
+        return false;
+      }
+      if (this.dy < 0 && e.y < s.y - 4) {
+        return false;
+      }
+      if (this.dy > 0 && e.y > s.y + s.width + 4) {
+        return false;
+      }
+      this.step = this.pathStepCalc(e, t);
+
+      this.stepsToTake = Math.min(
+        i / this.pathFindStepSize - this.pathFindStepSize,
+        30
+      );
+
+      this.hasHit = false;
+
       for (
-        this.step = this.pathStepCalc(e, t),
-          this.stepsToTake = Math.min(
-            i / this.pathFindStepSize - this.pathFindStepSize,
-            30
-          ),
-          this.hasHit = false,
-          this.testPosition = {
-            x: e.x,
-            y: e.y,
-          };
+        this.testPosition = {
+          x: e.x,
+          y: e.y,
+        };
         !this.hasHit && this.stepsToTake > 0;
 
-      )
-        this.stepsToTake--,
-          (this.testPosition.x += this.step.x),
-          (this.testPosition.y += this.step.y),
-          this.isInsidePoi(this.testPosition.x, this.testPosition.y, s, 4) &&
-            (this.hasHit = true);
+      ) {
+        this.stepsToTake--;
+        this.testPosition.x += this.step.x;
+        this.testPosition.y += this.step.y;
+
+        if (this.isInsidePoi(this.testPosition.x, this.testPosition.y, s, 4)) {
+          this.hasHit = true;
+        }
+      }
+
       return this.hasHit;
     }
+
     findNearestCorner(e, t) {
-      let s = null,
-        i = 1e4;
+      let s = null;
+      let i = 10000; /* 1e4 */
       for (let a = 0; a < t.length; a++) {
         const r = this.fastDistance(e.x, e.y, t[a].x, t[a].y);
-        r < i && ((i = r), (s = t[a]));
+
+        if (r < i) {
+          i = r;
+          s = t[a];
+        }
       }
       return s;
     }
+
     findAdjacentCorners(e, t) {
       const s = [];
-      for (let i = 0; i < t.corners.length; i++)
-        (t.corners[i].x != e.x && t.corners[i].y != e.y) ||
+      for (let i = 0; i < t.corners.length; i++) {
+        if (t.corners[i].x == e.x || t.corners[i].y == e.y) {
           s.push(t.corners[i]);
+        }
+      }
       return s;
     }
     navigateAroundBuilding(e, t, s, i) {
-      return (
-        (this.vector = {
-          x: t.x - e.x,
-          y: t.y - e.y,
-          distance: i,
-        }),
-        s
-          ? ((this.hitbuilding = this.willVectorHitBuilding(e, t, s, i)),
-            this.hitbuilding
-              ? ((this.corner = this.findNearestCorner(t, s.corners)),
-                (this.hitbuilding = this.willVectorHitBuilding(
-                  e,
-                  this.corner,
-                  s,
-                  i
-                )),
-                this.hitbuilding
-                  ? ((this.corner = this.findNearestCorner(
-                      e,
-                      this.findAdjacentCorners(this.corner, s)
-                    )),
-                    (this.vector.x = this.corner.x - e.x),
-                    (this.vector.y = this.corner.y - e.y),
-                    this.modifyVectorForCollision(this.vector, s, e))
-                  : ((this.vector.x = this.corner.x - e.x),
-                    (this.vector.y = this.corner.y - e.y),
-                    this.modifyVectorForCollision(this.vector, s, e)))
-              : this.modifyVectorForCollision(this.vector, s, e))
-          : this.normalizeVector(this.vector)
-      );
+      this.vector = {
+        x: t.x - e.x,
+        y: t.y - e.y,
+        distance: i,
+      };
+
+      return s
+        ? ((this.hitbuilding = this.willVectorHitBuilding(e, t, s, i)),
+          this.hitbuilding
+            ? ((this.corner = this.findNearestCorner(t, s.corners)),
+              (this.hitbuilding = this.willVectorHitBuilding(
+                e,
+                this.corner,
+                s,
+                i
+              )),
+              this.hitbuilding
+                ? ((this.corner = this.findNearestCorner(
+                    e,
+                    this.findAdjacentCorners(this.corner, s)
+                  )),
+                  (this.vector.x = this.corner.x - e.x),
+                  (this.vector.y = this.corner.y - e.y),
+                  this.modifyVectorForCollision(this.vector, s, e))
+                : ((this.vector.x = this.corner.x - e.x),
+                  (this.vector.y = this.corner.y - e.y),
+                  this.modifyVectorForCollision(this.vector, s, e)))
+            : this.modifyVectorForCollision(this.vector, s, e))
+        : this.normalizeVector(this.vector);
     }
+
     howDoIGetToMyTarget(e, t) {
+      this.distanceToTarget = this.fastDistance(e.x, e.y, t.x, t.y);
+      this.closeBuilding = this.findBuilding(e);
+      this.insideBuilding = false;
+
       if (
-        ((this.distanceToTarget = this.fastDistance(e.x, e.y, t.x, t.y)),
-        (this.closeBuilding = this.findBuilding(e)),
-        (this.insideBuilding = false),
         this.closeBuilding &&
-          ((this.insideBuilding = this.isInsidePoi(
-            e.x,
-            e.y,
-            this.closeBuilding,
-            0
-          )),
-          this.insideBuilding))
-      )
+        ((this.insideBuilding = this.isInsidePoi(
+          e.x,
+          e.y,
+          this.closeBuilding,
+          0
+        )),
+        this.insideBuilding)
+      ) {
         return this.isInsidePoi(t.x, t.y, this.closeBuilding, 0)
           ? this.modifyVectorForCollision(
               {
@@ -1691,49 +1760,65 @@ var Incremancer;
               this.closeBuilding,
               e
             );
+      }
+
       const s = this.findBuilding(t);
-      return s &&
+
+      if (
+        s &&
         ((this.insideBuilding = this.isInsidePoi(t.x, t.y, s, 0)),
         this.insideBuilding)
-        ? this.fastDistance(
+      ) {
+        if (
+          this.fastDistance(
             e.x,
             e.y,
             s.entrance.outside.x,
             s.entrance.outside.y
           ) < 30
-          ? this.modifyVectorForCollision(
-              {
-                x: s.entrance.inside.x - e.x,
-                y: s.entrance.inside.y - e.y,
-              },
-              this.closeBuilding,
-              e
-            )
-          : this.navigateAroundBuilding(
-              e,
-              s.entrance.outside,
-              this.closeBuilding,
-              this.distanceToTarget
-            )
-        : this.distanceToTarget < 20
-        ? this.modifyVectorForCollision(
+        ) {
+          return this.modifyVectorForCollision(
             {
-              x: t.x - e.x,
-              y: t.y - e.y,
+              x: s.entrance.inside.x - e.x,
+              y: s.entrance.inside.y - e.y,
             },
             this.closeBuilding,
             e
-          )
-        : this.navigateAroundBuilding(
-            e,
-            t,
-            this.closeBuilding,
-            this.distanceToTarget
           );
+        }
+
+        return this.navigateAroundBuilding(
+          e,
+          s.entrance.outside,
+          this.closeBuilding,
+          this.distanceToTarget
+        );
+      }
+
+      if (this.distanceToTarget < 20) {
+        return this.modifyVectorForCollision(
+          {
+            x: t.x - e.x,
+            y: t.y - e.y,
+          },
+          this.closeBuilding,
+          e
+        );
+      }
+
+      return this.navigateAroundBuilding(
+        e,
+        t,
+        this.closeBuilding,
+        this.distanceToTarget
+      );
     }
+
     isValidTreePosition(e) {
-      if (!this.isValidPosition(e)) return false;
-      for (let t = 0; t < this.treeSprites.length; t++)
+      if (!this.isValidPosition(e)) {
+        return false;
+      }
+      for (let t = 0; t < this.treeSprites.length; t++) {
         if (
           this.fastDistance(
             e.x,
@@ -1741,45 +1826,59 @@ var Incremancer;
             this.treeSprites[t].x,
             this.treeSprites[t].y
           ) < 25
-        )
+        ) {
           return false;
+        }
+      }
       return true;
     }
+    
     populateTrees() {
-      if (this.treeSprites.length > 0)
+      if (this.treeSprites.length > 0) {
         for (let e = 0; e < this.treeSprites.length; e++) {
           this.treeSprites[e].visible = false;
         }
-      if (0 == this.treeTextures.length) {
+      }
+      if (this.treeTextures.length == 0) {
         for (let e = 0; e < 6; e++) {
-          this.treeTextures.push(PIXI.Texture.from("tree" + e + ".png"));
+          this.treeTextures.push(PIXI.Texture.from(`tree${e}.png`));
         }
-        this.armyTextures.push(PIXI.Texture.from("hedgehog.png")),
-          this.armyTextures.push(PIXI.Texture.from("sandbags.png"));
+        this.armyTextures.push(PIXI.Texture.from("hedgehog.png"));
+        this.armyTextures.push(PIXI.Texture.from("sandbags.png"));
       }
       let e = Math.round(P.x / 50);
-      this.gameModel.isBossStage(this.gameModel.level) &&
-        (e = Math.round(1.5 * e));
+    
+      if (this.gameModel.isBossStage(this.gameModel.level)) {
+        e = Math.round(1.5 * e);
+      }
+    
       let t = 0;
-      for (; e > 0; ) {
-        let s,
-          i = false,
-          r = 1e3;
-        const n = 8,
-          o = 2;
-        for (; !i && r > 0; )
-          r--,
-            (s = {
-              x: n + Math.random() * (P.x - 2 * n),
-              y: n + Math.random() * (P.y - 2 * n),
-              width: o,
-              height: o,
-            }),
-            (i = this.isValidTreePosition(s));
+    
+      while (e > 0) {
+        let s;
+        let i = false;
+        let r = 1000; /* 1e3 */
+        const n = 8;
+        const o = 2;
+    
+        while (!i && r > 0) {
+          r--;
+    
+          s = {
+            x: n + Math.random() * (P.x - 2 * n),
+            y: n + Math.random() * (P.y - 2 * n),
+            width: o,
+            height: o,
+          };
+    
+          i = this.isValidTreePosition(s);
+        }
+    
         if (i) {
           let e = 0.4 + 0.6 * Math.random();
-          this.gameModel.constructions.graveyard &&
-            (e = Math.min(
+    
+          if (this.gameModel.constructions.graveyard) {
+            e = Math.min(
               (this.fastDistance(
                 s.x,
                 s.y,
@@ -1789,226 +1888,268 @@ var Incremancer;
                 90) /
                 400,
               1
-            ));
-          let i,
-            r =
-              this.treeTextures[
-                this.treeTextures.length -
-                  1 -
-                  Math.round((this.treeTextures.length - 1) * e)
-              ];
-          this.gameModel.isBossStage(this.gameModel.level) &&
-            Math.random() > 0.7 &&
-            (r = sample(this.armyTextures)),
-            this.treeSprites.length > t
-              ? ((i = this.treeSprites[t]), (i.texture = r), (i.visible = true))
-              : ((i = new PIXI.Sprite(r)),
-                this.treeSprites.push(i),
-                g.addChild(i)),
-            t++,
-            i.anchor.set(0.5, 1),
-            (i.x = s.x),
-            (i.y = s.y),
-            (i.zIndex = i.y),
-            (i.scale.x = i.scale.y = 2),
-            (i.scale.x = Math.random() > 0.5 ? i.scale.x : -1 * i.scale.x);
+            );
+          }
+    
+          let i;
+    
+          let r =
+            this.treeTextures[
+              this.treeTextures.length -
+                1 -
+                Math.round((this.treeTextures.length - 1) * e)
+            ];
+    
+          if (
+            this.gameModel.isBossStage(this.gameModel.level) &&
+            Math.random() > 0.7
+          ) {
+            r = sample(this.armyTextures);
+          }
+    
+          if (this.treeSprites.length > t) {
+            i = this.treeSprites[t];
+            i.texture = r;
+            i.visible = true;
+          } else {
+            i = new PIXI.Sprite(r);
+            this.treeSprites.push(i);
+            g.addChild(i);
+          }
+    
+          t++;
+          i.anchor.set(0.5, 1);
+          i.x = s.x;
+          i.y = s.y;
+          i.zIndex = i.y;
+          i.scale.x = 2;
+          i.scale.y = 2;
+          i.scale.x = Math.random() > 0.5 ? i.scale.x : -1 * i.scale.x;
         }
         e--;
       }
     }
+    
   }
   class te {
     constructor() {
-      (this.x = false), (this.y = false), (this.validX = 0), (this.validY = 0);
+      this.x = false;
+      this.y = false;
+      this.validX = 0;
+      this.validY = 0;
     }
   }
+  
   class PartFactory {
     constructor() {
-      if (
-        ((this.storm = false),
-        (this.gameModel = GameModel.getInstance()),
-        (this.costs = {
-          blood: "blood",
-          parts: "parts",
-        }),
-        (this.generatorsApplied = []),
-        (this.generators = [
-          new ie(
-            1,
-            "Simple Machine",
-            this.costs.blood,
-            1e6,
-            1.08,
-            1,
-            2,
-            "A simple device that produces 1 part every 2 seconds"
-          ),
-          new ie(
-            2,
-            "Part Duplicator",
-            this.costs.parts,
-            100,
-            1.09,
-            4,
-            3,
-            "A more advanced device that produces 4 parts every 3 seconds"
-          ),
-          new ie(
-            3,
-            "Stamp Press",
-            this.costs.parts,
-            1e3,
-            1.1,
-            16,
-            5,
-            "An industrial press that produces 16 parts every 5 seconds"
-          ),
-          new ie(
-            4,
-            "Conveyor",
-            this.costs.parts,
-            1e4,
-            1.11,
-            64,
-            8,
-            "A fantastic new invention that produces 64 parts every 8 seconds"
-          ),
-          new ie(
-            5,
-            "Splitter Combiner",
-            this.costs.parts,
-            1e5,
-            1.12,
-            192,
-            10,
-            "A wondrous machine that produces 192 parts every 10 seconds"
-          ),
-          new ie(
-            6,
-            "Batch Converter",
-            this.costs.parts,
-            5e5,
-            1.13,
-            512,
-            12,
-            "An astounding contraption that produces 512 parts every 12 seconds"
-          ),
-        ]),
-        PartFactory.instance)
-      )
+      this.storm = false;
+      this.gameModel = GameModel.getInstance();
+  
+      this.costs = {
+        blood: "blood",
+        parts: "parts",
+      };
+  
+      this.generatorsApplied = [];
+  
+      this.generators = [
+        new ie(
+          1,
+          "Simple Machine",
+          this.costs.blood,
+          1000000 /* 1e6 */,
+          1.08,
+          1,
+          2,
+          "A simple device that produces 1 part every 2 seconds"
+        ),
+        new ie(
+          2,
+          "Part Duplicator",
+          this.costs.parts,
+          100,
+          1.09,
+          4,
+          3,
+          "A more advanced device that produces 4 parts every 3 seconds"
+        ),
+        new ie(
+          3,
+          "Stamp Press",
+          this.costs.parts,
+          1000 /* 1e3 */,
+          1.1,
+          16,
+          5,
+          "An industrial press that produces 16 parts every 5 seconds"
+        ),
+        new ie(
+          4,
+          "Conveyor",
+          this.costs.parts,
+          10000 /* 1e4 */,
+          1.11,
+          64,
+          8,
+          "A fantastic new invention that produces 64 parts every 8 seconds"
+        ),
+        new ie(
+          5,
+          "Splitter Combiner",
+          this.costs.parts,
+          100000 /* 1e5 */,
+          1.12,
+          192,
+          10,
+          "A wondrous machine that produces 192 parts every 10 seconds"
+        ),
+        new ie(
+          6,
+          "Batch Converter",
+          this.costs.parts,
+          500000 /* 5e5 */,
+          1.13,
+          512,
+          12,
+          "An astounding contraption that produces 512 parts every 12 seconds"
+        ),
+      ];
+  
+      if (PartFactory.instance) {
         return PartFactory.instance;
+      }
+  
       PartFactory.instance = this;
     }
     factoryStats() {
-      let e = 0,
-        t = 0;
-      for (let s = 0; s < this.generatorsApplied.length; s++)
-        (e += this.generatorsApplied[s].rank),
-          (t +=
-            this.generatorsApplied[s].total / this.generatorsApplied[s].time);
+      let e = 0;
+      let t = 0;
+      for (let s = 0; s < this.generatorsApplied.length; s++) {
+        e += this.generatorsApplied[s].rank;
+        t += this.generatorsApplied[s].total / this.generatorsApplied[s].time;
+      }
       return {
         machines: e,
         partsPerSec: (this.storm ? 2 : 1) * t * this.gameModel.partsPCMod,
       };
     }
     update(e) {
-      for (let t = 0; t < this.generatorsApplied.length; t++)
-        (this.generatorsApplied[t].timeLeft -= e),
-          this.generatorsApplied[t].timeLeft <= 0 &&
-            ((this.generatorsApplied[t].timeLeft =
-              this.generatorsApplied[t].time),
+      for (let t = 0; t < this.generatorsApplied.length; t++) {
+        this.generatorsApplied[t].timeLeft -= e;
+  
+        if (this.generatorsApplied[t].timeLeft <= 0) {
+          (this.generatorsApplied[t].timeLeft = this.generatorsApplied[t].time),
             (this.gameModel.persistentData.parts +=
               this.generatorsApplied[t].total *
               this.gameModel.partsPCMod *
-              (this.storm ? 2 : 1)));
+              (this.storm ? 2 : 1));
+        }
+      }
     }
     updateLongTime(e) {
       let t = 0;
-      for (let s = 0; s < this.generatorsApplied.length; s++)
+      for (let s = 0; s < this.generatorsApplied.length; s++) {
         t +=
-          this.generatorsApplied[s].total *
-          (e / this.generatorsApplied[s].time);
+          this.generatorsApplied[s].total * (e / this.generatorsApplied[s].time);
+      }
       return t * this.gameModel.partsPCMod;
     }
     currentRank(e) {
-      for (
-        let t = 0;
-        t < this.gameModel.persistentData.generators.length;
-        t++
-      ) {
-        const s = this.gameModel.persistentData.generators[t];
-        if (e.id == s.id) return s.rank;
+      for (const s of this.gameModel.persistentData.generators) {
+        if (e.id == s.id) {
+          return s.rank;
+        }
       }
+  
       return 0;
     }
     purchasePrice(e) {
-      return Math.round(e.basePrice * Math.pow(e.multi, this.currentRank(e)));
+      return Math.round(e.basePrice * e.multi ** this.currentRank(e));
     }
     upgradeMaxAffordable(e) {
       const t = this.currentRank(e);
       let s = 0;
       switch (e.costType) {
-        case this.costs.blood:
+        case this.costs.blood: {
           s = h(e.basePrice, e.multi, t, this.gameModel.persistentData.blood);
           break;
-        case this.costs.parts:
+        }
+        case this.costs.parts: {
           s = h(e.basePrice, e.multi, t, this.gameModel.persistentData.parts);
+        }
       }
-      return 0 != e.cap ? Math.min(s, e.cap - t) : s;
+      return e.cap != 0 ? Math.min(s, e.cap - t) : s;
     }
     upgradeMaxPrice(e, t) {
       return l(e.basePrice, e.multi, this.currentRank(e), t);
     }
     canAffordGenerator(e) {
       switch (e.costType) {
-        case this.costs.blood:
+        case this.costs.blood: {
           return this.gameModel.persistentData.blood >= this.purchasePrice(e);
-        case this.costs.parts:
+        }
+        case this.costs.parts: {
           return this.gameModel.persistentData.parts >= this.purchasePrice(e);
+        }
       }
       return false;
     }
     purchaseMaxGenerators(e) {
       const t = this.upgradeMaxAffordable(e);
-      for (let s = 0; s < t; s++) this.purchaseGenerator(e, false);
+      for (let s = 0; s < t; s++) {
+        this.purchaseGenerator(e, false);
+      }
       this.gameModel.saveData();
     }
     purchaseGenerator(e, t = true) {
       if (this.canAffordGenerator(e)) {
         switch (e.costType) {
-          case this.costs.blood:
+          case this.costs.blood: {
             this.gameModel.persistentData.blood -= this.purchasePrice(e);
             break;
-          case this.costs.parts:
+          }
+          case this.costs.parts: {
             this.gameModel.persistentData.parts -= this.purchasePrice(e);
+          }
         }
         let s;
         for (
           let t = 0;
           t < this.gameModel.persistentData.generators.length;
           t++
-        )
-          e.id == this.gameModel.persistentData.generators[t].id &&
-            ((s = this.gameModel.persistentData.generators[t]), s.rank++);
-        s ||
+        ) {
+          if (e.id == this.gameModel.persistentData.generators[t].id) {
+            (s = this.gameModel.persistentData.generators[t]), s.rank++;
+          }
+        }
+  
+        if (!s) {
           this.gameModel.persistentData.generators.push({
             id: e.id,
             rank: 1,
-          }),
-          t && this.gameModel.saveData(),
-          this.applyGenerators();
+          });
+        }
+  
+        if (t) {
+          this.gameModel.saveData();
+        }
+  
+        this.applyGenerators();
       }
     }
     applyGenerator(e, t) {
       let s = false;
-      for (let i = 0; i < this.generatorsApplied.length; i++)
-        this.generatorsApplied[i].id == e.id &&
-          ((s = true),
-          (this.generatorsApplied[i].rank = t),
-          (this.generatorsApplied[i].total =
-            this.generatorsApplied[i].produces *
-            this.generatorsApplied[i].rank));
-      s ||
+      for (let i = 0; i < this.generatorsApplied.length; i++) {
+        if (this.generatorsApplied[i].id == e.id) {
+          (s = true),
+            (this.generatorsApplied[i].rank = t),
+            (this.generatorsApplied[i].total =
+              this.generatorsApplied[i].produces *
+              this.generatorsApplied[i].rank);
+        }
+      }
+  
+      if (!s) {
         this.generatorsApplied.push({
           id: e.id,
           produces: e.produces,
@@ -2017,14 +2158,19 @@ var Incremancer;
           time: e.time,
           timeLeft: e.time,
         });
+      }
     }
     applyGenerators() {
       for (let e = 0; e < this.generators.length; e++) {
         const t = this.currentRank(this.generators[e]);
-        t > 0 && this.applyGenerator(this.generators[e], t);
+  
+        if (t > 0) {
+          this.applyGenerator(this.generators[e], t);
+        }
       }
     }
   }
+  
   class ie {
     constructor(e, t, s, i, a, r, n, o) {
       (this.id = e),
