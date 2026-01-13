@@ -3199,36 +3199,48 @@ var Incremancer;
     loadData() {
       try {
         if (localStorage.getItem(this.storageName) !== null) {
-          (this.persistentData = JSON.parse(
+          this.persistentData = JSON.parse(
             localStorage.getItem(this.storageName)
-          )),
-            (this.level = this.persistentData.levelUnlocked),
-            localStorage.getItem(this.skeleton.storageName) !== null
-              ? ((this.skeleton.persistent = JSON.parse(
-                  localStorage.getItem(this.skeleton.storageName)
-                )),
-                !("gearSetEquipped" in this.skeleton.persistent) &&
-                  (this.skeleton.persistent.gearSetEquipped = -1),
-                !("gearSets" in this.skeleton.persistent) &&
-                  (this.skeleton.persistent.gearSets = []))
-              : (this.skeleton.persistent = {
-                  xpRate: 0,
-                  skeletons: 0,
-                  level: 1,
-                  xp: 0,
-                  items: [],
-                  gearSetEquipped: -1,
-                  gearSets: [],
-                  currItemId: 0,
-                  talentReset: false,
-                }),
-            localStorage.getItem(this.skeleton.talentsStorageName) !== null
-              ? (this.skeleton.talents = JSON.parse(
-                  localStorage.getItem(this.skeleton.talentsStorageName)
-                ))
-              : (this.skeleton.talents = []),
-            this.updatePersistentData(),
-            this.calcOfflineProgress();
+          );
+
+          this.level = this.persistentData.levelUnlocked;
+
+          if (localStorage.getItem(this.skeleton.storageName) !== null) {
+            this.skeleton.persistent = JSON.parse(
+              localStorage.getItem(this.skeleton.storageName)
+            );
+
+            if (!("gearSetEquipped" in this.skeleton.persistent)) {
+              this.skeleton.persistent.gearSetEquipped = -1;
+            }
+
+            if (!("gearSets" in this.skeleton.persistent)) {
+              this.skeleton.persistent.gearSets = [];
+            }
+          } else {
+            this.skeleton.persistent = {
+              xpRate: 0,
+              skeletons: 0,
+              level: 1,
+              xp: 0,
+              items: [],
+              gearSetEquipped: -1,
+              gearSets: [],
+              currItemId: 0,
+              talentReset: false,
+            };
+          }
+
+          if (localStorage.getItem(this.skeleton.talentsStorageName) !== null) {
+            this.skeleton.talents = JSON.parse(
+              localStorage.getItem(this.skeleton.talentsStorageName)
+            );
+          } else {
+            this.skeleton.talents = [];
+          }
+
+          this.updatePersistentData();
+          this.calcOfflineProgress();
         }
       } catch (e) {
         console.log(e);
@@ -3236,22 +3248,25 @@ var Incremancer;
     }
 
     calcOfflineProgress() {
-      if (
-        (this.upgrades.applyUpgrades(),
-        this.upgrades.updateRuneEffects(),
-        this.partFactory.applyGenerators(),
-        this.constructions.partFactory)
-      ) {
-        const e = (Date.now() - this.persistentData.dateOfSave) / 1e3,
-          t = this.partFactory.updateLongTime(e);
-        t > 0 &&
-          ((this.offlineMessage =
-            "Your factory has generated " +
-            formatWhole(t) +
-            " parts while you were away"),
-          (this.persistentData.parts += t));
+      this.upgrades.applyUpgrades();
+      this.upgrades.updateRuneEffects();
+      this.partFactory.applyGenerators();
+
+      if (this.constructions.partFactory) {
+        const e =
+          (Date.now() - this.persistentData.dateOfSave) / 1000; /* 1e3 */
+        const t = this.partFactory.updateLongTime(e);
+
+        if (t > 0) {
+          this.offlineMessage = `Your factory has generated ${formatWhole(
+            t
+          )} parts while you were away`;
+
+          this.persistentData.parts += t;
+        }
       }
     }
+
     resetData() {
       try {
         localStorage.removeItem(this.storageName),
@@ -3263,58 +3278,92 @@ var Incremancer;
       }
     }
     updatePersistentData() {
-      this.persistentData.constructions ||
-        (this.persistentData.constructions = []),
-        this.persistentData.generators || (this.persistentData.generators = []),
-        this.persistentData.parts || (this.persistentData.parts = 0),
-        this.persistentData.creatureLevels ||
-          (this.persistentData.creatureLevels = []),
-        this.persistentData.creatureAutobuild ||
-          (this.persistentData.creatureAutobuild = []),
-        this.persistentData.savedCreatures ||
-          (this.persistentData.savedCreatures = []),
-        this.persistentData.levelsCompleted ||
-          (this.persistentData.levelsCompleted = []),
-        this.persistentData.saveCreated ||
-          (this.persistentData.saveCreated = Date.now()),
-        void 0 === this.persistentData.particles &&
-          (this.persistentData.particles = true),
-        this.persistentData.runeshatter ||
-          (this.persistentData.runeshatter = 0),
-        this.creatureFactory.updateAutoBuild();
+      if (!this.persistentData.constructions) {
+        this.persistentData.constructions = [];
+      }
+
+      if (!this.persistentData.generators) {
+        this.persistentData.generators = [];
+      }
+
+      if (!this.persistentData.parts) {
+        this.persistentData.parts = 0;
+      }
+
+      if (!this.persistentData.creatureLevels) {
+        this.persistentData.creatureLevels = [];
+      }
+
+      if (!this.persistentData.creatureAutobuild) {
+        this.persistentData.creatureAutobuild = [];
+      }
+
+      if (!this.persistentData.savedCreatures) {
+        this.persistentData.savedCreatures = [];
+      }
+
+      if (!this.persistentData.levelsCompleted) {
+        this.persistentData.levelsCompleted = [];
+      }
+
+      if (!this.persistentData.saveCreated) {
+        this.persistentData.saveCreated = Date.now();
+      }
+
+      if (this.persistentData.particles === undefined) {
+        this.persistentData.particles = true;
+      }
+
+      if (!this.persistentData.runeshatter) {
+        this.persistentData.runeshatter = 0;
+      }
+
+      this.creatureFactory.updateAutoBuild();
     }
+
     sendMessage(e) {
-      this.messageQueue.includes(e) || this.messageQueue.push(e);
+      if (!this.messageQueue.includes(e)) {
+        this.messageQueue.push(e);
+      }
     }
     setResolution(e) {
-      this.app &&
-        ((this.app.renderer.resolution = e),
-        this.app.renderer.rootRenderTarget &&
-          (this.app.renderer.rootRenderTarget.resolution = e),
-        (this.app.renderer.plugins.interaction.resolution = e),
+      if (this.app) {
+        this.app.renderer.resolution = e;
+
+        if (this.app.renderer.rootRenderTarget) {
+          this.app.renderer.rootRenderTarget.resolution = e;
+        }
+
+        this.app.renderer.plugins.interaction.resolution = e;
+
         this.app.renderer.resize(
           document.body.clientWidth,
           document.body.clientHeight
-        ));
+        );
+      }
     }
+
     downloadSaveGame() {
-      (this.persistentData.skeleton = this.skeleton.persistent),
-        (this.persistentData.skeletonTalents = this.skeleton.talents),
-        (this.blob = new Blob(
-          [
-            LZString.compressToEncodedURIComponent(
-              JSON.stringify(this.persistentData)
-            ),
-          ],
-          {
-            type: "octet/stream",
-          }
-        )),
-        delete this.persistentData.skeleton,
-        (this.encodedContent = window.URL.createObjectURL(this.blob));
+      this.persistentData.skeleton = this.skeleton.persistent;
+      this.persistentData.skeletonTalents = this.skeleton.talents;
+
+      this.blob = new Blob(
+        [
+          LZString.compressToEncodedURIComponent(
+            JSON.stringify(this.persistentData)
+          ),
+        ],
+        {
+          type: "octet/stream",
+        }
+      );
+
+      delete this.persistentData.skeleton;
+      this.encodedContent = window.URL.createObjectURL(this.blob);
       const e = new Date().toISOString().replace(/:|T|Z|\./g, "");
-      this.savefilename = "incremancer-" + e + ".sav";
+      this.savefilename = `incremancer-${e}.sav`;
     }
+
     importFile() {
       const e = document.getElementById("import-file").files;
       if (e && 1 == e.length) {
