@@ -89,11 +89,11 @@ var Incremancer;
   }
 
   function l(basePrice, multiplier, currentRank, maxAffordableUpgrades) {
-    return 1 == multiplier
+    return multiplier == 1
       ? basePrice * maxAffordableUpgrades
       : basePrice *
-          ((Math.pow(multiplier, currentRank) *
-            (Math.pow(multiplier, maxAffordableUpgrades) - 1)) /
+          ((multiplier ** currentRank *
+            (multiplier ** maxAffordableUpgrades - 1)) /
             (multiplier - 1));
   }
 
@@ -106,10 +106,11 @@ var Incremancer;
     const a = e.clientY - champHoldRect.y;
     if (i > champHoldRect.width / 2) {
       i -= t.getElementsByClassName("tooltip")[0].getBoundingClientRect().width;
-      t.getElementsByClassName("tooltip")[0].style.top = a + 20 + "px";
-      t.getElementsByClassName("tooltip")[0].style.left = i + 20 + "px";
+      t.getElementsByClassName("tooltip")[0].style.top = `${a + 20}px`;
+      t.getElementsByClassName("tooltip")[0].style.left = `${i + 20}px`;
     }
   }
+
   let c, u, p, g, m, b, f, y, x;
   ((e) => {
     "undefined" != typeof Symbol &&
@@ -121,40 +122,44 @@ var Incremancer;
         value: true,
       });
   })(e);
-  let v,
-    S,
-    M,
-    k,
-    w,
-    T,
-    C,
-    D = {
-      x: 800,
-      y: 600,
-      defaultScale: 1,
-    },
-    P = {
-      x: 600,
-      y: 600,
-    };
+  let v;
+  let S;
+  let M;
+  let k;
+  let w;
+  let T;
+  let C;
+
+  let D = {
+    x: 800,
+    y: 600,
+    defaultScale: 1,
+  };
+
+  let P = {
+    x: 600,
+    y: 600,
+  };
 
   function z(e) {
-    (this.data = e.data),
-      (this.dragging = true),
-      (this.dragOffset = this.data.getLocalPosition(this)),
-      (this.dragOffset.x *= this.scale.x),
-      (this.dragOffset.y *= this.scale.y),
-      (this.dragStartX = this.x),
-      (this.dragStartY = this.y),
-      (B = 0);
+    this.data = e.data;
+    this.dragging = true;
+    this.dragOffset = this.data.getLocalPosition(this);
+    this.dragOffset.x *= this.scale.x;
+    this.dragOffset.y *= this.scale.y;
+    this.dragStartX = this.x;
+    this.dragStartY = this.y;
+    B = 0;
   }
 
   function I() {
-    (this.dragging = false), (this.data = null), (B = 0);
+    this.dragging = false;
+    this.data = null;
+    B = 0;
   }
-  let B = 0,
-    R = 0;
 
+  let B = 0;
+  let R = 0;
   function H(e) {
     if (T.zombieCursor) {
       T.zombieCursor.position = e.data.getLocalPosition(this.parent);
@@ -162,85 +167,134 @@ var Incremancer;
       T.mouseOutOfBounds =
         t.x < 0 || t.y < 0 || t.x > x.width || t.y > x.height;
     }
-    if (e.data.originalEvent.touches && e.data.originalEvent.touches.length > 1)
-      !(function (e) {
+    if (
+      e.data.originalEvent.touches &&
+      e.data.originalEvent.touches.length > 1
+    ) {
+      ((e) => {
         const t = Math.abs(
           e.data.originalEvent.touches[0].clientX -
             e.data.originalEvent.touches[1].clientX
         );
-        B
-          ? R + 50 < Date.now() &&
-            Math.abs(t - B) > 10 &&
-            (zoom(t > B ? 1 : -1, null), (R = Date.now()), (B = t))
-          : (B = t);
+
+        if (B) {
+          if (R + 50 < Date.now() && Math.abs(t - B) > 10) {
+            zoom(t > B ? 1 : -1, null);
+            R = Date.now();
+            B = t;
+          }
+        } else {
+          B = t;
+        }
       })(e);
-    else if (this.dragging) {
+    } else if (this.dragging) {
       const e = this.data.getLocalPosition(this.parent);
-      (this.x = e.x - this.dragOffset.x),
-        (this.y = e.y - this.dragOffset.y),
-        F(this),
-        distance(this.dragStartX, this.dragStartY, this.x, this.y) > 5 &&
-          (this.hasMoved = true);
+      this.x = e.x - this.dragOffset.x;
+      this.y = e.y - this.dragOffset.y;
+      F(this);
+
+      if (distance(this.dragStartX, this.dragStartY, this.x, this.y) > 5) {
+        this.hasMoved = true;
+      }
     }
   }
 
   function F(e) {
-    const t = P.x * e.scale.x,
-      s = P.y * e.scale.y;
-    e.x > 0.5 * D.x && (e.x = 0.5 * D.x),
-      e.x + t < 0.5 * D.x && (e.x = 0.5 * D.x - t),
-      e.y > 0.5 * D.y && (e.y = 0.5 * D.y),
-      e.y + s < 0.5 * D.y && (e.y = 0.5 * D.y - s);
+    const t = P.x * e.scale.x;
+    const s = P.y * e.scale.y;
+
+    if (e.x > 0.5 * D.x) {
+      e.x = 0.5 * D.x;
+    }
+
+    if (e.x + t < 0.5 * D.x) {
+      e.x = 0.5 * D.x - t;
+    }
+
+    if (e.y > 0.5 * D.y) {
+      e.y = 0.5 * D.y;
+    }
+
+    if (e.y + s < 0.5 * D.y) {
+      e.y = 0.5 * D.y - s;
+    }
   }
 
   function E(e) {
-    this.hasMoved ||
-      v.currentState != v.states.playingLevel ||
-      (Y.shift
-        ? T.spawnAllZombies(
-            e.data.getLocalPosition(this).x,
-            e.data.getLocalPosition(this).y
-          )
-        : T.spawnZombie(
-            e.data.getLocalPosition(this).x,
-            e.data.getLocalPosition(this).y
-          )),
-      (this.hasMoved = false);
+    if (!this.hasMoved && v.currentState == v.states.playingLevel) {
+      if (Y.shift) {
+        T.spawnAllZombies(
+          e.data.getLocalPosition(this).x,
+          e.data.getLocalPosition(this).y
+        );
+      } else {
+        T.spawnZombie(
+          e.data.getLocalPosition(this).x,
+          e.data.getLocalPosition(this).y
+        );
+      }
+    }
+
+    this.hasMoved = false;
   }
 
   function zoom(e, t) {
-    if (R + 50 > Date.now()) return;
+    if (R + 50 > Date.now()) {
+      return;
+    }
     R = Date.now();
     const s = c;
-    t ||
-      (t = {
+
+    if (!t) {
+      t = {
         x: 0.5 * D.x,
         y: 0.5 * D.y,
-      });
-    const i = P.x * s.scale.x,
-      a = P.y * s.scale.y;
-    t.x > s.x + i && (t.x = s.x + i),
-      t.x < s.x && (t.x = s.x),
-      t.y < s.y && (t.y = s.y),
-      t.y > s.y + a && (t.y = s.y + a);
-    const r = (t.x - s.x) / s.scale.x,
-      n = (t.y - s.y) / s.scale.y;
-    e > 0
-      ? s.scale.x < 10 &&
-        ((s.scale.x = s.scale.y = 1.1 * s.scale.x),
-        T.zombieCursor &&
-          T.zombieCursor.scale &&
-          (T.zombieCursor.scale.x = T.zombieCursor.scale.y =
-            1.1 * T.zombieCursor.scale.x))
-      : Math.max(i, a) > 0.8 * Math.min(D.y, D.x) &&
-        ((s.scale.x = s.scale.y = 0.9 * s.scale.x),
-        T.zombieCursor &&
-          T.zombieCursor.scale &&
-          (T.zombieCursor.scale.x = T.zombieCursor.scale.y =
-            0.9 * T.zombieCursor.scale.x)),
-      (s.x = t.x - r * s.scale.x),
-      (s.y = t.y - n * s.scale.y),
-      F(s);
+      };
+    }
+
+    const i = P.x * s.scale.x;
+    const a = P.y * s.scale.y;
+
+    if (t.x > s.x + i) {
+      t.x = s.x + i;
+    }
+
+    if (t.x < s.x) {
+      t.x = s.x;
+    }
+
+    if (t.y < s.y) {
+      t.y = s.y;
+    }
+
+    if (t.y > s.y + a) {
+      t.y = s.y + a;
+    }
+
+    const r = (t.x - s.x) / s.scale.x;
+    const n = (t.y - s.y) / s.scale.y;
+
+    if (e > 0) {
+      if (s.scale.x < 10) {
+        s.scale.x = s.scale.y = 1.1 * s.scale.x;
+
+        if (T.zombieCursor && T.zombieCursor.scale) {
+          T.zombieCursor.scale.x = T.zombieCursor.scale.y =
+            1.1 * T.zombieCursor.scale.x;
+        }
+      }
+    } else if (Math.max(i, a) > 0.8 * Math.min(D.y, D.x)) {
+      s.scale.x = s.scale.y = 0.9 * s.scale.x;
+
+      if (T.zombieCursor && T.zombieCursor.scale) {
+        T.zombieCursor.scale.x = T.zombieCursor.scale.y =
+          0.9 * T.zombieCursor.scale.x;
+      }
+    }
+
+    s.x = t.x - r * s.scale.x;
+    s.y = t.y - n * s.scale.y;
+    F(s);
   }
 
   function L(e) {
@@ -249,18 +303,26 @@ var Incremancer;
       x: e.clientX * (D.x / document.body.clientWidth),
       y: e.clientY * (D.y / document.body.clientHeight),
     };
-    e.deltaY < 0 || e.deltaX < 0 ? zoom(1, t) : zoom(-1, t);
+    if (e.deltaY < 0 || e.deltaX < 0) {
+      zoom(1, t);
+    } else {
+      zoom(-1, t);
+    }
   }
 
   function centerGameContainer(e = false) {
-    e &&
-      ((c.scale.x = D.defaultScale),
-      (c.scale.y = D.defaultScale),
-      T.zombieCursor &&
-        (T.zombieCursor.scale.x = T.zombieCursor.scale.y =
-          T.zombieCursorScale * D.defaultScale)),
-      (c.x = (D.x - P.x * c.scale.x) / 2),
-      (c.y = (D.y - P.y * c.scale.y) / 2);
+    if (e) {
+      c.scale.x = D.defaultScale;
+      c.scale.y = D.defaultScale;
+
+      if (T.zombieCursor) {
+        T.zombieCursor.scale.x = T.zombieCursor.scale.y =
+          T.zombieCursorScale * D.defaultScale;
+      }
+    }
+
+    c.x = (D.x - P.x * c.scale.x) / 2;
+    c.y = (D.y - P.y * c.scale.y) / 2;
   }
   const G = {
       x: 0,
@@ -276,79 +338,108 @@ var Incremancer;
         );
       },
       update() {
-        (this.x = -c.x / c.scale.x),
-          (this.y = -c.y / c.scale.y),
-          (this.width = D.x / c.scale.x),
-          (this.height = D.y / c.scale.y);
+        this.x = -c.x / c.scale.x;
+        this.y = -c.y / c.scale.y;
+        this.width = D.x / c.scale.x;
+        this.height = D.y / c.scale.y;
       },
     },
     X = new PIXI.Matrix();
 
   function U(e, t) {
-    !(function (e) {
+    {
       const t = Y;
       let s = false;
       const i = c;
-      t.w && ((i.y += t.scrollSpeed * e), (s = true)),
-        t.a && ((i.x += t.scrollSpeed * e), (s = true)),
-        t.s && ((i.y -= t.scrollSpeed * e), (s = true)),
-        t.d && ((i.x -= t.scrollSpeed * e), (s = true)),
-        s && F(i);
-    })(e),
-      G.update(),
-      (e *= v.gameSpeed),
-      M.update(e),
-      C.update(e),
-      T.update(e),
-      k.update(e),
-      w.update(e),
-      S.update(e),
-      (function (e, t) {
-        if (
-          (C.vipEscaping && void 0 !== C.vip
-            ? (y.alpha += e)
-            : ((y.alpha -= e), y.alpha < 0 && (y.alpha = 0)),
-          y.alpha > 0)
-        ) {
-          y.alpha > 1 && (y.alpha = 1),
-            (y.visible = true),
-            (y.x = 5),
-            (y.y = D.y - 305);
-          const e = c.scale.x,
-            s = c.scale.y,
-            i = c.x,
-            a = c.y;
-          c.position.set(0, 0),
-            C.vip && ((X.tx = -2 * C.vip.x + 150), (X.ty = -2 * C.vip.y + 150)),
-            c.scale.set(2, 2),
-            t.renderer.render(c, f, void 0, X),
-            c.scale.set(e, s),
-            c.position.set(i, a);
-        } else y.visible = false;
-      })(e, t);
+
+      if (t.w) {
+        i.y += t.scrollSpeed * e;
+        s = true;
+      }
+
+      if (t.a) {
+        i.x += t.scrollSpeed * e;
+        s = true;
+      }
+
+      if (t.s) {
+        i.y -= t.scrollSpeed * e;
+        s = true;
+      }
+
+      if (t.d) {
+        i.x -= t.scrollSpeed * e;
+        s = true;
+      }
+
+      if (s) {
+        F(i);
+      }
+    }
+
+    G.update();
+    e *= v.gameSpeed;
+    M.update(e);
+    C.update(e);
+    T.update(e);
+    k.update(e);
+    w.update(e);
+    S.update(e);
+
+    (function (e, t) {
+      if (
+        (C.vipEscaping && void 0 !== C.vip
+          ? (y.alpha += e)
+          : ((y.alpha -= e), y.alpha < 0 && (y.alpha = 0)),
+        y.alpha > 0)
+      ) {
+        y.alpha > 1 && (y.alpha = 1),
+          (y.visible = true),
+          (y.x = 5),
+          (y.y = D.y - 305);
+        const e = c.scale.x,
+          s = c.scale.y,
+          i = c.x,
+          a = c.y;
+        c.position.set(0, 0),
+          C.vip && ((X.tx = -2 * C.vip.x + 150), (X.ty = -2 * C.vip.y + 150)),
+          c.scale.set(2, 2),
+          t.renderer.render(c, f, void 0, X),
+          c.scale.set(e, s),
+          c.position.set(i, a);
+      } else y.visible = false;
+    })(e, t);
   }
 
   function N() {
-    const e = Math.min(500 + 50 * v.level, 1500),
-      t = (Math.random() * e) / 3;
-    (P = {
+    const e = Math.min(500 + 50 * v.level, 1500);
+    const t = (Math.random() * e) / 3;
+
+    P = {
       x: e + t,
       y: e - t,
-    }),
-      x && ((x.width = P.x), (x.height = P.y)),
-      (c.hitArea = new PIXI.Rectangle(0, 0, P.x, P.y));
+    };
+
+    if (x) {
+      (x.width = P.x), (x.height = P.y);
+    }
+
+    c.hitArea = new PIXI.Rectangle(0, 0, P.x, P.y);
   }
 
   function O() {
-    const e = document.body.clientWidth,
-      t = document.body.clientHeight;
-    (D = {
+    const e = document.body.clientWidth;
+    const t = document.body.clientHeight;
+
+    D = {
       x: e,
       y: t,
-      defaultScale: Math.max(e, t) / 1e3,
-    }),
-      (Y.scrollSpeed = Math.max(e, t) / 4);
+      defaultScale: Math.max(e, t) / 1000 /* 1e3 */,
+    };
+
+    Y.scrollSpeed = Math.max(e, t) / 4;
   }
+
   new Map(),
     (window.onload = function () {
       (v = GameModel.getInstance()),
@@ -485,65 +576,66 @@ var Incremancer;
     shift: false,
     canType: false,
   };
-  (window.onblur = function () {
-    (Y.w = Y.a = Y.s = Y.d = false), (Y.shift = false);
-  }),
-    (window.onkeydown = function (e) {
-      if (Y.canType) return true;
-      switch (e.keyCode) {
-        case 16:
-        case 17:
-          Y.shift = true;
-          break;
-        case 87:
-        case 38:
-          Y.w = true;
-          break;
-        case 65:
-        case 37:
-          Y.a = true;
-          break;
-        case 83:
-        case 40:
-          Y.s = true;
-          break;
-        case 68:
-        case 39:
-          Y.d = true;
-          break;
-        default:
-          return true;
-      }
-      return false;
-    }),
-    (window.onkeyup = function (e) {
-      if (Y.canType) return true;
-      switch (e.keyCode) {
-        case 16:
-        case 17:
-          Y.shift = false;
-          break;
-        case 87:
-        case 38:
-          Y.w = false;
-          break;
-        case 65:
-        case 37:
-          Y.a = false;
-          break;
-        case 83:
-        case 40:
-          Y.s = false;
-          break;
-        case 68:
-        case 39:
-          Y.d = false;
-          break;
-        default:
-          return true;
-      }
-      return false;
-    });
+  window.onblur = function () {
+    Y.w = Y.a = Y.s = Y.d = false;
+    Y.shift = false;
+  };
+  window.onkeydown = function (e) {
+    if (Y.canType) return true;
+    switch (e.keyCode) {
+      case 16:
+      case 17:
+        Y.shift = true;
+        break;
+      case 87:
+      case 38:
+        Y.w = true;
+        break;
+      case 65:
+      case 37:
+        Y.a = true;
+        break;
+      case 83:
+      case 40:
+        Y.s = true;
+        break;
+      case 68:
+      case 39:
+        Y.d = true;
+        break;
+      default:
+        return true;
+    }
+    return false;
+  };
+  window.onkeyup = function (e) {
+    if (Y.canType) return true;
+    switch (e.keyCode) {
+      case 16:
+      case 17:
+        Y.shift = false;
+        break;
+      case 87:
+      case 38:
+        Y.w = false;
+        break;
+      case 65:
+      case 37:
+        Y.a = false;
+        break;
+      case 83:
+      case 40:
+        Y.s = false;
+        break;
+      case 68:
+      case 39:
+        Y.d = false;
+        break;
+      default:
+        return true;
+    }
+    return false;
+  };
   class Spell {
     id: number;
     name: string;
@@ -588,151 +680,150 @@ var Incremancer;
     spells: Spell[];
 
     constructor() {
-      if (
-        ((this.cooldownReduction = 0),
-        (this.timeExtension = 0),
-        (this.costReduction = 0),
-        (this.skeleton = new Skeleton()),
-        (this.zombies = new Zombies()),
-        (this.humans = new Humans()),
-        (this.spellMap = new Map()),
-        (this.spells = [
-          new Spell(
-            1,
-            "Time Warp",
-            "Speed up the flow of time for 30 seconds",
-            "",
-            90,
-            30,
-            0,
-            function () {
-              GameModel.getInstance().gameSpeed = 2;
-            },
-            function () {
-              GameModel.getInstance().gameSpeed = 1;
+      this.cooldownReduction = 0;
+      this.timeExtension = 0;
+      this.costReduction = 0;
+      this.skeleton = new Skeleton();
+      this.zombies = new Zombies();
+      this.humans = new Humans();
+      this.spellMap = new Map();
+      this.spells = [
+        new Spell(
+          1,
+          "Time Warp",
+          "Speed up the flow of time for 30 seconds",
+          "",
+          90,
+          30,
+          0,
+          function () {
+            GameModel.getInstance().gameSpeed = 2;
+          },
+          function () {
+            GameModel.getInstance().gameSpeed = 1;
+          }
+        ),
+        new Spell(
+          2,
+          "Energy Charge",
+          "5x Energy rate for 20 seconds, cost 50 energy",
+          "",
+          160,
+          20,
+          50,
+          function () {
+            GameModel.getInstance().energySpellMultiplier = 5;
+            if (
+              GameModel.getInstance().persistentData.autoMaxHarpies &&
+              GameModel.getInstance().constructions.aviary
+            ) {
+              GameModel.getInstance().setMaxHarpies();
             }
-          ),
-          new Spell(
-            2,
-            "Energy Charge",
-            "5x Energy rate for 20 seconds, cost 50 energy",
-            "",
-            160,
-            20,
-            50,
-            function () {
-              GameModel.getInstance().energySpellMultiplier = 5;
-              if (
-                GameModel.getInstance().persistentData.autoMaxHarpies &&
-                GameModel.getInstance().constructions.aviary
-              ) {
-                GameModel.getInstance().setMaxHarpies();
-              }
-            },
-            function () {
-              GameModel.getInstance().energySpellMultiplier = 1;
-              if (
-                GameModel.getInstance().persistentData.autoMaxHarpies &&
-                GameModel.getInstance().constructions.aviary
-              ) {
-                GameModel.getInstance().setMaxHarpies();
-              }
+          },
+          function () {
+            GameModel.getInstance().energySpellMultiplier = 1;
+            if (
+              GameModel.getInstance().persistentData.autoMaxHarpies &&
+              GameModel.getInstance().constructions.aviary
+            ) {
+              GameModel.getInstance().setMaxHarpies();
             }
-          ),
-          new Spell(
-            3,
-            "Detonate",
-            "Turns your zombies into fast moving living bombs, cost 69 energy... nice",
-            "",
-            80,
-            8,
-            69,
-            function () {
-              new Spells().zombies.detonate = true;
-            },
-            function () {
-              new Spells().zombies.detonate = false;
-            }
-          ),
-          new Spell(
-            4,
-            "Earth Freeze",
-            "Freeze all humans in place preventing them from moving for 15 seconds, cost 75 energy",
-            "",
-            50,
-            15,
-            75,
-            function () {
-              new Spells().humans.frozen = true;
-            },
-            function () {
-              new Spells().humans.frozen = false;
-            }
-          ),
-          new Spell(
-            5,
-            "Gigazombies",
-            "For 5 seconds any zombies spawned will be giants with 10x health and attack damage, cost 100 energy",
-            "",
-            260,
-            5,
-            100,
-            function () {
-              new Spells().zombies.super = true;
-            },
-            function () {
-              new Spells().zombies.super = false;
-            }
-          ),
-          new Spell(
-            6,
-            "Incinerate",
-            "Burns humans near the skeleton champion",
-            "Has a chance to cast Incinerate when attacking, burning all humans within a large radius of the Skeleton",
-            1,
-            10,
-            10,
-            function () {
-              new Spells().skeleton.incinerate(), (this.timer = 1);
-            },
-            function () {}
-          ),
-          new Spell(
-            7,
-            "Pandemic",
-            "Causes plague to spread",
-            "Has a chance to cast Pandemic when attacking, causing infected humans to spread the plague to each other for 20 seconds",
-            10,
-            20,
-            10,
-            function () {
-              new Spells().humans.pandemic = true;
-            },
-            function () {
-              new Spells().humans.pandemic = false;
-            }
-          ),
-          new Spell(
-            8,
-            "Part Storm",
-            "Doubles parts",
-            "Has a chance to cast Part Storm when attacking, doubling the parts production of your factory machines for 15 seconds",
-            10,
-            15,
-            10,
-            function () {
-              new PartFactory().storm = true;
-            },
-            function () {
-              new PartFactory().storm = false;
-            }
-          ),
-        ]),
-        Spells.instance)
-      )
+          }
+        ),
+        new Spell(
+          3,
+          "Detonate",
+          "Turns your zombies into fast moving living bombs, cost 69 energy... nice",
+          "",
+          80,
+          8,
+          69,
+          function () {
+            new Spells().zombies.detonate = true;
+          },
+          function () {
+            new Spells().zombies.detonate = false;
+          }
+        ),
+        new Spell(
+          4,
+          "Earth Freeze",
+          "Freeze all humans in place preventing them from moving for 15 seconds, cost 75 energy",
+          "",
+          50,
+          15,
+          75,
+          function () {
+            new Spells().humans.frozen = true;
+          },
+          function () {
+            new Spells().humans.frozen = false;
+          }
+        ),
+        new Spell(
+          5,
+          "Gigazombies",
+          "For 5 seconds any zombies spawned will be giants with 10x health and attack damage, cost 100 energy",
+          "",
+          260,
+          5,
+          100,
+          function () {
+            new Spells().zombies.super = true;
+          },
+          function () {
+            new Spells().zombies.super = false;
+          }
+        ),
+        new Spell(
+          6,
+          "Incinerate",
+          "Burns humans near the skeleton champion",
+          "Has a chance to cast Incinerate when attacking, burning all humans within a large radius of the Skeleton",
+          1,
+          10,
+          10,
+          function () {
+            new Spells().skeleton.incinerate(), (this.timer = 1);
+          },
+          function () {}
+        ),
+        new Spell(
+          7,
+          "Pandemic",
+          "Causes plague to spread",
+          "Has a chance to cast Pandemic when attacking, causing infected humans to spread the plague to each other for 20 seconds",
+          10,
+          20,
+          10,
+          function () {
+            new Spells().humans.pandemic = true;
+          },
+          function () {
+            new Spells().humans.pandemic = false;
+          }
+        ),
+        new Spell(
+          8,
+          "Part Storm",
+          "Doubles parts",
+          "Has a chance to cast Part Storm when attacking, doubling the parts production of your factory machines for 15 seconds",
+          10,
+          15,
+          10,
+          function () {
+            new PartFactory().storm = true;
+          },
+          function () {
+            new PartFactory().storm = false;
+          }
+        ),
+      ];
+      if (Spells.instance) {
         return Spells.instance;
-      (Spells.instance = this),
-        this.spells.forEach((e) => this.spellMap.set(e.id, e));
+      }
+      Spells.instance = this;
+      this.spells.forEach((e) => this.spellMap.set(e.id, e));
     }
     lockAllSpells() {
       for (let e = 0; e < this.spells.length; e++)
@@ -747,113 +838,135 @@ var Incremancer;
     getUnlockedSpells() {
       return this.spells.filter((e) => e.unlocked);
     }
-    castSpell(e) {
-      const t = GameModel.getInstance();
-      e.onCooldown ||
-        e.active ||
-        !e.unlocked ||
-        e.energyCost - this.costReduction > t.energy ||
-        ((t.energy -= e.energyCost - this.costReduction),
-        (e.onCooldown = true),
-        (e.cooldownLeft = e.cooldown * this.cooldownReduction),
-        (e.active = true),
-        (e.timer = e.duration + this.timeExtension),
-        e.start(),
-        t.sendMessage(e.name));
+    castSpell(spell: Spell) {
+      const gameModel = GameModel.getInstance();
+      if (
+        spell.onCooldown ||
+        spell.active ||
+        !spell.unlocked ||
+        spell.energyCost - this.costReduction > gameModel.energy
+      ) {
+        return;
+      }
+
+      gameModel.energy -= spell.energyCost - this.costReduction;
+      spell.onCooldown = true;
+      spell.cooldownLeft = spell.cooldown * this.cooldownReduction;
+      spell.active = true;
+      spell.timer = spell.duration + this.timeExtension;
+
+      spell.start();
+      gameModel.sendMessage(spell.name);
     }
     castSpellNoMana(e) {
       const t = this.spellMap.get(e);
-      t &&
-        !t.active &&
-        ((t.active = true),
-        (t.timer = t.duration + this.timeExtension),
-        t.start(),
-        GameModel.getInstance().sendMessage(t.name));
+      if (t && !t.active) {
+        t.active = true;
+        t.timer = t.duration + this.timeExtension;
+        t.start();
+        GameModel.getInstance().sendMessage(t.name);
+      }
     }
     updateSpells(e) {
       for (let t = 0; t < this.spells.length; t++) {
         const s = this.spells[t];
-        s.onCooldown &&
-          !s.active &&
-          ((s.cooldownLeft -= e),
-          s.cooldownLeft <= 0 && (s.onCooldown = false)),
-          s.active &&
-            ((s.timer -= e), s.timer <= 0 && ((s.active = false), s.end()));
+        if (s.onCooldown && !s.active) {
+          s.cooldownLeft -= e;
+
+          if (s.cooldownLeft <= 0) {
+            s.onCooldown = false;
+          }
+        }
+
+        if (s.active) {
+          s.timer -= e;
+
+          if (s.timer <= 0) {
+            (s.active = false), s.end();
+          }
+        }
       }
     }
   }
   class V extends PIXI.TilingSprite {
     constructor(e) {
-      super(e),
-        (this.collisionX = 0),
-        (this.collisionY = 0),
-        (this.collisionWidth = 0),
-        (this.collisionHeight = 0);
+      super(e);
+      this.collisionX = 0;
+      this.collisionY = 0;
+      this.collisionWidth = 0;
+      this.collisionHeight = 0;
     }
   }
+
   class j {
     constructor(e, t, s, i, a) {
-      (this.id = 0),
-        (this.x = 0),
-        (this.y = 0),
-        (this.width = 0),
-        (this.height = 0),
-        (this.entrance = null),
-        (this.id = e),
-        (this.x = t),
-        (this.y = s),
-        (this.width = i),
-        (this.height = a);
+      this.id = 0;
+      this.x = 0;
+      this.y = 0;
+      this.width = 0;
+      this.height = 0;
+      this.entrance = null;
+      this.id = e;
+      this.x = t;
+      this.y = s;
+      this.width = i;
+      this.height = a;
     }
   }
+
   class $ {
     constructor() {
-      (this.attack = 0),
-        (this.scan = 0),
-        (this.smoke = 0),
-        (this.burnTick = 0),
-        (this.ability = 0),
-        (this.dogStun = 0),
-        (this.target = 0);
+      this.attack = 0;
+      this.scan = 0;
+      this.smoke = 0;
+      this.burnTick = 0;
+      this.ability = 0;
+      this.dogStun = 0;
+      this.target = 0;
     }
   }
+
   class K {
     constructor() {
-      (this.burning = false),
-        (this.infected = false),
-        (this.dead = false),
-        (this.golem = false);
+      this.burning = false;
+      this.infected = false;
+      this.dead = false;
+      this.golem = false;
     }
   }
+
   class Q extends PIXI.AnimatedSprite {
     constructor(e) {
-      super(e),
-        (this.xSpeed = 0),
-        (this.ySpeed = 0),
-        (this.health = 0),
-        (this.maxHealth = 0),
-        (this.zombie = false),
-        (this.targetVector = {
-          x: 0,
-          y: 0,
-        }),
-        (this.burnDamage = 0),
-        (this.hasIcon = false),
-        (this.flags = new K()),
-        (this.timer = new $());
+      super(e);
+      this.xSpeed = 0;
+      this.ySpeed = 0;
+      this.health = 0;
+      this.maxHealth = 0;
+      this.zombie = false;
+
+      this.targetVector = {
+        x: 0,
+        y: 0,
+      };
+
+      this.burnDamage = 0;
+      this.hasIcon = false;
+      this.flags = new K();
+      this.timer = new $();
     }
     reset() {
-      (this.xSpeed = 0),
-        (this.ySpeed = 0),
-        (this.alpha = 1),
-        (this.visible = true),
-        (this.burnDamage = 0),
-        (this.currentPoi = null),
-        (this.flags.dead = false),
-        (this.flags.burning = false),
-        (this.flags.infected = false);
+      this.xSpeed = 0;
+      this.ySpeed = 0;
+      this.alpha = 1;
+      this.visible = true;
+      this.burnDamage = 0;
+      this.currentPoi = null;
+      this.flags.dead = false;
+      this.flags.burning = false;
+      this.flags.infected = false;
     }
   }
+
   class J extends PIXI.Sprite {
     xSpeed: number;
     ySpeed: number;
@@ -864,6 +977,7 @@ var Incremancer;
       this.ySpeed = 0;
     }
   }
+
   class _ {
     constructor() {
       this.sprites = [];
@@ -889,6 +1003,7 @@ var Incremancer;
       return e;
     }
   }
+
   class ee {
     instance: ee;
 
@@ -951,7 +1066,7 @@ var Incremancer;
       for (let t = 0; t < this.buildings.length; t++)
         if (!this.roomNoOverlap(e, this.buildings[t])) return false;
       return !(
-        this.gameModel.level % 5 == 0 &&
+        this.gameModel.level % 5 === 0 &&
         !this.gameModel.isBossStage(this.gameModel.level) &&
         e.y < this.roadSprite.y + this.roadSprite.height &&
         e.y + e.height > this.roadSprite.y
@@ -960,48 +1075,59 @@ var Incremancer;
     getWall(e) {
       if (this.discardedWalls.length > 0) {
         const t = this.discardedWalls.pop();
-        return (t.texture = e), t;
+        t.texture = e;
+        return t;
       }
       return new V(e);
     }
     makeHorizontalWall(e, t, s, i, a, r) {
       if (s) {
         const s = this.getWall(t);
-        (s.x = i),
-          (s.y = a),
-          (s.width = r / 2 - this.entranceWidth),
-          (s.height = 4),
-          e.push(s);
+        s.x = i;
+        s.y = a;
+        s.width = r / 2 - this.entranceWidth;
+        s.height = 4;
+        e.push(s);
         const n = this.getWall(t);
-        (n.x = i + r / 2 + this.entranceWidth),
-          (n.y = a),
-          (n.width = r / 2 - this.entranceWidth),
-          (n.height = 4),
-          e.push(n);
+        n.x = i + r / 2 + this.entranceWidth;
+        n.y = a;
+        n.width = r / 2 - this.entranceWidth;
+        n.height = 4;
+        e.push(n);
       } else {
         const s = this.getWall(t);
-        (s.x = i), (s.y = a), (s.width = r), (s.height = 4), e.push(s);
+        s.x = i;
+        s.y = a;
+        s.width = r;
+        s.height = 4;
+        e.push(s);
       }
     }
+
     makeVerticalWall(e, t, s, i, a, r) {
       if (s) {
         const s = this.getWall(t);
-        (s.x = i),
-          (s.y = a),
-          (s.width = 4),
-          (s.height = r / 2 - this.entranceWidth),
-          e.push(s);
+        s.x = i;
+        s.y = a;
+        s.width = 4;
+        s.height = r / 2 - this.entranceWidth;
+        e.push(s);
         const n = this.getWall(t);
-        (n.x = i),
-          (n.y = a + r / 2 + this.entranceWidth),
-          (n.width = 4),
-          (n.height = r / 2 - this.entranceWidth),
-          e.push(n);
+        n.x = i;
+        n.y = a + r / 2 + this.entranceWidth;
+        n.width = 4;
+        n.height = r / 2 - this.entranceWidth;
+        e.push(n);
       } else {
         const s = this.getWall(t);
-        (s.x = i), (s.y = a), (s.width = 4), (s.height = r), e.push(s);
+        s.x = i;
+        s.y = a;
+        s.width = 4;
+        s.height = r;
+        e.push(s);
       }
     }
+
     getContainer() {
       return this.discardedContainers.length > 0
         ? this.discardedContainers.pop()
@@ -1013,7 +1139,8 @@ var Incremancer;
         : new PIXI.TilingSprite(PIXI.Texture.WHITE);
     }
     addBuilding(e) {
-      var t, s;
+      var t;
+      let s;
       e.container = this.getContainer();
       e.container.cacheAsBitmap = false;
       e.floorSprite = this.getFloorSprite();
@@ -1094,16 +1221,25 @@ var Incremancer;
         x: P.x / 2,
         y: P.y / 2,
       };
-      let h = 2e3;
+      let h = 2000; /* 2e3 */
       for (let e = 0; e < r.length; e++) {
         const t = weighted_hybrid_distance(r[e].x, r[e].y, o.x, o.y);
-        t < h && ((h = t), (n = r[e]));
+
+        if (t < h) {
+          h = t;
+          n = r[e];
+        }
       }
       e.entrance = n;
-      this.gameModel.level % 5 == 0 &&
-        (e.y < P.y / 2
-          ? (e.entrance = r.filter((e) => e.south)[0])
-          : (e.entrance = r.filter((e) => e.north)[0]));
+
+      if (this.gameModel.level % 5 == 0) {
+        if (e.y < P.y / 2) {
+          e.entrance = r.filter((e) => e.south)[0];
+        } else {
+          e.entrance = r.filter((e) => e.north)[0];
+        }
+      }
+
       e.walls = [];
       const l = sample(this.buildingTextures);
       this.makeHorizontalWall(
@@ -1113,40 +1249,41 @@ var Incremancer;
         -4,
         -4,
         e.width + 8
-      ),
-        this.makeHorizontalWall(
-          e.walls,
-          l,
-          e.entrance.south,
-          -4,
-          e.height,
-          e.width + 8
-        ),
-        this.makeVerticalWall(
-          e.walls,
-          l,
-          e.entrance.west,
-          -4,
-          -4,
-          e.height + 8
-        ),
-        this.makeVerticalWall(
-          e.walls,
-          l,
-          e.entrance.east,
-          e.width,
-          -4,
-          e.height + 8
-        );
-      for (let t = 0; t < e.walls.length; t++) e.container.addChild(e.walls[t]);
+      );
+
+      this.makeHorizontalWall(
+        e.walls,
+        l,
+        e.entrance.south,
+        -4,
+        e.height,
+        e.width + 8
+      );
+
+      this.makeVerticalWall(e.walls, l, e.entrance.west, -4, -4, e.height + 8);
+
+      this.makeVerticalWall(
+        e.walls,
+        l,
+        e.entrance.east,
+        e.width,
+        -4,
+        e.height + 8
+      );
+
+      for (let t = 0; t < e.walls.length; t++) {
+        e.container.addChild(e.walls[t]);
+      }
       e.container.cacheAsBitmap = true;
       u.addChild(e.container);
-      for (let t = 0; t < e.walls.length; t++)
+      for (let t = 0; t < e.walls.length; t++) {
         e.walls[t].collisionX = e.x + e.walls[t].x;
+      }
       e.walls[t].collisionY = e.y + e.walls[t].y;
       e.walls[t].collisionWidth = e.walls[t].width;
       e.walls[t].collisionHeight = e.walls[t].height;
     }
+
     addCorners(e) {
       e.corners = [];
       e.corners.push({
@@ -1191,101 +1328,117 @@ var Incremancer;
       };
     }
     populatePois() {
-      if ((this.setGraveyardPosition(), !this.buildingTextures)) {
-        this.buildingTextures = [];
-        for (let e = 0; e < 2; e++)
-          this.buildingTextures.push(
-            PIXI.Texture.from("floor" + (e + 1) + ".png")
-          );
-        for (let e = 0; e < 2; e++)
-          this.buildingTextures.push(
-            PIXI.Texture.from("wall" + (e + 1) + ".png")
-          );
-        (this.roadSprite = new PIXI.TilingSprite(
-          PIXI.Texture.from("road.png")
-        )),
-          (this.roadSprite.texture.baseTexture.mipmap = PIXI.MIPMAP_MODES.OFF),
-          (this.roadSprite.width = P.x),
-          this.roadSprite.tileScale.set(3, 3),
-          (this.roadSprite.height = 96),
-          u.addChild(this.roadSprite),
-          (this.roadSprite.visible = false),
-          this.roadSprite.anchor.set(0, 0);
-      }
-      if (this.buildings.length > 0)
-        for (let e = 0; e < this.buildings.length; e++)
-          u.removeChild(this.buildings[e].container),
-            this.buildings[e].walls.forEach((t) => {
-              this.discardedWalls.push(t),
-                this.buildings[e].container.removeChild(t);
-            }),
-            this.buildings[e].container.removeChild(
-              this.buildings[e].floorSprite
-            ),
-            this.discardedFloorSprites.push(this.buildings[e].floorSprite),
-            this.discardedContainers.push(this.buildings[e].container);
-      let e = 1;
-      (this.buildingsByPopularity = []), (this.buildings = []);
-      let t = this.minBuildings,
-        s = this.humans.getMaxHumans();
-      const i = Math.max(Math.min(50, Math.round(s / 3)), 10);
-      for (
-        this.roadSprite.visible = false,
-          this.gameModel.isBossStage(this.gameModel.level)
-            ? ((s = 0), (t = 0))
-            : this.gameModel.level % 5 == 0 &&
-              ((this.roadSprite.visible = true),
-              (this.roadSprite.width = P.x),
-              (this.roadSprite.x = 0),
-              (this.roadSprite.y = P.y / 2 - 48));
-        s > 0 || t > 0;
+      this.setGraveyardPosition();
 
-      ) {
+      if (!this.buildingTextures) {
+        this.buildingTextures = [];
+        for (let e = 0; e < 2; e++) {
+          this.buildingTextures.push(PIXI.Texture.from(`floor${e + 1}.png`));
+        }
+        for (let e = 0; e < 2; e++) {
+          this.buildingTextures.push(PIXI.Texture.from(`wall${e + 1}.png`));
+        }
+        this.roadSprite = new PIXI.TilingSprite(PIXI.Texture.from("road.png"));
+        this.roadSprite.texture.baseTexture.mipmap = PIXI.MIPMAP_MODES.OFF;
+        this.roadSprite.width = P.x;
+        this.roadSprite.tileScale.set(3, 3);
+        this.roadSprite.height = 96;
+        u.addChild(this.roadSprite);
+        this.roadSprite.visible = false;
+        this.roadSprite.anchor.set(0, 0);
+      }
+
+      if (this.buildings.length > 0) {
+        for (let e = 0; e < this.buildings.length; e++) {
+          u.removeChild(this.buildings[e].container);
+
+          this.buildings[e].walls.forEach((t) => {
+            this.discardedWalls.push(t);
+            this.buildings[e].container.removeChild(t);
+          });
+
+          this.buildings[e].container.removeChild(
+            this.buildings[e].floorSprite
+          );
+          this.discardedFloorSprites.push(this.buildings[e].floorSprite);
+          this.discardedContainers.push(this.buildings[e].container);
+        }
+      }
+      let e = 1;
+      this.buildingsByPopularity = [];
+      this.buildings = [];
+      let t = this.minBuildings;
+      let s = this.humans.getMaxHumans();
+      const i = Math.max(Math.min(50, Math.round(s / 3)), 10);
+      this.roadSprite.visible = false;
+
+      if (this.gameModel.isBossStage(this.gameModel.level)) {
+        s = 0;
+        t = 0;
+      } else if (this.gameModel.level % 5 == 0) {
+        this.roadSprite.visible = true;
+        this.roadSprite.width = P.x;
+        this.roadSprite.x = 0;
+        this.roadSprite.y = P.y / 2 - 48;
+      }
+
+      while (s > 0 || t > 0) {
         t--;
-        const a = Math.round(5 + Math.random() * (i - 5)),
-          r = Math.sqrt(500 * a);
+        const a = Math.round(5 + Math.random() * (i - 5));
+        const r = Math.sqrt(500 * a);
         s -= a;
-        let n,
-          o = false,
-          h = 1e3;
+        let n;
+        let o = false;
+        let h = 1000; /* 1e3 */
         const l = 10;
-        for (; !o && h > 0; )
-          h--,
-            (n =
-              this.gameModel.level % 5 == 0
-                ? Math.random() > 0.7
-                  ? {
-                      x: l + Math.random() * (P.x - (2 * l + r)),
-                      y: l + Math.random() * (P.y - (2 * l + r)),
-                      width: r,
-                      height: r,
-                    }
-                  : {
-                      x: l + Math.random() * (P.x - (2 * l + r)),
-                      y:
-                        Math.random() > 0.5
-                          ? P.y / 2 + this.roadSprite.height / 2 + 8
-                          : P.y / 2 - this.roadSprite.height / 2 - 8 - r,
-                      width: r,
-                      height: r,
-                    }
-                : {
+
+        while (!o && h > 0) {
+          h--;
+
+          n =
+            this.gameModel.level % 5 == 0
+              ? Math.random() > 0.7
+                ? {
                     x: l + Math.random() * (P.x - (2 * l + r)),
                     y: l + Math.random() * (P.y - (2 * l + r)),
                     width: r,
                     height: r,
-                  }),
-            (o = this.isValidPosition(n));
+                  }
+                : {
+                    x: l + Math.random() * (P.x - (2 * l + r)),
+                    y:
+                      Math.random() > 0.5
+                        ? P.y / 2 + this.roadSprite.height / 2 + 8
+                        : P.y / 2 - this.roadSprite.height / 2 - 8 - r,
+                    width: r,
+                    height: r,
+                  }
+              : {
+                  x: l + Math.random() * (P.x - (2 * l + r)),
+                  y: l + Math.random() * (P.y - (2 * l + r)),
+                  width: r,
+                  height: r,
+                };
+
+          o = this.isValidPosition(n);
+        }
+
         if (o) {
           const t = new j(e++, n.x, n.y, r, r);
           this.addBuilding(t);
           const s = Math.max(Math.round(r / 10), 1);
-          for (let e = 0; e < s; e++) this.buildingsByPopularity.push(t);
-          this.buildings.push(t), this.addCorners(t);
+          for (let e = 0; e < s; e++) {
+            this.buildingsByPopularity.push(t);
+          }
+          this.buildings.push(t);
+          this.addCorners(t);
         }
       }
-      this.populateBuildingMap(), this.populateTrees();
+
+      this.populateBuildingMap();
+      this.populateTrees();
     }
+
     populateBuildingMap() {
       if (
         ((this.buildingMap = []),
@@ -1594,11 +1747,13 @@ var Incremancer;
     }
     populateTrees() {
       if (this.treeSprites.length > 0)
-        for (let e = 0; e < this.treeSprites.length; e++)
+        for (let e = 0; e < this.treeSprites.length; e++) {
           this.treeSprites[e].visible = false;
+        }
       if (0 == this.treeTextures.length) {
-        for (let e = 0; e < 6; e++)
+        for (let e = 0; e < 6; e++) {
           this.treeTextures.push(PIXI.Texture.from("tree" + e + ".png"));
+        }
         this.armyTextures.push(PIXI.Texture.from("hedgehog.png")),
           this.armyTextures.push(PIXI.Texture.from("sandbags.png"));
       }
