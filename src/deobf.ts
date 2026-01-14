@@ -3060,13 +3060,13 @@ var Incremancer;
     }
     updateStats() {
       if (this.stats) {
-        (this.stats.zombie.health = this.zombieHealth),
-          (this.stats.zombie.damage = this.zombieDamage),
-          (this.stats.zombie.speed = this.zombieSpeed),
-          (this.stats.zombie.count = this.zombieCount),
-          (this.stats.skeleton.health = 10 * this.zombieHealth),
-          (this.stats.skeleton.damage = 10 * this.zombieDamage),
-          (this.stats.skeleton.speed = this.skeleton.moveSpeed);
+        this.stats.zombie.health = this.zombieHealth;
+        this.stats.zombie.damage = this.zombieDamage;
+        this.stats.zombie.speed = this.zombieSpeed;
+        this.stats.zombie.count = this.zombieCount;
+        this.stats.skeleton.health = 10 * this.zombieHealth;
+        this.stats.skeleton.damage = 10 * this.zombieDamage;
+        this.stats.skeleton.speed = this.skeleton.moveSpeed;
       }
     }
 
@@ -3366,62 +3366,83 @@ var Incremancer;
 
     importFile() {
       const e = document.getElementById("import-file").files;
-      if (e && 1 == e.length) {
-        const t = e[0],
-          s = new FileReader(),
-          i = GameModel.getInstance();
-        (s.onload = function (e) {
+      if (e && e.length == 1) {
+        const [t] = e;
+        const s = new FileReader();
+        const i = GameModel.getInstance();
+
+        s.onload = (e) => {
           const t = JSON.parse(
             LZString.decompressFromEncodedURIComponent(e.target.result)
           );
-          t.dateOfSave
-            ? (t.skeleton &&
-                ((i.skeleton.persistent = t.skeleton),
-                delete t.skeleton,
-                !("gearSetEquipped" in i.skeleton.persistent) &&
-                  (i.skeleton.persistent.gearSetEquipped = -1),
-                !("gearSets" in i.skeleton.persistent) &&
-                  (i.skeleton.persistent.gearSets = [])),
-              t.skeletonTalents
-                ? ((i.skeleton.talents = t.skeletonTalents),
-                  delete t.skeletonTalents)
-                : (i.skeleton.talents = []),
-              (i.persistentData = t),
-              i.updatePersistentData(),
-              i.saveToPlayFab(),
-              (i.level = i.persistentData.levelUnlocked),
-              (i.creatureFactory.spawnedSavedCreatures = false),
-              i.setupLevel())
-            : alert("Error loading save game");
-        }),
-          s.readAsText(t);
+
+          if (t.dateOfSave) {
+            if (t.skeleton) {
+              i.skeleton.persistent = t.skeleton;
+              delete t.skeleton;
+
+              if (!("gearSetEquipped" in i.skeleton.persistent)) {
+                i.skeleton.persistent.gearSetEquipped = -1;
+              }
+
+              if (!("gearSets" in i.skeleton.persistent)) {
+                i.skeleton.persistent.gearSets = [];
+              }
+            }
+
+            if (t.skeletonTalents) {
+              i.skeleton.talents = t.skeletonTalents;
+              delete t.skeletonTalents;
+            } else {
+              i.skeleton.talents = [];
+            }
+
+            i.persistentData = t;
+            i.updatePersistentData();
+            i.saveToPlayFab();
+            i.level = i.persistentData.levelUnlocked;
+            i.creatureFactory.spawnedSavedCreatures = false;
+            i.setupLevel();
+          } else {
+            alert("Error loading save game");
+          }
+        };
+
+        s.readAsText(t);
       }
     }
+
     toggleFullscreen() {
       if (
         document.fullscreenElement ||
         document.webkitFullscreenElement ||
         document.mozFullScreenElement ||
         document.msFullscreenElement
-      )
-        document.exitFullscreen
-          ? document.exitFullscreen()
-          : document.webkitExitFullscreen
-          ? document.webkitExitFullscreen()
-          : document.mozCancelFullScreen
-          ? document.mozCancelFullScreen()
-          : document.msExitFullscreen && document.msExitFullscreen();
-      else {
-        const e = document.body;
-        e.requestFullscreen
-          ? e.requestFullscreen()
-          : e.webkitRequestFullscreen
-          ? e.webkitRequestFullscreen()
-          : e.mozRequestFullScreen
-          ? e.mozRequestFullScreen()
-          : e.msRequestFullscreen && e.msRequestFullscreen();
+      ) {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+          document.webkitExitFullscreen();
+        } else if (document.mozCancelFullScreen) {
+          document.mozCancelFullScreen();
+        } else if (document.msExitFullscreen) {
+          document.msExitFullscreen();
+        }
+      } else {
+        const document_body = document.body;
+
+        if (document_body.requestFullscreen) {
+          document_body.requestFullscreen();
+        } else if (document_body.webkitRequestFullscreen) {
+          document_body.webkitRequestFullscreen();
+        } else if (document_body.mozRequestFullScreen) {
+          document_body.mozRequestFullScreen();
+        } else if (document_body.msRequestFullscreen) {
+          document_body.msRequestFullscreen();
+        }
       }
     }
+
     prestigePointsForLevel(e) {
       return this.persistentData.levelsCompleted.includes(e) ? 0 : e;
     }
@@ -3448,34 +3469,40 @@ var Incremancer;
       };
     }
     loginInUsingPlayFab() {
-      if (window.kongregate)
+      if (window.kongregate) {
         try {
           PlayFab.settings.titleId = this.titleId;
+
           const e = {
-              TitleId: PlayFab.settings.titleId,
-              AuthTicket: window.kongregate.services.getGameAuthToken(),
-              KongregateId: window.kongregate.services.getUserId(),
-              CreateAccount: true,
-            },
-            t = this;
+            TitleId: PlayFab.settings.titleId,
+            AuthTicket: window.kongregate.services.getGameAuthToken(),
+            KongregateId: window.kongregate.services.getUserId(),
+            CreateAccount: true,
+          };
+
+          const t = this;
           PlayFabClientSDK.LoginWithKongregate(
             e,
-            function (e) {
-              e &&
-                e.data &&
-                e.data.PlayFabId &&
-                ((t.playFabId = e.data.PlayFabId), t.loadFromPlayFab());
+            (e) => {
+              if (e && e.data && e.data.PlayFabId) {
+                t.playFabId = e.data.PlayFabId;
+                t.loadFromPlayFab();
+              }
             },
-            function (e) {
+            (e) => {
               console.log(e);
             }
           );
         } catch (e) {
           console.error(e);
         }
+      }
     }
+
     saveToPlayFab(e = false) {
-      if (((this.lastPlayFabSave = Date.now()), this.playFabId)) {
+      this.lastPlayFabSave = Date.now();
+
+      if (this.playFabId) {
         const t = this.persistentData.trophies;
         delete this.persistentData.trophies;
         const s = {
@@ -3506,26 +3533,31 @@ var Incremancer;
           const t = this;
           PlayFab.ClientApi.UpdateUserData(
             s,
-            function (s) {
-              e
-                ? (t.resetToBaseStats(),
-                  t.setupLevel(),
-                  window.location.reload())
-                : t.messageQueue.push("Game Saved to Cloud");
+            (s) => {
+              if (e) {
+                t.resetToBaseStats();
+                t.setupLevel();
+                window.location.reload();
+              } else {
+                t.messageQueue.push("Game Saved to Cloud");
+              }
             },
-            function (e) {
+            (e) => {
               console.log(e);
             }
           );
         } catch (e) {
           console.log(e);
         }
-      } else
-        e &&
-          (this.resetToBaseStats(),
-          this.setupLevel(),
-          window.location.reload());
+      } else {
+        if (e) {
+          this.resetToBaseStats();
+          this.setupLevel();
+          window.location.reload();
+        }
+      }
     }
+
     loadFromPlayFab(e = false) {
       if (this.playFabId) {
         const t = {
@@ -3537,45 +3569,57 @@ var Incremancer;
           const s = this;
           PlayFab.ClientApi.GetUserData(
             t,
-            function (t) {
+            (t) => {
               if (t.data.Data.save) {
                 const i = JSON.parse(
                   LZString.decompressFromEncodedURIComponent(
                     t.data.Data.save.Value
                   )
                 );
-                (e ||
+
+                if (
+                  e ||
                   i.saveCreated < s.persistentData.saveCreated ||
                   (i.saveCreated == s.persistentData.saveCreated &&
-                    i.dateOfSave > s.persistentData.dateOfSave)) &&
-                  ((s.persistentData = i),
-                  t.data.Data.trophies &&
-                    (s.persistentData.trophies = JSON.parse(
+                    i.dateOfSave > s.persistentData.dateOfSave)
+                ) {
+                  s.persistentData = i;
+
+                  if (t.data.Data.trophies) {
+                    s.persistentData.trophies = JSON.parse(
                       LZString.decompressFromEncodedURIComponent(
                         t.data.Data.trophies.Value
                       )
-                    )),
-                  t.data.Data.skeleton &&
-                    (s.skeleton.persistent = JSON.parse(
+                    );
+                  }
+
+                  if (t.data.Data.skeleton) {
+                    s.skeleton.persistent = JSON.parse(
                       LZString.decompressFromEncodedURIComponent(
                         t.data.Data.skeleton.Value
                       )
-                    )),
-                  t.data.Data.talents
-                    ? (s.skeleton.talents = JSON.parse(
-                        LZString.decompressFromEncodedURIComponent(
-                          t.data.Data.talents.Value
-                        )
-                      ))
-                    : (s.skeleton.talents = []),
-                  (s.level = s.persistentData.levelUnlocked),
-                  s.updatePersistentData(),
-                  s.calcOfflineProgress(),
-                  s.setupLevel(),
-                  s.messageQueue.push("Game Loaded from Cloud"));
+                    );
+                  }
+
+                  if (t.data.Data.talents) {
+                    s.skeleton.talents = JSON.parse(
+                      LZString.decompressFromEncodedURIComponent(
+                        t.data.Data.talents.Value
+                      )
+                    );
+                  } else {
+                    s.skeleton.talents = [];
+                  }
+
+                  s.level = s.persistentData.levelUnlocked;
+                  s.updatePersistentData();
+                  s.calcOfflineProgress();
+                  s.setupLevel();
+                  s.messageQueue.push("Game Loaded from Cloud");
+                }
               }
             },
-            function (e) {
+            (e) => {
               console.log(e);
             }
           );
@@ -3584,1467 +3628,1476 @@ var Incremancer;
         }
       }
     }
+
     allowPlayFabAction() {
       return this.lastPlayFabSave + 15e3 < Date.now();
     }
   }
   class Upgrades {
     constructor() {
-      if (
-        ((this.gameModel = GameModel.getInstance()),
-        (this.spells = new Spells()),
-        (this.skeleton = new Skeleton()),
-        (this.partFactory = new PartFactory()),
-        (this.types = {
-          energyRate: "energyRate",
-          energyCap: "energyCap",
-          damage: "damage",
-          health: "health",
-          speed: "speed",
-          brainsRate: "brainsRate",
-          bonesRate: "bonesRate",
-          bloodCap: "bloodCap",
-          brainsCap: "brainsCap",
-          brainRecoverChance: "brainRecoverChance",
-          riseFromTheDeadChance: "riseFromTheDeadChance",
-          boneCollectorCapacity: "boneCollectorCapacity",
-          construction: "construction",
-          infectedBite: "infectedBite",
-          infectedBlast: "infectedBlast",
-          plagueDamage: "plagueDamage",
-          plagueTicks: "plagueTicks",
-          burningSpeedPC: "burningSpeedPC",
-          unlockSpell: "unlockSpell",
-          spitDistance: "spitDistance",
-          blastHealing: "blastHealing",
-          plagueArmor: "plagueArmor",
-          monsterLimit: "monsterLimit",
-          runicSyphon: "runicSyphon",
-          gigazombies: "gigazombies",
-          bulletproof: "bulletproof",
-          harpySpeed: "harpySpeed",
-          tankBuster: "tankBuster",
-          harpyBombs: "harpyBombs",
-          spikeDelay: "spikeDelay",
-          bloodGainPC: "bloodGainPC",
-          bloodStoragePC: "bloodStoragePC",
-          brainsGainPC: "brainsGainPC",
-          brainsStoragePC: "brainsStoragePC",
-          bonesGainPC: "bonesGainPC",
-          partsGainPC: "partsGainPC",
-          zombieDmgPC: "zombieDmgPC",
-          zombieHealthPC: "zombieHealthPC",
-          HstrengthDmgPC: "HstrengthDmgPC",
-          HshellHealthPC: "HshellHealthPC",
-          CyroVatPC: "CyroVatPC",
-          PlagueVatPC: "PlagueVatPC",
-          CloningRep1PC: "CloningRep1PC",
-          BloodSynPC: "BloodSynPC",
-          SynBonePC: "SynBonePC",
-          SmolPartsPC: "SmolPartsPC",
-          AvionicsPC: "AvionicsPC",
-          SkeleMove: "SkeleMove",
-          ShockPC: "ShockPC",
-          EnergyCost: "EnergyCost",
-          golemHealthPC: "golemHealthPC",
-          golemDamagePC: "golemDamagePC",
-          prest_multPC: "prest_multPC",
-          startingPC: "startingPC",
-          energyCost: "energyCost",
-          autoconstruction: "autoconstruction",
-          autoshop: "autoshop",
-          graveyardHealth: "graveyardHealth",
-          talentPoint: "talentPoint",
-        }),
-        (this.costs = {
-          energy: "energy",
-          blood: "blood",
-          brains: "brains",
-          bones: "bones",
-          prestigePoints: "prestigePoints",
-          parts: "parts",
-        }),
-        (this.constructionStates = {
-          building: "building",
-          paused: "paused",
-          autoPaused: "autoPaused",
-        }),
-        (this.constructionTickTimer = 1),
-        (this.angularModel = null),
-        (this.runeCalculations = [
+      this.gameModel = GameModel.getInstance();
+      this.spells = new Spells();
+      this.skeleton = new Skeleton();
+      this.partFactory = new PartFactory();
+
+      this.types = {
+        energyRate: "energyRate",
+        energyCap: "energyCap",
+        damage: "damage",
+        health: "health",
+        speed: "speed",
+        brainsRate: "brainsRate",
+        bonesRate: "bonesRate",
+        bloodCap: "bloodCap",
+        brainsCap: "brainsCap",
+        brainRecoverChance: "brainRecoverChance",
+        riseFromTheDeadChance: "riseFromTheDeadChance",
+        boneCollectorCapacity: "boneCollectorCapacity",
+        construction: "construction",
+        infectedBite: "infectedBite",
+        infectedBlast: "infectedBlast",
+        plagueDamage: "plagueDamage",
+        plagueTicks: "plagueTicks",
+        burningSpeedPC: "burningSpeedPC",
+        unlockSpell: "unlockSpell",
+        spitDistance: "spitDistance",
+        blastHealing: "blastHealing",
+        plagueArmor: "plagueArmor",
+        monsterLimit: "monsterLimit",
+        runicSyphon: "runicSyphon",
+        gigazombies: "gigazombies",
+        bulletproof: "bulletproof",
+        harpySpeed: "harpySpeed",
+        tankBuster: "tankBuster",
+        harpyBombs: "harpyBombs",
+        spikeDelay: "spikeDelay",
+        bloodGainPC: "bloodGainPC",
+        bloodStoragePC: "bloodStoragePC",
+        brainsGainPC: "brainsGainPC",
+        brainsStoragePC: "brainsStoragePC",
+        bonesGainPC: "bonesGainPC",
+        partsGainPC: "partsGainPC",
+        zombieDmgPC: "zombieDmgPC",
+        zombieHealthPC: "zombieHealthPC",
+        HstrengthDmgPC: "HstrengthDmgPC",
+        HshellHealthPC: "HshellHealthPC",
+        CyroVatPC: "CyroVatPC",
+        PlagueVatPC: "PlagueVatPC",
+        CloningRep1PC: "CloningRep1PC",
+        BloodSynPC: "BloodSynPC",
+        SynBonePC: "SynBonePC",
+        SmolPartsPC: "SmolPartsPC",
+        AvionicsPC: "AvionicsPC",
+        SkeleMove: "SkeleMove",
+        ShockPC: "ShockPC",
+        EnergyCost: "EnergyCost",
+        golemHealthPC: "golemHealthPC",
+        golemDamagePC: "golemDamagePC",
+        prest_multPC: "prest_multPC",
+        startingPC: "startingPC",
+        energyCost: "energyCost",
+        autoconstruction: "autoconstruction",
+        autoshop: "autoshop",
+        graveyardHealth: "graveyardHealth",
+        talentPoint: "talentPoint",
+      };
+
+      this.costs = {
+        energy: "energy",
+        blood: "blood",
+        brains: "brains",
+        bones: "bones",
+        prestigePoints: "prestigePoints",
+        parts: "parts",
+      };
+
+      this.constructionStates = {
+        building: "building",
+        paused: "paused",
+        autoPaused: "autoPaused",
+      };
+
+      this.constructionTickTimer = 1;
+      this.angularModel = null;
+
+      this.runeCalculations = [
+        {
+          rune: "death",
+          effect: "attackSpeed",
+          cost: "blood",
+          logBase: 1.1,
+          adjustment: -70,
+          subtract: false,
+          cap: 0,
+        },
+        {
+          rune: "death",
+          effect: "critChance",
+          cost: "brains",
+          logBase: 1.3,
+          adjustment: -20,
+          cap: 0.8,
+        },
+        {
+          rune: "death",
+          effect: "critDamage",
+          cost: "bones",
+          logBase: 1.05,
+          adjustment: -100,
+          cap: 0,
+        },
+        {
+          rune: "life",
+          effect: "damageReduction",
+          cost: "blood",
+          logBase: 1.5,
+          adjustment: -15,
+          subtract: true,
+          cap: 0.8,
+        },
+        {
+          rune: "life",
+          effect: "healthRegen",
+          cost: "brains",
+          logBase: 2.9,
+          adjustment: -5.5,
+          cap: 0.5,
+        },
+        {
+          rune: "life",
+          effect: "damageReflection",
+          cost: "bones",
+          logBase: 1.24,
+          adjustment: -30,
+          cap: 1,
+        },
+      ];
+
+      this.constructionTypes = {
+        graveyard: "graveyard",
+        crypt: "crypt",
+        fort: "fort",
+        fortress: "fortress",
+        citadel: "citadel",
+        fence: "fence",
+        fenceSize: "fenceSize",
+        plagueWorkshop: "plagueWorkshop",
+        plagueLaboratory: "plagueLaboratory",
+        plagueSpikes: "plagueSpikes",
+        spellTower: "spellTower",
+        runesmith: "runesmith",
+        aviary: "aviary",
+        zombieCage: "zombieCage",
+        partFactory: "partFactory",
+        monsterFactory: "monsterFactory",
+        pit: "pit",
+        harpy: "harpy",
+        HybridLab: "HybridLab",
+        AdvHybridLab: "AdvHybridLab",
+        MiniAssembLine: "MiniAssembLine",
+        TechThinkTank: "TechThinkTank",
+      };
+
+      this.constructionUpgrades = [
+        new he(
+          201,
+          "Cursed Graveyard",
+          this.constructionTypes.graveyard,
           {
-            rune: "death",
-            effect: "attackSpeed",
-            cost: "blood",
-            logBase: 1.1,
-            adjustment: -70,
-            subtract: false,
-            cap: 0,
+            blood: 1800,
           },
+          30,
+          1,
+          1,
+          1,
+          null,
+          "Construct a Cursed Graveyard in the town that will automatically spawn zombies when your energy is at its maximum!",
+          "Graveyard menu now available!"
+        ),
+        new he(
+          205,
+          "Crypt",
+          this.constructionTypes.crypt,
           {
-            rune: "death",
-            effect: "critChance",
-            cost: "brains",
-            logBase: 1.3,
-            adjustment: -20,
-            cap: 0.8,
+            blood: 21000 /* 21e3 */,
+            bones: 2220,
           },
+          60,
+          1,
+          1,
+          1,
+          201,
+          "Construct a Crypt in your graveyard. This will give you a nice dark and quiet place to think. The additional space will also allow you to store 50% more blood and brains!",
+          null
+        ),
+        new he(
+          206,
+          "Bone Fort",
+          this.constructionTypes.fort,
           {
-            rune: "death",
-            effect: "critDamage",
-            cost: "bones",
-            logBase: 1.05,
-            adjustment: -100,
-            cap: 0,
+            blood: 60000 /* 6e4 */,
+            bones: 6000 /* 6e3 */,
+            energy: 60,
           },
+          60,
+          1,
+          1,
+          1,
+          205,
+          "Turn your crypt into a fort. The additional space will also allow you to store 60% more blood and brains.",
+          "New upgrades are available in the shop!"
+        ),
+        new he(
+          207,
+          "Bone Fortress",
+          this.constructionTypes.fortress,
           {
-            rune: "life",
-            effect: "damageReduction",
-            cost: "blood",
-            logBase: 1.5,
-            adjustment: -15,
-            subtract: true,
-            cap: 0.8,
+            blood: 100000 /* 1e5 */,
+            bones: 9000 /* 9e3 */,
+            energy: 90,
           },
+          60,
+          1,
+          1,
+          1,
+          206,
+          "Turn your fort into a fortress. The additional space will also allow you to store 70% more blood and brains.",
+          null
+        ),
+        new he(
+          211,
+          "Bone Citadel",
+          this.constructionTypes.citadel,
           {
-            rune: "life",
-            effect: "healthRegen",
-            cost: "brains",
-            logBase: 2.9,
-            adjustment: -5.5,
-            cap: 0.5,
+            blood: 200000 /* 2e5 */,
+            bones: 12000 /* 12e3 */,
+            energy: 120,
           },
+          60,
+          1,
+          1,
+          1,
+          207,
+          "Turn your fortress into a towering citadel that looms over the town. The additional space will also allow you to store 80% more blood and brains.",
+          "New upgrades are available in the shop!"
+        ),
+        new he(
+          202,
+          "Perimeter Fence",
+          this.constructionTypes.fence,
           {
-            rune: "life",
-            effect: "damageReflection",
-            cost: "bones",
-            logBase: 1.24,
-            adjustment: -30,
-            cap: 1,
+            bones: 880,
+            energy: 22,
           },
-        ]),
-        (this.constructionTypes = {
-          graveyard: "graveyard",
-          crypt: "crypt",
-          fort: "fort",
-          fortress: "fortress",
-          citadel: "citadel",
-          fence: "fence",
-          fenceSize: "fenceSize",
-          plagueWorkshop: "plagueWorkshop",
-          plagueLaboratory: "plagueLaboratory",
-          plagueSpikes: "plagueSpikes",
-          spellTower: "spellTower",
-          runesmith: "runesmith",
-          aviary: "aviary",
-          zombieCage: "zombieCage",
-          partFactory: "partFactory",
-          monsterFactory: "monsterFactory",
-          pit: "pit",
-          harpy: "harpy",
-          HybridLab: "HybridLab",
-          AdvHybridLab: "AdvHybridLab",
-          MiniAssembLine: "MiniAssembLine",
-          TechThinkTank: "TechThinkTank",
-        }),
-        (this.constructionUpgrades = [
-          new he(
-            201,
-            "Cursed Graveyard",
-            this.constructionTypes.graveyard,
-            {
-              blood: 1800,
-            },
-            30,
-            1,
-            1,
-            1,
-            null,
-            "Construct a Cursed Graveyard in the town that will automatically spawn zombies when your energy is at its maximum!",
-            "Graveyard menu now available!"
-          ),
-          new he(
-            205,
-            "Crypt",
-            this.constructionTypes.crypt,
-            {
-              blood: 21e3,
-              bones: 2220,
-            },
-            60,
-            1,
-            1,
-            1,
-            201,
-            "Construct a Crypt in your graveyard. This will give you a nice dark and quiet place to think. The additional space will also allow you to store 50% more blood and brains!",
-            null
-          ),
-          new he(
-            206,
-            "Bone Fort",
-            this.constructionTypes.fort,
-            {
-              blood: 6e4,
-              bones: 6e3,
-              energy: 60,
-            },
-            60,
-            1,
-            1,
-            1,
-            205,
-            "Turn your crypt into a fort. The additional space will also allow you to store 60% more blood and brains.",
-            "New upgrades are available in the shop!"
-          ),
-          new he(
-            207,
-            "Bone Fortress",
-            this.constructionTypes.fortress,
-            {
-              blood: 1e5,
-              bones: 9e3,
-              energy: 90,
-            },
-            60,
-            1,
-            1,
-            1,
-            206,
-            "Turn your fort into a fortress. The additional space will also allow you to store 70% more blood and brains.",
-            null
-          ),
-          new he(
-            211,
-            "Bone Citadel",
-            this.constructionTypes.citadel,
-            {
-              blood: 2e5,
-              bones: 12e3,
-              energy: 120,
-            },
-            60,
-            1,
-            1,
-            1,
-            207,
-            "Turn your fortress into a towering citadel that looms over the town. The additional space will also allow you to store 80% more blood and brains.",
-            "New upgrades are available in the shop!"
-          ),
-          new he(
-            202,
-            "Perimeter Fence",
-            this.constructionTypes.fence,
-            {
-              bones: 880,
-              energy: 22,
-            },
-            44,
-            1,
-            1,
-            1,
-            201,
-            "Build a protective fence around the graveyard that will reduce damage taken by zombies inside by 50%.",
-            null
-          ),
-          new he(
-            203,
-            "Bigger Fence",
-            this.constructionTypes.fenceSize,
-            {
-              bones: 880,
-              energy: 22,
-            },
-            44,
-            1,
-            10,
-            5,
-            202,
-            "Enlarge the fence so a greater area is protected.",
-            null
-          ),
-          new he(
-            204,
-            "Plague Workshop",
-            this.constructionTypes.plagueWorkshop,
-            {
-              blood: 10200,
-              brains: 600,
-            },
-            60,
-            1,
-            1,
-            1,
-            205,
-            "Build a laboratory to study the effects of plague. This will unlock new upgrades in the shop.",
-            "Plague upgrades now available!"
-          ),
-          new he(
-            208,
-            "Plague Spikes",
-            this.constructionTypes.plagueSpikes,
-            {
-              brains: 3e3,
-              bones: 1e3,
-            },
-            30,
-            1,
-            1,
-            1,
-            204,
-            "Booby trap the area around your graveyard with cruel spikes that infect trespassing humans with the plague.",
-            null
-          ),
-          new he(
-            209,
-            "Spell Tower",
-            this.constructionTypes.spellTower,
-            {
-              brains: 3e3,
-              blood: 3e4,
-            },
-            30,
-            1,
-            1,
-            1,
-            206,
-            "Dedicate one tower of your fort to the study of spellcraft. Perhaps you can learn some new spells?",
-            "Spells now available in the shop!"
-          ),
-          new he(
-            210,
-            "Runesmith",
-            this.constructionTypes.runesmith,
-            {
-              bones: 3e3,
-              blood: 12e4,
-              brains: 1e3,
-            },
-            30,
-            1,
-            1,
-            1,
-            207,
-            "Build a runesmith's workshop in order to fortify your zombies with powerful runes.",
-            null
-          ),
-          new he(
-            212,
-            "Accursed Aviary",
-            this.constructionTypes.aviary,
-            {
-              bones: 6e3,
-              blood: 22e4,
-              brains: 2e3,
-            },
-            60,
-            1,
-            1,
-            1,
-            211,
-            "Construct an aviary on top of your citadel so you can release wicked harpies to bomb the townspeople.",
-            "Harpies available for hire in the graveyard menu"
-          ),
-          new he(
-            213,
-            "Zombie Cage",
-            this.constructionTypes.zombieCage,
-            {
-              bones: 600,
-              blood: 900,
-            },
-            30,
-            1,
-            5,
-            1,
-            201,
-            "Build a cage to contain surplus zombies once a town is defeated.",
-            null
-          ),
-          new he(
-            214,
-            "Second Zombie Cage",
-            this.constructionTypes.zombieCage,
-            {
-              bones: 1200,
-              blood: 1800,
-            },
-            30,
-            1,
-            10,
-            1,
-            205,
-            "Build an additional cage to contain surplus zombies once a town is defeated.",
-            null
-          ),
-          new he(
-            215,
-            "Third Zombie Cage",
-            this.constructionTypes.zombieCage,
-            {
-              bones: 1800,
-              blood: 2700,
-            },
-            30,
-            1,
-            10,
-            1,
-            206,
-            "Build an additional cage to contain surplus zombies once a town is defeated.",
-            null
-          ),
-          new he(
-            216,
-            "Fourth Zombie Cage",
-            this.constructionTypes.zombieCage,
-            {
-              bones: 2400,
-              blood: 3600,
-            },
-            30,
-            1,
-            10,
-            1,
-            207,
-            "Build an additional cage to contain surplus zombies once a town is defeated.",
-            null
-          ),
-          new he(
-            217,
-            "Fifth Zombie Cage",
-            this.constructionTypes.zombieCage,
-            {
-              bones: 3e3,
-              blood: 4500,
-            },
-            30,
-            1,
-            15,
-            1,
-            211,
-            "Build an additional cage to contain surplus zombies once a town is defeated.",
-            null
-          ),
-          new he(
-            218,
-            "Plague Laboratory",
-            this.constructionTypes.plagueLaboratory,
-            {
-              brains: 25e3,
-              blood: 1e6,
-            },
-            50,
-            1,
-            1,
-            1,
-            211,
-            "Expand the plague workshop into a well equipped laboratory in order to unlock additional plague upgrades.",
-            null
-          ),
-          new he(
-            219,
-            "Part Factory",
-            this.constructionTypes.partFactory,
-            {
-              brains: 35e3,
-              blood: 15e6,
-            },
-            50,
-            1,
-            1,
-            1,
-            218,
-            "Build a factory to create parts that can be used to construct more powerful beings for your army.",
-            "Factory menu now available!"
-          ),
-          new he(
-            220,
-            "Creature Factory",
-            this.constructionTypes.monsterFactory,
-            {
-              brains: 45e3,
-              blood: 4e7,
-            },
-            50,
-            1,
-            1,
-            1,
-            219,
-            "Build a factory to turn creature parts into living entities of destruction",
-            "Creatures now available in factory menu!"
-          ),
-          new he(
-            221,
-            "Bottomless Pit",
-            this.constructionTypes.pit,
-            {
-              bones: 75e3,
-              parts: 5e6,
-            },
-            50,
-            1,
-            1,
-            10,
-            219,
-            "A bottomless pit with walls made from creature parts. Drastically increases your capacity to store blood and brains.",
-            null
-          ),
-          new he(
-            222,
-            "Harpy Outfitter",
-            this.constructionTypes.harpy,
-            {
-              bones: 75e3,
-              brains: 75e3,
-              blood: 8e7,
-            },
-            50,
-            1,
-            1,
-            1,
-            220,
-            "Build an outfitter to upgrade the abilities of your harpies.",
-            "Harpy upgrades now available in the shop!"
-          ),
-          new he(
-            301,
-            "Hybrid Laboratory",
-            this.constructionTypes.HybridLab,
-            {
-              bones: 75e6,
-              parts: 9e12,
-            },
-            240,
-            1,
-            1,
-            1,
-            222,
-            "Build a new laboratory to unlock the potential of Zombie-Golem Hybrids.  Deep storage tanks for Blood and Brains are needed for research, doubling storage",
-            "New upgrades are available in the shop!"
-          ),
-          new he(
-            302,
-            "Advanced Hybrid Laboratory",
-            this.constructionTypes.AdvHybridLab,
-            {
-              bones: 75e8,
-              parts: 7e13,
-            },
-            240,
-            1,
-            1,
-            1,
-            301,
-            "Build an advanced laboratory to further unlock the secrets of Zombie-Golem Hybridization. Even deeper storage tanks for Blood and Brains are needed for research. Doubles storage",
-            "New upgrades are available in the shop!"
-          ),
-          new he(
-            303,
-            "Miniturized Assembly Lines",
-            this.constructionTypes.MiniAssembLine,
-            {
-              bones: 75e10,
-              parts: 4e16,
-            },
-            240,
-            1,
-            1,
-            1,
-            302,
-            "Build a new way to create everything faster!  How deep can these storage tanks go? Doubles storage.",
-            "New upgrades are available in the shop!"
-          ),
-          new he(
-            304,
-            "Technical Think Tank",
-            this.constructionTypes.TechThinkTank,
-            {
-              bones: 75e12,
-              parts: 1e18,
-            },
-            240,
-            1,
-            1,
-            1,
-            303,
-            "Using all these stored brains allows us to harness their raw computational power for even more innovations!  Storage tanks resting on bedrock is as far as we can go, doubling storage",
-            "New upgrades are available in the shop!"
-          ),
-        ]),
-        (this.upgrades = [
-          new le(
-            1,
-            "Bloodthirst",
-            this.types.damage,
-            this.costs.blood,
-            50,
-            1.2,
-            1,
-            40,
-            "Your zombies thirst for blood and do +1 damage for each rank of Bloodthirst.",
-            null,
-            null
-          ),
-          new le(
-            9,
-            "Sharpened Teeth",
-            this.types.damage,
-            this.costs.blood,
-            3e3,
-            1.23,
-            3,
-            50,
-            "Your zombies bites do +3 damage with each rank of Sharpened Teeth.",
-            null,
-            206
-          ),
-          new le(
-            11,
-            "Razor Claws",
-            this.types.damage,
-            this.costs.blood,
-            28e3,
-            1.25,
-            5,
-            0,
-            "Your zombies attacks do +5 damage with each rank of Razor Claws.",
-            null,
-            211
-          ),
-          new le(
-            16,
-            "Killer Instinct",
-            this.types.damage,
-            this.costs.blood,
-            1e6,
-            1.27,
-            8,
-            0,
-            "Your zombies attacks do +8 damage with each rank of Killer Instinct.",
-            null,
-            220
-          ),
-          new le(
-            2,
-            "Like Leather",
-            this.types.health,
-            this.costs.blood,
-            100,
-            1.2,
-            10,
-            40,
-            "Your zombies gain tougher skin and +10 health with each rank.",
-            null,
-            null
-          ),
-          new le(
-            10,
-            "Thick Skull",
-            this.types.health,
-            this.costs.blood,
-            5e3,
-            1.23,
-            25,
-            50,
-            "Your zombies gain +25 health with each rank.",
-            null,
-            206
-          ),
-          new le(
-            12,
-            "Battle Hardened",
-            this.types.health,
-            this.costs.blood,
-            32e3,
-            1.25,
-            40,
-            0,
-            "Your zombies gain +40 health with each rank of Battle Hardened.",
-            null,
-            211
-          ),
-          new le(
-            17,
-            "Tough as Nails",
-            this.types.health,
-            this.costs.blood,
-            1e6,
-            1.27,
-            100,
-            0,
-            "Your zombies gain +100 health with each rank of Tough as Nails.",
-            null,
-            220
-          ),
-          new le(
-            3,
-            "Cold Storage",
-            this.types.brainsCap,
-            this.costs.blood,
-            150,
-            1.2,
-            50,
-            20,
-            "Turns out you can use all of your spare blood to store brains and keep them fresh. Each rank increases your maximum brain capacity by 50.",
-            null,
-            null
-          ),
-          new le(
-            4,
-            "Recycling is Cool",
-            this.types.brainRecoverChance,
-            this.costs.blood,
-            1e3,
-            1.2,
-            0.1,
-            10,
-            "Why are we wasting so many good brains on this project? Each rank increases your chance to get a brain back from a dead zombie by 10%",
-            null,
-            null
-          ),
-          new le(
-            5,
-            "Your Soul is Mine!",
-            this.types.riseFromTheDeadChance,
-            this.costs.blood,
-            1500,
-            1.4,
-            0.1,
-            10,
-            "Using your most powerful blood magic you command the bodies of the dead to rise as your servants! Each rank grants 10% chance that dead humans will turn into zombies.",
-            null,
-            null
-          ),
-          new le(
-            6,
-            "Infected Bite",
-            this.types.infectedBite,
-            this.costs.blood,
-            3500,
-            1.4,
-            0.1,
-            10,
-            "Your zombies are now infected with plague and could infect their victims too. Each rank adds 10% chance to inflict damage over time when a zombie attacks a target.",
-            null,
-            204
-          ),
-          new le(
-            7,
-            "Detonate",
-            this.types.unlockSpell,
-            this.costs.blood,
-            25e3,
-            1,
-            3,
-            1,
-            "Learn the Detonate spell which can explode all of your zombies into a cloud of plague. Not exactly sure how useful that will be.",
-            "New spell learned, Detonate!",
-            209
-          ),
-          new le(
-            8,
-            "Gigazombies?",
-            this.types.unlockSpell,
-            this.costs.blood,
-            5e4,
-            1,
-            5,
-            1,
-            "Learn the Gigazombies spell which will turn some of your zombies into hulking monstrosities with increased health and damage.",
-            "New spell learned, Gigazombies!",
-            209
-          ),
-          new le(
-            13,
-            "Blazing Speed",
-            this.types.burningSpeedPC,
-            this.costs.blood,
-            3e4,
-            1.25,
-            0.05,
-            10,
-            "The humans are using torches to set your zombies on fire. Perhaps we can turn the tables on them? Each rank increases the movement and attack speed of burning zombies by 5%",
-            null,
-            207
-          ),
-          new le(
-            14,
-            "Spit it Out",
-            this.types.spitDistance,
-            this.costs.blood,
-            5e5,
-            1.8,
-            5,
-            15,
-            "The first rank gives your zombies the ability to spit plague at enemies beyond normal attack range. Spit attacks do 50% zombie damage and infect the victim with plague. Subsequent ranks will increase the range of spit attacks.",
-            null,
-            218
-          ),
-          new le(
-            15,
-            "Runic Syphon",
-            this.types.runicSyphon,
-            this.costs.blood,
-            34e3,
-            1.9,
-            0.01,
-            10,
-            "Infuse your runes for free! Each rank gives your Runesmith the ability to infuse 1% of your resource income, without consuming it. Additionally when blood and brains reach their storage limit, any additional resources will be infused automatically.",
-            null,
-            210
-          ),
-          new le(
-            19,
-            "Faster Harpies",
-            this.types.harpySpeed,
-            this.costs.blood,
-            1e8,
-            1.07,
-            2,
-            20,
-            "These harpies are way too slow! We have to make them faster. Each rank increases harpy speed by 2",
-            null,
-            222
-          ),
-          new le(
-            20,
-            "Energy Rush",
-            this.types.energyRate,
-            this.costs.brains,
-            20,
-            1.8,
-            0.5,
-            20,
-            "Melting brains down in your cauldron to make smoothies can be beneficial for your health. It also increases your energy rate by 0.5 per second for each rank.",
-            null,
-            null
-          ),
-          new le(
-            21,
-            "Master Summoner",
-            this.types.energyCap,
-            this.costs.brains,
-            10,
-            1.5,
-            5,
-            20,
-            "All the brains you harvested have proved fruitful in your experiments. Each rank raises your maximum energy by 5.",
-            null,
-            null
-          ),
-          new le(
-            22,
-            "Primal Reflexes",
-            this.types.speed,
-            this.costs.brains,
-            5,
-            1.6,
-            1,
-            20,
-            "The zombies retain more of their human agility increasing run speed by 1 for each rank.",
-            null,
-            null
-          ),
-          new le(
-            23,
-            "Blood Harvest",
-            this.types.bloodStoragePC,
-            this.costs.brains,
-            50,
-            1.12,
-            0.1,
-            0,
-            "All this brain power has enabled you to devise some superior blood storage methods. Each rank increases your maximum blood by 10%.",
-            null,
-            null
-          ),
-          new le(
-            24,
-            "Unholy Construction",
-            this.types.construction,
-            this.costs.brains,
-            25,
-            1,
-            1,
-            1,
-            "Learn the art of Unholy Construction in order to build structures that will solidify your foothold on the town.",
-            "Construction menu now available!",
-            null
-          ),
-          new le(
-            25,
-            "Infected Corpse",
-            this.types.infectedBlast,
-            this.costs.brains,
-            500,
-            1.4,
-            0.1,
-            10,
-            "Fill your zombies with so much plague they are ready to explode! Each rank adds 10% chance for a zombie to explode into a cloud of plague upon death.",
-            null,
-            204
-          ),
-          new le(
-            26,
-            "Energy Charge",
-            this.types.unlockSpell,
-            this.costs.brains,
-            2e3,
-            1,
-            2,
-            1,
-            "Learn the Energy Charge spell which can drastically increase your energy rate for a short time.",
-            "New spell learned, Energy Charge!",
-            209
-          ),
-          new le(
-            27,
-            "What Doesn't Kill You",
-            this.types.blastHealing,
-            this.costs.brains,
-            1e4,
-            1.3,
-            0.1,
-            20,
-            "Plague explosions from zombies and harpies will also heal nearby zombies for 10% of the explosion damage with each rank.",
-            null,
-            218
-          ),
-          new le(
-            28,
-            "One is Never Enough",
-            this.types.monsterLimit,
-            this.costs.brains,
-            2e4,
-            1.2,
-            1,
-            15,
-            "We're definitely going to need more than one golem to finish the job. Each rank increases your creature limit by 1",
-            null,
-            220
-          ),
-          new le(
-            29,
-            "Tank Buster",
-            this.types.tankBuster,
-            this.costs.brains,
-            4e5,
-            1.2,
-            1,
-            1,
-            "Teach your harpies some new tricks. Once bought this upgrade will make your harpies drop fire bombs on tanks during boss stages.",
-            null,
-            222
-          ),
-          new le(
-            30,
-            "Improved Spikes",
-            this.types.spikeDelay,
-            this.costs.brains,
-            800,
-            1.2,
-            1,
-            4,
-            "Each rank reduces the delay between plague spike activation by 20%",
-            null,
-            208
-          ),
-          new le(
-            40,
-            "Bone Throne",
-            this.types.energyCap,
-            this.costs.bones,
-            50,
-            1.55,
-            10,
-            15,
-            "Sitting atop your throne of bones you can finally think clearly. Each rank increases maximum energy by 10.",
-            null,
-            null
-          ),
-          new le(
-            41,
-            "Crown of Bones",
-            this.types.energyRate,
-            this.costs.bones,
-            200,
-            1.5,
-            0.2,
-            25,
-            "Not just dapper, these spikes help channel your energy. Each rank increases energy rate by 0.2 per second.",
-            null,
-            null
-          ),
-          new le(
-            42,
-            "Bonebarrows",
-            this.types.boneCollectorCapacity,
-            this.costs.bones,
-            300,
-            1.2,
-            5,
-            20,
-            "Your bone collectors are struggling to carry all these bones. Maybe it's time we gave them an upgrade? Each rank increases their carrying capacity by 5.",
-            null,
-            null
-          ),
-          new le(
-            43,
-            "Bone Reinforced Tanks",
-            this.types.bloodCap,
-            this.costs.bones,
-            500,
-            1.07,
-            2e3,
-            0,
-            "Finally! Now that we have a solid construction material we can get to work building better storage for our other resources. Each rank increases blood storage by 2000.",
-            null,
-            null
-          ),
-          new le(
-            44,
-            "Brain Cage",
-            this.types.brainsCap,
-            this.costs.bones,
-            650,
-            1.07,
-            500,
-            0,
-            "There's nothing I love more than a mind enslaved. Now we can put these brains where they belong. In cages! Each rank increases brain storage by 500.",
-            null,
-            null
-          ),
-          new le(
-            45,
-            "Earth Freeze",
-            this.types.unlockSpell,
-            this.costs.bones,
-            5e3,
-            1,
-            4,
-            1,
-            "Learn the Earth Freeze spell which can freeze all humans in place for a short time.",
-            "New spell learned, Earth Freeze!",
-            209
-          ),
-          new le(
-            46,
-            "Plague Armor",
-            this.types.plagueArmor,
-            this.costs.bones,
-            15e3,
-            1.6,
-            0.02,
-            10,
-            "The best defense is a good offense? True in the case of Plague Armor which reduces the damage done by infected humans by 2% per rank.",
-            null,
-            218
-          ),
-          new le(
-            47,
-            "Bulletproof",
-            this.types.bulletproof,
-            this.costs.bones,
-            6e4,
-            1.6,
-            0.05,
-            15,
-            "Craft your earth golems from much harder stone. Each rank gives them 5% chance to reflect bullets back to their source.",
-            null,
-            220
-          ),
-          new le(
-            48,
-            "Bombs Away",
-            this.types.harpyBombs,
-            this.costs.bones,
-            5e5,
-            1.6,
-            1,
-            3,
-            "Upgrade your harpies so they can carry more than just one bomb at a time.",
-            null,
-            222
-          ),
-          new le(
-            60,
-            "Extra Limbs",
-            this.types.golemDamagePC,
-            this.costs.parts,
-            900,
-            1.3,
-            0.02,
-            0,
-            "Your golems gain +2% damage with each rank of Extra Limbs.",
-            null,
-            220
-          ),
-          new le(
-            61,
-            "Big Boned",
-            this.types.golemHealthPC,
-            this.costs.parts,
-            1e3,
-            1.31,
-            0.02,
-            0,
-            "Your golems gain +2% health with each rank of Big Boned.",
-            null,
-            220
-          ),
-          new le(
-            62,
-            "Hybrid Strength",
-            this.types.HstrengthDmgPC,
-            this.costs.parts,
-            1e3,
-            1.3,
-            0.01,
-            0,
-            "Animating Golem parts fused with zombie flesh creates a terrifyingly strong Hybrid. Your zombies gain +1% damage with each rank of Hybrid Strength.",
-            null,
-            301
-          ),
-          new le(
-            63,
-            "Hybrid Shell",
-            this.types.HshellHealthPC,
-            this.costs.parts,
-            1e3,
-            1.31,
-            0.01,
-            0,
-            "Golem armor shell provides extra protection for your fleshy zombies. Your zombies gain +1% health with each rank of Hybrid Shell.",
-            null,
-            301
-          ),
-          new le(
-            64,
-            "Advanced Cyrogenic Vats",
-            this.types.CyroVatPC,
-            this.costs.parts,
-            1e3,
-            1.4,
-            0.1,
-            0,
-            "Cooling these Brains further makes them last much longer. Your brain storage increases +10% with each rank of Advanced Cyrogenic Vats.",
-            null,
-            302
-          ),
-          new le(
-            65,
-            "Golem Part Plague Vats",
-            this.types.PlagueVatPC,
-            this.costs.brains,
-            1e3,
-            1.35,
-            0.01,
-            0,
-            "Using specialized Golem Parts allows for advancements in plague research. Plague Damage increases +1% with each rank of Golem Part Plague Vats.",
-            null,
-            302
-          ),
-          new le(
-            66,
-            "Cloning Replicator",
-            this.types.CloningRep1PC,
-            this.costs.parts,
-            1e12,
-            1.26,
-            0.05,
-            0,
-            "Mass produced Cloning Replicators allows for much greater use out of each Brain obtained. Brain Income increases +5% with each rank of Cloning Replicator.",
-            null,
-            303
-          ),
-          new le(
-            67,
-            "Blood Synthezizer",
-            this.types.BloodSynPC,
-            this.costs.parts,
-            2e12,
-            1.25,
-            0.05,
-            0,
-            "Artificial Blood can augment what we already get allowing for more of everything. Blood Income increases +5% with each rank of Blood Synthesizer.",
-            null,
-            303
-          ),
-          new le(
-            68,
-            "Synthetic Bone Fabricator",
-            this.types.SynBonePC,
-            this.costs.parts,
-            3e12,
-            1.24,
-            0.05,
-            0,
-            "Synthetic Bones made from Golem Parts?  Genius! Bone Income increases +5% with each rank of Synthetic Bone Fabricator.",
-            null,
-            303
-          ),
-          new le(
-            69,
-            "Insectoid Parts Assemblers",
-            this.types.SmolPartsPC,
-            this.costs.parts,
-            4e12,
-            1.23,
-            0.05,
-            0,
-            "Insect sized and shaped assemblers are far more efficient at maufacturing Golem parts. Parts Income increases +5% with each rank of Insectoid Parts Assemblers.",
-            null,
-            303
-          ),
-          new le(
-            70,
-            "Golem Avionic",
-            this.types.AvionicsPC,
-            this.costs.parts,
-            2e17,
-            1.2,
-            2,
-            50,
-            "Building on the success of hybrid zombies, small golem parts can enhance Harpy-Golem Hybrids. Harpy Speed +2 with each rank of Golem Avionics.",
-            null,
-            304
-          ),
-          new le(
-            71,
-            "Electro-Shock Collars",
-            this.types.ShockPC,
-            this.costs.parts,
-            3e14,
-            1.2,
-            0.0025,
-            0,
-            "Using shock collars tuned to the Hybrid Zombie's nervous system causes them to attack at blinding speeds! Attack Speed +0.25% with each rank of Electro-Shock Collars.",
-            null,
-            304
-          ),
-          new le(
-            72,
-            "Power Regulators",
-            this.types.EnergyCost,
-            this.costs.parts,
-            1e18,
-            1.2,
-            1,
-            30,
-            "Golem parts assembled around the graveyard can help regulate and attune necrotic power. Reduces zombie summoning cost by 1 with each rank of Power Regulators.",
-            null,
-            304
-          ),
-          new le(
-            73,
-            "Sephirin's Reputation",
-            this.types.prest_multPC,
-            this.costs.blood,
-            1e20,
-            1.25,
-            0.03,
-            0,
-            "Astounding levels of blood sacrificed can enhance your reputation with dark entities in the Void. +3% Zombie Heatlh and Damage per rank",
-            null,
-            304
-          ),
-          new le(
-            74,
-            "Strider's Mathemagics",
-            this.types.SkeleMove,
-            this.costs.parts,
-            1e18,
-            6,
-            1,
-            10,
-            "Using Archane Mathemagics you imbue your Skeleton Champion with golem based ligaments. +1 Movement Speed per rank.(In testing)",
-            null,
-            304
-          ),
-        ]),
-        (this.prestigeUpgrades = [
-          new le(
-            108,
-            "A Small Investment",
-            this.types.startingPC,
-            this.costs.prestigePoints,
-            10,
-            1.25,
-            1,
-            0,
-            "Each rank gives you an additional 500 blood, 50 brains, and 200 bones when starting a new level.",
-            null,
-            null
-          ),
-          new le(
-            109,
-            "Time Warp",
-            this.types.unlockSpell,
-            this.costs.prestigePoints,
-            50,
-            1,
-            1,
-            1,
-            "Unlock the Time Warp spell in order to speed up the flow of time.",
-            null,
-            null
-          ),
-          new le(
-            110,
-            "Master of Death",
-            this.types.energyCost,
-            this.costs.prestigePoints,
-            1e3,
-            1,
-            1,
-            5,
-            "Each rank reduces the energy cost of summoning a zombie by 1",
-            null,
-            null
-          ),
-          new le(
-            101,
-            "Blood Storage",
-            this.types.bloodStoragePC,
-            this.costs.prestigePoints,
-            10,
-            1.25,
-            0.2,
-            0,
-            "Additional 20% blood storage for each rank.",
-            null,
-            null
-          ),
-          new le(
-            102,
-            "Blood Rate",
-            this.types.bloodGainPC,
-            this.costs.prestigePoints,
-            10,
-            1.25,
-            0.2,
-            0,
-            "Additional 20% blood income rate for each rank.",
-            null,
-            null
-          ),
-          new le(
-            103,
-            "Brain Storage",
-            this.types.brainsStoragePC,
-            this.costs.prestigePoints,
-            10,
-            1.25,
-            0.2,
-            0,
-            "Additional 20% brain storage for each rank.",
-            null,
-            null
-          ),
-          new le(
-            104,
-            "Brain Rate",
-            this.types.brainsGainPC,
-            this.costs.prestigePoints,
-            10,
-            1.25,
-            0.2,
-            0,
-            "Additional 20% brain income rate for each rank.",
-            null,
-            null
-          ),
-          new le(
-            105,
-            "Bone Rate",
-            this.types.bonesGainPC,
-            this.costs.prestigePoints,
-            10,
-            1.25,
-            0.2,
-            0,
-            "Additional 20% bones income rate for each rank.",
-            null,
-            null
-          ),
-          new le(
-            111,
-            "Parts Rate",
-            this.types.partsGainPC,
-            this.costs.prestigePoints,
-            10,
-            1.25,
-            0.2,
-            0,
-            "Additional 20% creature parts income rate for each rank.",
-            null,
-            null
-          ),
-          new le(
-            112,
-            "Auto Construction",
-            this.types.autoconstruction,
-            this.costs.prestigePoints,
-            250,
-            1,
-            1,
-            1,
-            "Unlock the ability to automatically start construction of the cheapest available building option.",
-            null,
-            null
-          ),
-          new le(
-            114,
-            "Auto Shop",
-            this.types.autoshop,
-            this.costs.prestigePoints,
-            250,
-            1,
-            1,
-            1,
-            "Unlock the ability to automatically purchase items from the shop.",
-            null,
-            null
-          ),
-          new le(
-            113,
-            "Graveyard Health",
-            this.types.graveyardHealth,
-            this.costs.prestigePoints,
-            10,
-            1.25,
-            0.1,
-            0,
-            "Additional 10% graveyard health during boss levels with each rank.",
-            null,
-            null
-          ),
-          new le(
-            115,
-            "Talent Point",
-            this.types.talentPoint,
-            this.costs.prestigePoints,
-            100,
-            1.175,
-            1,
-            0,
-            "Additional skeleton talent point",
-            null,
-            null
-          ),
-        ]),
-        Upgrades.instance)
-      )
+          44,
+          1,
+          1,
+          1,
+          201,
+          "Build a protective fence around the graveyard that will reduce damage taken by zombies inside by 50%.",
+          null
+        ),
+        new he(
+          203,
+          "Bigger Fence",
+          this.constructionTypes.fenceSize,
+          {
+            bones: 880,
+            energy: 22,
+          },
+          44,
+          1,
+          10,
+          5,
+          202,
+          "Enlarge the fence so a greater area is protected.",
+          null
+        ),
+        new he(
+          204,
+          "Plague Workshop",
+          this.constructionTypes.plagueWorkshop,
+          {
+            blood: 10200,
+            brains: 600,
+          },
+          60,
+          1,
+          1,
+          1,
+          205,
+          "Build a laboratory to study the effects of plague. This will unlock new upgrades in the shop.",
+          "Plague upgrades now available!"
+        ),
+        new he(
+          208,
+          "Plague Spikes",
+          this.constructionTypes.plagueSpikes,
+          {
+            brains: 3000 /* 3e3 */,
+            bones: 1000 /* 1e3 */,
+          },
+          30,
+          1,
+          1,
+          1,
+          204,
+          "Booby trap the area around your graveyard with cruel spikes that infect trespassing humans with the plague.",
+          null
+        ),
+        new he(
+          209,
+          "Spell Tower",
+          this.constructionTypes.spellTower,
+          {
+            brains: 3000 /* 3e3 */,
+            blood: 30000 /* 3e4 */,
+          },
+          30,
+          1,
+          1,
+          1,
+          206,
+          "Dedicate one tower of your fort to the study of spellcraft. Perhaps you can learn some new spells?",
+          "Spells now available in the shop!"
+        ),
+        new he(
+          210,
+          "Runesmith",
+          this.constructionTypes.runesmith,
+          {
+            bones: 3000 /* 3e3 */,
+            blood: 120000 /* 12e4 */,
+            brains: 1000 /* 1e3 */,
+          },
+          30,
+          1,
+          1,
+          1,
+          207,
+          "Build a runesmith's workshop in order to fortify your zombies with powerful runes.",
+          null
+        ),
+        new he(
+          212,
+          "Accursed Aviary",
+          this.constructionTypes.aviary,
+          {
+            bones: 6000 /* 6e3 */,
+            blood: 220000 /* 22e4 */,
+            brains: 2000 /* 2e3 */,
+          },
+          60,
+          1,
+          1,
+          1,
+          211,
+          "Construct an aviary on top of your citadel so you can release wicked harpies to bomb the townspeople.",
+          "Harpies available for hire in the graveyard menu"
+        ),
+        new he(
+          213,
+          "Zombie Cage",
+          this.constructionTypes.zombieCage,
+          {
+            bones: 600,
+            blood: 900,
+          },
+          30,
+          1,
+          5,
+          1,
+          201,
+          "Build a cage to contain surplus zombies once a town is defeated.",
+          null
+        ),
+        new he(
+          214,
+          "Second Zombie Cage",
+          this.constructionTypes.zombieCage,
+          {
+            bones: 1200,
+            blood: 1800,
+          },
+          30,
+          1,
+          10,
+          1,
+          205,
+          "Build an additional cage to contain surplus zombies once a town is defeated.",
+          null
+        ),
+        new he(
+          215,
+          "Third Zombie Cage",
+          this.constructionTypes.zombieCage,
+          {
+            bones: 1800,
+            blood: 2700,
+          },
+          30,
+          1,
+          10,
+          1,
+          206,
+          "Build an additional cage to contain surplus zombies once a town is defeated.",
+          null
+        ),
+        new he(
+          216,
+          "Fourth Zombie Cage",
+          this.constructionTypes.zombieCage,
+          {
+            bones: 2400,
+            blood: 3600,
+          },
+          30,
+          1,
+          10,
+          1,
+          207,
+          "Build an additional cage to contain surplus zombies once a town is defeated.",
+          null
+        ),
+        new he(
+          217,
+          "Fifth Zombie Cage",
+          this.constructionTypes.zombieCage,
+          {
+            bones: 3000 /* 3e3 */,
+            blood: 4500,
+          },
+          30,
+          1,
+          15,
+          1,
+          211,
+          "Build an additional cage to contain surplus zombies once a town is defeated.",
+          null
+        ),
+        new he(
+          218,
+          "Plague Laboratory",
+          this.constructionTypes.plagueLaboratory,
+          {
+            brains: 25000 /* 25e3 */,
+            blood: 1000000 /* 1e6 */,
+          },
+          50,
+          1,
+          1,
+          1,
+          211,
+          "Expand the plague workshop into a well equipped laboratory in order to unlock additional plague upgrades.",
+          null
+        ),
+        new he(
+          219,
+          "Part Factory",
+          this.constructionTypes.partFactory,
+          {
+            brains: 35000 /* 35e3 */,
+            blood: 15000000 /* 15e6 */,
+          },
+          50,
+          1,
+          1,
+          1,
+          218,
+          "Build a factory to create parts that can be used to construct more powerful beings for your army.",
+          "Factory menu now available!"
+        ),
+        new he(
+          220,
+          "Creature Factory",
+          this.constructionTypes.monsterFactory,
+          {
+            brains: 45000 /* 45e3 */,
+            blood: 40000000 /* 4e7 */,
+          },
+          50,
+          1,
+          1,
+          1,
+          219,
+          "Build a factory to turn creature parts into living entities of destruction",
+          "Creatures now available in factory menu!"
+        ),
+        new he(
+          221,
+          "Bottomless Pit",
+          this.constructionTypes.pit,
+          {
+            bones: 75000 /* 75e3 */,
+            parts: 5000000 /* 5e6 */,
+          },
+          50,
+          1,
+          1,
+          10,
+          219,
+          "A bottomless pit with walls made from creature parts. Drastically increases your capacity to store blood and brains.",
+          null
+        ),
+        new he(
+          222,
+          "Harpy Outfitter",
+          this.constructionTypes.harpy,
+          {
+            bones: 75000 /* 75e3 */,
+            brains: 75000 /* 75e3 */,
+            blood: 80000000 /* 8e7 */,
+          },
+          50,
+          1,
+          1,
+          1,
+          220,
+          "Build an outfitter to upgrade the abilities of your harpies.",
+          "Harpy upgrades now available in the shop!"
+        ),
+        new he(
+          301,
+          "Hybrid Laboratory",
+          this.constructionTypes.HybridLab,
+          {
+            bones: 75000000 /* 75e6 */,
+            parts: 9000000000000 /* 9e12 */,
+          },
+          240,
+          1,
+          1,
+          1,
+          222,
+          "Build a new laboratory to unlock the potential of Zombie-Golem Hybrids.  Deep storage tanks for Blood and Brains are needed for research, doubling storage",
+          "New upgrades are available in the shop!"
+        ),
+        new he(
+          302,
+          "Advanced Hybrid Laboratory",
+          this.constructionTypes.AdvHybridLab,
+          {
+            bones: 7500000000 /* 75e8 */,
+            parts: 70000000000000 /* 7e13 */,
+          },
+          240,
+          1,
+          1,
+          1,
+          301,
+          "Build an advanced laboratory to further unlock the secrets of Zombie-Golem Hybridization. Even deeper storage tanks for Blood and Brains are needed for research. Doubles storage",
+          "New upgrades are available in the shop!"
+        ),
+        new he(
+          303,
+          "Miniturized Assembly Lines",
+          this.constructionTypes.MiniAssembLine,
+          {
+            bones: 750000000000 /* 75e10 */,
+            parts: 40000000000000000 /* 4e16 */,
+          },
+          240,
+          1,
+          1,
+          1,
+          302,
+          "Build a new way to create everything faster!  How deep can these storage tanks go? Doubles storage.",
+          "New upgrades are available in the shop!"
+        ),
+        new he(
+          304,
+          "Technical Think Tank",
+          this.constructionTypes.TechThinkTank,
+          {
+            bones: 75000000000000 /* 75e12 */,
+            parts: 1000000000000000000 /* 1e18 */,
+          },
+          240,
+          1,
+          1,
+          1,
+          303,
+          "Using all these stored brains allows us to harness their raw computational power for even more innovations!  Storage tanks resting on bedrock is as far as we can go, doubling storage",
+          "New upgrades are available in the shop!"
+        ),
+      ];
+
+      this.upgrades = [
+        new le(
+          1,
+          "Bloodthirst",
+          this.types.damage,
+          this.costs.blood,
+          50,
+          1.2,
+          1,
+          40,
+          "Your zombies thirst for blood and do +1 damage for each rank of Bloodthirst.",
+          null,
+          null
+        ),
+        new le(
+          9,
+          "Sharpened Teeth",
+          this.types.damage,
+          this.costs.blood,
+          3000 /* 3e3 */,
+          1.23,
+          3,
+          50,
+          "Your zombies bites do +3 damage with each rank of Sharpened Teeth.",
+          null,
+          206
+        ),
+        new le(
+          11,
+          "Razor Claws",
+          this.types.damage,
+          this.costs.blood,
+          28000 /* 28e3 */,
+          1.25,
+          5,
+          0,
+          "Your zombies attacks do +5 damage with each rank of Razor Claws.",
+          null,
+          211
+        ),
+        new le(
+          16,
+          "Killer Instinct",
+          this.types.damage,
+          this.costs.blood,
+          1000000 /* 1e6 */,
+          1.27,
+          8,
+          0,
+          "Your zombies attacks do +8 damage with each rank of Killer Instinct.",
+          null,
+          220
+        ),
+        new le(
+          2,
+          "Like Leather",
+          this.types.health,
+          this.costs.blood,
+          100,
+          1.2,
+          10,
+          40,
+          "Your zombies gain tougher skin and +10 health with each rank.",
+          null,
+          null
+        ),
+        new le(
+          10,
+          "Thick Skull",
+          this.types.health,
+          this.costs.blood,
+          5000 /* 5e3 */,
+          1.23,
+          25,
+          50,
+          "Your zombies gain +25 health with each rank.",
+          null,
+          206
+        ),
+        new le(
+          12,
+          "Battle Hardened",
+          this.types.health,
+          this.costs.blood,
+          32000 /* 32e3 */,
+          1.25,
+          40,
+          0,
+          "Your zombies gain +40 health with each rank of Battle Hardened.",
+          null,
+          211
+        ),
+        new le(
+          17,
+          "Tough as Nails",
+          this.types.health,
+          this.costs.blood,
+          1000000 /* 1e6 */,
+          1.27,
+          100,
+          0,
+          "Your zombies gain +100 health with each rank of Tough as Nails.",
+          null,
+          220
+        ),
+        new le(
+          3,
+          "Cold Storage",
+          this.types.brainsCap,
+          this.costs.blood,
+          150,
+          1.2,
+          50,
+          20,
+          "Turns out you can use all of your spare blood to store brains and keep them fresh. Each rank increases your maximum brain capacity by 50.",
+          null,
+          null
+        ),
+        new le(
+          4,
+          "Recycling is Cool",
+          this.types.brainRecoverChance,
+          this.costs.blood,
+          1000 /* 1e3 */,
+          1.2,
+          0.1,
+          10,
+          "Why are we wasting so many good brains on this project? Each rank increases your chance to get a brain back from a dead zombie by 10%",
+          null,
+          null
+        ),
+        new le(
+          5,
+          "Your Soul is Mine!",
+          this.types.riseFromTheDeadChance,
+          this.costs.blood,
+          1500,
+          1.4,
+          0.1,
+          10,
+          "Using your most powerful blood magic you command the bodies of the dead to rise as your servants! Each rank grants 10% chance that dead humans will turn into zombies.",
+          null,
+          null
+        ),
+        new le(
+          6,
+          "Infected Bite",
+          this.types.infectedBite,
+          this.costs.blood,
+          3500,
+          1.4,
+          0.1,
+          10,
+          "Your zombies are now infected with plague and could infect their victims too. Each rank adds 10% chance to inflict damage over time when a zombie attacks a target.",
+          null,
+          204
+        ),
+        new le(
+          7,
+          "Detonate",
+          this.types.unlockSpell,
+          this.costs.blood,
+          25000 /* 25e3 */,
+          1,
+          3,
+          1,
+          "Learn the Detonate spell which can explode all of your zombies into a cloud of plague. Not exactly sure how useful that will be.",
+          "New spell learned, Detonate!",
+          209
+        ),
+        new le(
+          8,
+          "Gigazombies?",
+          this.types.unlockSpell,
+          this.costs.blood,
+          50000 /* 5e4 */,
+          1,
+          5,
+          1,
+          "Learn the Gigazombies spell which will turn some of your zombies into hulking monstrosities with increased health and damage.",
+          "New spell learned, Gigazombies!",
+          209
+        ),
+        new le(
+          13,
+          "Blazing Speed",
+          this.types.burningSpeedPC,
+          this.costs.blood,
+          30000 /* 3e4 */,
+          1.25,
+          0.05,
+          10,
+          "The humans are using torches to set your zombies on fire. Perhaps we can turn the tables on them? Each rank increases the movement and attack speed of burning zombies by 5%",
+          null,
+          207
+        ),
+        new le(
+          14,
+          "Spit it Out",
+          this.types.spitDistance,
+          this.costs.blood,
+          500000 /* 5e5 */,
+          1.8,
+          5,
+          15,
+          "The first rank gives your zombies the ability to spit plague at enemies beyond normal attack range. Spit attacks do 50% zombie damage and infect the victim with plague. Subsequent ranks will increase the range of spit attacks.",
+          null,
+          218
+        ),
+        new le(
+          15,
+          "Runic Syphon",
+          this.types.runicSyphon,
+          this.costs.blood,
+          34000 /* 34e3 */,
+          1.9,
+          0.01,
+          10,
+          "Infuse your runes for free! Each rank gives your Runesmith the ability to infuse 1% of your resource income, without consuming it. Additionally when blood and brains reach their storage limit, any additional resources will be infused automatically.",
+          null,
+          210
+        ),
+        new le(
+          19,
+          "Faster Harpies",
+          this.types.harpySpeed,
+          this.costs.blood,
+          100000000 /* 1e8 */,
+          1.07,
+          2,
+          20,
+          "These harpies are way too slow! We have to make them faster. Each rank increases harpy speed by 2",
+          null,
+          222
+        ),
+        new le(
+          20,
+          "Energy Rush",
+          this.types.energyRate,
+          this.costs.brains,
+          20,
+          1.8,
+          0.5,
+          20,
+          "Melting brains down in your cauldron to make smoothies can be beneficial for your health. It also increases your energy rate by 0.5 per second for each rank.",
+          null,
+          null
+        ),
+        new le(
+          21,
+          "Master Summoner",
+          this.types.energyCap,
+          this.costs.brains,
+          10,
+          1.5,
+          5,
+          20,
+          "All the brains you harvested have proved fruitful in your experiments. Each rank raises your maximum energy by 5.",
+          null,
+          null
+        ),
+        new le(
+          22,
+          "Primal Reflexes",
+          this.types.speed,
+          this.costs.brains,
+          5,
+          1.6,
+          1,
+          20,
+          "The zombies retain more of their human agility increasing run speed by 1 for each rank.",
+          null,
+          null
+        ),
+        new le(
+          23,
+          "Blood Harvest",
+          this.types.bloodStoragePC,
+          this.costs.brains,
+          50,
+          1.12,
+          0.1,
+          0,
+          "All this brain power has enabled you to devise some superior blood storage methods. Each rank increases your maximum blood by 10%.",
+          null,
+          null
+        ),
+        new le(
+          24,
+          "Unholy Construction",
+          this.types.construction,
+          this.costs.brains,
+          25,
+          1,
+          1,
+          1,
+          "Learn the art of Unholy Construction in order to build structures that will solidify your foothold on the town.",
+          "Construction menu now available!",
+          null
+        ),
+        new le(
+          25,
+          "Infected Corpse",
+          this.types.infectedBlast,
+          this.costs.brains,
+          500,
+          1.4,
+          0.1,
+          10,
+          "Fill your zombies with so much plague they are ready to explode! Each rank adds 10% chance for a zombie to explode into a cloud of plague upon death.",
+          null,
+          204
+        ),
+        new le(
+          26,
+          "Energy Charge",
+          this.types.unlockSpell,
+          this.costs.brains,
+          2000 /* 2e3 */,
+          1,
+          2,
+          1,
+          "Learn the Energy Charge spell which can drastically increase your energy rate for a short time.",
+          "New spell learned, Energy Charge!",
+          209
+        ),
+        new le(
+          27,
+          "What Doesn't Kill You",
+          this.types.blastHealing,
+          this.costs.brains,
+          10000 /* 1e4 */,
+          1.3,
+          0.1,
+          20,
+          "Plague explosions from zombies and harpies will also heal nearby zombies for 10% of the explosion damage with each rank.",
+          null,
+          218
+        ),
+        new le(
+          28,
+          "One is Never Enough",
+          this.types.monsterLimit,
+          this.costs.brains,
+          20000 /* 2e4 */,
+          1.2,
+          1,
+          15,
+          "We're definitely going to need more than one golem to finish the job. Each rank increases your creature limit by 1",
+          null,
+          220
+        ),
+        new le(
+          29,
+          "Tank Buster",
+          this.types.tankBuster,
+          this.costs.brains,
+          400000 /* 4e5 */,
+          1.2,
+          1,
+          1,
+          "Teach your harpies some new tricks. Once bought this upgrade will make your harpies drop fire bombs on tanks during boss stages.",
+          null,
+          222
+        ),
+        new le(
+          30,
+          "Improved Spikes",
+          this.types.spikeDelay,
+          this.costs.brains,
+          800,
+          1.2,
+          1,
+          4,
+          "Each rank reduces the delay between plague spike activation by 20%",
+          null,
+          208
+        ),
+        new le(
+          40,
+          "Bone Throne",
+          this.types.energyCap,
+          this.costs.bones,
+          50,
+          1.55,
+          10,
+          15,
+          "Sitting atop your throne of bones you can finally think clearly. Each rank increases maximum energy by 10.",
+          null,
+          null
+        ),
+        new le(
+          41,
+          "Crown of Bones",
+          this.types.energyRate,
+          this.costs.bones,
+          200,
+          1.5,
+          0.2,
+          25,
+          "Not just dapper, these spikes help channel your energy. Each rank increases energy rate by 0.2 per second.",
+          null,
+          null
+        ),
+        new le(
+          42,
+          "Bonebarrows",
+          this.types.boneCollectorCapacity,
+          this.costs.bones,
+          300,
+          1.2,
+          5,
+          20,
+          "Your bone collectors are struggling to carry all these bones. Maybe it's time we gave them an upgrade? Each rank increases their carrying capacity by 5.",
+          null,
+          null
+        ),
+        new le(
+          43,
+          "Bone Reinforced Tanks",
+          this.types.bloodCap,
+          this.costs.bones,
+          500,
+          1.07,
+          2000 /* 2e3 */,
+          0,
+          "Finally! Now that we have a solid construction material we can get to work building better storage for our other resources. Each rank increases blood storage by 2000.",
+          null,
+          null
+        ),
+        new le(
+          44,
+          "Brain Cage",
+          this.types.brainsCap,
+          this.costs.bones,
+          650,
+          1.07,
+          500,
+          0,
+          "There's nothing I love more than a mind enslaved. Now we can put these brains where they belong. In cages! Each rank increases brain storage by 500.",
+          null,
+          null
+        ),
+        new le(
+          45,
+          "Earth Freeze",
+          this.types.unlockSpell,
+          this.costs.bones,
+          5000 /* 5e3 */,
+          1,
+          4,
+          1,
+          "Learn the Earth Freeze spell which can freeze all humans in place for a short time.",
+          "New spell learned, Earth Freeze!",
+          209
+        ),
+        new le(
+          46,
+          "Plague Armor",
+          this.types.plagueArmor,
+          this.costs.bones,
+          15000 /* 15e3 */,
+          1.6,
+          0.02,
+          10,
+          "The best defense is a good offense? True in the case of Plague Armor which reduces the damage done by infected humans by 2% per rank.",
+          null,
+          218
+        ),
+        new le(
+          47,
+          "Bulletproof",
+          this.types.bulletproof,
+          this.costs.bones,
+          60000 /* 6e4 */,
+          1.6,
+          0.05,
+          15,
+          "Craft your earth golems from much harder stone. Each rank gives them 5% chance to reflect bullets back to their source.",
+          null,
+          220
+        ),
+        new le(
+          48,
+          "Bombs Away",
+          this.types.harpyBombs,
+          this.costs.bones,
+          500000 /* 5e5 */,
+          1.6,
+          1,
+          3,
+          "Upgrade your harpies so they can carry more than just one bomb at a time.",
+          null,
+          222
+        ),
+        new le(
+          60,
+          "Extra Limbs",
+          this.types.golemDamagePC,
+          this.costs.parts,
+          900,
+          1.3,
+          0.02,
+          0,
+          "Your golems gain +2% damage with each rank of Extra Limbs.",
+          null,
+          220
+        ),
+        new le(
+          61,
+          "Big Boned",
+          this.types.golemHealthPC,
+          this.costs.parts,
+          1000 /* 1e3 */,
+          1.31,
+          0.02,
+          0,
+          "Your golems gain +2% health with each rank of Big Boned.",
+          null,
+          220
+        ),
+        new le(
+          62,
+          "Hybrid Strength",
+          this.types.HstrengthDmgPC,
+          this.costs.parts,
+          1000 /* 1e3 */,
+          1.3,
+          0.01,
+          0,
+          "Animating Golem parts fused with zombie flesh creates a terrifyingly strong Hybrid. Your zombies gain +1% damage with each rank of Hybrid Strength.",
+          null,
+          301
+        ),
+        new le(
+          63,
+          "Hybrid Shell",
+          this.types.HshellHealthPC,
+          this.costs.parts,
+          1000 /* 1e3 */,
+          1.31,
+          0.01,
+          0,
+          "Golem armor shell provides extra protection for your fleshy zombies. Your zombies gain +1% health with each rank of Hybrid Shell.",
+          null,
+          301
+        ),
+        new le(
+          64,
+          "Advanced Cyrogenic Vats",
+          this.types.CyroVatPC,
+          this.costs.parts,
+          1000 /* 1e3 */,
+          1.4,
+          0.1,
+          0,
+          "Cooling these Brains further makes them last much longer. Your brain storage increases +10% with each rank of Advanced Cyrogenic Vats.",
+          null,
+          302
+        ),
+        new le(
+          65,
+          "Golem Part Plague Vats",
+          this.types.PlagueVatPC,
+          this.costs.brains,
+          1000 /* 1e3 */,
+          1.35,
+          0.01,
+          0,
+          "Using specialized Golem Parts allows for advancements in plague research. Plague Damage increases +1% with each rank of Golem Part Plague Vats.",
+          null,
+          302
+        ),
+        new le(
+          66,
+          "Cloning Replicator",
+          this.types.CloningRep1PC,
+          this.costs.parts,
+          1000000000000 /* 1e12 */,
+          1.26,
+          0.05,
+          0,
+          "Mass produced Cloning Replicators allows for much greater use out of each Brain obtained. Brain Income increases +5% with each rank of Cloning Replicator.",
+          null,
+          303
+        ),
+        new le(
+          67,
+          "Blood Synthezizer",
+          this.types.BloodSynPC,
+          this.costs.parts,
+          2000000000000 /* 2e12 */,
+          1.25,
+          0.05,
+          0,
+          "Artificial Blood can augment what we already get allowing for more of everything. Blood Income increases +5% with each rank of Blood Synthesizer.",
+          null,
+          303
+        ),
+        new le(
+          68,
+          "Synthetic Bone Fabricator",
+          this.types.SynBonePC,
+          this.costs.parts,
+          3000000000000 /* 3e12 */,
+          1.24,
+          0.05,
+          0,
+          "Synthetic Bones made from Golem Parts?  Genius! Bone Income increases +5% with each rank of Synthetic Bone Fabricator.",
+          null,
+          303
+        ),
+        new le(
+          69,
+          "Insectoid Parts Assemblers",
+          this.types.SmolPartsPC,
+          this.costs.parts,
+          4000000000000 /* 4e12 */,
+          1.23,
+          0.05,
+          0,
+          "Insect sized and shaped assemblers are far more efficient at maufacturing Golem parts. Parts Income increases +5% with each rank of Insectoid Parts Assemblers.",
+          null,
+          303
+        ),
+        new le(
+          70,
+          "Golem Avionic",
+          this.types.AvionicsPC,
+          this.costs.parts,
+          200000000000000000 /* 2e17 */,
+          1.2,
+          2,
+          50,
+          "Building on the success of hybrid zombies, small golem parts can enhance Harpy-Golem Hybrids. Harpy Speed +2 with each rank of Golem Avionics.",
+          null,
+          304
+        ),
+        new le(
+          71,
+          "Electro-Shock Collars",
+          this.types.ShockPC,
+          this.costs.parts,
+          300000000000000 /* 3e14 */,
+          1.2,
+          0.0025,
+          0,
+          "Using shock collars tuned to the Hybrid Zombie's nervous system causes them to attack at blinding speeds! Attack Speed +0.25% with each rank of Electro-Shock Collars.",
+          null,
+          304
+        ),
+        new le(
+          72,
+          "Power Regulators",
+          this.types.EnergyCost,
+          this.costs.parts,
+          1000000000000000000 /* 1e18 */,
+          1.2,
+          1,
+          30,
+          "Golem parts assembled around the graveyard can help regulate and attune necrotic power. Reduces zombie summoning cost by 1 with each rank of Power Regulators.",
+          null,
+          304
+        ),
+        new le(
+          73,
+          "Sephirin's Reputation",
+          this.types.prest_multPC,
+          this.costs.blood,
+          100000000000000000000 /* 1e20 */,
+          1.25,
+          0.03,
+          0,
+          "Astounding levels of blood sacrificed can enhance your reputation with dark entities in the Void. +3% Zombie Heatlh and Damage per rank",
+          null,
+          304
+        ),
+        new le(
+          74,
+          "Strider's Mathemagics",
+          this.types.SkeleMove,
+          this.costs.parts,
+          1000000000000000000 /* 1e18 */,
+          6,
+          1,
+          10,
+          "Using Archane Mathemagics you imbue your Skeleton Champion with golem based ligaments. +1 Movement Speed per rank.(In testing)",
+          null,
+          304
+        ),
+      ];
+
+      this.prestigeUpgrades = [
+        new le(
+          108,
+          "A Small Investment",
+          this.types.startingPC,
+          this.costs.prestigePoints,
+          10,
+          1.25,
+          1,
+          0,
+          "Each rank gives you an additional 500 blood, 50 brains, and 200 bones when starting a new level.",
+          null,
+          null
+        ),
+        new le(
+          109,
+          "Time Warp",
+          this.types.unlockSpell,
+          this.costs.prestigePoints,
+          50,
+          1,
+          1,
+          1,
+          "Unlock the Time Warp spell in order to speed up the flow of time.",
+          null,
+          null
+        ),
+        new le(
+          110,
+          "Master of Death",
+          this.types.energyCost,
+          this.costs.prestigePoints,
+          1000 /* 1e3 */,
+          1,
+          1,
+          5,
+          "Each rank reduces the energy cost of summoning a zombie by 1",
+          null,
+          null
+        ),
+        new le(
+          101,
+          "Blood Storage",
+          this.types.bloodStoragePC,
+          this.costs.prestigePoints,
+          10,
+          1.25,
+          0.2,
+          0,
+          "Additional 20% blood storage for each rank.",
+          null,
+          null
+        ),
+        new le(
+          102,
+          "Blood Rate",
+          this.types.bloodGainPC,
+          this.costs.prestigePoints,
+          10,
+          1.25,
+          0.2,
+          0,
+          "Additional 20% blood income rate for each rank.",
+          null,
+          null
+        ),
+        new le(
+          103,
+          "Brain Storage",
+          this.types.brainsStoragePC,
+          this.costs.prestigePoints,
+          10,
+          1.25,
+          0.2,
+          0,
+          "Additional 20% brain storage for each rank.",
+          null,
+          null
+        ),
+        new le(
+          104,
+          "Brain Rate",
+          this.types.brainsGainPC,
+          this.costs.prestigePoints,
+          10,
+          1.25,
+          0.2,
+          0,
+          "Additional 20% brain income rate for each rank.",
+          null,
+          null
+        ),
+        new le(
+          105,
+          "Bone Rate",
+          this.types.bonesGainPC,
+          this.costs.prestigePoints,
+          10,
+          1.25,
+          0.2,
+          0,
+          "Additional 20% bones income rate for each rank.",
+          null,
+          null
+        ),
+        new le(
+          111,
+          "Parts Rate",
+          this.types.partsGainPC,
+          this.costs.prestigePoints,
+          10,
+          1.25,
+          0.2,
+          0,
+          "Additional 20% creature parts income rate for each rank.",
+          null,
+          null
+        ),
+        new le(
+          112,
+          "Auto Construction",
+          this.types.autoconstruction,
+          this.costs.prestigePoints,
+          250,
+          1,
+          1,
+          1,
+          "Unlock the ability to automatically start construction of the cheapest available building option.",
+          null,
+          null
+        ),
+        new le(
+          114,
+          "Auto Shop",
+          this.types.autoshop,
+          this.costs.prestigePoints,
+          250,
+          1,
+          1,
+          1,
+          "Unlock the ability to automatically purchase items from the shop.",
+          null,
+          null
+        ),
+        new le(
+          113,
+          "Graveyard Health",
+          this.types.graveyardHealth,
+          this.costs.prestigePoints,
+          10,
+          1.25,
+          0.1,
+          0,
+          "Additional 10% graveyard health during boss levels with each rank.",
+          null,
+          null
+        ),
+        new le(
+          115,
+          "Talent Point",
+          this.types.talentPoint,
+          this.costs.prestigePoints,
+          100,
+          1.175,
+          1,
+          0,
+          "Additional skeleton talent point",
+          null,
+          null
+        ),
+      ];
+
+      if (Upgrades.instance) {
         return Upgrades.instance;
+      }
 
       Upgrades.instance = this;
     }
     hasRequirement(e) {
       return (
         !e.requires ||
-        0 !=
-          this.gameModel.persistentData.constructions.filter(
-            (t) => t.id == e.requires
-          ).length
+        this.gameModel.persistentData.constructions.filter(
+          (t) => t.id == e.requires
+        ).length != 0
       );
     }
     getUpgrades(e) {
@@ -5052,652 +5105,661 @@ var Incremancer;
         case this.costs.blood:
         case this.costs.brains:
         case this.costs.bones:
-        case this.costs.parts:
+        case this.costs.parts: {
           return this.upgrades.filter(
             (t) =>
               t.costType == e &&
-              (0 == t.cap || this.currentRank(t) < t.cap) &&
+              (t.cap == 0 || this.currentRank(t) < t.cap) &&
               this.hasRequirement(t)
           );
-        case "completed":
+        }
+        case "completed": {
           return this.upgrades.filter(
             (e) => e.cap > 0 && this.currentRank(e) >= e.cap
           );
+        }
       }
     }
     applyUpgrades() {
-      this.gameModel.resetToBaseStats(), this.spells.lockAllSpells();
+      this.gameModel.resetToBaseStats();
+      this.spells.lockAllSpells();
       for (let e = 0; e < this.gameModel.persistentData.upgrades.length; e++) {
-        let t = this.upgrades.filter(
-          (t) => t.id == this.gameModel.persistentData.upgrades[e].id
-        )[0];
-        t ||
-          (t = this.prestigeUpgrades.filter(
+        if (!t) {
+          t = this.prestigeUpgrades.filter(
             (t) => t.id == this.gameModel.persistentData.upgrades[e].id
-          )[0]),
-          t &&
-            this.applyUpgrade(
-              t,
-              this.gameModel.persistentData.upgrades[e].rank
-            );
+          )[0];
+        }
+
+        if (t) {
+          this.applyUpgrade(t, this.gameModel.persistentData.upgrades[e].rank);
+        }
       }
       for (
         let e = 0;
         e < this.gameModel.persistentData.constructions.length;
         e++
-      )
+      ) {
         this.applyConstructionUpgrade(
           this.gameModel.persistentData.constructions[e]
         );
+      }
       const e = new Trophies().getAquiredTrophyList();
-      for (let t = 0; t < e.length; t++) this.applyUpgrade(e[t], e[t].rank);
-      this.skeleton.applyUpgrades(),
-        (this.gameModel.bloodMax *= this.gameModel.bloodStorePCMod),
-        (this.gameModel.brainsMax *= this.gameModel.brainsStorePCMod),
-        (this.gameModel.zombieDamage *= this.gameModel.zombieDamagePCMod),
-        (this.gameModel.zombieHealth *= this.gameModel.zombieHealthPCMod),
-        this.gameModel.persistentData.runeshatter &&
-          ((this.gameModel.zombieDamage *= this.shatterEffect()),
-          (this.gameModel.zombieHealth *= this.shatterEffect()),
-          (this.gameModel.zombieCost +=
-            this.gameModel.persistentData.runeshatter));
+      for (let t = 0; t < e.length; t++) {
+        this.applyUpgrade(e[t], e[t].rank);
+      }
+      this.skeleton.applyUpgrades();
+      this.gameModel.bloodMax *= this.gameModel.bloodStorePCMod;
+      this.gameModel.brainsMax *= this.gameModel.brainsStorePCMod;
+      this.gameModel.zombieDamage *= this.gameModel.zombieDamagePCMod;
+      this.gameModel.zombieHealth *= this.gameModel.zombieHealthPCMod;
+
+      if (this.gameModel.persistentData.runeshatter) {
+        this.gameModel.zombieDamage *= this.shatterEffect();
+        this.gameModel.zombieHealth *= this.shatterEffect();
+        this.gameModel.zombieCost += this.gameModel.persistentData.runeshatter;
+      }
     }
     applyUpgrade(e, t) {
       switch (e.type) {
-        case this.types.energyRate:
+        case this.types.energyRate: {
           return void (this.gameModel.energyRate += e.effect * t);
-        case this.types.brainsRate:
+        }
+        case this.types.brainsRate: {
           return void (this.gameModel.brainsRate += e.effect * t);
-        case this.types.bonesRate:
+        }
+        case this.types.bonesRate: {
           return void (this.gameModel.bonesRate += e.effect * t);
-        case this.types.energyCap:
+        }
+        case this.types.energyCap: {
           return void (this.gameModel.energyMax += e.effect * t);
-        case this.types.bloodCap:
+        }
+        case this.types.bloodCap: {
           return void (this.gameModel.bloodMax += e.effect * t);
-        case this.types.brainsCap:
+        }
+        case this.types.brainsCap: {
           return void (this.gameModel.brainsMax += e.effect * t);
-        case this.types.damage:
+        }
+        case this.types.damage: {
           return void (this.gameModel.zombieDamage += e.effect * t);
-        case this.types.speed:
+        }
+        case this.types.speed: {
           return void (this.gameModel.zombieSpeed += e.effect * t);
-        case this.types.health:
+        }
+        case this.types.health: {
           return void (this.gameModel.zombieHealth += e.effect * t);
-        case this.types.brainRecoverChance:
+        }
+        case this.types.brainRecoverChance: {
           return void (this.gameModel.brainRecoverChance += e.effect * t);
-        case this.types.riseFromTheDeadChance:
+        }
+        case this.types.riseFromTheDeadChance: {
           return void (this.gameModel.riseFromTheDeadChance += e.effect * t);
-        case this.types.infectedBite:
+        }
+        case this.types.infectedBite: {
           return void (this.gameModel.infectedBiteChance += e.effect * t);
-        case this.types.infectedBlast:
+        }
+        case this.types.infectedBlast: {
           return void (this.gameModel.infectedBlastChance += e.effect * t);
-        case this.types.plagueDamage:
+        }
+        case this.types.plagueDamage: {
           return void (this.gameModel.plagueDamageMod += e.effect);
-        case this.types.plagueTicks:
+        }
+        case this.types.plagueTicks: {
           return void (this.gameModel.plagueticks += e.effect);
-        case this.types.burningSpeedPC:
+        }
+        case this.types.burningSpeedPC: {
           return void (this.gameModel.burningSpeedMod += e.effect * t);
-        case this.types.construction:
+        }
+        case this.types.construction: {
           return void (this.gameModel.construction = 1);
-        case this.types.boneCollectorCapacity:
+        }
+        case this.types.boneCollectorCapacity: {
           return void (this.gameModel.boneCollectorCapacity += e.effect * t);
-        case this.types.unlockSpell:
+        }
+        case this.types.unlockSpell: {
           return void this.spells.unlockSpell(e.effect);
-        case this.types.spitDistance:
+        }
+        case this.types.spitDistance: {
           return void (this.gameModel.spitDistance = 30 + e.effect * t);
-        case this.types.blastHealing:
+        }
+        case this.types.blastHealing: {
           return void (this.gameModel.blastHealing += e.effect * t);
-        case this.types.plagueArmor:
+        }
+        case this.types.plagueArmor: {
           return void (this.gameModel.plagueDmgReduction -= e.effect * t);
-        case this.types.monsterLimit:
+        }
+        case this.types.monsterLimit: {
           return void (this.gameModel.creatureLimit += e.effect * t);
-        case this.types.runicSyphon:
+        }
+        case this.types.runicSyphon: {
           return void (this.gameModel.runicSyphon.percentage += e.effect * t);
-        case this.types.bulletproof:
+        }
+        case this.types.bulletproof: {
           return void (this.gameModel.bulletproofChance += e.effect * t);
-        case this.types.harpySpeed:
+        }
+        case this.types.harpySpeed: {
           return void (this.gameModel.harpySpeed += e.effect * t);
-        case this.types.SkeleMove:
-          return (
-            void (this.gameModel.SkeleMoveMod += e.effect * t),
-            (this.skeleton.moveSpeed += e.effect * t)
-          );
-        case this.types.tankBuster:
+        }
+        case this.types.SkeleMove: {
+          void (this.gameModel.SkeleMoveMod += e.effect * t);
+          this.skeleton.moveSpeed += e.effect * t;
+          return this.skeleton.moveSpeed;
+        }
+        case this.types.tankBuster: {
           return void (this.gameModel.tankBuster = true);
-        case this.types.harpyBombs:
+        }
+        case this.types.harpyBombs: {
           return void (this.gameModel.harpyBombs += e.effect * t);
-        case this.types.spikeDelay:
+        }
+        case this.types.spikeDelay: {
           return void (this.gameModel.spikeDelay -= e.effect * t);
-        case this.types.bonesGainPC:
+        }
+        case this.types.bonesGainPC: {
           return void (this.gameModel.bonesPCMod *=
             e.costType == this.costs.prestigePoints
               ? this.calculateWithPrestigeRankBonus(e, t)
-              : Math.pow(1 + e.effect, t));
-        case this.types.partsGainPC:
+              : (1 + e.effect) ** t);
+        }
+        case this.types.partsGainPC: {
           return void (this.gameModel.partsPCMod *=
             e.costType == this.costs.prestigePoints
               ? this.calculateWithPrestigeRankBonus(e, t)
-              : Math.pow(1 + e.effect, t));
-        case this.types.bloodGainPC:
+              : (1 + e.effect) ** t);
+        }
+        case this.types.bloodGainPC: {
           return void (this.gameModel.bloodPCMod *=
             e.costType == this.costs.prestigePoints
               ? this.calculateWithPrestigeRankBonus(e, t)
-              : Math.pow(1 + e.effect, t));
-        case this.types.bloodStoragePC:
+              : (1 + e.effect) ** t);
+        }
+        case this.types.bloodStoragePC: {
           return void (this.gameModel.bloodStorePCMod *=
             e.costType == this.costs.prestigePoints
               ? this.calculateWithPrestigeRankBonus(e, t)
-              : Math.pow(1 + e.effect, t));
-        case this.types.brainsGainPC:
+              : (1 + e.effect) ** t);
+        }
+        case this.types.brainsGainPC: {
           return void (this.gameModel.brainsPCMod *=
             t > e.costType == this.costs.prestigePoints
               ? this.calculateWithPrestigeRankBonus(e, t)
-              : Math.pow(1 + e.effect, t));
-        case this.types.brainsStoragePC:
+              : (1 + e.effect) ** t);
+        }
+        case this.types.brainsStoragePC: {
           return void (this.gameModel.brainsStorePCMod *=
             e.costType == this.costs.prestigePoints
               ? this.calculateWithPrestigeRankBonus(e, t)
-              : Math.pow(1 + e.effect, t));
-        case this.types.zombieDmgPC:
-          return void (this.gameModel.zombieDamagePCMod *= Math.pow(
-            1 + e.effect,
-            t
-          ));
-        case this.types.zombieHealthPC:
-          return void (this.gameModel.zombieHealthPCMod *= Math.pow(
-            1 + e.effect,
-            t
-          ));
-        case this.types.HstrengthDmgPC:
-          return (
-            void (this.gameModel.zombieDamagePCMod *= Math.pow(
-              1 + e.effect,
-              t
-            )),
-            (this.gameModel.HstrengthDmgPCMod *= Math.pow(1 + e.effect, t))
-          );
-        case this.types.HshellHealthPC:
-          return (
-            void (this.gameModel.zombieHealthPCMod *= Math.pow(
-              1 + e.effect,
-              t
-            )),
-            (this.gameModel.HshellHealthPCMod *= Math.pow(1 + e.effect, t))
-          );
-        case this.types.CyroVatPC:
-          return (
-            void (this.gameModel.brainsMax *= Math.pow(1 + e.effect, t)),
-            (this.gameModel.CyroVatPCMod *= Math.pow(1 + e.effect, t))
-          );
-        case this.types.PlagueVatPC:
-          return void (this.gameModel.PlagueVatPCMod *= Math.pow(
-            1 + e.effect,
-            t
-          ));
-        case this.types.CloningRep1PC:
-          return (
-            void (this.gameModel.brainsPCMod *= Math.pow(1 + e.effect, t)),
-            (this.gameModel.CloningRep1PCMod *= Math.pow(1 + e.effect, t))
-          );
-        case this.types.BloodSynPC:
-          return (
-            void (this.gameModel.bloodPCMod *= Math.pow(1 + e.effect, t)),
-            (this.gameModel.BloodSynPCMod *= Math.pow(1 + e.effect, t))
-          );
-        case this.types.SynBonePC:
-          return (
-            void (this.gameModel.bonesPCMod *= Math.pow(1 + e.effect, t)),
-            (this.gameModel.SynBonePCMod *= Math.pow(1 + e.effect, t))
-          );
-        case this.types.SmolPartsPC:
-          return (
-            void (this.gameModel.partsPCMod *= Math.pow(1 + e.effect, t)),
-            (this.gameModel.SmolPartsPCMod *= Math.pow(1 + e.effect, t))
-          );
-        case this.types.AvionicsPC:
-          return (
-            void (this.gameModel.harpySpeed += e.effect * t),
-            (this.gameModel.AvionicsPCMod += e.effect * t)
-          );
+              : (1 + e.effect) ** t);
+        }
+        case this.types.zombieDmgPC: {
+          return void (this.gameModel.zombieDamagePCMod *= (1 + e.effect) ** t);
+        }
+        case this.types.zombieHealthPC: {
+          return void (this.gameModel.zombieHealthPCMod *= (1 + e.effect) ** t);
+        }
+        case this.types.HstrengthDmgPC: {
+          void (this.gameModel.zombieDamagePCMod *= (1 + e.effect) ** t);
+          this.gameModel.HstrengthDmgPCMod *= (1 + e.effect) ** t;
+          return this.gameModel.HstrengthDmgPCMod;
+        }
+        case this.types.HshellHealthPC: {
+          void (this.gameModel.zombieHealthPCMod *= (1 + e.effect) ** t);
+          this.gameModel.HshellHealthPCMod *= (1 + e.effect) ** t;
+          return this.gameModel.HshellHealthPCMod;
+        }
+        case this.types.CyroVatPC: {
+          void (this.gameModel.brainsMax *= (1 + e.effect) ** t);
+          this.gameModel.CyroVatPCMod *= (1 + e.effect) ** t;
+          return this.gameModel.CyroVatPCMod;
+        }
+        case this.types.PlagueVatPC: {
+          return void (this.gameModel.PlagueVatPCMod *= (1 + e.effect) ** t);
+        }
+        case this.types.CloningRep1PC: {
+          void (this.gameModel.brainsPCMod *= (1 + e.effect) ** t);
+          this.gameModel.CloningRep1PCMod *= (1 + e.effect) ** t;
+          return this.gameModel.CloningRep1PCMod;
+        }
+        case this.types.BloodSynPC: {
+          void (this.gameModel.bloodPCMod *= (1 + e.effect) ** t);
+          this.gameModel.BloodSynPCMod *= (1 + e.effect) ** t;
+          return this.gameModel.BloodSynPCMod;
+        }
+        case this.types.SynBonePC: {
+          void (this.gameModel.bonesPCMod *= (1 + e.effect) ** t);
+          this.gameModel.SynBonePCMod *= (1 + e.effect) ** t;
+          return this.gameModel.SynBonePCMod;
+        }
+        case this.types.SmolPartsPC: {
+          void (this.gameModel.partsPCMod *= (1 + e.effect) ** t);
+          this.gameModel.SmolPartsPCMod *= (1 + e.effect) ** t;
+          return this.gameModel.SmolPartsPCMod;
+        }
+        case this.types.AvionicsPC: {
+          void (this.gameModel.harpySpeed += e.effect * t);
+          this.gameModel.AvionicsPCMod += e.effect * t;
+          return this.gameModel.AvionicsPCMod;
+        }
 
-        case this.types.ShockPC:
-          return (
-            void (this.attackSpeed *= Math.pow(1 + e.effect, t)),
-            (this.gameModel.ShockPCMod *= Math.pow(1 + e.effect, t))
-          );
-        case this.types.EnergyCost:
-          return (
-            void (this.gameModel.zombieCost -= e.effect * t),
-            (this.gameModel.EnergyCostMod -= e.effect * t)
-          );
-        case this.types.prest_multPC:
-          return (
-            void (this.gameModel.zombieDamagePCMod *= Math.pow(
-              1 + e.effect,
-              t
-            )),
-            (this.gameModel.zombieHealthPCMod *= Math.pow(1 + e.effect, t)),
-            (this.gameModel.prest_multPCMod *= Math.pow(1 + e.effect, t))
-          );
-        case this.types.golemDamagePC:
-          return void (this.gameModel.golemDamagePCMod *= Math.pow(
-            1 + e.effect,
-            t
-          ));
-        case this.types.golemHealthPC:
-          return void (this.gameModel.golemHealthPCMod *= Math.pow(
-            1 + e.effect,
-            t
-          ));
-        case this.types.startingPC:
+        case this.types.ShockPC: {
+          void (this.attackSpeed *= (1 + e.effect) ** t);
+          this.gameModel.ShockPCMod *= (1 + e.effect) ** t;
+          return this.gameModel.ShockPCMod;
+        }
+        case this.types.EnergyCost: {
+          void (this.gameModel.zombieCost -= e.effect * t);
+          this.gameModel.EnergyCostMod -= e.effect * t;
+          return this.gameModel.EnergyCostMod;
+        }
+        case this.types.prest_multPC: {
+          void (this.gameModel.zombieDamagePCMod *= (1 + e.effect) ** t);
+          this.gameModel.zombieHealthPCMod *= (1 + e.effect) ** t;
+          this.gameModel.prest_multPCMod *= (1 + e.effect) ** t;
+          return this.gameModel.prest_multPCMod;
+        }
+        case this.types.golemDamagePC: {
+          return void (this.gameModel.golemDamagePCMod *= (1 + e.effect) ** t);
+        }
+        case this.types.golemHealthPC: {
+          return void (this.gameModel.golemHealthPCMod *= (1 + e.effect) ** t);
+        }
+        case this.types.startingPC: {
           return void (this.gameModel.startingResources += e.effect * t);
-        case this.types.energyCost:
+        }
+        case this.types.energyCost: {
           return void (this.gameModel.zombieCost -= e.effect * t);
-        case this.types.autoconstruction:
+        }
+        case this.types.autoconstruction: {
           return void (this.gameModel.autoconstructionUnlocked = true);
-        case this.types.autoshop:
+        }
+        case this.types.autoshop: {
           return void (this.gameModel.autoUpgrades = true);
-        case this.types.graveyardHealth:
-          return void (this.gameModel.graveyardHealthMod *= Math.pow(
-            1 + e.effect,
-            t
-          ));
-        case this.types.talentPoint:
+        }
+        case this.types.graveyardHealth: {
+          return void (this.gameModel.graveyardHealthMod *=
+            (1 + e.effect) ** t);
+        }
+        case this.types.talentPoint: {
           return void (this.skeleton.talentPoints = t);
+        }
       }
     }
     calculateWithPrestigeRankBonus(e, t) {
       if (t <= 60) {
-        return Math.pow(1 + e.effect, t);
+        return (1 + e.effect) ** t;
       }
 
-      let multiplier = Math.pow(1 + e.effect, 60);
+      let multiplier = (1 + e.effect) ** 60;
 
       for (let i = 1; i <= t - 60; i++) {
-        multiplier *= 1 + e.effect * Math.pow(1 + 0.05, i);
+        multiplier *= 1 + e.effect * (1 + 0.05) ** i;
       }
 
       return multiplier;
     }
     applyConstructionUpgrade(e) {
       switch (e.type) {
-        case this.constructionTypes.graveyard:
+        case this.constructionTypes.graveyard: {
           return void (this.gameModel.constructions.graveyard = 1);
-        case this.constructionTypes.crypt:
-          return (
-            (this.gameModel.constructions.crypt = 1),
-            (this.gameModel.brainsStorePCMod *= 1.5),
-            void (this.gameModel.bloodStorePCMod *= 1.5)
-          );
-        case this.constructionTypes.fort:
-          return (
-            (this.gameModel.constructions.fort = 1),
-            (this.gameModel.brainsStorePCMod *= 1.6),
-            void (this.gameModel.bloodStorePCMod *= 1.6)
-          );
-        case this.constructionTypes.fortress:
-          return (
-            (this.gameModel.constructions.fortress = 1),
-            (this.gameModel.brainsStorePCMod *= 1.7),
-            void (this.gameModel.bloodStorePCMod *= 1.7)
-          );
-        case this.constructionTypes.citadel:
-          return (
-            (this.gameModel.constructions.citadel = 1),
-            (this.gameModel.brainsStorePCMod *= 1.8),
-            void (this.gameModel.bloodStorePCMod *= 1.8)
-          );
-        case this.constructionTypes.plagueSpikes:
+        }
+        case this.constructionTypes.crypt: {
+          this.gameModel.constructions.crypt = 1;
+          this.gameModel.brainsStorePCMod *= 1.5;
+          return void (this.gameModel.bloodStorePCMod *= 1.5);
+        }
+        case this.constructionTypes.fort: {
+          this.gameModel.constructions.fort = 1;
+          this.gameModel.brainsStorePCMod *= 1.6;
+          return void (this.gameModel.bloodStorePCMod *= 1.6);
+        }
+        case this.constructionTypes.fortress: {
+          this.gameModel.constructions.fortress = 1;
+          this.gameModel.brainsStorePCMod *= 1.7;
+          return void (this.gameModel.bloodStorePCMod *= 1.7);
+        }
+        case this.constructionTypes.citadel: {
+          this.gameModel.constructions.citadel = 1;
+          this.gameModel.brainsStorePCMod *= 1.8;
+          return void (this.gameModel.bloodStorePCMod *= 1.8);
+        }
+        case this.constructionTypes.plagueSpikes: {
           return void (this.gameModel.constructions.plagueSpikes = 1);
-        case this.constructionTypes.fence:
+        }
+        case this.constructionTypes.fence: {
           return void (this.gameModel.constructions.fence = 1);
-        case this.constructionTypes.fenceSize:
+        }
+        case this.constructionTypes.fenceSize: {
           return void (this.gameModel.fenceRadius += e.effect * e.rank);
-        case this.constructionTypes.pit:
-          return (
-            (this.gameModel.bloodMax += 1e6 * e.rank),
-            void (this.gameModel.brainsMax += 1e5 * e.rank)
+        }
+        case this.constructionTypes.pit: {
+          this.gameModel.bloodMax += 1000000 /* 1e6 */ * e.rank;
+          return void (this.gameModel.brainsMax += 100000 /* 1e5 */ * e.rank);
+        }
+        case this.constructionTypes.runesmith: {
+          this.gameModel.constructions.runesmith = 1;
+
+          return void (
+            this.gameModel.persistentData.runes ||
+            (this.gameModel.persistentData.runes = {
+              life: {
+                blood: 0,
+                brains: 0,
+                bones: 0,
+              },
+              death: {
+                blood: 0,
+                brains: 0,
+                bones: 0,
+              },
+            })
           );
-        case this.constructionTypes.runesmith:
-          return (
-            (this.gameModel.constructions.runesmith = 1),
-            void (
-              this.gameModel.persistentData.runes ||
-              (this.gameModel.persistentData.runes = {
-                life: {
-                  blood: 0,
-                  brains: 0,
-                  bones: 0,
-                },
-                death: {
-                  blood: 0,
-                  brains: 0,
-                  bones: 0,
-                },
-              })
-            )
-          );
-        case this.constructionTypes.aviary:
+        }
+        case this.constructionTypes.aviary: {
           return void (this.gameModel.constructions.aviary = 1);
-        case this.constructionTypes.zombieCage:
+        }
+        case this.constructionTypes.zombieCage: {
           return void (this.gameModel.zombieCages += e.effect * e.rank);
-        case this.constructionTypes.partFactory:
-          return (
-            (this.gameModel.constructions.partFactory = true),
-            void (this.gameModel.constructions.factory = true)
-          );
-        case this.constructionTypes.monsterFactory:
-          return (
-            (this.gameModel.constructions.monsterFactory = true),
-            void (this.gameModel.constructions.factory = true)
-          );
-        case this.constructionTypes.HybridLab:
-          return (
-            (this.gameModel.constructions.HybridLab = 1),
-            (this.gameModel.brainsStorePCMod *= 2),
-            void (this.gameModel.bloodStorePCMod *= 2)
-          );
-        case this.constructionTypes.AdvHybridLab:
-          return (
-            (this.gameModel.constructions.AdvHybridLab = 1),
-            (this.gameModel.brainsStorePCMod *= 2),
-            void (this.gameModel.bloodStorePCMod *= 2)
-          );
-        case this.constructionTypes.MiniAssembLine:
-          return (
-            (this.gameModel.constructions.MiniAssembLine = 1),
-            (this.gameModel.brainsStorePCMod *= 2),
-            void (this.gameModel.bloodStorePCMod *= 2)
-          );
-        case this.constructionTypes.AdvHybridLab:
-          return (
-            (this.gameModel.constructions.TechThinkTank = 1),
-            (this.gameModel.brainsStorePCMod *= 2),
-            void (this.gameModel.bloodStorePCMod *= 2)
-          );
+        }
+        case this.constructionTypes.partFactory: {
+          this.gameModel.constructions.partFactory = true;
+          return void (this.gameModel.constructions.factory = true);
+        }
+        case this.constructionTypes.monsterFactory: {
+          this.gameModel.constructions.monsterFactory = true;
+          return void (this.gameModel.constructions.factory = true);
+        }
+        case this.constructionTypes.HybridLab: {
+          this.gameModel.constructions.HybridLab = 1;
+          this.gameModel.brainsStorePCMod *= 2;
+          return void (this.gameModel.bloodStorePCMod *= 2);
+        }
+        case this.constructionTypes.AdvHybridLab: {
+          this.gameModel.constructions.AdvHybridLab = 1;
+          this.gameModel.brainsStorePCMod *= 2;
+          return void (this.gameModel.bloodStorePCMod *= 2);
+        }
+        case this.constructionTypes.MiniAssembLine: {
+          this.gameModel.constructions.MiniAssembLine = 1;
+          this.gameModel.brainsStorePCMod *= 2;
+          return void (this.gameModel.bloodStorePCMod *= 2);
+        }
+        case this.constructionTypes.AdvHybridLab: {
+          this.gameModel.constructions.TechThinkTank = 1;
+          this.gameModel.brainsStorePCMod *= 2;
+          return void (this.gameModel.bloodStorePCMod *= 2);
+        }
       }
     }
     displayStatValue(e) {
       switch (e.type) {
-        case this.types.energyRate:
-          return (
-            "Energy rate: " +
-            formatDecimal(this.gameModel.energyRate) +
-            " per second"
-          );
-        case this.types.energyCap:
-          return "Maximum energy: " + formatWhole(this.gameModel.energyMax);
-        case this.types.bloodCap:
-          return "Maximum blood: " + formatWhole(this.gameModel.bloodMax);
-        case this.types.brainsCap:
-          return "Maximum brains: " + formatWhole(this.gameModel.brainsMax);
-        case this.types.damage:
-          return "Zombie damage: " + formatWhole(this.gameModel.zombieDamage);
-        case this.types.speed:
-          return "Zombie speed: " + formatWhole(this.gameModel.zombieSpeed);
-        case this.types.health:
-          return (
-            "Zombie maximum health: " + formatWhole(this.gameModel.zombieHealth)
-          );
-        case this.types.brainRecoverChance:
-          return (
-            Math.round(100 * this.gameModel.brainRecoverChance) +
-            "% chance to recover brain"
-          );
-        case this.types.riseFromTheDeadChance:
-          return (
-            Math.round(100 * this.gameModel.riseFromTheDeadChance) +
-            "% chance for human corpses to turn into zombies"
-          );
-        case this.types.infectedBite:
-          return (
-            Math.round(100 * this.gameModel.infectedBiteChance) +
-            "% chance for zombies to infect their targets"
-          );
-        case this.types.infectedBlast:
-          return (
-            Math.round(100 * this.gameModel.infectedBlastChance) +
-            "% chance for zombies to explode on death"
-          );
-        case this.types.bulletproof:
-          return (
-            Math.round(100 * this.gameModel.bulletproofChance) +
-            "% chance for earth golems to reflect bullets"
-          );
-        case this.types.construction:
+        case this.types.energyRate: {
+          return `Energy rate: ${formatDecimal(
+            this.gameModel.energyRate
+          )} per second`;
+        }
+        case this.types.energyCap: {
+          return `Maximum energy: ${formatWhole(this.gameModel.energyMax)}`;
+        }
+        case this.types.bloodCap: {
+          return `Maximum blood: ${formatWhole(this.gameModel.bloodMax)}`;
+        }
+        case this.types.brainsCap: {
+          return `Maximum brains: ${formatWhole(this.gameModel.brainsMax)}`;
+        }
+        case this.types.damage: {
+          return `Zombie damage: ${formatWhole(this.gameModel.zombieDamage)}`;
+        }
+        case this.types.speed: {
+          return `Zombie speed: ${formatWhole(this.gameModel.zombieSpeed)}`;
+        }
+        case this.types.health: {
+          return `Zombie maximum health: ${formatWhole(
+            this.gameModel.zombieHealth
+          )}`;
+        }
+        case this.types.brainRecoverChance: {
+          return `${Math.round(
+            100 * this.gameModel.brainRecoverChance
+          )}% chance to recover brain`;
+        }
+        case this.types.riseFromTheDeadChance: {
+          return `${Math.round(
+            100 * this.gameModel.riseFromTheDeadChance
+          )}% chance for human corpses to turn into zombies`;
+        }
+        case this.types.infectedBite: {
+          return `${Math.round(
+            100 * this.gameModel.infectedBiteChance
+          )}% chance for zombies to infect their targets`;
+        }
+        case this.types.infectedBlast: {
+          return `${Math.round(
+            100 * this.gameModel.infectedBlastChance
+          )}% chance for zombies to explode on death`;
+        }
+        case this.types.bulletproof: {
+          return `${Math.round(
+            100 * this.gameModel.bulletproofChance
+          )}% chance for earth golems to reflect bullets`;
+        }
+        case this.types.construction: {
           return this.gameModel.construction > 0
             ? "You have unlocked Unholy Construction"
             : "You have yet to unlock Unholy Construction";
-        case this.types.boneCollectorCapacity:
-          return (
-            "Bone collector capacity: " +
-            formatWhole(this.gameModel.boneCollectorCapacity)
-          );
-        case this.types.bonesGainPC:
-          return (
-            "Bones: " +
-            formatWhole(Math.round(100 * this.gameModel.bonesPCMod)) +
-            "%"
-          );
-        case this.types.partsGainPC:
-          return (
-            "Parts: " +
-            formatWhole(Math.round(100 * this.gameModel.partsPCMod)) +
-            "%"
-          );
-        case this.types.bloodGainPC:
-          return (
-            "Blood: " +
-            formatWhole(Math.round(100 * this.gameModel.bloodPCMod)) +
-            "%"
-          );
-        case this.types.bloodStoragePC:
-          return (
-            "Blood Storage: " +
-            formatWhole(100 * this.gameModel.bloodStorePCMod) +
-            "%"
-          );
-        case this.types.brainsGainPC:
-          return (
-            "Brains: " +
-            formatWhole(Math.round(100 * this.gameModel.brainsPCMod)) +
-            "%"
-          );
-        case this.types.brainsStoragePC:
-          return (
-            "Brains Storage: " +
-            formatWhole(100 * this.gameModel.brainsStorePCMod) +
-            "%"
-          );
-        case this.types.zombieDmgPC:
-          return (
-            "Zombie Damage: " +
-            Math.round(100 * this.gameModel.zombieDamagePCMod - 100) +
-            "%"
-          );
-        case this.types.zombieHealthPC:
-          return (
-            "Zombie Health: " +
-            Math.round(100 * this.gameModel.zombieHealthPCMod - 100) +
-            "%"
-          );
-        case this.types.HstrengthDmgPC:
-          return (
-            "Zombie Damage: " +
-            Math.round(100 * this.gameModel.HstrengthDmgPCMod - 100) +
-            "%"
-          );
-        case this.types.HshellHealthPC:
-          return (
-            "Zombie Health: " +
-            Math.round(100 * this.gameModel.HshellHealthPCMod - 100) +
-            "%"
-          );
-        case this.types.CyroVatPC:
-          return (
-            "Brains Storage: " +
-            Math.round(100 * this.gameModel.CyroVatPCMod - 100) +
-            "%"
-          );
-        case this.types.PlagueVatPC:
-          return (
-            "Plague Damage: " +
-            Math.round(100 * this.gameModel.PlagueVatPCMod - 100) +
-            "%"
-          );
-        case this.types.CloningRep1PC:
-          return (
-            "Additional Brain Income: " +
-            Math.round(100 * this.gameModel.CloningRep1PCMod - 100) +
-            "%"
-          );
-        case this.types.BloodSynPC:
-          return (
-            "Additional Blood Income: " +
-            Math.round(100 * this.gameModel.BloodSynPCMod - 100) +
-            "%"
-          );
-        case this.types.SynBonePC:
-          return (
-            "Additional Bone Income: " +
-            Math.round(100 * this.gameModel.SynBonePCMod - 100) +
-            "%"
-          );
-        case this.types.SmolPartsPC:
-          return (
-            "Additional Parts Income: " +
-            Math.round(100 * this.gameModel.SmolPartsPCMod - 100) +
-            "%"
-          );
-        case this.types.EnergyCost:
-          return "Zombie Cost: " + this.gameModel.zombieCost + " energy";
-        case this.types.AvionicsPC:
-          return "Harpy speed: " + formatWhole(this.gameModel.harpySpeed);
-        case this.types.SkeleMove:
-          return "Skeleton speed: " + formatWhole(this.gameModel.SkeleMoveMod);
-        case this.types.ShockPC:
-          return (
-            "Attack Speed multiplier: " +
-            Math.round(100 * this.gameModel.ShockPCMod - 100) +
-            "%"
-          );
-        case this.types.prest_multPC:
-          return (
-            "Zombie Health and Damage: " +
-            Math.round(100 * this.gameModel.prest_multPCMod) +
-            "%"
-          );
-        case this.types.golemDamagePC:
-          return (
-            "Golem Damage: " +
-            Math.round(100 * this.gameModel.golemDamagePCMod) +
-            "%"
-          );
-        case this.types.golemHealthPC:
-          return (
-            "Golem Health: " +
-            Math.round(100 * this.gameModel.golemHealthPCMod) +
-            "%"
-          );
-        case this.types.startingPC:
-          return (
-            Math.round(500 * this.gameModel.startingResources) +
-            " blood, " +
-            Math.round(50 * this.gameModel.startingResources) +
-            " brains, " +
-            Math.round(200 * this.gameModel.startingResources) +
-            " bones"
-          );
-        case this.types.unlockSpell:
+        }
+        case this.types.boneCollectorCapacity: {
+          return `Bone collector capacity: ${formatWhole(
+            this.gameModel.boneCollectorCapacity
+          )}`;
+        }
+        case this.types.bonesGainPC: {
+          return `Bones: ${formatWhole(
+            Math.round(100 * this.gameModel.bonesPCMod)
+          )}%`;
+        }
+        case this.types.partsGainPC: {
+          return `Parts: ${formatWhole(
+            Math.round(100 * this.gameModel.partsPCMod)
+          )}%`;
+        }
+        case this.types.bloodGainPC: {
+          return `Blood: ${formatWhole(
+            Math.round(100 * this.gameModel.bloodPCMod)
+          )}%`;
+        }
+        case this.types.bloodStoragePC: {
+          return `Blood Storage: ${formatWhole(
+            100 * this.gameModel.bloodStorePCMod
+          )}%`;
+        }
+        case this.types.brainsGainPC: {
+          return `Brains: ${formatWhole(
+            Math.round(100 * this.gameModel.brainsPCMod)
+          )}%`;
+        }
+        case this.types.brainsStoragePC: {
+          return `Brains Storage: ${formatWhole(
+            100 * this.gameModel.brainsStorePCMod
+          )}%`;
+        }
+        case this.types.zombieDmgPC: {
+          return `Zombie Damage: ${Math.round(
+            100 * this.gameModel.zombieDamagePCMod - 100
+          )}%`;
+        }
+        case this.types.zombieHealthPC: {
+          return `Zombie Health: ${Math.round(
+            100 * this.gameModel.zombieHealthPCMod - 100
+          )}%`;
+        }
+        case this.types.HstrengthDmgPC: {
+          return `Zombie Damage: ${Math.round(
+            100 * this.gameModel.HstrengthDmgPCMod - 100
+          )}%`;
+        }
+        case this.types.HshellHealthPC: {
+          return `Zombie Health: ${Math.round(
+            100 * this.gameModel.HshellHealthPCMod - 100
+          )}%`;
+        }
+        case this.types.CyroVatPC: {
+          return `Brains Storage: ${Math.round(
+            100 * this.gameModel.CyroVatPCMod - 100
+          )}%`;
+        }
+        case this.types.PlagueVatPC: {
+          return `Plague Damage: ${Math.round(
+            100 * this.gameModel.PlagueVatPCMod - 100
+          )}%`;
+        }
+        case this.types.CloningRep1PC: {
+          return `Additional Brain Income: ${Math.round(
+            100 * this.gameModel.CloningRep1PCMod - 100
+          )}%`;
+        }
+        case this.types.BloodSynPC: {
+          return `Additional Blood Income: ${Math.round(
+            100 * this.gameModel.BloodSynPCMod - 100
+          )}%`;
+        }
+        case this.types.SynBonePC: {
+          return `Additional Bone Income: ${Math.round(
+            100 * this.gameModel.SynBonePCMod - 100
+          )}%`;
+        }
+        case this.types.SmolPartsPC: {
+          return `Additional Parts Income: ${Math.round(
+            100 * this.gameModel.SmolPartsPCMod - 100
+          )}%`;
+        }
+        case this.types.EnergyCost: {
+          return `Zombie Cost: ${this.gameModel.zombieCost} energy`;
+        }
+        case this.types.AvionicsPC: {
+          return `Harpy speed: ${formatWhole(this.gameModel.harpySpeed)}`;
+        }
+        case this.types.SkeleMove: {
+          return `Skeleton speed: ${formatWhole(this.gameModel.SkeleMoveMod)}`;
+        }
+        case this.types.ShockPC: {
+          return `Attack Speed multiplier: ${Math.round(
+            100 * this.gameModel.ShockPCMod - 100
+          )}%`;
+        }
+        case this.types.prest_multPC: {
+          return `Zombie Health and Damage: ${Math.round(
+            100 * this.gameModel.prest_multPCMod
+          )}%`;
+        }
+        case this.types.golemDamagePC: {
+          return `Golem Damage: ${Math.round(
+            100 * this.gameModel.golemDamagePCMod
+          )}%`;
+        }
+        case this.types.golemHealthPC: {
+          return `Golem Health: ${Math.round(
+            100 * this.gameModel.golemHealthPCMod
+          )}%`;
+        }
+        case this.types.startingPC: {
+          return `${Math.round(
+            500 * this.gameModel.startingResources
+          )} blood, ${Math.round(
+            50 * this.gameModel.startingResources
+          )} brains, ${Math.round(
+            200 * this.gameModel.startingResources
+          )} bones`;
+        }
+        case this.types.unlockSpell: {
           return this.currentRank(e) > 0
             ? "You have learned this spell"
             : "You have yet to learn this spell";
-        case this.types.energyCost:
-          return "Zombie Cost: " + this.gameModel.zombieCost + " energy";
-        case this.types.burningSpeedPC:
-          return (
-            "Burning zombie speed: " +
-            Math.round(100 * this.gameModel.burningSpeedMod) +
-            "%"
-          );
-        case this.types.blastHealing:
-          return (
-            "Plague heal: " +
-            Math.round(100 * this.gameModel.blastHealing) +
-            "%"
-          );
-        case this.types.spitDistance:
-          return "Zombie spit distance: " + this.gameModel.spitDistance;
-        case this.types.plagueArmor:
-          return (
-            "Infected damage reduction: " +
-            Math.round(100 - 100 * this.gameModel.plagueDmgReduction) +
-            "%"
-          );
-        case this.types.monsterLimit:
-          return "Creature limit: " + this.gameModel.creatureLimit;
-        case this.types.runicSyphon:
-          return (
-            "Syphon amount: " +
-            Math.round(100 * this.gameModel.runicSyphon.percentage) +
-            "%"
-          );
-        case this.types.autoconstruction:
+        }
+        case this.types.energyCost: {
+          return `Zombie Cost: ${this.gameModel.zombieCost} energy`;
+        }
+        case this.types.burningSpeedPC: {
+          return `Burning zombie speed: ${Math.round(
+            100 * this.gameModel.burningSpeedMod
+          )}%`;
+        }
+        case this.types.blastHealing: {
+          return `Plague heal: ${Math.round(
+            100 * this.gameModel.blastHealing
+          )}%`;
+        }
+        case this.types.spitDistance: {
+          return `Zombie spit distance: ${this.gameModel.spitDistance}`;
+        }
+        case this.types.plagueArmor: {
+          return `Infected damage reduction: ${Math.round(
+            100 - 100 * this.gameModel.plagueDmgReduction
+          )}%`;
+        }
+        case this.types.monsterLimit: {
+          return `Creature limit: ${this.gameModel.creatureLimit}`;
+        }
+        case this.types.runicSyphon: {
+          return `Syphon amount: ${Math.round(
+            100 * this.gameModel.runicSyphon.percentage
+          )}%`;
+        }
+        case this.types.autoconstruction: {
           return this.currentRank(e) > 0
             ? "You have unlocked automatic construction"
             : "You have yet to unlock automatic construction";
-        case this.types.autoshop:
+        }
+        case this.types.autoshop: {
           return this.currentRank(e) > 0
             ? "You have unlocked automatic shop purchases"
             : "You have yet to unlock automatic shop purchases";
-        case this.types.graveyardHealth:
-          return (
-            "Graveyard health: " +
-            Math.round(100 * this.gameModel.graveyardHealthMod) +
-            "%"
-          );
-        case this.types.harpySpeed:
-          return "Harpy speed: " + formatWhole(this.gameModel.harpySpeed);
-        case this.types.harpyBombs:
-          return "Harpy bombs: " + formatWhole(this.gameModel.harpyBombs);
-        case this.types.tankBuster:
+        }
+        case this.types.graveyardHealth: {
+          return `Graveyard health: ${Math.round(
+            100 * this.gameModel.graveyardHealthMod
+          )}%`;
+        }
+        case this.types.harpySpeed: {
+          return `Harpy speed: ${formatWhole(this.gameModel.harpySpeed)}`;
+        }
+        case this.types.harpyBombs: {
+          return `Harpy bombs: ${formatWhole(this.gameModel.harpyBombs)}`;
+        }
+        case this.types.tankBuster: {
           return this.currentRank(e) > 0
             ? "You have unlocked tank buster"
             : "You have yet to unlock tank buster";
-        case this.types.spikeDelay:
-          return (
-            "Current spike delay: " + (5 - this.currentRank(e)) + " seconds"
-          );
+        }
+        case this.types.spikeDelay: {
+          return `Current spike delay: ${5 - this.currentRank(e)} seconds`;
+        }
       }
     }
     currentRank(e) {
-      for (let t = 0; t < this.gameModel.persistentData.upgrades.length; t++) {
-        const s = this.gameModel.persistentData.upgrades[t];
-        if (e.id == s.id) return s.rank;
+      for (const s of this.gameModel.persistentData.upgrades) {
+        if (e.id == s.id) {
+          return s.rank;
+        }
       }
+
       return 0;
     }
     currentRankConstruction(e) {
-      if (this.gameModel.persistentData.constructions)
-        for (
-          let t = 0;
-          t < this.gameModel.persistentData.constructions.length;
-          t++
-        ) {
-          const s = this.gameModel.persistentData.constructions[t];
-          if (e.id == s.id) return s.rank;
+      if (this.gameModel.persistentData.constructions) {
+        for (const s of this.gameModel.persistentData.constructions) {
+          if (e.id == s.id) {
+            return s.rank;
+          }
         }
+      }
       return 0;
     }
     upgradePrice(e) {
-      return Math.round(
-        e.basePrice * Math.pow(e.multiplier, this.currentRank(e))
-      );
+      return Math.round(e.basePrice * e.multiplier ** this.currentRank(e));
     }
     upgradeMaxAffordable(e) {
       const t = this.currentRank(e);
       let s = 0;
       switch (e.costType) {
-        case this.costs.blood:
+        case this.costs.blood: {
           s = h(
             e.basePrice,
             e.multiplier,
@@ -5705,7 +5767,8 @@ var Incremancer;
             this.gameModel.persistentData.blood
           );
           break;
-        case this.costs.brains:
+        }
+        case this.costs.brains: {
           s = h(
             e.basePrice,
             e.multiplier,
@@ -5713,7 +5776,8 @@ var Incremancer;
             this.gameModel.persistentData.brains
           );
           break;
-        case this.costs.bones:
+        }
+        case this.costs.bones: {
           s = h(
             e.basePrice,
             e.multiplier,
@@ -5721,7 +5785,8 @@ var Incremancer;
             this.gameModel.persistentData.bones
           );
           break;
-        case this.costs.parts:
+        }
+        case this.costs.parts: {
           s = h(
             e.basePrice,
             e.multiplier,
@@ -5729,15 +5794,17 @@ var Incremancer;
             this.gameModel.persistentData.parts
           );
           break;
-        case this.costs.prestigePoints:
+        }
+        case this.costs.prestigePoints: {
           s = h(
             e.basePrice,
             e.multiplier,
             t,
             this.gameModel.persistentData.prestigePointsToSpend
           );
+        }
       }
-      return 0 != e.cap ? Math.min(s, e.cap - t) : s;
+      return e.cap != 0 ? Math.min(s, e.cap - t) : s;
     }
     upgradeMaxPrice(e, maxAffordableUpgrades) {
       return l(
@@ -5749,24 +5816,31 @@ var Incremancer;
     }
     canAffordUpgrade(e) {
       if (e.cap > 0 && this.currentRank(e) >= e.cap) {
-        return (e.auto = false), false;
+        e.auto = false;
+        return false;
       }
       switch (e.costType) {
-        case this.costs.energy:
+        case this.costs.energy: {
           return this.gameModel.energy >= this.upgradePrice(e);
-        case this.costs.blood:
+        }
+        case this.costs.blood: {
           return this.gameModel.persistentData.blood >= this.upgradePrice(e);
-        case this.costs.brains:
+        }
+        case this.costs.brains: {
           return this.gameModel.persistentData.brains >= this.upgradePrice(e);
-        case this.costs.bones:
+        }
+        case this.costs.bones: {
           return this.gameModel.persistentData.bones >= this.upgradePrice(e);
-        case this.costs.parts:
+        }
+        case this.costs.parts: {
           return this.gameModel.persistentData.parts >= this.upgradePrice(e);
-        case this.costs.prestigePoints:
+        }
+        case this.costs.prestigePoints: {
           return (
             this.gameModel.persistentData.prestigePointsToSpend >=
             this.upgradePrice(e)
           );
+        }
       }
       return false;
     }
@@ -5775,72 +5849,100 @@ var Incremancer;
         .filter((t) => t.requires == e.id)
         .map((e) => e.name)
         .join(", ");
-      return (
-        (t += this.upgrades
-          .filter((t) => t.requires == e.id)
-          .map((e) => e.name)
-          .join(", ")),
-        t
-      );
+
+      t += this.upgrades
+        .filter((t) => t.requires == e.id)
+        .map((e) => e.name)
+        .join(", ");
+
+      return t;
     }
     purchaseMaxUpgrades(e) {
       const t = this.upgradeMaxAffordable(e);
-      for (let s = 0; s < t; s++) this.purchaseUpgrade(e, false);
+      for (let s = 0; s < t; s++) {
+        this.purchaseUpgrade(e, false);
+      }
       this.gameModel.saveData();
     }
     purchaseUpgrade(e, t = true) {
       if (this.canAffordUpgrade(e)) {
-        let s,
-          i = false;
+        let s;
+        let i = false;
         switch (e.costType) {
-          case this.costs.energy:
+          case this.costs.energy: {
             this.gameModel.energy -= this.upgradePrice(e);
             break;
-          case this.costs.blood:
+          }
+          case this.costs.blood: {
             this.gameModel.persistentData.blood -= this.upgradePrice(e);
             break;
-          case this.costs.brains:
+          }
+          case this.costs.brains: {
             this.gameModel.persistentData.brains -= this.upgradePrice(e);
             break;
-          case this.costs.bones:
+          }
+          case this.costs.bones: {
             this.gameModel.persistentData.bones -= this.upgradePrice(e);
             break;
-          case this.costs.prestigePoints:
-            (i = true),
-              (this.gameModel.persistentData.prestigePointsToSpend -=
-                this.upgradePrice(e));
-            break;
-          case this.costs.parts:
-            this.gameModel.persistentData.parts -= this.upgradePrice(e);
-        }
-        for (let t = 0; t < this.gameModel.persistentData.upgrades.length; t++)
-          if (e.id == this.gameModel.persistentData.upgrades[t].id) {
-            (s = true),
-              (this.gameModel.persistentData.upgrades[t] = {
-                id: e.id,
-                rank: this.gameModel.persistentData.upgrades[t].rank + 1,
-              }),
-              i &&
-                (this.gameModel.persistentData.upgrades[t].costType =
-                  this.costs.prestigePoints);
+          }
+          case this.costs.prestigePoints: {
+            i = true;
+            this.gameModel.persistentData.prestigePointsToSpend -=
+              this.upgradePrice(e);
             break;
           }
+          case this.costs.parts: {
+            this.gameModel.persistentData.parts -= this.upgradePrice(e);
+          }
+        }
+        for (
+          let t = 0;
+          t < this.gameModel.persistentData.upgrades.length;
+          t++
+        ) {
+          if (e.id == this.gameModel.persistentData.upgrades[t].id) {
+            s = true;
+
+            this.gameModel.persistentData.upgrades[t] = {
+              id: e.id,
+              rank: this.gameModel.persistentData.upgrades[t].rank + 1,
+            };
+
+            if (i) {
+              this.gameModel.persistentData.upgrades[t].costType =
+                this.costs.prestigePoints;
+            }
+
+            break;
+          }
+        }
         if (!s) {
           const t = {
             id: e.id,
             rank: 1,
             costType: null,
           };
-          i && (t.costType = this.costs.prestigePoints),
-            this.gameModel.persistentData.upgrades.push(t);
+
+          if (i) {
+            t.costType = this.costs.prestigePoints;
+          }
+
+          this.gameModel.persistentData.upgrades.push(t);
         }
-        t && this.gameModel.saveData(),
-          this.applyUpgrades(),
-          e.purchaseMessage && this.gameModel.sendMessage(e.purchaseMessage);
+
+        if (t) {
+          this.gameModel.saveData();
+        }
+
+        this.applyUpgrades();
+
+        if (e.purchaseMessage) {
+          this.gameModel.sendMessage(e.purchaseMessage);
+        }
       }
     }
     removeUpgrade(e) {
-      for (let t = 0; t < this.gameModel.persistentData.upgrades.length; t++)
+      for (let t = 0; t < this.gameModel.persistentData.upgrades.length; t++) {
         if (e.id == this.gameModel.persistentData.upgrades[t].id) {
           this.gameModel.persistentData.upgrades[t] = {
             id: e.id,
@@ -5848,46 +5950,52 @@ var Incremancer;
           };
           break;
         }
+      }
       this.applyUpgrades();
     }
     consumeResources(e) {
       let t = true;
+      this.gameModel.persistentData.currentConstruction.shortfall = {};
+
+      if (e.energy && e.energy > this.gameModel.energy) {
+        t = false;
+        this.gameModel.persistentData.currentConstruction.shortfall.energy =
+          true;
+      }
+
+      if (e.blood && e.blood > this.gameModel.persistentData.blood) {
+        t = false;
+        this.gameModel.persistentData.currentConstruction.shortfall.blood =
+          true;
+      }
+
+      if (e.brains && e.brains > this.gameModel.persistentData.brains) {
+        t = false;
+        this.gameModel.persistentData.currentConstruction.shortfall.brains =
+          true;
+      }
+
+      if (e.bones && e.bones > this.gameModel.persistentData.bones) {
+        t = false;
+        this.gameModel.persistentData.currentConstruction.shortfall.bones =
+          true;
+      }
+
+      if (e.parts && e.parts > this.gameModel.persistentData.parts) {
+        t = false;
+        this.gameModel.persistentData.currentConstruction.shortfall.parts =
+          true;
+      }
+
       return (
-        (this.gameModel.persistentData.currentConstruction.shortfall = {}),
-        e.energy &&
-          e.energy > this.gameModel.energy &&
-          ((t = false),
-          (this.gameModel.persistentData.currentConstruction.shortfall.energy =
-            true)),
-        e.blood &&
-          e.blood > this.gameModel.persistentData.blood &&
-          ((t = false),
-          (this.gameModel.persistentData.currentConstruction.shortfall.blood =
-            true)),
-        e.brains &&
-          e.brains > this.gameModel.persistentData.brains &&
-          ((t = false),
-          (this.gameModel.persistentData.currentConstruction.shortfall.brains =
-            true)),
-        e.bones &&
-          e.bones > this.gameModel.persistentData.bones &&
-          ((t = false),
-          (this.gameModel.persistentData.currentConstruction.shortfall.bones =
-            true)),
-        e.parts &&
-          e.parts > this.gameModel.persistentData.parts &&
-          ((t = false),
-          (this.gameModel.persistentData.currentConstruction.shortfall.parts =
-            true)),
         !!t &&
-          ((this.gameModel.persistentData.currentConstruction.shortfall =
-            false),
-          e.energy && (this.gameModel.energy -= e.energy),
-          e.blood && (this.gameModel.persistentData.blood -= e.blood),
-          e.brains && (this.gameModel.persistentData.brains -= e.brains),
-          e.bones && (this.gameModel.persistentData.bones -= e.bones),
-          e.parts && (this.gameModel.persistentData.parts -= e.parts),
-          true)
+        ((this.gameModel.persistentData.currentConstruction.shortfall = false),
+        e.energy && (this.gameModel.energy -= e.energy),
+        e.blood && (this.gameModel.persistentData.blood -= e.blood),
+        e.brains && (this.gameModel.persistentData.brains -= e.brains),
+        e.bones && (this.gameModel.persistentData.bones -= e.bones),
+        e.parts && (this.gameModel.persistentData.parts -= e.parts),
+        true)
       );
     }
     completeConstruction() {
@@ -5899,40 +6007,56 @@ var Incremancer;
         let s = 0;
         s < this.gameModel.persistentData.constructions.length;
         s++
-      )
-        e.id == this.gameModel.persistentData.constructions[s].id &&
-          ((t = this.gameModel.persistentData.constructions[s]),
-          (t.effect = e.effect),
-          t.rank++);
-      t ||
+      ) {
+        if (e.id == this.gameModel.persistentData.constructions[s].id) {
+          t = this.gameModel.persistentData.constructions[s];
+          t.effect = e.effect;
+          t.rank++;
+        }
+      }
+
+      if (!t) {
         this.gameModel.persistentData.constructions.push({
           id: e.id,
           name: e.name,
           rank: 1,
           type: e.type,
           effect: e.effect,
-        }),
-        (this.gameModel.persistentData.currentConstruction = false),
-        this.gameModel.saveData(),
-        this.applyUpgrades(),
-        this.angularModel.updateConstructionUpgrades(),
-        this.gameModel.sendMessage("Construction of " + e.name + " complete!"),
-        e.completeMessage && this.gameModel.sendMessage(e.completeMessage);
+        });
+      }
+
+      this.gameModel.persistentData.currentConstruction = false;
+      this.gameModel.saveData();
+      this.applyUpgrades();
+      this.angularModel.updateConstructionUpgrades();
+      this.gameModel.sendMessage(`Construction of ${e.name} complete!`);
+
+      if (e.completeMessage) {
+        this.gameModel.sendMessage(e.completeMessage);
+      }
     }
     updateAutoUpgrades() {
       if (this.gameModel.autoUpgrades) {
-        for (let e = 0; e < this.upgrades.length; e++)
-          this.upgrades[e].auto &&
+        for (let e = 0; e < this.upgrades.length; e++) {
+          if (this.upgrades[e].auto) {
             this.purchaseUpgrade(this.upgrades[e], false);
-        if (this.gameModel.constructions.factory)
-          for (let e = 0; e < this.partFactory.generators.length; e++)
-            this.partFactory.generators[e].auto &&
+          }
+        }
+        if (this.gameModel.constructions.factory) {
+          for (let e = 0; e < this.partFactory.generators.length; e++) {
+            if (this.partFactory.generators[e].auto) {
               this.partFactory.purchaseGenerator(
                 this.partFactory.generators[e],
                 false
               );
+            }
+          }
+        }
       }
-      this.gameModel.autoShatter && this.doShatter();
+
+      if (this.gameModel.autoShatter) {
+        this.doShatter();
+      }
     }
     updateConstruction(e) {
       if (
@@ -5940,27 +6064,40 @@ var Incremancer;
           this.gameModel.autoconstruction) &&
         this.gameModel.persistentData.currentConstruction.state !=
           this.constructionStates.paused
-      )
-        if (this.gameModel.persistentData.currentConstruction)
-          (this.constructionTickTimer -= e),
-            this.constructionTickTimer < 0 &&
-              ((this.constructionTickTimer = 1),
+      ) {
+        if (this.gameModel.persistentData.currentConstruction) {
+          this.constructionTickTimer -= e;
+
+          if (this.constructionTickTimer < 0) {
+            this.constructionTickTimer = 1;
+
+            if (
               this.consumeResources(
                 this.gameModel.persistentData.currentConstruction.costPerTick
               )
-                ? ((this.gameModel.persistentData.currentConstruction.state =
-                    this.constructionStates.building),
-                  (this.gameModel.persistentData.currentConstruction.timeRemaining -= 1),
-                  this.gameModel.persistentData.currentConstruction
-                    .timeRemaining <= 0 && this.completeConstruction())
-                : (this.gameModel.persistentData.currentConstruction.state =
-                    this.constructionStates.autoPaused));
-        else if (this.gameModel.autoconstruction) {
+            ) {
+              this.gameModel.persistentData.currentConstruction.state =
+                this.constructionStates.building;
+              this.gameModel.persistentData.currentConstruction.timeRemaining -= 1;
+
+              if (
+                this.gameModel.persistentData.currentConstruction
+                  .timeRemaining <= 0
+              ) {
+                this.completeConstruction();
+              }
+            } else {
+              this.gameModel.persistentData.currentConstruction.state =
+                this.constructionStates.autoPaused;
+            }
+          }
+        } else if (this.gameModel.autoconstruction) {
           const e = this.getAvailableConstructions();
-          if (!e || 0 == e.length)
+          if (!e || e.length == 0) {
             return void (this.gameModel.autoconstruction = false);
-          let t = null,
-            s = 0;
+          }
+          let t = null;
+          let s = 0;
           for (let i = 0; i < e.length; i++) {
             const a =
               (e[i].costs.energy || 0) +
@@ -5968,48 +6105,81 @@ var Incremancer;
               (e[i].costs.brains || 0) +
               (e[i].costs.bones || 0) +
               100 * (e[i].costs.parts || 0);
-            (a < s || !t) && ((s = a), (t = e[i]));
+
+            if (a < s || !t) {
+              s = a;
+              t = e[i];
+            }
           }
-          t && setTimeout(() => this.startConstruction(t));
+
+          if (t) {
+            setTimeout(() => this.startConstruction(t));
+          }
         }
+      }
     }
     startConstruction(e) {
-      if (this.gameModel.persistentData.currentConstruction) return;
+      if (this.gameModel.persistentData.currentConstruction) {
+        return;
+      }
+
       const t =
-          this.gameModel.persistentData.blood >= (e.costs.blood || 0) &&
-          this.gameModel.persistentData.brains >= (e.costs.brains || 0) &&
-          this.gameModel.persistentData.bones >= (e.costs.bones || 0) &&
-          this.gameModel.persistentData.parts >= (e.costs.parts || 0) &&
-          this.gameModel.energy >= (e.costs.energy || 0),
-        s = {
-          energy: 0,
-          blood: 0,
-          brains: 0,
-          bones: 0,
-          parts: 0,
-        };
-      e.costs.energy && (s.energy = e.costs.energy / (t ? 5 : e.time)),
-        e.costs.blood && (s.blood = e.costs.blood / (t ? 5 : e.time)),
-        e.costs.brains && (s.brains = e.costs.brains / (t ? 5 : e.time)),
-        e.costs.bones && (s.bones = e.costs.bones / (t ? 5 : e.time)),
-        e.costs.parts && (s.parts = e.costs.parts / (t ? 5 : e.time)),
-        (this.gameModel.persistentData.currentConstruction = {
-          state: this.constructionStates.building,
-          name: e.name,
-          id: e.id,
-          timeRemaining: t ? 5 : e.time,
-          time: t ? 5 : e.time,
-          costPerTick: s,
-        });
+        this.gameModel.persistentData.blood >= (e.costs.blood || 0) &&
+        this.gameModel.persistentData.brains >= (e.costs.brains || 0) &&
+        this.gameModel.persistentData.bones >= (e.costs.bones || 0) &&
+        this.gameModel.persistentData.parts >= (e.costs.parts || 0) &&
+        this.gameModel.energy >= (e.costs.energy || 0);
+
+      const s = {
+        energy: 0,
+        blood: 0,
+        brains: 0,
+        bones: 0,
+        parts: 0,
+      };
+
+      if (e.costs.energy) {
+        s.energy = e.costs.energy / (t ? 5 : e.time);
+      }
+
+      if (e.costs.blood) {
+        s.blood = e.costs.blood / (t ? 5 : e.time);
+      }
+
+      if (e.costs.brains) {
+        s.brains = e.costs.brains / (t ? 5 : e.time);
+      }
+
+      if (e.costs.bones) {
+        s.bones = e.costs.bones / (t ? 5 : e.time);
+      }
+
+      if (e.costs.parts) {
+        s.parts = e.costs.parts / (t ? 5 : e.time);
+      }
+
+      this.gameModel.persistentData.currentConstruction = {
+        state: this.constructionStates.building,
+        name: e.name,
+        id: e.id,
+        timeRemaining: t ? 5 : e.time,
+        time: t ? 5 : e.time,
+        costPerTick: s,
+      };
     }
     playPauseConstruction() {
-      this.gameModel.persistentData.currentConstruction &&
-        (this.gameModel.persistentData.currentConstruction.state ==
-        this.constructionStates.paused
-          ? (this.gameModel.persistentData.currentConstruction.state =
-              this.constructionStates.building)
-          : (this.gameModel.persistentData.currentConstruction.state =
-              this.constructionStates.paused));
+      if (this.gameModel.persistentData.currentConstruction) {
+        if (
+          this.gameModel.persistentData.currentConstruction.state ==
+          this.constructionStates.paused
+        ) {
+          this.gameModel.persistentData.currentConstruction.state =
+            this.constructionStates.building;
+        } else {
+          this.gameModel.persistentData.currentConstruction.state =
+            this.constructionStates.paused;
+        }
+      }
     }
     cancelConstruction() {
       this.gameModel.persistentData.currentConstruction = false;
@@ -6020,10 +6190,9 @@ var Incremancer;
           this.gameModel.persistentData.currentConstruction.id == e.id) ||
         this.currentRankConstruction(e) >= e.cap ||
         (e.requires &&
-          0 ==
-            this.gameModel.persistentData.constructions.filter(
-              (t) => t.id == e.requires
-            ).length)
+          this.gameModel.persistentData.constructions.filter(
+            (t) => t.id == e.requires
+          ).length == 0)
       );
     }
     constructionComplete(e) {
@@ -6041,44 +6210,59 @@ var Incremancer;
     }
     upgradeIdCheck() {
       const e = [];
-      this.upgrades.forEach(function (t) {
-        e[t.id] && console.error("ID " + t.id + " already used"),
-          (e[t.id] = true);
-      }),
-        this.prestigeUpgrades.forEach(function (t) {
-          e[t.id] && console.error("ID " + t.id + " already used"),
-            (e[t.id] = true);
-        }),
-        this.constructionUpgrades.forEach(function (t) {
-          e[t.id] && console.error("ID " + t.id + " already used"),
-            (e[t.id] = true);
-        });
+
+      this.upgrades.forEach((t) => {
+        if (e[t.id]) {
+          console.error(`ID ${t.id} already used`);
+        }
+
+        e[t.id] = true;
+      });
+
+      this.prestigeUpgrades.forEach((t) => {
+        if (e[t.id]) {
+          console.error(`ID ${t.id} already used`);
+        }
+
+        e[t.id] = true;
+      });
+
+      this.constructionUpgrades.forEach((t) => {
+        if (e[t.id]) {
+          console.error(`ID ${t.id} already used`);
+        }
+
+        e[t.id] = true;
+      });
     }
     updateRunicSyphon(e) {
-      e.percentage > 0 &&
-        ((this.gameModel.persistentData.runes.life.blood += e.blood / 2),
-        (this.gameModel.persistentData.runes.death.blood += e.blood / 2),
-        (this.gameModel.persistentData.runes.life.brains += e.brains / 2),
-        (this.gameModel.persistentData.runes.death.brains += e.brains / 2),
-        (this.gameModel.persistentData.runes.life.bones += e.bones / 2),
-        (this.gameModel.persistentData.runes.death.bones += e.bones / 2),
-        (e.blood = 0),
-        (e.brains = 0),
-        (e.bones = 0),
-        this.updateRuneEffects());
+      if (e.percentage > 0) {
+        this.gameModel.persistentData.runes.life.blood += e.blood / 2;
+        this.gameModel.persistentData.runes.death.blood += e.blood / 2;
+        this.gameModel.persistentData.runes.life.brains += e.brains / 2;
+        this.gameModel.persistentData.runes.death.brains += e.brains / 2;
+        this.gameModel.persistentData.runes.life.bones += e.bones / 2;
+        this.gameModel.persistentData.runes.death.bones += e.bones / 2;
+        e.blood = 0;
+        e.brains = 0;
+        e.bones = 0;
+        this.updateRuneEffects();
+      }
     }
     shatterPercent(e) {
-      const t = 1e8 * Math.pow(1.5, this.gameModel.persistentData.runeshatter);
+      const t =
+        100000000 /* 1e8 */ * 1.5 ** this.gameModel.persistentData.runeshatter;
       return Math.floor(100 * Math.min(1, e.blood / t));
     }
     shatterBloodCost(e) {
       return Math.max(
         0,
-        1e8 * Math.pow(1.5, this.gameModel.persistentData.runeshatter) - e.blood
+        100000000 /* 1e8 */ * 1.5 ** this.gameModel.persistentData.runeshatter -
+          e.blood
       );
     }
     shatterEffect() {
-      return Math.pow(1.1, this.gameModel.persistentData.runeshatter);
+      return 1.1 ** this.gameModel.persistentData.runeshatter;
     }
     canShatter() {
       return (
@@ -6089,39 +6273,53 @@ var Incremancer;
       );
     }
     doShatter() {
-      this.canShatter() &&
-        (this.gameModel.persistentData.runeshatter++,
-        (this.gameModel.persistentData.runes.life.blood = 0),
-        (this.gameModel.persistentData.runes.death.blood = 0),
-        (this.gameModel.persistentData.runes.life.brains = 0),
-        (this.gameModel.persistentData.runes.death.brains = 0),
-        (this.gameModel.persistentData.runes.life.bones = 0),
-        (this.gameModel.persistentData.runes.death.bones = 0),
-        this.updateRuneEffects(),
-        this.applyUpgrades());
+      if (this.canShatter()) {
+        this.gameModel.persistentData.runeshatter++;
+        this.gameModel.persistentData.runes.life.blood = 0;
+        this.gameModel.persistentData.runes.death.blood = 0;
+        this.gameModel.persistentData.runes.life.brains = 0;
+        this.gameModel.persistentData.runes.death.brains = 0;
+        this.gameModel.persistentData.runes.life.bones = 0;
+        this.gameModel.persistentData.runes.death.bones = 0;
+        this.updateRuneEffects();
+        this.applyUpgrades();
+      }
     }
     infuseRune(e, t, s) {
       const i =
-        "life" == e
+        e == "life"
           ? this.gameModel.persistentData.runes.life
           : this.gameModel.persistentData.runes.death;
       switch (t) {
-        case "blood":
-          this.gameModel.persistentData.blood >= s &&
-            ((i.blood += s), (this.gameModel.persistentData.blood -= s));
+        case "blood": {
+          if (this.gameModel.persistentData.blood >= s) {
+            i.blood += s;
+            this.gameModel.persistentData.blood -= s;
+          }
+
           break;
-        case "brains":
-          this.gameModel.persistentData.brains >= s &&
-            ((i.brains += s), (this.gameModel.persistentData.brains -= s));
+        }
+        case "brains": {
+          if (this.gameModel.persistentData.brains >= s) {
+            i.brains += s;
+            this.gameModel.persistentData.brains -= s;
+          }
+
           break;
-        case "bones":
-          this.gameModel.persistentData.bones >= s &&
-            ((i.bones += s), (this.gameModel.persistentData.bones -= s));
+        }
+        case "bones": {
+          if (this.gameModel.persistentData.bones >= s) {
+            i.bones += s;
+            this.gameModel.persistentData.bones -= s;
+          }
+        }
       }
       this.updateRuneEffects();
     }
     updateRuneEffects() {
-      if (!this.gameModel.persistentData.runes) return;
+      if (!this.gameModel.persistentData.runes) {
+        return;
+      }
       const e = {
         attackSpeed: 1,
         critChance: 0,
@@ -6130,122 +6328,138 @@ var Incremancer;
         healthRegen: 0,
         damageReflection: 0,
       };
-      for (let t = 0; t < this.runeCalculations.length; t++) {
-        const s = this.runeCalculations[t],
-          i = this.gameModel.persistentData.runes[s.rune][s.cost];
+
+      this.runeCalculations.forEach((s, t) => {
+        const i = this.gameModel.persistentData.runes[s.rune][s.cost];
         if (i > 0) {
           let t = (Math.log(i) / Math.log(s.logBase) + s.adjustment) / 100;
-          t > 0 &&
-            (s.cap && t > s.cap && (t = s.cap),
-            s.subtract ? (e[s.effect] -= t) : (e[s.effect] += t));
+
+          if (t > 0) {
+            if (s.cap && t > s.cap) {
+              t = s.cap;
+            }
+
+            if (s.subtract) {
+              e[s.effect] -= t;
+            } else {
+              e[s.effect] += t;
+            }
+          }
         }
-      }
+      });
+
       this.gameModel.runeEffects = e;
     }
   }
+
   class he {
     constructor(e, t, s, i, a, r, n, o, h, l, d) {
-      (this.id = e),
-        (this.name = t),
-        (this.type = s),
-        (this.costs = i),
-        (this.time = a),
-        (this.multiplier = r),
-        (this.effect = n),
-        (this.cap = o),
-        (this.requires = h),
-        (this.description = l),
-        (this.completeMessage = d);
+      this.id = e;
+      this.name = t;
+      this.type = s;
+      this.costs = i;
+      this.time = a;
+      this.multiplier = r;
+      this.effect = n;
+      this.cap = o;
+      this.requires = h;
+      this.description = l;
+      this.completeMessage = d;
     }
   }
   class le {
     constructor(e, t, s, i, a, r, n, o, h, l, d) {
-      (this.id = e),
-        (this.name = t),
-        (this.type = s),
-        (this.costType = i),
-        (this.basePrice = a),
-        (this.multiplier = r),
-        (this.effect = n),
-        (this.cap = o),
-        (this.description = h),
-        (this.rank = 1),
-        (this.purchaseMessage = l),
-        (this.requires = d);
+      this.id = e;
+      this.name = t;
+      this.type = s;
+      this.costType = i;
+      this.basePrice = a;
+      this.multiplier = r;
+      this.effect = n;
+      this.cap = o;
+      this.description = h;
+      this.rank = 1;
+      this.purchaseMessage = l;
+      this.requires = d;
     }
   }
+
   class Trophies {
     constructor() {
-      if (
-        ((this.gameModel = GameModel.getInstance()),
-        (this.upgrades = new Upgrades()),
-        (this.trophyStats = [
-          {
-            type: this.upgrades.types.health,
-            value: 50,
-            percentage: false,
-          },
-          {
-            type: this.upgrades.types.damage,
-            value: 7,
-            percentage: false,
-          },
-          {
-            type: this.upgrades.types.energyCap,
-            value: 10,
-            percentage: false,
-          },
-          {
-            type: this.upgrades.types.energyRate,
-            value: 0.5,
-            percentage: false,
-          },
-          {
-            type: this.upgrades.types.plagueTicks,
-            value: 1,
-            percentage: false,
-            static: true,
-          },
-          {
-            type: this.upgrades.types.plagueDamage,
-            value: 50,
-            percentage: false,
-          },
-          {
-            type: this.upgrades.types.bloodCap,
-            value: 5e3,
-            percentage: false,
-          },
-          {
-            type: this.upgrades.types.brainsRate,
-            value: 2,
-            percentage: false,
-          },
-          {
-            type: this.upgrades.types.zombieHealthPC,
-            value: 0.02,
-            percentage: true,
-          },
-          {
-            type: this.upgrades.types.bonesRate,
-            value: 2,
-            percentage: false,
-          },
-          {
-            type: this.upgrades.types.zombieDmgPC,
-            value: 0.02,
-            percentage: true,
-          },
-        ]),
-        Trophies.instance)
-      )
+      this.gameModel = GameModel.getInstance();
+      this.upgrades = new Upgrades();
+
+      this.trophyStats = [
+        {
+          type: this.upgrades.types.health,
+          value: 50,
+          percentage: false,
+        },
+        {
+          type: this.upgrades.types.damage,
+          value: 7,
+          percentage: false,
+        },
+        {
+          type: this.upgrades.types.energyCap,
+          value: 10,
+          percentage: false,
+        },
+        {
+          type: this.upgrades.types.energyRate,
+          value: 0.5,
+          percentage: false,
+        },
+        {
+          type: this.upgrades.types.plagueTicks,
+          value: 1,
+          percentage: false,
+          static: true,
+        },
+        {
+          type: this.upgrades.types.plagueDamage,
+          value: 50,
+          percentage: false,
+        },
+        {
+          type: this.upgrades.types.bloodCap,
+          value: 5000 /* 5e3 */,
+          percentage: false,
+        },
+        {
+          type: this.upgrades.types.brainsRate,
+          value: 2,
+          percentage: false,
+        },
+        {
+          type: this.upgrades.types.zombieHealthPC,
+          value: 0.02,
+          percentage: true,
+        },
+        {
+          type: this.upgrades.types.bonesRate,
+          value: 2,
+          percentage: false,
+        },
+        {
+          type: this.upgrades.types.zombieDmgPC,
+          value: 0.02,
+          percentage: true,
+        },
+      ];
+
+      if (Trophies.instance) {
         return Trophies.instance;
+      }
+
       Trophies.instance = this;
     }
     isPercentage(e) {
-      for (let t = 0; t < this.trophyStats.length; t++)
-        if (this.trophyStats[t].type == e)
-          return 1 == this.trophyStats[t].percentage;
+      for (let t = 0; t < this.trophyStats.length; t++) {
+        if (this.trophyStats[t].type == e) {
+          return this.trophyStats[t].percentage == 1;
+        }
+      }
     }
     doesLevelHaveTrophy(e) {
       return !(
@@ -6257,9 +6471,9 @@ var Incremancer;
       );
     }
     createTrophy(e, t, s) {
-      const i = Math.round(e / 5) - 1,
-        a = Math.floor(i / this.trophyStats.length),
-        r = this.trophyStats[i - a * this.trophyStats.length];
+      const i = Math.round(e / 5) - 1;
+      const a = Math.floor(i / this.trophyStats.length);
+      const r = this.trophyStats[i - a * this.trophyStats.length];
       return {
         level: e,
         type: r.type,
@@ -6270,34 +6484,47 @@ var Incremancer;
       };
     }
     trophyAquired(e) {
-      this.gameModel.persistentData.trophies ||
-        (this.gameModel.persistentData.trophies = []),
-        this.gameModel.persistentData.trophies.includes(e)
-          ? this.gameModel.sendMessage("The VIP has been killed!")
-          : (this.gameModel.persistentData.trophies.push(e),
-            this.gameModel.persistentData.trophies.sort(),
-            this.gameModel.saveData(),
-            this.upgrades.applyUpgrades(),
-            window.kongregate &&
-              window.kongregate.stats.submit(
-                "trophies",
-                this.gameModel.persistentData.trophies.length
-              ),
-            this.gameModel.sendMessage(
-              "The VIP has been killed! - New Trophy Aquired"
-            ));
+      if (!this.gameModel.persistentData.trophies) {
+        this.gameModel.persistentData.trophies = [];
+      }
+
+      if (this.gameModel.persistentData.trophies.includes(e)) {
+        this.gameModel.sendMessage("The VIP has been killed!");
+      } else {
+        this.gameModel.persistentData.trophies.push(e);
+        this.gameModel.persistentData.trophies.sort();
+        this.gameModel.saveData();
+        this.upgrades.applyUpgrades();
+
+        if (window.kongregate) {
+          window.kongregate.stats.submit(
+            "trophies",
+            this.gameModel.persistentData.trophies.length
+          );
+        }
+
+        this.gameModel.sendMessage(
+          "The VIP has been killed! - New Trophy Aquired"
+        );
+      }
     }
     getTrophyList() {
-      this.gameModel.persistentData.trophies ||
-        (this.gameModel.persistentData.trophies = []),
-        this.gameModel.persistentData.vipEscaped ||
-          (this.gameModel.persistentData.vipEscaped = []);
+      if (!this.gameModel.persistentData.trophies) {
+        this.gameModel.persistentData.trophies = [];
+      }
+
+      if (!this.gameModel.persistentData.vipEscaped) {
+        this.gameModel.persistentData.vipEscaped = [];
+      }
+
       const e = [];
       let t = this.gameModel.persistentData.allTimeHighestLevel + 5;
-      for (let e = 0; e < this.gameModel.persistentData.trophies.length; e++)
-        this.gameModel.persistentData.trophies[e] > t &&
-          (t = this.gameModel.persistentData.trophies[e]);
-      for (let s = 5; s <= t; s += 5)
+      for (let e = 0; e < this.gameModel.persistentData.trophies.length; e++) {
+        if (this.gameModel.persistentData.trophies[e] > t) {
+          t = this.gameModel.persistentData.trophies[e];
+        }
+      }
+      for (let s = 5; s <= t; s += 5) {
         e.push(
           this.createTrophy(
             s,
@@ -6305,27 +6532,34 @@ var Incremancer;
             this.gameModel.persistentData.vipEscaped.includes(s)
           )
         );
+      }
       return e;
     }
     getTrophyTotals() {
-      const e = this.getTrophyList().filter((e) => e.owned),
-        t = [];
-      for (let s = 0; s < e.length; s++)
-        0 == t.filter((t) => t.type == e[s].type).length
-          ? t.push(e[s])
-          : this.isPercentage(e[s].type)
-          ? (t.filter((t) => t.type == e[s].type)[0].effect =
-              (t.filter((t) => t.type == e[s].type)[0].effect + 1) *
-                (1 + e[s].effect) -
-              1)
-          : (t.filter((t) => t.type == e[s].type)[0].effect += e[s].effect);
+      const e = this.getTrophyList().filter((e) => e.owned);
+
+      const t = [];
+      for (let s = 0; s < e.length; s++) {
+        if (t.filter((t) => t.type == e[s].type).length == 0) {
+          t.push(e[s]);
+        } else if (this.isPercentage(e[s].type)) {
+          t.filter((t) => t.type == e[s].type)[0].effect =
+            (t.filter((t) => t.type == e[s].type)[0].effect + 1) *
+              (1 + e[s].effect) -
+            1;
+        } else {
+          t.filter((t) => t.type == e[s].type)[0].effect += e[s].effect;
+        }
+      }
       return t;
     }
     getAquiredTrophyList() {
-      this.gameModel.persistentData.trophies ||
-        (this.gameModel.persistentData.trophies = []);
+      if (!this.gameModel.persistentData.trophies) {
+        this.gameModel.persistentData.trophies = [];
+      }
+
       const e = [];
-      for (let t = 0; t < this.gameModel.persistentData.trophies.length; t++)
+      for (let t = 0; t < this.gameModel.persistentData.trophies.length; t++) {
         e.push(
           this.createTrophy(
             this.gameModel.persistentData.trophies[t],
@@ -6333,95 +6567,114 @@ var Incremancer;
             false
           )
         );
+      }
       return e;
     }
   }
-  var ce, ue, pe, ge, me, be;
-  !(function (e) {
-    (e[(e.standing = 0)] = "standing"),
-      (e[(e.walking = 1)] = "walking"),
-      (e[(e.attacking = 2)] = "attacking"),
-      (e[(e.fleeing = 3)] = "fleeing"),
-      (e[(e.escaping = 4)] = "escaping");
-  })(ce || (ce = {}));
+
+  const ce = {
+    standing: 0,
+    walking: 1,
+    attacking: 2,
+    fleeing: 3,
+    escaping: 4,
+
+    // reverse mapping
+    0: "standing",
+
+    1: "walking",
+    2: "attacking",
+    3: "fleeing",
+    4: "escaping",
+  };
+
+  let be;
+
   class fe extends PIXI.Text {
-    constructor() {
-      super(...arguments), (this.human = null), (this.yOffset = 0);
+    constructor(...args) {
+      super(...args);
+      this.human = null;
+      this.yOffset = 0;
     }
   }
+
   class ye extends $ {
-    constructor() {
-      super(...arguments),
-        (this.flee = 0),
-        (this.standing = 0),
-        (this.target = 0),
-        (this.plagueTick = 0),
-        (this.healTick = 0);
+    constructor(...args) {
+      super(...args);
+      this.flee = 0;
+      this.standing = 0;
+      this.target = 0;
+      this.plagueTick = 0;
+      this.healTick = 0;
     }
   }
+
   class xe extends K {
-    constructor() {
-      super(...arguments),
-        (this.dog = false),
-        (this.doctor = false),
-        (this.tank = false),
-        (this.vip = false),
-        (this.torchBearer = false);
+    constructor(...args) {
+      super(...args);
+      this.dog = false;
+      this.doctor = false;
+      this.tank = false;
+      this.vip = false;
+      this.torchBearer = false;
     }
   }
+
   class ve extends Q {
-    constructor() {
-      super(...arguments),
-        (this.maxSpeed = 0),
-        (this.flags = new xe()),
-        (this.target = null),
-        (this.speedMod = 0),
-        (this.human = true),
-        (this.plagueTicks = 0),
-        (this.plagueDamage = 0),
-        (this.visionDistance = 0),
-        (this.timer = new ye());
+    constructor(...args) {
+      super(...args);
+      this.maxSpeed = 0;
+      this.flags = new xe();
+      this.target = null;
+      this.speedMod = 0;
+      this.human = true;
+      this.plagueTicks = 0;
+      this.plagueDamage = 0;
+      this.visionDistance = 0;
+      this.timer = new ye();
     }
   }
+
   class Humans {
     constructor() {
-      if (
-        ((this.maxWalkSpeed = 15),
-        (this.maxRunSpeed = 35),
-        (this.minSecondsTostand = 1),
-        (this.maxSecondsToStand = 60),
-        (this.chanceToStayInCurrentBuilding = 0.95),
-        (this.textures = []),
-        (this.doctorTextures = []),
-        (this.humans = []),
-        (this.discardedHumans = []),
-        (this.aliveHumans = []),
-        (this.graveyardAttackers = []),
-        (this.humansPerLevel = 50),
-        (this.maxHumans = 1e3),
-        (this.scaling = 2),
-        (this.visionDistance = 60),
-        (this.vipEscaping = false),
-        (this.fleeChancePerZombie = 0.1),
-        (this.fleeTime = 10),
-        (this.scanTime = 3),
-        (this.attackDistance = 20),
-        (this.moveTargetDistance = 3),
-        (this.attackSpeed = 2),
-        (this.attackDamage = 5),
-        (this.fadeSpeed = 0.1),
-        (this.plagueTickTimer = 5),
-        (this.healTickTimer = 5),
-        (this.burnTickTimer = 5),
-        (this.smokeTimer = 0.3),
-        (this.fastDistance = weighted_hybrid_distance),
-        (this.frozen = false),
-        (this.pandemic = false),
-        (this.graveYardPosition = null),
-        (this.drawTargets = false),
-        Humans.instance)
-      )
+      this.maxWalkSpeed = 15;
+      this.maxRunSpeed = 35;
+      this.minSecondsTostand = 1;
+      this.maxSecondsToStand = 60;
+      this.chanceToStayInCurrentBuilding = 0.95;
+      this.textures = [];
+      this.doctorTextures = [];
+      this.humans = [];
+      this.discardedHumans = [];
+      this.aliveHumans = [];
+      this.graveyardAttackers = [];
+      this.humansPerLevel = 50;
+      this.maxHumans = 1000 /* 1e3 */;
+      this.scaling = 2;
+      this.visionDistance = 60;
+      this.vipEscaping = false;
+      this.fleeChancePerZombie = 0.1;
+      this.fleeTime = 10;
+      this.scanTime = 3;
+      this.attackDistance = 20;
+      this.moveTargetDistance = 3;
+      this.attackSpeed = 2;
+      this.attackDamage = 5;
+      this.fadeSpeed = 0.1;
+      this.plagueTickTimer = 5;
+      this.healTickTimer = 5;
+      this.burnTickTimer = 5;
+      this.smokeTimer = 0.3;
+      this.fastDistance = weighted_hybrid_distance;
+      this.frozen = false;
+      this.pandemic = false;
+      this.graveYardPosition = null;
+      this.drawTargets = false;
+
+      if (Humans.instance) {
         return Humans.instance;
+      }
+
       Humans.instance = this;
     }
     randomSecondsToStand() {
@@ -6431,56 +6684,79 @@ var Incremancer;
       );
     }
     damageHuman(e, t) {
-      this.gameModel.addBlood(Math.round(t / 3)),
-        (e.health -= t),
-        (e.timer.scan = 0),
-        e.flags.tank
-          ? this.fragments.newPart(e.x, e.y - 18, 8086798)
-          : (this.blood.newSplatter(e.x, e.y),
-            (e.speedMod = Math.max(Math.min(1, e.health / e.maxHealth), 0.25))),
-        e.health <= 0 &&
-          !e.flags.dead &&
-          (this.bones.newBones(e.x, e.y),
-          (e.flags.dead = true),
-          this.gameModel.addBrains(1),
-          this.skeleton.addXp(this.gameModel.level),
-          this.skeleton.testForLoot(),
-          e.flags.tank
-            ? (this.blasts.newDroneBlast(e.x, e.y - 5),
-              this.fragments.newFragmentExplosion(e.x, e.y - 5, 8086798),
-              (e.visible = false))
-            : (e.textures = e.deadTexture),
-          e.flags.vip &&
-            ((this.vipText.visible = false),
-            this.trophies.trophyAquired(this.gameModel.level),
-            setTimeout(() => {
-              this.vipEscaping = false;
-            }, 2e3))),
-        this.army.assaultStarted ||
-          (Math.random() > 0.9 &&
-            this.gameModel.isBossStage(this.gameModel.level) &&
-            ((this.army.assaultStarted = true),
-            this.gameModel.sendMessage("The assault has begun!")));
+      this.gameModel.addBlood(Math.round(t / 3));
+      e.health -= t;
+      e.timer.scan = 0;
+
+      if (e.flags.tank) {
+        this.fragments.newPart(e.x, e.y - 18, 8086798);
+      } else {
+        this.blood.newSplatter(e.x, e.y);
+        e.speedMod = Math.max(Math.min(1, e.health / e.maxHealth), 0.25);
+      }
+
+      if (e.health <= 0 && !e.flags.dead) {
+        this.bones.newBones(e.x, e.y);
+        e.flags.dead = true;
+        this.gameModel.addBrains(1);
+        this.skeleton.addXp(this.gameModel.level);
+        this.skeleton.testForLoot();
+
+        if (e.flags.tank) {
+          this.blasts.newDroneBlast(e.x, e.y - 5);
+          this.fragments.newFragmentExplosion(e.x, e.y - 5, 8086798);
+          e.visible = false;
+        } else {
+          e.textures = e.deadTexture;
+        }
+
+        if (e.flags.vip) {
+          this.vipText.visible = false;
+          this.trophies.trophyAquired(this.gameModel.level);
+
+          setTimeout(() => {
+            this.vipEscaping = false;
+          }, 2000 /* 2e3 */);
+        }
+      }
+
+      if (!this.army.assaultStarted) {
+        if (
+          Math.random() > 0.9 &&
+          this.gameModel.isBossStage(this.gameModel.level)
+        ) {
+          this.army.assaultStarted = true;
+          this.gameModel.sendMessage("The assault has begun!");
+        }
+      }
     }
     updateBurns(e, t) {
-      (e.timer.burnTick -= t),
-        (e.timer.smoke -= t),
-        e.timer.smoke < 0 &&
-          (this.smoke.newFireSmoke(e.x, e.y - 14),
-          (e.timer.smoke = this.smokeTimer)),
-        e.timer.burnTick < 0 &&
-          (this.damageHuman(e, e.burnDamage),
-          (e.timer.burnTick = this.burnTickTimer),
-          this.exclamations.newFire(e));
+      e.timer.burnTick -= t;
+      e.timer.smoke -= t;
+
+      if (e.timer.smoke < 0) {
+        this.smoke.newFireSmoke(e.x, e.y - 14);
+        e.timer.smoke = this.smokeTimer;
+      }
+
+      if (e.timer.burnTick < 0) {
+        this.damageHuman(e, e.burnDamage);
+        e.timer.burnTick = this.burnTickTimer;
+        this.exclamations.newFire(e);
+      }
     }
     assignRandomTarget(e) {
-      (Math.random() > this.chanceToStayInCurrentBuilding ||
-        e.timer.flee > 0) &&
-        (e.currentPoi = this.map.getRandomBuilding()),
-        (e.target = this.map.randomPositionInBuilding(e.currentPoi)),
-        (e.maxSpeed = e.timer.flee > 0 ? this.maxRunSpeed : this.maxWalkSpeed),
-        (e.xSpeed = 0),
-        (e.ySpeed = 0);
+      if (
+        Math.random() > this.chanceToStayInCurrentBuilding ||
+        e.timer.flee > 0
+      ) {
+        e.currentPoi = this.map.getRandomBuilding();
+      }
+
+      e.target = this.map.randomPositionInBuilding(e.currentPoi);
+      e.maxSpeed = e.timer.flee > 0 ? this.maxRunSpeed : this.maxWalkSpeed;
+      e.xSpeed = 0;
+      e.ySpeed = 0;
     }
     getMaxNpcs() {
       return Math.min(
@@ -6505,228 +6781,305 @@ var Incremancer;
         : 0.02 * Math.min(this.gameModel.level - 10, 40);
     }
     getMaxHealth(e) {
-      return e < 7
-        ? 10 * (e + 4)
-        : e < 12
-        ? 20 * (e - 1)
-        : e < 16
-        ? 25 * (e - 3)
-        : e < 29
-        ? 50 * (e - 9)
-        : e < 49
-        ? 100 * (e - 19)
-        : e < 64
-        ? 300 * (e - 39)
-        : e < 85
-        ? 500 * (e - 49)
-        : e < 499
-        ? 17800 * Math.pow(1.015, e - 84)
-        : e < 999
-        ? 85e5 * Math.pow(1.03, e - 499)
-        : e < 1499
-        ? 98e16 * Math.pow(1.021, e - 1499)
-        : e > 2299
-        ? 845e23 * Math.pow(1.025, e - 2299)
-        : 4.5e12 * Math.pow(1.025, e - 999);
+      if (e < 7) {
+        return 10 * (e + 4);
+      }
+
+      if (e < 12) {
+        return 20 * (e - 1);
+      }
+
+      if (e < 16) {
+        return 25 * (e - 3);
+      }
+
+      if (e < 29) {
+        return 50 * (e - 9);
+      }
+
+      if (e < 49) {
+        return 100 * (e - 19);
+      }
+
+      if (e < 64) {
+        return 300 * (e - 39);
+      }
+
+      if (e < 85) {
+        return 500 * (e - 49);
+      }
+
+      if (e < 499) {
+        return 17800 * 1.015 ** (e - 84);
+      }
+
+      if (e < 999) {
+        return 8500000 /* 85e5 */ * 1.03 ** (e - 499);
+      }
+
+      if (e < 1499) {
+        return 980000000000000000 /* 98e16 */ * 1.021 ** (e - 1499);
+      }
+
+      if (e > 2299) {
+        return (
+          8.45e25 /* 845e23 */ /* 8.45e25 */ /* 8.45e25 */ * 1.025 ** (e - 2299)
+        );
+      }
+
+      return 4500000000000 /* 4.5e12 */ * 1.025 ** (e - 999);
     }
     getAttackDamage() {
-      1 != this.gameModel.level
-        ? 2 != this.gameModel.level
-          ? 3 != this.gameModel.level
-            ? (this.attackDamage = Math.round(
-                this.getMaxHealth(this.gameModel.level) / 10
-              ))
-            : (this.attackDamage = 5)
-          : (this.attackDamage = 4)
-        : (this.attackDamage = 2);
+      if (this.gameModel.level != 1) {
+        if (this.gameModel.level != 2) {
+          if (this.gameModel.level != 3) {
+            this.attackDamage = Math.round(
+              this.getMaxHealth(this.gameModel.level) / 10
+            );
+          } else {
+            this.attackDamage = 5;
+          }
+        } else {
+          this.attackDamage = 4;
+        }
+      } else {
+        this.attackDamage = 2;
+      }
     }
     setupVipText(e) {
-      this.vipText ||
-        ((this.vipText = new fe("VIP", {
+      if (!this.vipText) {
+        this.vipText = new fe("VIP", {
           fontFamily: "sans-serif",
           fontSize: 64,
           fill: "#FC0",
           stroke: "#000",
           strokeThickness: 5,
           align: "center",
-        })),
-        this.vipText.anchor.set(0.5, 1),
-        (this.vipText.scale.x = 0.25),
-        (this.vipText.scale.y = 0.25),
-        b.addChild(this.vipText)),
-        (this.vipText.visible = true),
-        (this.vipText.human = e),
-        (this.vipText.yOffset = -20),
-        (this.vipText.x = e.x),
-        (this.vipText.y = e.y + this.vipText.yOffset);
+        });
+
+        this.vipText.anchor.set(0.5, 1);
+        this.vipText.scale.x = 0.25;
+        this.vipText.scale.y = 0.25;
+        b.addChild(this.vipText);
+      }
+
+      this.vipText.visible = true;
+      this.vipText.human = e;
+      this.vipText.yOffset = -20;
+      this.vipText.x = e.x;
+      this.vipText.y = e.y + this.vipText.yOffset;
     }
     populate() {
-      if (
-        ((this.map = new ee()),
-        (this.zombies = new Zombies()),
-        (this.gameModel = GameModel.getInstance()),
-        (this.blood = new _e()),
-        (this.smoke = new ot()),
-        (this.bones = new Bones()),
-        (this.skeleton = new Skeleton()),
-        (this.blasts = new nt()),
-        (this.fragments = new lt()),
-        (this.trophies = new Trophies()),
-        (this.exclamations = new it()),
-        (this.bullets = new rt()),
-        (this.police = new Police()),
-        (this.army = new Army()),
-        (this.tanks = new De()),
-        this.map.populatePois(),
-        0 == this.textures.length)
-      )
+      this.map = new ee();
+      this.zombies = new Zombies();
+      this.gameModel = GameModel.getInstance();
+      this.blood = new _e();
+      this.smoke = new ot();
+      this.bones = new Bones();
+      this.skeleton = new Skeleton();
+      this.blasts = new nt();
+      this.fragments = new lt();
+      this.trophies = new Trophies();
+      this.exclamations = new it();
+      this.bullets = new rt();
+      this.police = new Police();
+      this.army = new Army();
+      this.tanks = new De();
+      this.map.populatePois();
+
+      if (this.textures.length == 0) {
         for (let e = 0; e < 6; e++) {
           const t = [];
-          for (let s = 0; s < 3; s++)
-            t.push(
-              PIXI.Texture.from("human" + (e + 1) + "_" + (s + 1) + ".png")
-            );
+          for (let s = 0; s < 3; s++) {
+            t.push(PIXI.Texture.from(`human${e + 1}_${s + 1}.png`));
+          }
           this.textures.push({
             animated: t,
-            dead: [PIXI.Texture.from("human" + (e + 1) + "_dead.png")],
+            dead: [PIXI.Texture.from(`human${e + 1}_dead.png`)],
           });
         }
-      if (0 == this.doctorTextures.length) {
-        for (let e = 0; e < 3; e++)
-          this.doctorTextures.push(
-            PIXI.Texture.from("doctor" + (e + 1) + ".png")
-          );
+      }
+
+      if (this.doctorTextures.length == 0) {
+        for (let e = 0; e < 3; e++) {
+          this.doctorTextures.push(PIXI.Texture.from(`doctor${e + 1}.png`));
+        }
         this.doctorDeadTexture = [PIXI.Texture.from("doctor4.png")];
       }
       if (this.humans.length > 0) {
-        for (let e = 0; e < this.humans.length; e++)
-          g.removeChild(this.humans[e]), this.humans[e].stop();
-        (this.discardedHumans = this.humans.slice()),
-          (this.humans.length = 0),
-          (this.aliveHumans.length = 0);
+        for (let e = 0; e < this.humans.length; e++) {
+          g.removeChild(this.humans[e]);
+          this.humans[e].stop();
+        }
+        this.discardedHumans = this.humans.slice();
+        this.humans.length = 0;
+        this.aliveHumans.length = 0;
       }
-      this.police.populate(),
-        this.army.populate(),
-        this.tanks.populate(),
-        this.getAttackDamage();
+      this.police.populate();
+      this.army.populate();
+      this.tanks.populate();
+      this.getAttackDamage();
       const e = this.getMaxHumans();
       let t = this.getMaxDoctors();
       const s = this.getMaxHealth(this.gameModel.level);
       let i = this.trophies.doesLevelHaveTrophy(this.gameModel.level);
-      (this.vip = void 0),
-        i
-          ? (this.escapeTarget = {
-              x: P.x / 2,
-              y: P.y + 50,
-            })
-          : this.vipText && (this.vipText.visible = false);
+      this.vip = undefined;
+
+      if (i) {
+        this.escapeTarget = {
+          x: P.x / 2,
+          y: P.y + 50,
+        };
+      } else if (this.vipText) {
+        this.vipText.visible = false;
+      }
+
       for (let a = 0; a < e; a++) {
         let e;
-        if (t > 0)
-          this.discardedHumans.length > 0
-            ? ((e = this.discardedHumans.pop()),
-              (e.textures = this.doctorTextures))
-            : (e = new ve(this.doctorTextures)),
-            (e.deadTexture = this.doctorDeadTexture),
-            (e.flags.doctor = true),
-            (e.flags.torchBearer = false),
-            (e.timer.healTick = Math.random() * this.healTickTimer),
-            t--;
-        else {
-          const t = Math.random() < this.getTorchChance(),
-            s = Math.floor(3 * Math.random()) + (t ? 3 : 0);
-          this.discardedHumans.length > 0
-            ? ((e = this.discardedHumans.pop()),
-              (e.textures = this.textures[s].animated))
-            : (e = new ve(this.textures[s].animated)),
-            (e.flags.torchBearer = t),
-            (e.deadTexture = this.textures[s].dead),
-            (e.flags.doctor = false);
+        if (t > 0) {
+          if (this.discardedHumans.length > 0) {
+            e = this.discardedHumans.pop();
+            e.textures = this.doctorTextures;
+          } else {
+            e = new ve(this.doctorTextures);
+          }
+
+          e.deadTexture = this.doctorDeadTexture;
+          e.flags.doctor = true;
+          e.flags.torchBearer = false;
+          e.timer.healTick = Math.random() * this.healTickTimer;
+          t--;
+        } else {
+          const t = Math.random() < this.getTorchChance();
+          const s = Math.floor(3 * Math.random()) + (t ? 3 : 0);
+
+          if (this.discardedHumans.length > 0) {
+            e = this.discardedHumans.pop();
+            e.textures = this.textures[s].animated;
+          } else {
+            e = new ve(this.textures[s].animated);
+          }
+
+          e.flags.torchBearer = t;
+          e.deadTexture = this.textures[s].dead;
+          e.flags.doctor = false;
         }
-        e.reset(),
-          (e.flags.vip = false),
-          (e.flags.dead = false),
-          (e.flags.burning = false),
-          (e.flags.infected = false),
-          (e.burnDamage = 0),
-          (e.plagueDamage = 0),
-          (e.plagueTicks = 0),
-          (e.animationSpeed = 0.15),
-          e.anchor.set(35 / 80, 1),
-          (e.currentPoi = this.map.getRandomBuilding()),
-          e.position.copyFrom(this.map.randomPositionInBuilding(e.currentPoi)),
-          (e.zIndex = e.position.y),
-          (e.xSpeed = 0),
-          (e.ySpeed = 0),
-          (e.timer.plagueTick = Math.random() * this.plagueTickTimer),
-          (e.target = false),
-          (e.speedMod = 1),
-          (e.zombieTarget = null),
-          (e.lastKnownBuilding = null),
-          (e.visionDistance = this.visionDistance),
-          (e.visible = true),
-          (e.alpha = 1),
-          (e.maxHealth = e.health = s),
-          i &&
-            !e.flags.doctor &&
-            ((e.flags.vip = true),
-            (this.vip = e),
-            (i = false),
-            (e.maxHealth = e.health = 2 * s),
-            this.setupVipText(e)),
-          (e.timer.scan = Math.random() * this.scanTime),
-          (e.timer.flee = 0),
-          this.changeState(e, ce.standing),
-          (e.timer.standing = Math.random() * this.randomSecondsToStand()),
-          (e.timer.attack = this.attackSpeed),
-          e.scale.set(
-            Math.random() > 0.5 ? this.scaling : -1 * this.scaling,
-            this.scaling
-          ),
-          this.humans.push(e),
-          g.addChild(e);
+        e.reset();
+        e.flags.vip = false;
+        e.flags.dead = false;
+        e.flags.burning = false;
+        e.flags.infected = false;
+        e.burnDamage = 0;
+        e.plagueDamage = 0;
+        e.plagueTicks = 0;
+        e.animationSpeed = 0.15;
+        e.anchor.set(35 / 80, 1);
+        e.currentPoi = this.map.getRandomBuilding();
+        e.position.copyFrom(this.map.randomPositionInBuilding(e.currentPoi));
+        e.zIndex = e.position.y;
+        e.xSpeed = 0;
+        e.ySpeed = 0;
+        e.timer.plagueTick = Math.random() * this.plagueTickTimer;
+        e.target = false;
+        e.speedMod = 1;
+        e.zombieTarget = null;
+        e.lastKnownBuilding = null;
+        e.visionDistance = this.visionDistance;
+        e.visible = true;
+        e.alpha = 1;
+        e.maxHealth = s;
+        e.health = s;
+
+        if (i && !e.flags.doctor) {
+          e.flags.vip = true;
+          this.vip = e;
+          i = false;
+          e.maxHealth = e.health = 2 * s;
+          this.setupVipText(e);
+        }
+
+        e.timer.scan = Math.random() * this.scanTime;
+        e.timer.flee = 0;
+        this.changeState(e, ce.standing);
+        e.timer.standing = Math.random() * this.randomSecondsToStand();
+        e.timer.attack = this.attackSpeed;
+
+        e.scale.set(
+          Math.random() > 0.5 ? this.scaling : -1 * this.scaling,
+          this.scaling
+        );
+
+        this.humans.push(e);
+        g.addChild(e);
       }
     }
     updateHumanSpeed(e, t) {
-      if (this.frozen) return void e.gotoAndStop(0);
-      if ((e.playing || e.play(), e.timer.dogStun && e.timer.dogStun > 0))
+      if (this.frozen) {
+        return void e.gotoAndStop(0);
+      }
+
+      if (!e.playing) {
+        e.play();
+      }
+
+      if (e.timer.dogStun && e.timer.dogStun > 0) {
         return void (e.timer.dogStun -= t);
-      (0 == e.timer.target && e.targetVector) || (e.timer.target = 0),
-        (e.timer.target -= t),
-        e.timer.target <= 0 &&
-          ((e.targetVector = this.map.howDoIGetToMyTarget(e, e.target)),
-          (e.timer.target = 0.2));
+      }
+
+      if (e.timer.target != 0 || !e.targetVector) {
+        e.timer.target = 0;
+      }
+
+      e.timer.target -= t;
+
+      if (e.timer.target <= 0) {
+        e.targetVector = this.map.howDoIGetToMyTarget(e, e.target);
+        e.timer.target = 0.2;
+      }
+
       const s = e.speedMod * e.maxSpeed;
-      (e.xSpeed = e.targetVector.x * s),
-        (e.ySpeed = e.targetVector.y * s),
-        (isNaN(e.xSpeed) || isNaN(e.ySpeed)) &&
-          ((e.xSpeed = 0), (e.ySpeed = 0)),
-        (e.position.x += e.xSpeed * t),
-        (e.position.y += e.ySpeed * t),
-        (e.zIndex = e.position.y),
-        Math.abs(e.xSpeed) > 1 &&
-          !e.flags.tank &&
-          (e.scale.x = e.xSpeed > 0 ? this.scaling : -this.scaling);
+      e.xSpeed = e.targetVector.x * s;
+      e.ySpeed = e.targetVector.y * s;
+
+      if (isNaN(e.xSpeed) || isNaN(e.ySpeed)) {
+        e.xSpeed = 0;
+        e.ySpeed = 0;
+      }
+
+      e.position.x += e.xSpeed * t;
+      e.position.y += e.ySpeed * t;
+      e.zIndex = e.position.y;
+
+      if (Math.abs(e.xSpeed) > 1 && !e.flags.tank) {
+        e.scale.x = e.xSpeed > 0 ? this.scaling : -this.scaling;
+      }
     }
     update(e) {
-      if (this.gameModel.currentState != this.gameModel.states.playingLevel)
+      if (this.gameModel.currentState != this.gameModel.states.playingLevel) {
         return;
-      const t = [],
-        s = this.zombies.aliveZombies;
+      }
+      const t = [];
+      const s = this.zombies.aliveZombies;
       this.graveyardAttackers.length = 0;
-      for (let i = 0; i < this.humans.length; i++)
-        this.updateHuman(this.humans[i], e, s),
-          this.humans[i].flags.dead || t.push(this.humans[i]);
-      (this.aliveHumans = t),
-        (this.gameModel.stats.human.count = this.aliveHumans.length),
-        this.police.update(e, s),
-        this.army.update(e, s),
-        this.tanks.update(e, s),
-        this.vipText &&
-          this.vipText.visible &&
-          ((this.vipText.x = this.vipText.human.x),
-          (this.vipText.y = this.vipText.human.y + this.vipText.yOffset)),
-        (this.gameModel.humanCount = this.aliveHumans.length);
+      for (let i = 0; i < this.humans.length; i++) {
+        this.updateHuman(this.humans[i], e, s);
+
+        if (!this.humans[i].flags.dead) {
+          t.push(this.humans[i]);
+        }
+      }
+      this.aliveHumans = t;
+      this.gameModel.stats.human.count = this.aliveHumans.length;
+      this.police.update(e, s);
+      this.army.update(e, s);
+      this.tanks.update(e, s);
+
+      if (this.vipText && this.vipText.visible) {
+        this.vipText.x = this.vipText.human.x;
+        this.vipText.y = this.vipText.human.y + this.vipText.yOffset;
+      }
+
+      this.gameModel.humanCount = this.aliveHumans.length;
     }
     updateDeadHumanFading(e, t) {
       if (e.visible) {
@@ -6735,244 +7088,335 @@ var Incremancer;
           e.alpha - this.fadeSpeed * t <= 0.5 &&
           !e.flags.tank &&
           Math.random() < this.gameModel.riseFromTheDeadChance
-        )
-          return (
-            this.zombies.createZombie(e.x, e.y, e.flags.dog),
-            (e.visible = false),
-            void g.removeChild(e)
-          );
-        (e.alpha -= this.fadeSpeed * t),
-          e.alpha < 0 && ((e.visible = false), g.removeChild(e));
+        ) {
+          this.zombies.createZombie(e.x, e.y, e.flags.dog);
+          e.visible = false;
+          return void g.removeChild(e);
+        }
+        e.alpha -= this.fadeSpeed * t;
+
+        if (e.alpha < 0) {
+          e.visible = false;
+          g.removeChild(e);
+        }
       }
     }
     changeState(e, t) {
       switch (t) {
-        case ce.standing:
-          e.gotoAndStop(0),
-            (e.maxSpeed = this.maxWalkSpeed),
-            (e.timer.standing = this.randomSecondsToStand());
+        case ce.standing: {
+          e.gotoAndStop(0);
+          e.maxSpeed = this.maxWalkSpeed;
+          e.timer.standing = this.randomSecondsToStand();
           break;
-        case ce.walking:
-          e.play(), (e.maxSpeed = this.maxWalkSpeed);
+        }
+        case ce.walking: {
+          e.play();
+          e.maxSpeed = this.maxWalkSpeed;
           break;
-        case ce.fleeing:
-          e.play(),
-            (e.timer.flee = this.fleeTime),
-            (e.maxSpeed = this.maxRunSpeed),
-            this.assignRandomTarget(e),
-            this.exclamations.newExclamation(e);
+        }
+        case ce.fleeing: {
+          e.play();
+          e.timer.flee = this.fleeTime;
+          e.maxSpeed = this.maxRunSpeed;
+          this.assignRandomTarget(e);
+          this.exclamations.newExclamation(e);
           break;
-        case ce.escaping:
-          e.play(),
-            (e.maxSpeed = this.maxRunSpeed),
-            (e.target = this.escapeTarget),
-            this.exclamations.newExclamation(e),
-            this.gameModel.sendMessage("The VIP is escaping!"),
-            (this.vipEscaping = true);
+        }
+        case ce.escaping: {
+          e.play();
+          e.maxSpeed = this.maxRunSpeed;
+          e.target = this.escapeTarget;
+          this.exclamations.newExclamation(e);
+          this.gameModel.sendMessage("The VIP is escaping!");
+          this.vipEscaping = true;
           break;
-        case ce.attacking:
-          e.play(), (e.maxSpeed = this.maxRunSpeed);
+        }
+        case ce.attacking: {
+          e.play();
+          e.maxSpeed = this.maxRunSpeed;
+        }
       }
       e.state = t;
     }
     inflictBurn(e, t) {
-      e.flags.torchBearer &&
-        (t.flags.burning
-          ? (t.burnDamage += this.attackDamage)
-          : (this.exclamations.newFire(t), (t.burnDamage = this.attackDamage)),
-        (t.flags.burning = true));
+      if (e.flags.torchBearer) {
+        if (t.flags.burning) {
+          t.burnDamage += this.attackDamage;
+        } else {
+          this.exclamations.newFire(t);
+          t.burnDamage = this.attackDamage;
+        }
+
+        t.flags.burning = true;
+      }
     }
     burnHuman(e, t) {
-      e &&
-        (e.flags.burning
-          ? (e.burnDamage += t)
-          : ((e.timer.burnTick = this.burnTickTimer),
-            (e.timer.smoke = this.smokeTimer),
-            this.exclamations.newFire(e),
-            (e.burnDamage = t)),
-        (e.flags.burning = true));
+      if (e) {
+        if (e.flags.burning) {
+          e.burnDamage += t;
+        } else {
+          e.timer.burnTick = this.burnTickTimer;
+          e.timer.smoke = this.smokeTimer;
+          this.exclamations.newFire(e);
+          e.burnDamage = t;
+        }
+
+        e.flags.burning = true;
+      }
     }
     updatePlague(e, t) {
-      (e.timer.plagueTick -= t),
-        e.timer.plagueTick < 0 &&
-          (this.damageHuman(e, e.plagueDamage),
-          (e.timer.plagueTick =
-            this.plagueTickTimer *
-            (1 / this.gameModel.runeEffects.attackSpeed)),
-          this.exclamations.newPoison(e),
-          e.plagueTicks--,
-          this.pandemic && this.pandemicBullet(e),
-          e.plagueTicks <= 0 &&
-            ((e.flags.infected = false), (e.plagueDamage = 0)));
+      e.timer.plagueTick -= t;
+
+      if (e.timer.plagueTick < 0) {
+        this.damageHuman(e, e.plagueDamage);
+        e.timer.plagueTick =
+          this.plagueTickTimer * (1 / this.gameModel.runeEffects.attackSpeed);
+        this.exclamations.newPoison(e);
+        e.plagueTicks--;
+
+        if (this.pandemic) {
+          this.pandemicBullet(e);
+        }
+
+        if (e.plagueTicks <= 0) {
+          e.flags.infected = false;
+          e.plagueDamage = 0;
+        }
+      }
     }
     pandemicBullet(e) {
-      for (let t = 0; t < this.aliveHumans.length; t++)
-        Math.abs(this.aliveHumans[t].x - e.x) < 30 &&
+      for (let t = 0; t < this.aliveHumans.length; t++) {
+        if (
+          Math.abs(this.aliveHumans[t].x - e.x) < 30 &&
           Math.abs(this.aliveHumans[t].y - e.y) < 30 &&
-          Math.random() < 0.3 &&
+          Math.random() < 0.3
+        ) {
           this.bullets.newBullet(
             e,
             this.aliveHumans[t],
             this.gameModel.zombieDamage / 2,
             true
           );
+        }
+      }
     }
     healHuman(e) {
-      e.health < e.maxHealth &&
-        (e.flags.infected && e.plagueTicks > 0 && e.plagueTicks--,
-        (e.health += 2 * this.attackDamage),
-        e.health > e.maxHealth &&
-          ((e.health = e.maxHealth),
-          (e.speedMod = Math.max(Math.min(1, e.health / e.maxHealth), 0.25))),
-        this.exclamations.newHealing(e));
+      if (e.health < e.maxHealth) {
+        if (e.flags.infected && e.plagueTicks > 0) {
+          e.plagueTicks--;
+        }
+
+        e.health += 2 * this.attackDamage;
+
+        if (e.health > e.maxHealth) {
+          e.health = e.maxHealth;
+          e.speedMod = Math.max(Math.min(1, e.health / e.maxHealth), 0.25);
+        }
+
+        this.exclamations.newHealing(e);
+      }
     }
     doHeal(e, t) {
-      if (((e.timer.healTick -= t), e.timer.healTick < 0)) {
+      e.timer.healTick -= t;
+
+      if (e.timer.healTick < 0) {
         const t = 100;
         e.timer.healTick = this.healTickTimer;
-        for (let s = 0; s < this.aliveHumans.length; s++)
-          Math.abs(this.aliveHumans[s].x - e.x) < t &&
+        for (let s = 0; s < this.aliveHumans.length; s++) {
+          if (
+            Math.abs(this.aliveHumans[s].x - e.x) < t &&
             Math.abs(this.aliveHumans[s].y - e.y) < t &&
             this.fastDistance(
               e.x,
               e.y,
               this.aliveHumans[s].x,
               this.aliveHumans[s].y
-            ) < t &&
+            ) < t
+          ) {
             this.healHuman(this.aliveHumans[s]);
+          }
+        }
       }
     }
     updateHuman(e, t, s) {
-      if (e.flags.dead) return this.updateDeadHumanFading(e, t);
-      if (
-        ((e.timer.attack -= t),
-        (e.timer.scan -= t),
-        (e.timer.flee -= t),
-        e.flags.infected && this.updatePlague(e, t),
-        e.flags.doctor && this.doHeal(e, t),
-        e.flags.burning && this.updateBurns(e, t),
-        (!e.zombieTarget || e.zombieTarget.flags.dead) && e.timer.scan < 0)
-      ) {
-        const t = this.scanForZombies(e, s);
-        t > 0 &&
-          (e.flags.vip
-            ? e.state !== ce.escaping && this.changeState(e, ce.escaping)
-            : Math.random() < t * this.fleeChancePerZombie
-            ? this.changeState(e, ce.fleeing)
-            : ((e.target = e.zombieTarget), this.changeState(e, ce.attacking)));
+      if (e.flags.dead) {
+        return this.updateDeadHumanFading(e, t);
       }
+      e.timer.attack -= t;
+      e.timer.scan -= t;
+      e.timer.flee -= t;
+
+      if (e.flags.infected) {
+        this.updatePlague(e, t);
+      }
+
+      if (e.flags.doctor) {
+        this.doHeal(e, t);
+      }
+
+      if (e.flags.burning) {
+        this.updateBurns(e, t);
+      }
+
+      if ((!e.zombieTarget || e.zombieTarget.flags.dead) && e.timer.scan < 0) {
+        const t = this.scanForZombies(e, s);
+
+        if (t > 0) {
+          if (e.flags.vip) {
+            if (e.state !== ce.escaping) {
+              this.changeState(e, ce.escaping);
+            }
+          } else if (Math.random() < t * this.fleeChancePerZombie) {
+            this.changeState(e, ce.fleeing);
+          } else {
+            e.target = e.zombieTarget;
+            this.changeState(e, ce.attacking);
+          }
+        }
+      }
+
       switch (e.state) {
-        case ce.standing:
-          (e.timer.standing -= t),
-            e.timer.standing < 0 &&
-              (this.assignRandomTarget(e), this.changeState(e, ce.walking));
+        case ce.standing: {
+          e.timer.standing -= t;
+
+          if (e.timer.standing < 0) {
+            this.assignRandomTarget(e);
+            this.changeState(e, ce.walking);
+          }
+
           break;
+        }
         case ce.walking:
-        case ce.fleeing:
-          this.fastDistance(
-            e.position.x,
-            e.position.y,
-            e.target.x,
-            e.target.y
-          ) < this.moveTargetDistance
-            ? ((e.target = void 0),
-              (e.zombieTarget = void 0),
-              this.changeState(e, ce.standing))
-            : this.updateHumanSpeed(e, t);
+        case ce.fleeing: {
+          if (
+            this.fastDistance(
+              e.position.x,
+              e.position.y,
+              e.target.x,
+              e.target.y
+            ) < this.moveTargetDistance
+          ) {
+            e.target = undefined;
+            e.zombieTarget = undefined;
+            this.changeState(e, ce.standing);
+          } else {
+            this.updateHumanSpeed(e, t);
+          }
+
           break;
-        case ce.escaping:
-          this.fastDistance(
-            e.position.x,
-            e.position.y,
-            e.target.x,
-            e.target.y
-          ) < this.moveTargetDistance
-            ? (this.smoke.newDroneCloud(e.x, e.y),
-              (e.flags.dead = true),
-              (e.zombieTarget = void 0),
-              (e.visible = false),
-              (this.vipText.visible = false),
-              this.gameModel.sendMessage("The VIP has escaped!"),
-              this.gameModel.vipEscaped(),
-              setTimeout(() => {
-                this.vipEscaping = false;
-              }, 2e3))
-            : this.updateHumanSpeed(e, t);
+        }
+        case ce.escaping: {
+          if (
+            this.fastDistance(
+              e.position.x,
+              e.position.y,
+              e.target.x,
+              e.target.y
+            ) < this.moveTargetDistance
+          ) {
+            this.smoke.newDroneCloud(e.x, e.y);
+            e.flags.dead = true;
+            e.zombieTarget = undefined;
+            e.visible = false;
+            this.vipText.visible = false;
+            this.gameModel.sendMessage("The VIP has escaped!");
+            this.gameModel.vipEscaped();
+
+            setTimeout(() => {
+              this.vipEscaping = false;
+            }, 2000 /* 2e3 */);
+          } else {
+            this.updateHumanSpeed(e, t);
+          }
+
           break;
-        case ce.attacking:
-          (e.scale.x = e.target.x > e.x ? this.scaling : -this.scaling),
-            e.zombieTarget && !e.zombieTarget.flags.dead
-              ? this.fastDistance(
-                  e.position.x,
-                  e.position.y,
-                  e.target.x,
-                  e.target.y
-                ) < this.attackDistance
-                ? e.timer.attack < 0 &&
-                  (this.zombies.damageZombie(
-                    e.zombieTarget,
-                    this.attackDamage,
-                    e
-                  ),
-                  this.inflictBurn(e, e.zombieTarget),
-                  (e.timer.attack = this.attackSpeed))
-                : this.updateHumanSpeed(e, t)
-              : this.changeState(e, ce.standing);
+        }
+        case ce.attacking: {
+          e.scale.x = e.target.x > e.x ? this.scaling : -this.scaling;
+
+          if (e.zombieTarget && !e.zombieTarget.flags.dead) {
+            if (
+              this.fastDistance(
+                e.position.x,
+                e.position.y,
+                e.target.x,
+                e.target.y
+              ) < this.attackDistance
+            ) {
+              if (e.timer.attack < 0) {
+                this.zombies.damageZombie(e.zombieTarget, this.attackDamage, e);
+                this.inflictBurn(e, e.zombieTarget);
+                e.timer.attack = this.attackSpeed;
+              }
+            } else {
+              this.updateHumanSpeed(e, t);
+            }
+          } else {
+            this.changeState(e, ce.standing);
+          }
+        }
       }
     }
     scanForZombies(e, t) {
       e.timer.scan = this.scanTime;
       let s = 0;
-      for (let i = 0; i < t.length; i++)
+      for (let i = 0; i < t.length; i++) {
         if (
           !t[i].flags.dead &&
           Math.abs(t[i].x - e.x) < e.visionDistance &&
           Math.abs(t[i].y - e.y) < e.visionDistance &&
           ((e.zombieTarget = t[i]), s++, s > 9)
-        )
+        ) {
           return s;
+        }
+      }
       return s;
     }
   }
+
   class Me extends ve {
-    constructor() {
-      super(...arguments), (this.radioTime = 0), (this.followTimer = 0);
+    constructor(...args) {
+      super(...args);
+      this.radioTime = 0;
+      this.followTimer = 0;
     }
   }
-  !(function (e) {
-    (e[(e.shooting = 0)] = "shooting"),
-      (e[(e.attacking = 1)] = "attacking"),
-      (e[(e.walking = 2)] = "walking"),
-      (e[(e.running = 3)] = "running"),
-      (e[(e.standing = 4)] = "standing"),
-      (e[(e.following = 5)] = "following"),
-      (e[(e.hunting = 6)] = "hunting");
-  })(ue || (ue = {}));
+
+  enum policeState {
+    "shooting",
+    "attacking",
+    "walking",
+    "running",
+    "standing",
+    "following",
+    "hunting",
+  }
   class Police {
     constructor() {
-      if (
-        ((this.maxWalkSpeed = 15),
-        (this.maxRunSpeed = 40),
-        (this.police = []),
-        (this.discardedPolice = []),
-        (this.walkTexture = []),
-        (this.deadTexture = []),
-        (this.dogTexture = []),
-        (this.deadDogTexture = []),
-        (this.policeDogLevel = 20),
-        (this.policePerLevel = 1),
-        (this.attackSpeed = 2),
-        (this.attackDamage = 16),
-        (this.attackDistance = 20),
-        (this.moveTargetDistance = 5),
-        (this.shootDistance = 110),
-        (this.visionDistance = 150),
-        (this.scaling = 2),
-        (this.dogScaling = 1.3),
-        (this.radioTime = 30),
-        Police.instance)
-      )
+      this.maxWalkSpeed = 15;
+      this.maxRunSpeed = 40;
+      this.police = [];
+      this.discardedPolice = [];
+      this.walkTexture = [];
+      this.deadTexture = [];
+      this.dogTexture = [];
+      this.deadDogTexture = [];
+      this.policeDogLevel = 20;
+      this.policePerLevel = 1;
+      this.attackSpeed = 2;
+      this.attackDamage = 16;
+      this.attackDistance = 20;
+      this.moveTargetDistance = 5;
+      this.shootDistance = 110;
+      this.visionDistance = 150;
+      this.scaling = 2;
+      this.dogScaling = 1.3;
+      this.radioTime = 30;
+
+      if (Police.instance) {
         return Police.instance;
+      }
+
       Police.instance = this;
     }
     isExtraPolice() {
@@ -6996,133 +7440,162 @@ var Incremancer;
       this.attackDamage = Math.round(this.getMaxHealth() / 10);
     }
     populate() {
-      if (
-        ((this.map = new ee()),
-        (this.gameModel = GameModel.getInstance()),
-        (this.humans = new Humans()),
-        (this.exclamations = new it()),
-        (this.zombies = new Zombies()),
-        (this.bullets = new rt()),
-        0 == this.walkTexture.length)
-      ) {
-        for (let e = 0; e < 3; e++)
-          this.walkTexture.push(PIXI.Texture.from("cop" + (e + 1) + ".png"));
+      this.map = new ee();
+      this.gameModel = GameModel.getInstance();
+      this.humans = new Humans();
+      this.exclamations = new it();
+      this.zombies = new Zombies();
+      this.bullets = new rt();
+
+      if (this.walkTexture.length == 0) {
+        for (let e = 0; e < 3; e++) {
+          this.walkTexture.push(PIXI.Texture.from(`cop${e + 1}.png`));
+        }
         this.deadTexture = [PIXI.Texture.from("cop4.png")];
-        for (let e = 0; e < 2; e++)
-          this.dogTexture.push(PIXI.Texture.from("dog" + (e + 1) + ".png"));
+        for (let e = 0; e < 2; e++) {
+          this.dogTexture.push(PIXI.Texture.from(`dog${e + 1}.png`));
+        }
         this.deadDogTexture = [PIXI.Texture.from("dogdead.png")];
       }
+
       if (this.police.length > 0) {
-        for (let e = 0; e < this.police.length; e++)
+        for (let e = 0; e < this.police.length; e++) {
           g.removeChild(this.police[e]);
-        (this.discardedPolice = this.police.slice()), (this.police = []);
+        }
+        this.discardedPolice = this.police.slice();
+        this.police = [];
       }
-      const e = this.getMaxPolice(),
-        t = this.getMaxHealth(),
-        s = 0.6 * t;
+      const e = this.getMaxPolice();
+      const t = this.getMaxHealth();
+      const s = 0.6 * t;
       this.getAttackDamage();
       for (let i = 0; i < e; i++) {
         let e;
-        this.discardedPolice.length > 0
-          ? ((e = this.discardedPolice.pop()),
-            (e.alpha = 1),
-            (e.textures = this.walkTexture))
-          : (e = new Me(this.walkTexture)),
-          e.reset(),
-          (e.flags.dog = false),
-          (e.flags.dead = false),
-          (e.flags.infected = false),
-          (e.flags.burning = false),
-          (e.burnDamage = 0),
-          (e.plagueDamage = 0),
-          (e.plagueTicks = 0),
-          (e.deadTexture = this.deadTexture),
-          (e.animationSpeed = 0.2),
-          e.anchor.set(35 / 80, 1),
-          (e.currentPoi = this.map.getRandomBuilding()),
-          e.position.copyFrom(this.map.randomPositionInBuilding(e.currentPoi)),
-          (e.zIndex = e.position.y),
-          (e.xSpeed = 0),
-          (e.ySpeed = 0),
-          (e.radioTime = 5),
-          (e.speedMod = 1),
-          (e.lastKnownBuilding = void 0),
-          (e.timer.plagueTick = Math.random() * this.humans.plagueTickTimer),
-          (e.maxSpeed = this.maxWalkSpeed),
-          (e.visionDistance = this.visionDistance),
-          (e.visible = true),
-          (e.maxHealth = e.health = t),
-          (e.timer.scan = Math.random() * this.humans.scanTime),
-          (e.timer.standing =
-            Math.random() * this.humans.randomSecondsToStand()),
-          (e.target = false),
-          (e.zombieTarget = void 0),
-          (e.policeState = ue.standing),
-          (e.timer.attack = this.attackSpeed),
-          e.scale.set(
-            Math.random() > 0.5 ? this.scaling : -1 * this.scaling,
-            this.scaling
-          ),
-          this.police.push(e),
-          g.addChild(e),
+
+        if (this.discardedPolice.length > 0) {
+          e = this.discardedPolice.pop();
+          e.alpha = 1;
+          e.textures = this.walkTexture;
+        } else {
+          e = new Me(this.walkTexture);
+        }
+
+        e.reset();
+        e.flags.dog = false;
+        e.flags.dead = false;
+        e.flags.infected = false;
+        e.flags.burning = false;
+        e.burnDamage = 0;
+        e.plagueDamage = 0;
+        e.plagueTicks = 0;
+        e.deadTexture = this.deadTexture;
+        e.animationSpeed = 0.2;
+        e.anchor.set(35 / 80, 1);
+        e.currentPoi = this.map.getRandomBuilding();
+        e.position.copyFrom(this.map.randomPositionInBuilding(e.currentPoi));
+        e.zIndex = e.position.y;
+        e.xSpeed = 0;
+        e.ySpeed = 0;
+        e.radioTime = 5;
+        e.speedMod = 1;
+        e.lastKnownBuilding = undefined;
+        e.timer.plagueTick = Math.random() * this.humans.plagueTickTimer;
+        e.maxSpeed = this.maxWalkSpeed;
+        e.visionDistance = this.visionDistance;
+        e.visible = true;
+        e.maxHealth = t;
+        e.health = t;
+        e.timer.scan = Math.random() * this.humans.scanTime;
+        e.timer.standing = Math.random() * this.humans.randomSecondsToStand();
+        e.target = false;
+        e.zombieTarget = undefined;
+        e.policeState = policeState.standing;
+        e.timer.attack = this.attackSpeed;
+
+        e.scale.set(
+          Math.random() > 0.5 ? this.scaling : -1 * this.scaling,
+          this.scaling
+        );
+
+        this.police.push(e);
+        g.addChild(e);
+
+        if (
           this.gameModel.level >= this.policeDogLevel &&
-            Math.random() > 0.5 &&
-            this.createPoliceDog(e, s);
+          Math.random() > 0.5
+        ) {
+          this.createPoliceDog(e, s);
+        }
       }
-      this.isExtraPolice() &&
+
+      if (this.isExtraPolice()) {
         this.gameModel.sendMessage("Warning: High Police Activity!");
+      }
     }
     createPoliceDog(e, t) {
       let s;
-      this.discardedPolice.length > 0
-        ? ((s = this.discardedPolice.pop()),
-          (s.alpha = 1),
-          (s.textures = this.dogTexture))
-        : (s = new Me(this.dogTexture)),
-        s.reset(),
-        (s.owner = e),
-        (s.flags.dog = true),
-        (s.flags.dead = false),
-        (s.flags.infected = false),
-        (s.flags.burning = false),
-        (s.burnDamage = 0),
-        (s.plagueDamage = 0),
-        (s.plagueTicks = 0),
-        (s.deadTexture = this.deadDogTexture),
-        (s.animationSpeed = 0.15),
-        s.anchor.set(0.5, 1),
-        s.position.set(e.position.x + 3, e.position.y),
-        (s.zIndex = s.position.y),
-        (s.xSpeed = 0),
-        (s.ySpeed = 0),
-        (s.speedMod = 1),
-        (s.lastKnownBuilding = null),
-        (s.timer.plagueTick = Math.random() * this.humans.plagueTickTimer),
-        (s.maxSpeed = this.maxRunSpeed),
-        (s.visionDistance = this.visionDistance),
-        (s.visible = true),
-        (s.maxHealth = s.health = t),
-        (s.timer.scan = Math.random() * this.humans.scanTime),
-        (s.target = e),
-        (s.zombieTarget = null),
-        (s.policeState = ue.following),
-        (s.followTimer = 0),
-        (s.timer.attack = this.attackSpeed),
-        s.scale.set(
-          Math.random() > 0.5 ? this.dogScaling : -1 * this.dogScaling,
-          this.dogScaling
-        ),
-        this.police.push(s),
-        g.addChild(s);
+
+      if (this.discardedPolice.length > 0) {
+        s = this.discardedPolice.pop();
+        s.alpha = 1;
+        s.textures = this.dogTexture;
+      } else {
+        s = new Me(this.dogTexture);
+      }
+
+      s.reset();
+      s.owner = e;
+      s.flags.dog = true;
+      s.flags.dead = false;
+      s.flags.infected = false;
+      s.flags.burning = false;
+      s.burnDamage = 0;
+      s.plagueDamage = 0;
+      s.plagueTicks = 0;
+      s.deadTexture = this.deadDogTexture;
+      s.animationSpeed = 0.15;
+      s.anchor.set(0.5, 1);
+      s.position.set(e.position.x + 3, e.position.y);
+      s.zIndex = s.position.y;
+      s.xSpeed = 0;
+      s.ySpeed = 0;
+      s.speedMod = 1;
+      s.lastKnownBuilding = null;
+      s.timer.plagueTick = Math.random() * this.humans.plagueTickTimer;
+      s.maxSpeed = this.maxRunSpeed;
+      s.visionDistance = this.visionDistance;
+      s.visible = true;
+      s.maxHealth = t;
+      s.health = t;
+      s.timer.scan = Math.random() * this.humans.scanTime;
+      s.target = e;
+      s.zombieTarget = null;
+      s.policeState = policeState.following;
+      s.followTimer = 0;
+      s.timer.attack = this.attackSpeed;
+
+      s.scale.set(
+        Math.random() > 0.5 ? this.dogScaling : -1 * this.dogScaling,
+        this.dogScaling
+      );
+
+      this.police.push(s);
+      g.addChild(s);
     }
     update(e, t) {
       let s = 0;
-      for (let i = 0; i < this.police.length; i++)
-        this.police[i].flags.dog
-          ? this.updatePoliceDog(this.police[i], e, t)
-          : this.updatePolice(this.police[i], e, t),
-          this.police[i].flags.dead ||
-            (this.humans.aliveHumans.push(this.police[i]), s++);
+      for (let i = 0; i < this.police.length; i++) {
+        if (this.police[i].flags.dog) {
+          this.updatePoliceDog(this.police[i], e, t);
+        } else {
+          this.updatePolice(this.police[i], e, t);
+        }
+
+        if (!this.police[i].flags.dead) {
+          this.humans.aliveHumans.push(this.police[i]);
+          s++;
+        }
+      }
       this.gameModel.stats.police.count = s;
     }
     decideStateOnZombieDistance(e) {
@@ -7134,35 +7607,45 @@ var Incremancer;
           e.zombieTarget.x,
           e.zombieTarget.y
         );
-        if (t > this.shootDistance) return void this.changeState(e, ue.running);
-        if (t < this.attackDistance)
-          return void this.changeState(e, ue.attacking);
-        this.changeState(e, ue.shooting);
+        if (t > this.shootDistance) {
+          return void this.changeState(e, policeState.running);
+        }
+        if (t < this.attackDistance) {
+          return void this.changeState(e, policeState.attacking);
+        }
+        this.changeState(e, policeState.shooting);
       }
     }
     changeState(e, t) {
       switch (t) {
-        case ue.standing:
+        case policeState.standing: {
           e.gotoAndStop(0);
           break;
-        case ue.walking:
-          e.play(), (e.maxSpeed = this.maxWalkSpeed);
-          break;
-        case ue.running:
-          e.play(), (e.maxSpeed = this.maxRunSpeed);
-          break;
-        case ue.shooting:
-          e.gotoAndStop(0);
-          break;
-        case ue.attacking:
+        }
+        case policeState.walking: {
           e.play();
+          e.maxSpeed = this.maxWalkSpeed;
+          break;
+        }
+        case policeState.running: {
+          e.play();
+          e.maxSpeed = this.maxRunSpeed;
+          break;
+        }
+        case policeState.shooting: {
+          e.gotoAndStop(0);
+          break;
+        }
+        case policeState.attacking: {
+          e.play();
+        }
       }
       e.policeState = t;
     }
     radioForBackup(e) {
-      let t = null,
-        s = 2e3;
-      for (let a = 0; a < this.police.length; a++)
+      let t = null;
+      let s = 2000; /* 2e3 */
+      for (let a = 0; a < this.police.length; a++) {
         if (
           !this.police[a].flags.dead &&
           !this.police[a].flags.dog &&
@@ -7175,174 +7658,254 @@ var Incremancer;
             this.police[a].x,
             this.police[a].y
           );
-          r < s && ((t = this.police[a]), (s = r));
+
+          if (r < s) {
+            t = this.police[a];
+            s = r;
+          }
         }
-      t &&
-        ((t.zombieTarget = e.zombieTarget),
-        this.exclamations.newRadio(e),
-        this.exclamations.newRadio(t),
-        (e.radioTime = this.radioTime),
-        (t.radioTime = this.radioTime));
-    }
-    updatePolice(e, t, s) {
-      if (e.flags.dead) return this.humans.updateDeadHumanFading(e, t);
-      switch (
-        ((e.timer.attack -= t),
-        (e.timer.scan -= t),
-        (e.radioTime -= t),
-        e.flags.infected && this.humans.updatePlague(e, t),
-        e.flags.burning && this.humans.updateBurns(e, t),
-        (!e.zombieTarget || e.zombieTarget.flags.dead) &&
-          e.timer.scan < 0 &&
-          (this.humans.scanForZombies(e, s),
-          e.zombieTarget &&
-            !e.zombieTarget.flags.dead &&
-            e.radioTime < 0 &&
-            this.radioForBackup(e)),
-        this.decideStateOnZombieDistance(e),
-        e.policeState)
-      ) {
-        case ue.standing:
-          (e.timer.standing -= t),
-            e.timer.standing < 0 &&
-              (this.humans.assignRandomTarget(e),
-              this.changeState(e, ue.walking));
-          break;
-        case ue.walking:
-          weighted_hybrid_distance(
-            e.position.x,
-            e.position.y,
-            e.target.x,
-            e.target.y
-          ) < this.moveTargetDistance
-            ? ((e.target = false),
-              (e.zombieTarget = null),
-              (e.timer.standing = this.humans.randomSecondsToStand()),
-              this.changeState(e, ue.standing))
-            : this.humans.updateHumanSpeed(e, t);
-          break;
-        case ue.running:
-          e.zombieTarget && !e.zombieTarget.flags.dead
-            ? e.target && this.humans.updateHumanSpeed(e, t)
-            : this.changeState(e, ue.standing);
-          break;
-        case ue.attacking:
-          e.zombieTarget && !e.zombieTarget.flags.dead
-            ? ((e.scale.x =
-                e.zombieTarget.x > e.x ? this.scaling : -this.scaling),
-              e.timer.attack < 0 &&
-                (this.zombies.damageZombie(
-                  e.zombieTarget,
-                  this.attackDamage,
-                  e
-                ),
-                (e.timer.attack = this.attackSpeed)))
-            : this.changeState(e, ue.standing);
-          break;
-        case ue.shooting:
-          e.zombieTarget && !e.zombieTarget.flags.dead
-            ? ((e.scale.x =
-                e.zombieTarget.x > e.x ? this.scaling : -this.scaling),
-              e.timer.attack < 0 &&
-                (this.bullets.newBullet(e, e.zombieTarget, this.attackDamage),
-                (e.timer.attack = this.attackSpeed)))
-            : this.changeState(e, ue.standing);
+      }
+
+      if (t) {
+        t.zombieTarget = e.zombieTarget;
+        this.exclamations.newRadio(e);
+        this.exclamations.newRadio(t);
+        e.radioTime = this.radioTime;
+        t.radioTime = this.radioTime;
       }
     }
-    updateDogSpeed(e, t) {
-      this.humans.updateHumanSpeed(e, t),
-        Math.abs(e.xSpeed) > 1 &&
-          (e.scale.x = e.xSpeed > 0 ? this.dogScaling : -this.dogScaling);
-    }
-    updatePoliceDog(e, t, s) {
-      if (e.flags.dead) return this.humans.updateDeadHumanFading(e, t);
-      switch (
-        ((e.timer.attack -= t),
-        (e.timer.scan -= t),
-        e.flags.infected && this.humans.updatePlague(e, t),
-        e.flags.burning && this.humans.updateBurns(e, t),
-        e.policeState)
-      ) {
-        case ue.following:
-          if (e.owner.flags.dead) {
-            (e.policeState = ue.hunting), e.play();
-            break;
+    updatePolice(e, t, s) {
+      if (e.flags.dead) {
+        return this.humans.updateDeadHumanFading(e, t);
+      }
+      e.timer.attack -= t;
+      e.timer.scan -= t;
+      e.radioTime -= t;
+
+      if (e.flags.infected) {
+        this.humans.updatePlague(e, t);
+      }
+
+      if (e.flags.burning) {
+        this.humans.updateBurns(e, t);
+      }
+
+      if ((!e.zombieTarget || e.zombieTarget.flags.dead) && e.timer.scan < 0) {
+        this.humans.scanForZombies(e, s);
+
+        if (e.zombieTarget && !e.zombieTarget.flags.dead && e.radioTime < 0) {
+          this.radioForBackup(e);
+        }
+      }
+
+      this.decideStateOnZombieDistance(e);
+
+      switch (e.policeState) {
+        case policeState.standing: {
+          e.timer.standing -= t;
+
+          if (e.timer.standing < 0) {
+            this.humans.assignRandomTarget(e);
+            this.changeState(e, policeState.walking);
           }
-          if (e.owner.zombieTarget && !e.owner.zombieTarget.flags.dead) {
-            (e.policeState = ue.attacking),
-              e.play(),
-              (e.target = e.owner.zombieTarget);
-            break;
-          }
-          (e.target = e.owner),
+
+          break;
+        }
+        case policeState.walking: {
+          if (
             weighted_hybrid_distance(
               e.position.x,
               e.position.y,
               e.target.x,
               e.target.y
             ) < this.moveTargetDistance
-              ? ((e.followTimer = 3 * Math.random()), e.gotoAndStop(0))
-              : ((e.followTimer -= t),
-                e.followTimer < 0 && (e.play(), this.updateDogSpeed(e, t)));
+          ) {
+            e.target = false;
+            e.zombieTarget = null;
+            e.timer.standing = this.humans.randomSecondsToStand();
+            this.changeState(e, policeState.standing);
+          } else {
+            this.humans.updateHumanSpeed(e, t);
+          }
+
           break;
-        case ue.attacking:
-          e.zombieTarget && !e.zombieTarget.flags.dead
-            ? weighted_hybrid_distance(
+        }
+        case policeState.running: {
+          if (e.zombieTarget && !e.zombieTarget.flags.dead) {
+            if (e.target) {
+              this.humans.updateHumanSpeed(e, t);
+            }
+          } else {
+            this.changeState(e, policeState.standing);
+          }
+
+          break;
+        }
+        case policeState.attacking: {
+          if (e.zombieTarget && !e.zombieTarget.flags.dead) {
+            e.scale.x = e.zombieTarget.x > e.x ? this.scaling : -this.scaling;
+
+            if (e.timer.attack < 0) {
+              this.zombies.damageZombie(e.zombieTarget, this.attackDamage, e);
+              e.timer.attack = this.attackSpeed;
+            }
+          } else {
+            this.changeState(e, policeState.standing);
+          }
+
+          break;
+        }
+        case policeState.shooting: {
+          if (e.zombieTarget && !e.zombieTarget.flags.dead) {
+            e.scale.x = e.zombieTarget.x > e.x ? this.scaling : -this.scaling;
+
+            if (e.timer.attack < 0) {
+              this.bullets.newBullet(e, e.zombieTarget, this.attackDamage);
+              e.timer.attack = this.attackSpeed;
+            }
+          } else {
+            this.changeState(e, policeState.standing);
+          }
+        }
+      }
+    }
+    updateDogSpeed(e, t) {
+      this.humans.updateHumanSpeed(e, t);
+
+      if (Math.abs(e.xSpeed) > 1) {
+        e.scale.x = e.xSpeed > 0 ? this.dogScaling : -this.dogScaling;
+      }
+    }
+    updatePoliceDog(e, t, s) {
+      if (e.flags.dead) {
+        return this.humans.updateDeadHumanFading(e, t);
+      }
+      e.timer.attack -= t;
+      e.timer.scan -= t;
+
+      if (e.flags.infected) {
+        this.humans.updatePlague(e, t);
+      }
+
+      if (e.flags.burning) {
+        this.humans.updateBurns(e, t);
+      }
+
+      switch (e.policeState) {
+        case policeState.following: {
+          if (e.owner.flags.dead) {
+            e.policeState = policeState.hunting;
+            e.play();
+            break;
+          }
+          if (e.owner.zombieTarget && !e.owner.zombieTarget.flags.dead) {
+            e.policeState = policeState.attacking;
+            e.play();
+            e.target = e.owner.zombieTarget;
+            break;
+          }
+          e.target = e.owner;
+
+          if (
+            weighted_hybrid_distance(
+              e.position.x,
+              e.position.y,
+              e.target.x,
+              e.target.y
+            ) < this.moveTargetDistance
+          ) {
+            e.followTimer = 3 * Math.random();
+            e.gotoAndStop(0);
+          } else {
+            e.followTimer -= t;
+
+            if (e.followTimer < 0) {
+              e.play();
+              this.updateDogSpeed(e, t);
+            }
+          }
+
+          break;
+        }
+        case policeState.attacking: {
+          if (e.zombieTarget && !e.zombieTarget.flags.dead) {
+            if (
+              weighted_hybrid_distance(
                 e.position.x,
                 e.position.y,
                 e.zombieTarget.x,
                 e.zombieTarget.y
               ) < this.moveTargetDistance
-              ? ((e.scale.x =
-                  e.target.x > e.x ? this.dogScaling : -this.dogScaling),
-                e.timer.attack < 0 &&
-                  (this.zombies.damageZombie(
-                    e.zombieTarget,
-                    this.attackDamage,
-                    e
-                  ),
-                  (e.target.dogStun = 1),
-                  (e.timer.attack = this.attackSpeed)))
-              : ((e.target = e.zombieTarget), this.updateDogSpeed(e, t))
-            : (e.policeState = ue.following);
+            ) {
+              e.scale.x = e.target.x > e.x ? this.dogScaling : -this.dogScaling;
+
+              if (e.timer.attack < 0) {
+                this.zombies.damageZombie(e.zombieTarget, this.attackDamage, e);
+                e.target.dogStun = 1;
+                e.timer.attack = this.attackSpeed;
+              }
+            } else {
+              e.target = e.zombieTarget;
+              this.updateDogSpeed(e, t);
+            }
+          } else {
+            e.policeState = policeState.following;
+          }
+
           break;
-        case ue.hunting:
-          (!e.zombieTarget || e.zombieTarget.flags.dead) &&
-            e.timer.scan < 0 &&
-            (this.humans.scanForZombies(e, s),
-            e.zombieTarget && (e.policeState = ue.attacking)),
+        }
+        case policeState.hunting: {
+          if (
+            (!e.zombieTarget || e.zombieTarget.flags.dead) &&
+            e.timer.scan < 0
+          ) {
+            this.humans.scanForZombies(e, s);
+
+            if (e.zombieTarget) {
+              e.policeState = policeState.attacking;
+            }
+          }
+
+          if (
             weighted_hybrid_distance(
               e.position.x,
               e.position.y,
               e.target.x,
               e.target.y
             ) < this.moveTargetDistance
-              ? ((e.target = {
-                  x: Math.random() * P.x,
-                  y: Math.random() * P.y,
-                }),
-                (e.maxSpeed = this.maxRunSpeed))
-              : this.updateDogSpeed(e, t);
+          ) {
+            e.target = {
+              x: Math.random() * P.x,
+              y: Math.random() * P.y,
+            };
+
+            e.maxSpeed = this.maxRunSpeed;
+          } else {
+            this.updateDogSpeed(e, t);
+          }
+        }
       }
     }
   }
+
   class we extends ve {
-    constructor() {
-      super(...arguments),
-        (this.minigun = false),
-        (this.rocketlauncher = false),
-        (this.attackingGraveyard = false),
-        (this.shotsLeft = 0),
-        (this.shotTimer = 0);
+    constructor(...args) {
+      super(...args);
+      this.minigun = false;
+      this.rocketlauncher = false;
+      this.attackingGraveyard = false;
+      this.shotsLeft = 0;
+      this.shotTimer = 0;
     }
   }
-  !(function (e) {
-    (e[(e.shooting = 0)] = "shooting"),
-      (e[(e.attacking = 1)] = "attacking"),
-      (e[(e.walking = 2)] = "walking"),
-      (e[(e.running = 3)] = "running"),
-      (e[(e.standing = 4)] = "standing");
-  })(pe || (pe = {}));
+
+  enum armyState {
+    "shooting",
+    "attacking",
+    "walking",
+    "running",
+    "standing",
+  }
   class Army {
     constructor() {
       if (
@@ -7478,7 +8041,7 @@ var Incremancer;
           (e.target = false),
           (e.zombieTarget = null),
           (e.graveYardTarget = null),
-          (e.armyState = pe.standing),
+          (e.armyState = armyState.standing),
           (e.attackingGraveyard = false),
           e.scale.set(
             Math.random() > 0.5 ? this.scaling : -1 * this.scaling,
@@ -7514,29 +8077,29 @@ var Incremancer;
           e.target.y
         );
         if (s > this.shootDistance && !e.rocketlauncher)
-          return void this.changeState(e, pe.running);
+          return void this.changeState(e, armyState.running);
         if (s > 1.2 * this.shootDistance && e.rocketlauncher)
-          return void this.changeState(e, pe.running);
+          return void this.changeState(e, armyState.running);
         if (s < this.attackDistance && !e.graveYardTarget)
-          return void this.changeState(e, pe.attacking);
-        this.changeState(e, pe.shooting);
+          return void this.changeState(e, armyState.attacking);
+        this.changeState(e, armyState.shooting);
       }
     }
     changeState(e, t) {
       switch (t) {
-        case pe.standing:
+        case armyState.standing:
           e.gotoAndStop(0);
           break;
-        case pe.walking:
+        case armyState.walking:
           e.play(), (e.maxSpeed = this.maxWalkSpeed);
           break;
-        case pe.running:
+        case armyState.running:
           e.play(), (e.maxSpeed = this.maxRunSpeed);
           break;
-        case pe.shooting:
+        case armyState.shooting:
           e.gotoAndStop(0);
           break;
-        case pe.attacking:
+        case armyState.attacking:
           e.play();
       }
       e.armyState = t;
@@ -7564,13 +8127,13 @@ var Incremancer;
         this.decideStateOnZombieDistance(e),
         e.armyState)
       ) {
-        case pe.standing:
+        case armyState.standing:
           (e.timer.standing -= t),
             e.timer.standing < 0 &&
               (this.humans.assignRandomTarget(e),
-              this.changeState(e, pe.walking));
+              this.changeState(e, armyState.walking));
           break;
-        case pe.walking:
+        case armyState.walking:
           weighted_hybrid_distance(
             e.position.x,
             e.position.y,
@@ -7580,19 +8143,19 @@ var Incremancer;
             ? ((e.target = null),
               (e.zombieTarget = null),
               (e.timer.standing = this.humans.randomSecondsToStand()),
-              this.changeState(e, pe.standing))
+              this.changeState(e, armyState.standing))
             : this.humans.updateHumanSpeed(e, t);
           break;
-        case pe.running:
+        case armyState.running:
           e.graveYardTarget || (e.zombieTarget && !e.zombieTarget.flags.dead)
             ? ((e.target =
                 null !== (a = e.graveYardTarget) && void 0 !== a
                   ? a
                   : e.zombieTarget),
               this.humans.updateHumanSpeed(e, t))
-            : this.changeState(e, pe.standing);
+            : this.changeState(e, armyState.standing);
           break;
-        case pe.attacking:
+        case armyState.attacking:
           e.zombieTarget && !e.zombieTarget.flags.dead
             ? ((e.scale.x =
                 e.zombieTarget.x > e.x ? this.scaling : -this.scaling),
@@ -7603,9 +8166,9 @@ var Incremancer;
                   e
                 ),
                 (e.timer.attack = this.attackSpeed)))
-            : this.changeState(e, pe.standing);
+            : this.changeState(e, armyState.standing);
           break;
-        case pe.shooting:
+        case armyState.shooting:
           e.graveYardTarget || (e.zombieTarget && !e.zombieTarget.flags.dead)
             ? ((e.target =
                 null !== (r = e.graveYardTarget) && void 0 !== r
@@ -7637,7 +8200,7 @@ var Incremancer;
                     e.rocketlauncher
                   ),
                   e.shotsLeft--)))
-            : this.changeState(e, pe.standing);
+            : this.changeState(e, armyState.standing);
       }
     }
     callDroneStrike(e, t) {
@@ -7742,19 +8305,21 @@ var Incremancer;
     }
   }
   class Ce extends ve {
-    constructor() {
-      super(...arguments), (this.attackingGraveyard = false);
+    constructor(...args) {
+      super(...args);
+      this.attackingGraveyard = false;
     }
   }
-  !(function (e) {
-    (e[(e.shooting = 0)] = "shooting"),
-      (e[(e.attacking = 1)] = "attacking"),
-      (e[(e.patrolling = 2)] = "patrolling");
-  })(ge || (ge = {})),
-    (function (e) {
-      (e[(e.horizontal = 0)] = "horizontal"),
-        (e[(e.vertical = 1)] = "vertical");
-    })(me || (me = {}));
+
+  enum tankState {
+    shooting,
+    attacking,
+    patrolling,
+  }
+  enum currentDirection {
+    horizontal,
+    vertical,
+  }
   class De {
     constructor() {
       if (
@@ -7826,7 +8391,7 @@ var Incremancer;
           e.play(),
           (e.turretSprite.x = 0),
           (e.turretSprite.y = -7),
-          (e.currentDirection = me.horizontal),
+          (e.currentDirection = currentDirection.horizontal),
           (e.currentPoi = this.map.getRandomBuilding()),
           e.position.copyFrom(this.map.randomPositionInBuilding(e.currentPoi)),
           (e.zIndex = e.position.y),
@@ -7849,7 +8414,7 @@ var Incremancer;
           (e.zombieTarget = null),
           (e.graveYardTarget = null),
           (e.attackingGraveyard = false),
-          (e.tankState = ge.patrolling),
+          (e.tankState = tankState.patrolling),
           (e.timer.attack = this.attackSpeed),
           e.scale.set(this.scaling, this.scaling),
           this.tanks.push(e),
@@ -7883,7 +8448,7 @@ var Incremancer;
         this.decideStateOnZombieDistance(e),
         e.tankState)
       ) {
-        case ge.patrolling:
+        case tankState.patrolling:
           e.target || (e.target = this.map.randomPositionInBuilding(null)),
             weighted_hybrid_distance(
               e.position.x,
@@ -7894,15 +8459,15 @@ var Incremancer;
               ? ((e.target = false), (e.zombieTarget = null))
               : this.humans.updateHumanSpeed(e, t);
           break;
-        case ge.attacking:
+        case tankState.attacking:
           e.attackingGraveyard
             ? ((e.target = e.graveYardTarget),
               this.humans.updateHumanSpeed(e, t))
             : e.zombieTarget && !e.zombieTarget.flags.dead
             ? this.humans.updateHumanSpeed(e, t)
-            : this.changeState(e, ge.patrolling);
+            : this.changeState(e, tankState.patrolling);
           break;
-        case ge.shooting:
+        case tankState.shooting:
           e.graveYardTarget || (e.zombieTarget && !e.zombieTarget.flags.dead)
             ? e.timer.attack < 0 &&
               ((e.timer.attack = this.attackSpeed),
@@ -7913,7 +8478,7 @@ var Incremancer;
                 false,
                 true
               ))
-            : this.changeState(e, ge.patrolling);
+            : this.changeState(e, tankState.patrolling);
       }
       this.updateTankSprites(e, t);
     }
@@ -7921,13 +8486,13 @@ var Incremancer;
       var s;
       if (
         (Math.abs(e.xSpeed) > Math.abs(e.ySpeed)
-          ? e.currentDirection != me.horizontal &&
-            ((e.currentDirection = me.horizontal),
+          ? e.currentDirection != currentDirection.horizontal &&
+            ((e.currentDirection = currentDirection.horizontal),
             (e.textures = this.textures.horizontal),
             e.play(),
             (e.turretSprite.y = -7))
-          : e.currentDirection != me.vertical &&
-            ((e.currentDirection = me.vertical),
+          : e.currentDirection != currentDirection.vertical &&
+            ((e.currentDirection = currentDirection.vertical),
             (e.textures = this.textures.vertical),
             e.play(),
             (e.turretSprite.y = -8)),
@@ -7956,17 +8521,17 @@ var Incremancer;
             e.target.y
           ) > this.shootDistance)
         )
-          return void this.changeState(e, ge.attacking);
-        this.changeState(e, ge.shooting);
+          return void this.changeState(e, tankState.attacking);
+        this.changeState(e, tankState.shooting);
       }
     }
     changeState(e, t) {
       switch (t) {
-        case ge.patrolling:
-        case ge.attacking:
+        case tankState.patrolling:
+        case tankState.attacking:
           e.play();
           break;
-        case ge.shooting:
+        case tankState.shooting:
           e.gotoAndStop(0);
       }
       e.tankState = t;
