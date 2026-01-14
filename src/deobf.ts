@@ -1,4 +1,4 @@
-import { default as PIXI } from "pixi.js";
+import * as PIXI from "pixi.js-legacy";
 import LZString from "lz-string";
 import angular from "angular";
 import { kongregateAPI, PlayFab, PlayFabClientSDK } from "./lib/shim"; // until full removal of kong dependency
@@ -11,7 +11,7 @@ var Incremancer;
    *
    * Desmos: \sqrt{a^{2}+b^{2}}
    */
-  function pythag(a: number, b: number): number {
+  function magnitude(a: number, b: number): number {
     return Math.sqrt(a * a + b * b);
   }
 
@@ -29,7 +29,7 @@ var Incremancer;
   /**
    * Uses mixture of manhattan and euclidian distance for pathfinding
    */
-  function weighted_hybrid_distance(
+  function fastDistance(
     x1: number,
     y1: number,
     x2: number,
@@ -123,13 +123,13 @@ var Incremancer;
         value: true,
       });
   })(e);
-  let v;
-  let S;
-  let M;
-  let k;
-  let w;
-  let T;
-  let C;
+  let gameModel;
+  let particles;
+  let graveyard;
+  let creatures;
+  let skeleton;
+  let zombies;
+  let humans;
 
   let D = {
     x: 800,
@@ -162,10 +162,10 @@ var Incremancer;
   let B = 0;
   let R = 0;
   function H(e) {
-    if (T.zombieCursor) {
-      T.zombieCursor.position = e.data.getLocalPosition(this.parent);
+    if (zombies.zombieCursor) {
+      zombies.zombieCursor.position = e.data.getLocalPosition(this.parent);
       const t = e.data.getLocalPosition(x);
-      T.mouseOutOfBounds =
+      zombies.mouseOutOfBounds =
         t.x < 0 || t.y < 0 || t.x > x.width || t.y > x.height;
     }
     if (
@@ -222,14 +222,14 @@ var Incremancer;
   }
 
   function E(e) {
-    if (!this.hasMoved && v.currentState == v.states.playingLevel) {
+    if (!this.hasMoved && gameModel.currentState == gameModel.states.playingLevel) {
       if (Y.shift) {
-        T.spawnAllZombies(
+        zombies.spawnAllZombies(
           e.data.getLocalPosition(this).x,
           e.data.getLocalPosition(this).y
         );
       } else {
-        T.spawnZombie(
+        zombies.spawnZombie(
           e.data.getLocalPosition(this).x,
           e.data.getLocalPosition(this).y
         );
@@ -279,17 +279,17 @@ var Incremancer;
       if (s.scale.x < 10) {
         s.scale.x = s.scale.y = 1.1 * s.scale.x;
 
-        if (T.zombieCursor && T.zombieCursor.scale) {
-          T.zombieCursor.scale.x = T.zombieCursor.scale.y =
-            1.1 * T.zombieCursor.scale.x;
+        if (zombies.zombieCursor && zombies.zombieCursor.scale) {
+          zombies.zombieCursor.scale.x = zombies.zombieCursor.scale.y =
+            1.1 * zombies.zombieCursor.scale.x;
         }
       }
     } else if (Math.max(i, a) > 0.8 * Math.min(D.y, D.x)) {
       s.scale.x = s.scale.y = 0.9 * s.scale.x;
 
-      if (T.zombieCursor && T.zombieCursor.scale) {
-        T.zombieCursor.scale.x = T.zombieCursor.scale.y =
-          0.9 * T.zombieCursor.scale.x;
+      if (zombies.zombieCursor && zombies.zombieCursor.scale) {
+        zombies.zombieCursor.scale.x = zombies.zombieCursor.scale.y =
+          0.9 * zombies.zombieCursor.scale.x;
       }
     }
 
@@ -316,9 +316,9 @@ var Incremancer;
       c.scale.x = D.defaultScale;
       c.scale.y = D.defaultScale;
 
-      if (T.zombieCursor) {
-        T.zombieCursor.scale.x = T.zombieCursor.scale.y =
-          T.zombieCursorScale * D.defaultScale;
+      if (zombies.zombieCursor) {
+        zombies.zombieCursor.scale.x = zombies.zombieCursor.scale.y =
+          zombies.zombieCursorScale * D.defaultScale;
       }
     }
 
@@ -379,17 +379,17 @@ var Incremancer;
     }
 
     G.update();
-    e *= v.gameSpeed;
-    M.update(e);
-    C.update(e);
-    T.update(e);
-    k.update(e);
-    w.update(e);
-    S.update(e);
+    e *= gameModel.gameSpeed;
+    graveyard.update(e);
+    humans.update(e);
+    zombies.update(e);
+    creatures.update(e);
+    skeleton.update(e);
+    particles.update(e);
 
     (function (e, t) {
       if (
-        (C.vipEscaping && void 0 !== C.vip
+        (humans.vipEscaping && void 0 !== humans.vip
           ? (y.alpha += e)
           : ((y.alpha -= e), y.alpha < 0 && (y.alpha = 0)),
         y.alpha > 0)
@@ -403,7 +403,7 @@ var Incremancer;
           i = c.x,
           a = c.y;
         c.position.set(0, 0),
-          C.vip && ((X.tx = -2 * C.vip.x + 150), (X.ty = -2 * C.vip.y + 150)),
+          humans.vip && ((X.tx = -2 * humans.vip.x + 150), (X.ty = -2 * humans.vip.y + 150)),
           c.scale.set(2, 2),
           t.renderer.render(c, f, void 0, X),
           c.scale.set(e, s),
@@ -413,7 +413,7 @@ var Incremancer;
   }
 
   function N() {
-    const e = Math.min(500 + 50 * v.level, 1500);
+    const e = Math.min(500 + 50 * gameModel.level, 1500);
     const t = (Math.random() * e) / 3;
 
     P = {
@@ -441,134 +441,155 @@ var Incremancer;
     Y.scrollSpeed = Math.max(e, t) / 4;
   }
 
-  new Map(),
-    (window.onload = function () {
-      (v = GameModel.getInstance()),
-        (S = new Particles()),
-        (M = new Graveyard()),
-        (k = new Creatures()),
-        (w = new Skeleton()),
-        (T = new Zombies()),
-        (C = new Humans()),
-        v.loadData(),
-        v.onReady(),
-        O(),
-        (function () {
-          PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
-          const e = new PIXI.Application({
-            width: D.x,
-            height: D.y,
-            backgroundColor: 1066256,
-            resolution: v.persistentData.resolution || 1,
-            antialias: false,
-            resizeTo: window,
-          });
-          document.body.appendChild(e.view),
-            PIXI.utils.isWebGLSupported() ||
-              console.error(
-                "Warning: WebGL support not detected. Game performance may be slower."
-              ),
-            (function (e) {
-              (c = new PIXI.Container()),
-                (u = new PIXI.Container()),
-                (p = new PIXI.Container()),
-                (g = new PIXI.Container()),
-                (g.sortableChildren = true),
-                (b = new PIXI.Container()),
-                (m = new PIXI.Container()),
-                (f = PIXI.RenderTexture.create({
-                  width: 300,
-                  height: 300,
-                })),
-                (y = new PIXI.Sprite(f)),
-                (y.visible = false),
-                (y.alpha = 0),
-                m.addChild(y),
-                c.addChild(u),
-                c.addChild(p),
-                c.addChild(g),
-                c.addChild(b),
-                e.stage.addChild(c),
-                e.stage.addChild(m),
-                (c.interactive = true),
-                (c.interactiveChildren = false),
-                c.on("pointerdown", z),
-                c.on("pointerup", I),
-                c.on("pointerupoutside", I),
-                c.on("pointermove", H),
-                c.on("click", E),
-                c.on("tap", E),
-                (document.getElementsByTagName("canvas")[0].onwheel = L),
-                (document.getElementsByTagName("canvas")[0].oncontextmenu =
-                  function (e) {
-                    e.preventDefault();
-                  });
-            })(e),
-            e.loader
-              .add("sprites/ground.json")
-              .add("sprites/megagraveyard.png")
-              .add("sprites/graveyard.json")
-              .add("sprites/buildings.json")
-              .add("sprites/humans.json")
-              .add("sprites/cop.json")
-              .add("sprites/dogs.json")
-              .add("sprites/army.json")
-              .add("sprites/doctor.json")
-              .add("sprites/zombie.json")
-              .add("sprites/golem.json")
-              .add("sprites/bonecollector.json")
-              .add("sprites/harpy.json")
-              .add("sprites/objects2.json")
-              .add("sprites/fenceposts.json")
-              .add("sprites/trees2.json")
-              .add("sprites/fortress.json")
-              .add("sprites/tank.json")
-              .add("sprites/skeleton.json")
-              .load(function () {
-                (v.app = e),
-                  N(),
-                  (x = new PIXI.TilingSprite(PIXI.Texture.from("grass.png"))),
-                  (x.texture.baseTexture.mipmap = PIXI.MIPMAP_MODES.OFF),
-                  (x.width = P.x),
-                  (x.height = P.y),
-                  u.addChild(x),
-                  v.setupLevel(),
-                  setTimeout(function () {
-                    centerGameContainer(true);
-                  }),
-                  e.ticker.add((t) => {
-                    U(e.ticker.deltaMS / 1e3, e), (v.frameRate = e.ticker.FPS);
-                  });
-              });
-        })(),
-        /* prevent hotlinking, if iframe & not kong or gti ? rickroll*/
-        window.self !== window.top &&
-          ("" != document.referrer &&
-          -1 == document.referrer.indexOf("kongregate.com") &&
-          -1 == document.referrer.indexOf("konggames.com") &&
-          -1 == document.referrer.indexOf("gti.nz")
-            ? (window.location.href =
-                "https://www.youtube.com/watch?v=dQw4w9WgXcQ")
-            : (-1 === document.referrer.indexOf("kongregate.com") &&
-                -1 === document.referrer.indexOf("konggames.com")) ||
-              kongregateAPI.loadAPI(function () {
-                (window.kongregate = kongregateAPI.getAPI()),
-                  (v.kongregate = true),
-                  v.loginInUsingPlayFab();
-              })),
-        document.addEventListener(
-          "visibilitychange",
-          function () {
-            "hidden" == document.visibilityState
-              ? (v.hidden = true)
-              : (v.hidden = false);
-          },
-          false
-        );
-    }),
-    (window.onresize = function () {
-      O();
+  new Map(); // used before declar but still works??
+
+window.onload = () => {
+  gameModel = GameModel.getInstance();
+  particles = new Particles();
+  graveyard = new Graveyard();
+  creatures = new Creatures();
+  skeleton = new Skeleton();
+  zombies = new Zombies();
+  humans = new Humans();
+  gameModel.loadData();
+  gameModel.onReady();
+  O();
+
+  (() => {
+    PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
+    const e = new PIXI.Application({
+      width: D.x,
+      height: D.y,
+      backgroundColor: 1066256,
+      resolution: gameModel.persistentData.resolution || 1,
+      antialias: false,
+      resizeTo: window,
     });
+    document.body.appendChild(e.view);
+
+    if (!PIXI.utils.isWebGLSupported()) {
+      console.error(
+        "Warning: WebGL support not detected. Game performance may be slower."
+      );
+    }
+
+    ((e) => {
+      c = new PIXI.Container();
+      u = new PIXI.Container();
+      p = new PIXI.Container();
+      g = new PIXI.Container();
+      g.sortableChildren = true;
+      b = new PIXI.Container();
+      m = new PIXI.Container();
+
+      f = PIXI.RenderTexture.create({
+        width: 300,
+        height: 300,
+      });
+
+      y = new PIXI.Sprite(f);
+      y.visible = false;
+      y.alpha = 0;
+      m.addChild(y);
+      c.addChild(u);
+      c.addChild(p);
+      c.addChild(g);
+      c.addChild(b);
+      e.stage.addChild(c);
+      e.stage.addChild(m);
+      c.interactive = true;
+      c.interactiveChildren = false;
+      c.on("pointerdown", z);
+      c.on("pointerup", I);
+      c.on("pointerupoutside", I);
+      c.on("pointermove", H);
+      c.on("click", E);
+      c.on("tap", E);
+      document.getElementsByTagName("canvas")[0].onwheel = L;
+
+      document.getElementsByTagName("canvas")[0].oncontextmenu = (e) => {
+        e.preventDefault();
+      };
+    })(e);
+
+    e.loader
+      .add("sprites/ground.json")
+      .add("sprites/megagraveyard.png")
+      .add("sprites/graveyard.json")
+      .add("sprites/buildings.json")
+      .add("sprites/humans.json")
+      .add("sprites/cop.json")
+      .add("sprites/dogs.json")
+      .add("sprites/army.json")
+      .add("sprites/doctor.json")
+      .add("sprites/zombie.json")
+      .add("sprites/golem.json")
+      .add("sprites/bonecollector.json")
+      .add("sprites/harpy.json")
+      .add("sprites/objects2.json")
+      .add("sprites/fenceposts.json")
+      .add("sprites/trees2.json")
+      .add("sprites/fortress.json")
+      .add("sprites/tank.json")
+      .add("sprites/skeleton.json")
+      .load(() => {
+        gameModel.app = e;
+        N();
+        x = new PIXI.TilingSprite(PIXI.Texture.from("grass.png"));
+        x.texture.baseTexture.mipmap = PIXI.MIPMAP_MODES.OFF;
+        x.width = P.x;
+        x.height = P.y;
+        u.addChild(x);
+        gameModel.setupLevel();
+
+        setTimeout(() => {
+          centerGameContainer(true);
+        });
+
+        e.ticker.add((t) => {
+          U(e.ticker.deltaMS / 1000 /* 1e3 */, e);
+          gameModel.frameRate = e.ticker.FPS;
+        });
+      });
+  })();
+
+  if (window.self !== window.top) {
+    if (
+      document.referrer != "" &&
+      !document.referrer.includes("kongregate.com") &&
+      !document.referrer.includes("konggames.com") &&
+      !document.referrer.includes("gti.nz")
+    ) {
+      window.location.href = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+    } else if (
+      document.referrer.includes("kongregate.com") ||
+      document.referrer.includes("konggames.com")
+    ) {
+      kongregateAPI.loadAPI(() => {
+        window.kongregate = kongregateAPI.getAPI();
+        gameModel.kongregate = true;
+        gameModel.loginInUsingPlayFab();
+      });
+    }
+  }
+
+  document.addEventListener(
+    "visibilitychange",
+    () => {
+      if (document.visibilityState == "hidden") {
+        gameModel.hidden = true;
+      } else {
+        gameModel.hidden = false;
+      }
+    },
+    false
+  );
+};
+
+window.onresize = () => {
+  O();
+};
+
   const Y = {
     scrollSpeed: 200,
     w: false,
@@ -679,10 +700,14 @@ var Incremancer;
     }
   }
   class Spells {
-    spells: Spell[];
     cooldownReduction: number;
     timeExtension: number;
     costReduction: number;
+    skeleton: Skeleton;
+    zombies: Zombies;
+    humans: Humans;
+    spellMap: Map<number, Spell>
+    spells: Spell[];
 
     constructor() {
       this.cooldownReduction = 0;
@@ -1009,8 +1034,8 @@ var Incremancer;
     }
   }
 
-  class ee {
-    instance: ee;
+  class Map {
+    instance: Map;
 
     constructor() {
       this.gameModel = GameModel.getInstance();
@@ -1035,7 +1060,7 @@ var Incremancer;
       };
       this.graveYardPosition = null;
       this.wallCollisionBuffer = 3;
-      this.fastDistance = weighted_hybrid_distance;
+      this.fastDistance = fastDistance;
       this.pathFindStepSize = 5;
       this.dx = 0;
       this.dy = 0;
@@ -1049,10 +1074,10 @@ var Incremancer;
       this.treeTextures = [];
       this.armyTextures = [];
 
-      if (ee.instance) {
-        return ee.instance;
+      if (Map.instance) {
+        return Map.instance;
       }
-      ee.instance = this;
+      Map.instance = this;
     }
     getRandomBuilding() {
       return sample(this.buildingsByPopularity);
@@ -1228,7 +1253,7 @@ var Incremancer;
       };
       let h = 2000; /* 2e3 */
       for (let e = 0; e < r.length; e++) {
-        const t = weighted_hybrid_distance(r[e].x, r[e].y, o.x, o.y);
+        const t = fastDistance(r[e].x, r[e].y, o.x, o.y);
 
         if (t < h) {
           h = t;
@@ -6660,7 +6685,7 @@ var Incremancer;
       this.healTickTimer = 5;
       this.burnTickTimer = 5;
       this.smokeTimer = 0.3;
-      this.fastDistance = weighted_hybrid_distance;
+      this.fastDistance = fastDistance;
       this.frozen = false;
       this.pandemic = false;
       this.graveYardPosition = null;
@@ -6865,18 +6890,18 @@ var Incremancer;
       this.vipText.y = e.y + this.vipText.yOffset;
     }
     populate() {
-      this.map = new ee();
+      this.map = new Map();
       this.zombies = new Zombies();
       this.gameModel = GameModel.getInstance();
-      this.blood = new _e();
-      this.smoke = new ot();
+      this.blood = new Blood();
+      this.smoke = new Smoke();
       this.bones = new Bones();
       this.skeleton = new Skeleton();
-      this.blasts = new nt();
+      this.blasts = new Blasts();
       this.fragments = new lt();
       this.trophies = new Trophies();
-      this.exclamations = new it();
-      this.bullets = new rt();
+      this.exclamations = new Exclamations();
+      this.bullets = new Bullets();
       this.police = new Police();
       this.army = new Army();
       this.tanks = new De();
@@ -7435,12 +7460,12 @@ var Incremancer;
       this.attackDamage = Math.round(this.getMaxHealth() / 10);
     }
     populate() {
-      this.map = new ee();
+      this.map = new Map();
       this.gameModel = GameModel.getInstance();
       this.humans = new Humans();
-      this.exclamations = new it();
+      this.exclamations = new Exclamations();
       this.zombies = new Zombies();
-      this.bullets = new rt();
+      this.bullets = new Bullets();
 
       if (this.walkTexture.length == 0) {
         for (let e = 0; e < 3; e++) {
@@ -7596,7 +7621,7 @@ var Incremancer;
     decideStateOnZombieDistance(e) {
       if (e.zombieTarget && !e.zombieTarget.flags.dead) {
         e.target = e.zombieTarget;
-        const t = weighted_hybrid_distance(
+        const t = fastDistance(
           e.position.x,
           e.position.y,
           e.zombieTarget.x,
@@ -7647,7 +7672,7 @@ var Incremancer;
           (!this.police[a].zombieTarget ||
             this.police[a].zombieTarget.flags.dead)
         ) {
-          const r = weighted_hybrid_distance(
+          const r = fastDistance(
             e.x,
             e.y,
             this.police[a].x,
@@ -7708,7 +7733,7 @@ var Incremancer;
         }
         case policeState.walking: {
           if (
-            weighted_hybrid_distance(
+            fastDistance(
               e.position.x,
               e.position.y,
               e.target.x,
@@ -7802,7 +7827,7 @@ var Incremancer;
           e.target = e.owner;
 
           if (
-            weighted_hybrid_distance(
+            fastDistance(
               e.position.x,
               e.position.y,
               e.target.x,
@@ -7825,7 +7850,7 @@ var Incremancer;
         case policeState.attacking: {
           if (e.zombieTarget && !e.zombieTarget.flags.dead) {
             if (
-              weighted_hybrid_distance(
+              fastDistance(
                 e.position.x,
                 e.position.y,
                 e.zombieTarget.x,
@@ -7862,7 +7887,7 @@ var Incremancer;
           }
 
           if (
-            weighted_hybrid_distance(
+            fastDistance(
               e.position.x,
               e.position.y,
               e.target.x,
@@ -7954,15 +7979,15 @@ var Incremancer;
       this.attackDamage = Math.round(this.getMaxHealth() / 10);
     }
     populate() {
-      this.map = new ee();
+      this.map = new Map();
       this.zombies = new Zombies();
       this.humans = new Humans();
       this.gameModel = GameModel.getInstance();
       this.graveyard = new Graveyard();
-      this.bullets = new rt();
+      this.bullets = new Bullets();
       this.assaultStarted = false;
-      this.blasts = new nt();
-      this.exclamations = new it();
+      this.blasts = new Blasts();
+      this.exclamations = new Exclamations();
 
       if (this.textures.length == 0) {
         for (let e = 0; e < 3; e++) {
@@ -8093,7 +8118,7 @@ var Incremancer;
     decideStateOnZombieDistance(e) {
       if (e.graveYardTarget || (e.zombieTarget && !e.zombieTarget.flags.dead)) {
         e.target = e.graveYardTarget ?? e.zombieTarget;
-        const s = weighted_hybrid_distance(
+        const s = fastDistance(
           e.position.x,
           e.position.y,
           e.target.x,
@@ -8186,7 +8211,7 @@ var Incremancer;
         }
         case armyState.walking: {
           if (
-            weighted_hybrid_distance(
+            fastDistance(
               e.position.x,
               e.position.y,
               e.target.x,
@@ -8469,13 +8494,13 @@ var Incremancer;
       this.attackDamage = Math.round(this.getMaxHealth() / 10);
     }
     populate() {
-      this.map = new ee();
+      this.map = new Map();
       this.gameModel = GameModel.getInstance();
       this.zombies = new Zombies();
       this.humans = new Humans();
       this.army = new Army();
       this.graveyard = new Graveyard();
-      this.bullets = new rt();
+      this.bullets = new Bullets();
 
       if (!this.textures) {
         this.textures = {
@@ -8595,7 +8620,7 @@ var Incremancer;
           }
 
           if (
-            weighted_hybrid_distance(
+            fastDistance(
               e.position.x,
               e.position.y,
               e.target.x,
@@ -8677,7 +8702,7 @@ var Incremancer;
         e.target = e.graveYardTarget ?? e.zombieTarget;
 
         if (
-          weighted_hybrid_distance(
+          fastDistance(
             e.position.x,
             e.position.y,
             e.target.x,
@@ -8843,8 +8868,8 @@ var Incremancer;
       this.gigamutagen = 0;
       this.gigamutationTimer = 10;
       this.smokeTimer = 0.3;
-      this.fastDistance = weighted_hybrid_distance;
-      this.magnitude = pythag;
+      this.fastDistance = fastDistance;
+      this.magnitude = magnitude;
       this.detonate = false;
       this.super = false;
       this.reactionTime = 0;
@@ -8858,17 +8883,17 @@ var Incremancer;
       Zombies.instance = this;
     }
     populate() {
-      this.map = new ee();
+      this.map = new Map();
       this.model = GameModel.getInstance();
       this.humans = new Humans();
       this.graveyard = new Graveyard();
       this.creatureFactory = new CreatureFactory();
-      this.smoke = new ot();
-      this.blood = new _e();
+      this.smoke = new Smoke();
+      this.blood = new Blood();
       this.bones = new Bones();
-      this.exclamations = new it();
-      this.blasts = new nt();
-      this.bullets = new rt();
+      this.exclamations = new Exclamations();
+      this.blasts = new Blasts();
+      this.bullets = new Bullets();
       this.model.zombieCount = 0;
 
       if (this.textures.length == 0) {
@@ -9707,8 +9732,8 @@ var Incremancer;
 
       this.burnTickTimer = 5;
       this.smokeTimer = 0.3;
-      this.fastDistance = weighted_hybrid_distance;
-      this.magnitude = pythag;
+      this.fastDistance = fastDistance;
+      this.magnitude = magnitude;
       this.damageZombie = null;
       this.searchClosestTarget = null;
       this.updateBurns = null;
@@ -9937,20 +9962,20 @@ var Incremancer;
     }
     populate() {
       this.model = GameModel.getInstance();
-      this.map = new ee();
+      this.map = new Map();
       this.graveyard = new Graveyard();
-      this.exclamations = new it();
-      this.bullets = new rt();
+      this.exclamations = new Exclamations();
+      this.bullets = new Bullets();
       this.spells = new Spells();
-      this.smoke = new ot();
+      this.smoke = new Smoke();
       this.upgrades = new Upgrades();
       this.humans = new Humans();
       this.zombies = new Zombies();
       this.prestigePoints = new Je();
       this.partFactory = new PartFactory();
       this.bones = new Bones();
-      this.blasts = new nt();
-      this.blood = new _e();
+      this.blasts = new Blasts();
+      this.blood = new Blood();
       this.damageZombie = this.zombies.damageZombie;
       this.searchClosestTarget = this.zombies.searchClosestTarget;
       this.updateBurns = this.zombies.updateBurns;
@@ -10846,8 +10871,8 @@ var Incremancer;
 
       this.burnTickTimer = 5;
       this.smokeTimer = 0.3;
-      this.fastDistance = weighted_hybrid_distance;
-      this.magnitude = pythag;
+      this.fastDistance = fastDistance;
+      this.magnitude = magnitude;
       this.damageZombie = this.zombies.damageZombie;
       this.searchClosestTarget = this.zombies.searchClosestTarget;
       this.updateBurns = this.zombies.updateBurns;
@@ -10864,16 +10889,16 @@ var Incremancer;
       Creatures.instance = this;
     }
     populate() {
-      this.map = new ee();
+      this.map = new Map();
       this.model = GameModel.getInstance();
       this.graveyard = new Graveyard();
-      this.smoke = new ot();
-      this.bullets = new rt();
+      this.smoke = new Smoke();
+      this.bullets = new Bullets();
       this.humans = new Humans();
-      this.exclamations = new it();
-      this.blood = new _e();
+      this.exclamations = new Exclamations();
+      this.blood = new Blood();
       this.bones = new Bones();
-      this.blasts = new nt();
+      this.blasts = new Blasts();
 
       if (!this.golemTextures.set) {
         this.golemTextures.down = [];
@@ -11288,7 +11313,7 @@ var Incremancer;
       this.level = 1;
       this.spikeTimer = 5;
       this.fenceRadius = 50;
-      this.fastDistance = weighted_hybrid_distance;
+      this.fastDistance = fastDistance;
       this.graveyardHealth = 0;
       this.graveyardMaxHealth = 0;
 
@@ -11310,13 +11335,13 @@ var Incremancer;
     }
     initialize() {
       this.boneCollectors = new BoneCollectors();
-      this.zmMap = new ee();
+      this.zmMap = new Map();
       this.zombies = new Zombies();
       this.bones = new Bones();
       this.gameModel = GameModel.getInstance();
-      this.smoke = new ot();
+      this.smoke = new Smoke();
       this.harpies = new Ke();
-      this.blood = new _e();
+      this.blood = new Blood();
       this.humans = new Humans();
 
       if (this.gameModel.persistentData.graveyardZombies === undefined) {
@@ -11696,7 +11721,7 @@ var Incremancer;
       this.maxSpeed = 125;
       this.scaling = 2;
       this.collectDistance = 10;
-      this.fastDistance = weighted_hybrid_distance;
+      this.fastDistance = fastDistance;
 
       if (BoneCollectors.instance) {
         return BoneCollectors.instance;
@@ -11933,7 +11958,7 @@ var Incremancer;
       this.discardedBombSprites = [];
       this.bombHeight = 100;
       this.scaling = 2.5;
-      this.fastDistance = weighted_hybrid_distance;
+      this.fastDistance = fastDistance;
 
       if (Ke.instance) {
         return Ke.instance;
@@ -12182,12 +12207,12 @@ var Incremancer;
 
   class Particles {
     constructor() {
-      this.blood = new _e();
-      this.smoke = new ot();
+      this.blood = new Blood();
+      this.smoke = new Smoke();
       this.prestigePoints = new Je();
-      this.bullets = new rt();
-      this.exclamations = new it();
-      this.blasts = new nt();
+      this.bullets = new Bullets();
+      this.exclamations = new Exclamations();
+      this.blasts = new Blasts();
       this.fragments = new lt();
 
       if (Particles.instance) {
@@ -12225,7 +12250,7 @@ var Incremancer;
   class Je extends _ {
     constructor() {
       super();
-      this.zmMap = new ee();
+      this.zmMap = new Map();
       this.speed = 20;
 
       if (Je.instance) {
@@ -12289,7 +12314,7 @@ var Incremancer;
       e.y += e.ySpeed * t;
 
       if (
-        weighted_hybrid_distance(e.x, e.y, s.x, s.y) < 30 &&
+        fastDistance(e.x, e.y, s.x, s.y) < 30 &&
         ((e.visible = false), (e.x = 100), (e.y = 100), this.animElement)
       ) {
         const e = this.animElement;
@@ -12314,7 +12339,7 @@ var Incremancer;
     }
   }
 
-  class _e {
+  class Blood {
     constructor() {
       this.maxParts = 500;
       this.partCounter = 0;
@@ -12328,11 +12353,11 @@ var Incremancer;
       this.visibleParts = 0;
       this.viewableArea = null;
 
-      if (_e.instance) {
-        return _e.instance;
+      if (Blood.instance) {
+        return Blood.instance;
       }
 
-      _e.instance = this;
+      Blood.instance = this;
     }
     getTexture(e) {
       const t = document.createElement("canvas");
@@ -12598,7 +12623,7 @@ var Incremancer;
     }
   }
 
-  class it {
+  class Exclamations {
     constructor() {
       this.sprites = [];
       this.discardedSprites = [];
@@ -12606,11 +12631,11 @@ var Incremancer;
       this.height = 20;
       this.fadeSpeed = 4;
 
-      if (it.instance) {
-        return it.instance;
+      if (Exclamations.instance) {
+        return Exclamations.instance;
       }
 
-      it.instance = this;
+      Exclamations.instance = this;
     }
     initialize() {
       if (!this.container) {
@@ -12717,7 +12742,7 @@ var Incremancer;
     }
   }
 
-  class rt {
+  class Bullets {
     constructor() {
       this.zombies = new Zombies();
       this.humans = new Humans();
@@ -12730,11 +12755,11 @@ var Incremancer;
       this.discardedSprites = [];
       this.fadeSpeed = 0.2;
 
-      if (rt.instance) {
-        return rt.instance;
+      if (Bullets.instance) {
+        return Bullets.instance;
       }
 
-      rt.instance = this;
+      Bullets.instance = this;
     }
     getTexture() {
       const e = document.createElement("canvas");
@@ -12801,7 +12826,7 @@ var Incremancer;
     }
     updatePart(e, t) {
       if (
-        weighted_hybrid_distance(e.x, e.y + 8, e.target.x, e.target.y) <
+        fastDistance(e.x, e.y + 8, e.target.x, e.target.y) <
         e.hitbox
       ) {
         if (e.plague) {
@@ -12916,16 +12941,16 @@ var Incremancer;
     }
   }
 
-  class nt extends _ {
+  class Blasts extends _ {
     constructor() {
       super();
       this.viewableArea = null;
 
-      if (nt.instance) {
-        return nt.instance;
+      if (Blasts.instance) {
+        return Blasts.instance;
       }
 
-      nt.instance = this;
+      Blasts.instance = this;
 
       this.create = (e) => new J(e);
     }
@@ -12980,7 +13005,7 @@ var Incremancer;
       s.scale.y = 2;
       s.x = e;
       s.y = t;
-      new ot().newCloud(e, t);
+      new Smoke().newCloud(e, t);
     }
     newZombieBlast(e, t) {
       if (this.viewableArea.hideParticle(e, t)) {
@@ -12993,7 +13018,7 @@ var Incremancer;
       s.scale.y = 2;
       s.x = e;
       s.y = t;
-      new ot().newCloud(e, t);
+      new Smoke().newCloud(e, t);
     }
     newDetonateBlast(e, t) {
       if (this.viewableArea.hideParticle(e, t)) {
@@ -13006,7 +13031,7 @@ var Incremancer;
       s.scale.y = 2.5;
       s.x = e;
       s.y = t;
-      new ot().newCloud(e, t);
+      new Smoke().newCloud(e, t);
     }
     newDroneBlast(e, t) {
       const s = this.getSprite();
@@ -13016,11 +13041,11 @@ var Incremancer;
       s.tint = 16777215;
       s.x = e;
       s.y = t;
-      new ot().newDroneCloud(e, t);
+      new Smoke().newDroneCloud(e, t);
     }
   }
 
-  class ot extends _ {
+  class Smoke extends _ {
     constructor() {
       super();
       this.tint = 16777215;
@@ -13029,11 +13054,11 @@ var Incremancer;
       this.gameModel = null;
       this.sizeVariance = 0.2;
 
-      if (ot.instance) {
-        return ot.instance;
+      if (Smoke.instance) {
+        return Smoke.instance;
       }
 
-      ot.instance = this;
+      Smoke.instance = this;
 
       this.create = (e) => new J(e);
     }
@@ -15338,3 +15363,7 @@ var Incremancer;
     ]);
   Incremancer = e;
 })();
+
+angular.element(document).ready(() => {
+  angular.bootstrap(document, ['incremancer']);
+});
