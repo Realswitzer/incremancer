@@ -1,4 +1,6 @@
 {
-    "compilerOptions": {"target": "esnext"},
+    "compilerOptions": {"target": "esnext", "moduleResolution": "bundler"},
     "typeAcquisition": {"include": ["esnext","dom"]}
+    ,
+    "include": ["src/**/*"]
 }

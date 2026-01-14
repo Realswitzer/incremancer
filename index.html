@@ -12,11 +12,13 @@
     <meta name="theme-color" content="#104510" />
     <meta charset="utf-8"/>
     <link rel="manifest" href="manifest.json">
-    <script src='https://download.playfab.com/PlayFabClientApi.js'></script>
-    <script src='https://www.kongregate.com/javascripts/kongregate_api.js'></script>
-    <script src="js/lz-string.min.js"></script>
+    <!-- keeping but will strip after removing kong entirely, see src/lib/shim.ts
+      <script src='https://download.playfab.com/PlayFabClientApi.js'></script>
+    <script src='https://www.kongregate.com/javascripts/kongregate_api.js'></script> -->
+    <!-- Disabling due to relying on npm packages.
+       <script src="js/lz-string.min.js"></script>
     <script src="js/pixi-legacy.min.js"></script>
-    <script src="js/angular.min.js"></script>
+    <script src="js/angular.min.js"></script> -->
     <script src="dist/bundle.js"></script>
     <link rel="stylesheet" type="text/css" href="zombiemancer.css">
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon"/>

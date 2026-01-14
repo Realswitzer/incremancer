@@ -1,6 +1,7 @@
-// import { default as PIXI } from "pixi.js";
-// import LZString from "lz-string";
-// import { angular } from "./lib/angular";
+import { default as PIXI } from "pixi.js";
+import LZString from "lz-string";
+import angular from "angular";
+import { kongregateAPI, PlayFab, PlayFabClientSDK } from "./lib/shim"; // until full removal of kong dependency
 
 var Incremancer;
 (() => {
@@ -540,6 +541,7 @@ var Incremancer;
                   });
               });
         })(),
+        /* prevent hotlinking, if iframe & not kong or gti ? rickroll*/
         window.self !== window.top &&
           ("" != document.referrer &&
           -1 == document.referrer.indexOf("kongregate.com") &&
@@ -678,6 +680,9 @@ var Incremancer;
   }
   class Spells {
     spells: Spell[];
+    cooldownReduction: number;
+    timeExtension: number;
+    costReduction: number;
 
     constructor() {
       this.cooldownReduction = 0;
@@ -13638,19 +13643,10 @@ var Incremancer;
 
         function u() {
           const e = new Date().getTime();
-
-          !(function (e, t) {
-            this.model.update(e, t);
-            this.updateMessages(e);
-
-            if (this.sidePanels.factory) {
-              this.factoryStats = factory.factoryStats();
-            }
-          })(
-            Math.min(1000 /* 1e3 */, Math.max(e - this.lastUpdate, 0)) /
-              1000 /* 1e3 */,
-            e
-          );
+          const c = Math.min(1000, Math.max(e - this.lastUpdate, 0)) / 1000;
+          if (this.sidePanels.factory) {
+            this.factoryStats = factory.factoryStats();
+          }
 
           this.lastUpdate = e;
         }
