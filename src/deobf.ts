@@ -1,6 +1,6 @@
-import { default as PIXI } from "pixi.js";
-import LZString from "lz-string";
-import { angular } from "./lib/angular";
+// import { default as PIXI } from "pixi.js";
+// import LZString from "lz-string";
+// import { angular } from "./lib/angular";
 
 var Incremancer;
 (() => {
