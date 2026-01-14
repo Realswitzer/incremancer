@@ -6572,23 +6572,13 @@ var Incremancer;
     }
   }
 
-  const ce = {
-    standing: 0,
-    walking: 1,
-    attacking: 2,
-    fleeing: 3,
-    escaping: 4,
-
-    // reverse mapping
-    0: "standing",
-
-    1: "walking",
-    2: "attacking",
-    3: "fleeing",
-    4: "escaping",
-  };
-
-  let be;
+  enum humanState {
+    standing,
+    walking,
+    attacking,
+    fleeing,
+    escaping,
+  }
 
   class fe extends PIXI.Text {
     constructor(...args) {
@@ -7000,7 +6990,7 @@ var Incremancer;
 
         e.timer.scan = Math.random() * this.scanTime;
         e.timer.flee = 0;
-        this.changeState(e, ce.standing);
+        this.changeState(e, humanState.standing);
         e.timer.standing = Math.random() * this.randomSecondsToStand();
         e.timer.attack = this.attackSpeed;
 
@@ -7103,18 +7093,18 @@ var Incremancer;
     }
     changeState(e, t) {
       switch (t) {
-        case ce.standing: {
+        case humanState.standing: {
           e.gotoAndStop(0);
           e.maxSpeed = this.maxWalkSpeed;
           e.timer.standing = this.randomSecondsToStand();
           break;
         }
-        case ce.walking: {
+        case humanState.walking: {
           e.play();
           e.maxSpeed = this.maxWalkSpeed;
           break;
         }
-        case ce.fleeing: {
+        case humanState.fleeing: {
           e.play();
           e.timer.flee = this.fleeTime;
           e.maxSpeed = this.maxRunSpeed;
@@ -7122,7 +7112,7 @@ var Incremancer;
           this.exclamations.newExclamation(e);
           break;
         }
-        case ce.escaping: {
+        case humanState.escaping: {
           e.play();
           e.maxSpeed = this.maxRunSpeed;
           e.target = this.escapeTarget;
@@ -7131,7 +7121,7 @@ var Incremancer;
           this.vipEscaping = true;
           break;
         }
-        case ce.attacking: {
+        case humanState.attacking: {
           e.play();
           e.maxSpeed = this.maxRunSpeed;
         }
@@ -7263,31 +7253,31 @@ var Incremancer;
 
         if (t > 0) {
           if (e.flags.vip) {
-            if (e.state !== ce.escaping) {
-              this.changeState(e, ce.escaping);
+            if (e.state !== humanState.escaping) {
+              this.changeState(e, humanState.escaping);
             }
           } else if (Math.random() < t * this.fleeChancePerZombie) {
-            this.changeState(e, ce.fleeing);
+            this.changeState(e, humanState.fleeing);
           } else {
             e.target = e.zombieTarget;
-            this.changeState(e, ce.attacking);
+            this.changeState(e, humanState.attacking);
           }
         }
       }
 
       switch (e.state) {
-        case ce.standing: {
+        case humanState.standing: {
           e.timer.standing -= t;
 
           if (e.timer.standing < 0) {
             this.assignRandomTarget(e);
-            this.changeState(e, ce.walking);
+            this.changeState(e, humanState.walking);
           }
 
           break;
         }
-        case ce.walking:
-        case ce.fleeing: {
+        case humanState.walking:
+        case humanState.fleeing: {
           if (
             this.fastDistance(
               e.position.x,
@@ -7298,14 +7288,14 @@ var Incremancer;
           ) {
             e.target = undefined;
             e.zombieTarget = undefined;
-            this.changeState(e, ce.standing);
+            this.changeState(e, humanState.standing);
           } else {
             this.updateHumanSpeed(e, t);
           }
 
           break;
         }
-        case ce.escaping: {
+        case humanState.escaping: {
           if (
             this.fastDistance(
               e.position.x,
@@ -7331,7 +7321,7 @@ var Incremancer;
 
           break;
         }
-        case ce.attacking: {
+        case humanState.attacking: {
           e.scale.x = e.target.x > e.x ? this.scaling : -this.scaling;
 
           if (e.zombieTarget && !e.zombieTarget.flags.dead) {
@@ -7352,7 +7342,7 @@ var Incremancer;
               this.updateHumanSpeed(e, t);
             }
           } else {
-            this.changeState(e, ce.standing);
+            this.changeState(e, humanState.standing);
           }
         }
       }
@@ -7908,31 +7898,32 @@ var Incremancer;
   }
   class Army {
     constructor() {
-      if (
-        ((this.maxWalkSpeed = 20),
-        (this.maxRunSpeed = 50),
-        (this.armymen = []),
-        (this.discardedArmymen = []),
-        (this.textures = []),
-        (this.aliveZombies = []),
-        (this.armyPerLevel = 0.9),
-        (this.attackSpeed = 2),
-        (this.attackDamage = 20),
-        (this.attackDistance = 25),
-        (this.moveTargetDistance = 5),
-        (this.shootDistance = 130),
-        (this.visionDistance = 200),
-        (this.scaling = 2),
-        (this.shotsPerBurst = 3),
-        (this.droneStrikeTimer = 0),
-        (this.droneStrikeTime = 35),
-        (this.assaultStarted = false),
-        (this.droneStrike = null),
-        (this.droneActive = false),
-        (this.droneBlastRadius = 35),
-        Army.instance)
-      )
+      this.maxWalkSpeed = 20;
+      this.maxRunSpeed = 50;
+      this.armymen = [];
+      this.discardedArmymen = [];
+      this.textures = [];
+      this.aliveZombies = [];
+      this.armyPerLevel = 0.9;
+      this.attackSpeed = 2;
+      this.attackDamage = 20;
+      this.attackDistance = 25;
+      this.moveTargetDistance = 5;
+      this.shootDistance = 130;
+      this.visionDistance = 200;
+      this.scaling = 2;
+      this.shotsPerBurst = 3;
+      this.droneStrikeTimer = 0;
+      this.droneStrikeTime = 35;
+      this.assaultStarted = false;
+      this.droneStrike = null;
+      this.droneActive = false;
+      this.droneBlastRadius = 35;
+
+      if (Army.instance) {
         return Army.instance;
+      }
+
       Army.instance = this;
     }
     isExtraArmy() {
@@ -7958,277 +7949,375 @@ var Incremancer;
       this.attackDamage = Math.round(this.getMaxHealth() / 10);
     }
     populate() {
-      if (
-        ((this.map = new ee()),
-        (this.zombies = new Zombies()),
-        (this.humans = new Humans()),
-        (this.gameModel = GameModel.getInstance()),
-        (this.graveyard = new Graveyard()),
-        (this.bullets = new rt()),
-        (this.assaultStarted = false),
-        (this.blasts = new nt()),
-        (this.exclamations = new it()),
-        0 == this.textures.length)
-      )
+      this.map = new ee();
+      this.zombies = new Zombies();
+      this.humans = new Humans();
+      this.gameModel = GameModel.getInstance();
+      this.graveyard = new Graveyard();
+      this.bullets = new rt();
+      this.assaultStarted = false;
+      this.blasts = new nt();
+      this.exclamations = new it();
+
+      if (this.textures.length == 0) {
         for (let e = 0; e < 3; e++) {
           const t = [];
-          for (let s = 0; s < 3; s++)
-            t.push(
-              PIXI.Texture.from("army" + (e + 1) + "_" + (s + 1) + ".png")
-            );
+          for (let s = 0; s < 3; s++) {
+            t.push(PIXI.Texture.from(`army${e + 1}_${s + 1}.png`));
+          }
           this.textures.push({
             animated: t,
-            dead: [PIXI.Texture.from("army" + (e + 1) + "_dead.png")],
+            dead: [PIXI.Texture.from(`army${e + 1}_dead.png`)],
           });
         }
-      if (
-        (this.droneStrike &&
-          this.droneStrike.laser &&
-          (b.removeChild(this.droneStrike.text),
-          b.removeChild(this.droneStrike.laser)),
-        this.armymen.length > 0)
-      ) {
-        for (let e = 0; e < this.armymen.length; e++)
+      }
+
+      if (this.droneStrike && this.droneStrike.laser) {
+        b.removeChild(this.droneStrike.text);
+        b.removeChild(this.droneStrike.laser);
+      }
+
+      if (this.armymen.length > 0) {
+        for (let e = 0; e < this.armymen.length; e++) {
           g.removeChild(this.armymen[e]);
-        (this.discardedArmymen = this.armymen.slice()), (this.armymen = []);
+        }
+        this.discardedArmymen = this.armymen.slice();
+        this.armymen = [];
       }
-      const e = this.getMaxArmy(),
-        t = this.getMaxHealth();
-      this.getAttackDamage(),
-        (this.droneStrike = false),
-        (this.droneStrikeTimer = Math.random() * this.droneStrikeTime),
-        (this.droneActive = this.gameModel.level >= 25);
+
+      const e = this.getMaxArmy();
+      const t = this.getMaxHealth();
+      this.getAttackDamage();
+      this.droneStrike = false;
+      this.droneStrikeTimer = Math.random() * this.droneStrikeTime;
+      this.droneActive = this.gameModel.level >= 25;
       for (let s = 0; s < e; s++) {
-        let e,
-          s = 0;
-        this.gameModel.level > 35 && Math.random() < 0.3 && (s = 1),
-          ((this.gameModel.level > 45 && Math.random() < 0.3) ||
-            (this.gameModel.isBossStage(this.gameModel.level) &&
-              Math.random() < 0.5)) &&
-            (s = 2),
-          this.discardedArmymen.length > 0
-            ? ((e = this.discardedArmymen.pop()),
-              (e.alpha = 1),
-              (e.textures = this.textures[s].animated))
-            : (e = new we(this.textures[s].animated)),
-          e.reset(),
-          (e.flags.dead = false),
-          (e.flags.infected = false),
-          (e.flags.burning = false),
-          (e.burnDamage = 0),
-          (e.plagueDamage = 0),
-          (e.minigun = 1 == s),
-          (e.rocketlauncher = 2 == s),
-          (e.deadTexture = this.textures[s].dead),
-          (e.animationSpeed = 0.2),
-          e.anchor.set(35 / 80, 1),
-          (e.currentPoi = this.map.getRandomBuilding()),
-          e.position.copyFrom(this.map.randomPositionInBuilding(e.currentPoi)),
-          (e.zIndex = e.position.y),
-          (e.xSpeed = 0),
-          (e.ySpeed = 0),
-          (e.speedMod = 1),
-          (e.lastKnownBuilding = null),
-          (e.maxSpeed = this.maxWalkSpeed),
-          (e.visionDistance = this.visionDistance),
-          (e.visible = true),
-          (e.maxHealth = e.health = t),
-          (e.timer.attack = this.attackSpeed),
-          (e.timer.plagueTick = Math.random() * this.humans.plagueTickTimer),
-          (e.timer.scan = Math.random() * this.humans.scanTime),
-          (e.timer.standing =
-            Math.random() * this.humans.randomSecondsToStand()),
-          (e.target = false),
-          (e.zombieTarget = null),
-          (e.graveYardTarget = null),
-          (e.armyState = armyState.standing),
-          (e.attackingGraveyard = false),
-          e.scale.set(
-            Math.random() > 0.5 ? this.scaling : -1 * this.scaling,
-            this.scaling
-          ),
-          this.armymen.push(e),
-          g.addChild(e);
+        let e;
+        let s = 0;
+
+        if (this.gameModel.level > 35 && Math.random() < 0.3) {
+          s = 1;
+        }
+
+        if (
+          (this.gameModel.level > 45 && Math.random() < 0.3) ||
+          (this.gameModel.isBossStage(this.gameModel.level) &&
+            Math.random() < 0.5)
+        ) {
+          s = 2;
+        }
+
+        if (this.discardedArmymen.length > 0) {
+          e = this.discardedArmymen.pop();
+          e.alpha = 1;
+          e.textures = this.textures[s].animated;
+        } else {
+          e = new we(this.textures[s].animated);
+        }
+
+        e.reset();
+        e.flags.dead = false;
+        e.flags.infected = false;
+        e.flags.burning = false;
+        e.burnDamage = 0;
+        e.plagueDamage = 0;
+        e.minigun = s == 1;
+        e.rocketlauncher = s == 2;
+        e.deadTexture = this.textures[s].dead;
+        e.animationSpeed = 0.2;
+        e.anchor.set(35 / 80, 1);
+        e.currentPoi = this.map.getRandomBuilding();
+        e.position.copyFrom(this.map.randomPositionInBuilding(e.currentPoi));
+        e.zIndex = e.position.y;
+        e.xSpeed = 0;
+        e.ySpeed = 0;
+        e.speedMod = 1;
+        e.lastKnownBuilding = null;
+        e.maxSpeed = this.maxWalkSpeed;
+        e.visionDistance = this.visionDistance;
+        e.visible = true;
+        e.maxHealth = t;
+        e.health = t;
+        e.timer.attack = this.attackSpeed;
+        e.timer.plagueTick = Math.random() * this.humans.plagueTickTimer;
+        e.timer.scan = Math.random() * this.humans.scanTime;
+        e.timer.standing = Math.random() * this.humans.randomSecondsToStand();
+        e.target = false;
+        e.zombieTarget = null;
+        e.graveYardTarget = null;
+        e.armyState = armyState.standing;
+        e.attackingGraveyard = false;
+
+        e.scale.set(
+          Math.random() > 0.5 ? this.scaling : -1 * this.scaling,
+          this.scaling
+        );
+
+        this.armymen.push(e);
+        g.addChild(e);
       }
-      this.isExtraArmy() &&
+
+      if (this.isExtraArmy()) {
         this.gameModel.sendMessage("Warning: High Military Activity!");
+      }
     }
     update(e, t) {
       let s = 0;
-      (this.aliveZombies = t), this.droneActive && (this.droneStrikeTimer -= e);
-      for (let i = 0; i < this.armymen.length; i++)
-        this.updateArmy(this.armymen[i], e, t),
-          this.armymen[i].flags.dead ||
-            (this.humans.aliveHumans.push(this.armymen[i]),
-            this.armymen[i].attackingGraveyard &&
-              this.humans.graveyardAttackers.push(this.armymen[i]),
-            s++);
-      (this.gameModel.stats.army.count = s), this.updateDroneStrike(e, t);
+      this.aliveZombies = t;
+
+      if (this.droneActive) {
+        this.droneStrikeTimer -= e;
+      }
+
+      for (let i = 0; i < this.armymen.length; i++) {
+        this.updateArmy(this.armymen[i], e, t);
+
+        if (!this.armymen[i].flags.dead) {
+          this.humans.aliveHumans.push(this.armymen[i]);
+
+          if (this.armymen[i].attackingGraveyard) {
+            this.humans.graveyardAttackers.push(this.armymen[i]);
+          }
+
+          s++;
+        }
+      }
+      this.gameModel.stats.army.count = s;
+      this.updateDroneStrike(e, t);
     }
     decideStateOnZombieDistance(e) {
-      var t;
       if (e.graveYardTarget || (e.zombieTarget && !e.zombieTarget.flags.dead)) {
-        e.target =
-          null !== (t = e.graveYardTarget) && void 0 !== t ? t : e.zombieTarget;
+        e.target = e.graveYardTarget ?? e.zombieTarget;
         const s = weighted_hybrid_distance(
           e.position.x,
           e.position.y,
           e.target.x,
           e.target.y
         );
-        if (s > this.shootDistance && !e.rocketlauncher)
+        if (s > this.shootDistance && !e.rocketlauncher) {
           return void this.changeState(e, armyState.running);
-        if (s > 1.2 * this.shootDistance && e.rocketlauncher)
+        }
+        if (s > 1.2 * this.shootDistance && e.rocketlauncher) {
           return void this.changeState(e, armyState.running);
-        if (s < this.attackDistance && !e.graveYardTarget)
+        }
+        if (s < this.attackDistance && !e.graveYardTarget) {
           return void this.changeState(e, armyState.attacking);
+        }
         this.changeState(e, armyState.shooting);
       }
     }
     changeState(e, t) {
       switch (t) {
-        case armyState.standing:
+        case armyState.standing: {
           e.gotoAndStop(0);
           break;
-        case armyState.walking:
-          e.play(), (e.maxSpeed = this.maxWalkSpeed);
-          break;
-        case armyState.running:
-          e.play(), (e.maxSpeed = this.maxRunSpeed);
-          break;
-        case armyState.shooting:
-          e.gotoAndStop(0);
-          break;
-        case armyState.attacking:
+        }
+        case armyState.walking: {
           e.play();
+          e.maxSpeed = this.maxWalkSpeed;
+          break;
+        }
+        case armyState.running: {
+          e.play();
+          e.maxSpeed = this.maxRunSpeed;
+          break;
+        }
+        case armyState.shooting: {
+          e.gotoAndStop(0);
+          break;
+        }
+        case armyState.attacking: {
+          e.play();
+        }
       }
       e.armyState = t;
     }
     updateArmy(e, t, s) {
-      var a, r;
-      if (e.flags.dead) return this.humans.updateDeadHumanFading(e, t);
-      switch (
-        ((e.timer.attack -= t),
-        (e.timer.scan -= t),
-        e.flags.infected && this.humans.updatePlague(e, t),
-        e.flags.burning && this.humans.updateBurns(e, t),
+      if (e.flags.dead) {
+        return this.humans.updateDeadHumanFading(e, t);
+      }
+      e.timer.attack -= t;
+      e.timer.scan -= t;
+
+      if (e.flags.infected) {
+        this.humans.updatePlague(e, t);
+      }
+
+      if (e.flags.burning) {
+        this.humans.updateBurns(e, t);
+      }
+
+      if (
         !e.graveYardTarget &&
-          (!e.zombieTarget || e.zombieTarget.flags.dead) &&
-          e.timer.scan < 0 &&
-          (this.humans.scanForZombies(e, s) > 3 &&
-            this.droneActive &&
-            this.droneStrikeTimer < 0 &&
-            this.callDroneStrike(e, s),
-          this.assaultStarted &&
-            e.rocketlauncher &&
-            Math.random() > 0.98 &&
-            ((e.graveYardTarget = this.graveyard.target),
-            (e.attackingGraveyard = true))),
-        this.decideStateOnZombieDistance(e),
-        e.armyState)
+        (!e.zombieTarget || e.zombieTarget.flags.dead) &&
+        e.timer.scan < 0
       ) {
-        case armyState.standing:
-          (e.timer.standing -= t),
-            e.timer.standing < 0 &&
-              (this.humans.assignRandomTarget(e),
-              this.changeState(e, armyState.walking));
+        if (
+          this.humans.scanForZombies(e, s) > 3 &&
+          this.droneActive &&
+          this.droneStrikeTimer < 0
+        ) {
+          this.callDroneStrike(e, s);
+        }
+
+        if (this.assaultStarted && e.rocketlauncher && Math.random() > 0.98) {
+          e.graveYardTarget = this.graveyard.target;
+          e.attackingGraveyard = true;
+        }
+      }
+
+      this.decideStateOnZombieDistance(e);
+
+      switch (e.armyState) {
+        case armyState.standing: {
+          e.timer.standing -= t;
+
+          if (e.timer.standing < 0) {
+            this.humans.assignRandomTarget(e);
+            this.changeState(e, armyState.walking);
+          }
+
           break;
-        case armyState.walking:
-          weighted_hybrid_distance(
-            e.position.x,
-            e.position.y,
-            e.target.x,
-            e.target.y
-          ) < this.moveTargetDistance
-            ? ((e.target = null),
-              (e.zombieTarget = null),
-              (e.timer.standing = this.humans.randomSecondsToStand()),
-              this.changeState(e, armyState.standing))
-            : this.humans.updateHumanSpeed(e, t);
+        }
+        case armyState.walking: {
+          if (
+            weighted_hybrid_distance(
+              e.position.x,
+              e.position.y,
+              e.target.x,
+              e.target.y
+            ) < this.moveTargetDistance
+          ) {
+            e.target = null;
+            e.zombieTarget = null;
+            e.timer.standing = this.humans.randomSecondsToStand();
+            this.changeState(e, armyState.standing);
+          } else {
+            this.humans.updateHumanSpeed(e, t);
+          }
+
           break;
-        case armyState.running:
-          e.graveYardTarget || (e.zombieTarget && !e.zombieTarget.flags.dead)
-            ? ((e.target =
-                null !== (a = e.graveYardTarget) && void 0 !== a
-                  ? a
-                  : e.zombieTarget),
-              this.humans.updateHumanSpeed(e, t))
-            : this.changeState(e, armyState.standing);
+        }
+        case armyState.running: {
+          if (
+            e.graveYardTarget ||
+            (e.zombieTarget && !e.zombieTarget.flags.dead)
+          ) {
+            e.target = e.graveYardTarget ?? e.zombieTarget;
+            this.humans.updateHumanSpeed(e, t);
+          } else {
+            this.changeState(e, armyState.standing);
+          }
+
           break;
-        case armyState.attacking:
-          e.zombieTarget && !e.zombieTarget.flags.dead
-            ? ((e.scale.x =
-                e.zombieTarget.x > e.x ? this.scaling : -this.scaling),
-              e.timer.attack < 0 &&
-                (this.zombies.damageZombie(
-                  e.zombieTarget,
-                  this.attackDamage,
-                  e
-                ),
-                (e.timer.attack = this.attackSpeed)))
-            : this.changeState(e, armyState.standing);
+        }
+        case armyState.attacking: {
+          if (e.zombieTarget && !e.zombieTarget.flags.dead) {
+            e.scale.x = e.zombieTarget.x > e.x ? this.scaling : -this.scaling;
+
+            if (e.timer.attack < 0) {
+              this.zombies.damageZombie(e.zombieTarget, this.attackDamage, e);
+              e.timer.attack = this.attackSpeed;
+            }
+          } else {
+            this.changeState(e, armyState.standing);
+          }
+
           break;
-        case armyState.shooting:
-          e.graveYardTarget || (e.zombieTarget && !e.zombieTarget.flags.dead)
-            ? ((e.target =
-                null !== (r = e.graveYardTarget) && void 0 !== r
-                  ? r
-                  : e.zombieTarget),
-              (e.scale.x = e.target.x > e.x ? this.scaling : -this.scaling),
-              e.timer.attack < 0 &&
-                ((e.shotsLeft = this.shotsPerBurst),
-                e.minigun && (e.shotsLeft = 3 * this.shotsPerBurst),
-                e.rocketlauncher && (e.shotsLeft = 1),
-                (e.timer.attack = e.rocketlauncher
-                  ? 1.5 * this.attackSpeed
-                  : this.attackSpeed),
-                (e.shotTimer = 0)),
-              e.shotsLeft > 0 &&
-                ((e.shotTimer -= t),
-                e.shotTimer < 0 &&
-                  ((e.shotTimer = 0.15),
-                  e.minigun && (e.shotTimer = 0.08),
-                  this.bullets.newBullet(
-                    e,
-                    e.target,
-                    e.rocketlauncher
-                      ? 1.2 * this.attackDamage
-                      : e.minigun
-                      ? this.attackDamage / 2
-                      : this.attackDamage,
-                    false,
-                    e.rocketlauncher
-                  ),
-                  e.shotsLeft--)))
-            : this.changeState(e, armyState.standing);
+        }
+        case armyState.shooting: {
+          if (
+            e.graveYardTarget ||
+            (e.zombieTarget && !e.zombieTarget.flags.dead)
+          ) {
+            e.target = e.graveYardTarget ?? e.zombieTarget;
+            e.scale.x = e.target.x > e.x ? this.scaling : -this.scaling;
+
+            if (e.timer.attack < 0) {
+              e.shotsLeft = this.shotsPerBurst;
+
+              if (e.minigun) {
+                e.shotsLeft = 3 * this.shotsPerBurst;
+              }
+
+              if (e.rocketlauncher) {
+                e.shotsLeft = 1;
+              }
+
+              e.timer.attack = e.rocketlauncher
+                ? 1.5 * this.attackSpeed
+                : this.attackSpeed;
+
+              e.shotTimer = 0;
+            }
+
+            if (e.shotsLeft > 0) {
+              e.shotTimer -= t;
+
+              if (e.shotTimer < 0) {
+                e.shotTimer = 0.15;
+
+                if (e.minigun) {
+                  e.shotTimer = 0.08;
+                }
+
+                this.bullets.newBullet(
+                  e,
+                  e.target,
+                  e.rocketlauncher
+                    ? 1.2 * this.attackDamage
+                    : e.minigun
+                    ? this.attackDamage / 2
+                    : this.attackDamage,
+                  false,
+                  e.rocketlauncher
+                );
+
+                e.shotsLeft--;
+              }
+            }
+          } else {
+            this.changeState(e, armyState.standing);
+          }
+        }
       }
     }
     callDroneStrike(e, t) {
       let s = 0;
-      for (let i = 0; i < t.length; i++)
-        t[i].x > e.zombieTarget.x - this.droneBlastRadius &&
+      for (let i = 0; i < t.length; i++) {
+        if (
+          t[i].x > e.zombieTarget.x - this.droneBlastRadius &&
           t[i].x < e.zombieTarget.x + this.droneBlastRadius &&
           t[i].y > e.zombieTarget.y - this.droneBlastRadius &&
-          t[i].y < e.zombieTarget.y + this.droneBlastRadius &&
+          t[i].y < e.zombieTarget.y + this.droneBlastRadius
+        ) {
           s++;
+        }
+      }
       let i = 0;
       const a = this.humans.aliveHumans;
-      for (let t = 0; t < a.length; t++)
-        a[t].x > e.zombieTarget.x - this.droneBlastRadius &&
+      for (let t = 0; t < a.length; t++) {
+        if (
+          a[t].x > e.zombieTarget.x - this.droneBlastRadius &&
           a[t].x < e.zombieTarget.x + this.droneBlastRadius &&
           a[t].y > e.zombieTarget.y - this.droneBlastRadius &&
-          a[t].y < e.zombieTarget.y + this.droneBlastRadius &&
+          a[t].y < e.zombieTarget.y + this.droneBlastRadius
+        ) {
           i++;
-      s > 1 &&
-        0 == i &&
-        (this.exclamations.newRadio(e),
-        (this.droneStrikeTimer = this.droneStrikeTime),
-        (this.droneStrike = {
+        }
+      }
+
+      if (s > 1 && i == 0) {
+        this.exclamations.newRadio(e);
+        this.droneStrikeTimer = this.droneStrikeTime;
+
+        this.droneStrike = {
           caller: e,
           target: e.zombieTarget,
           timer: 3,
           bombsLeft: 3,
-        }));
+        };
+      }
     }
     droneBomb(e) {
       this.droneExplosion(
@@ -8236,74 +8325,99 @@ var Incremancer;
         this.droneStrike.target.y + 32 * (Math.random() - 1),
         e,
         3 * this.attackDamage
-      ),
-        (this.droneStrike.timer = 0.3),
-        this.droneStrike.bombsLeft--;
+      );
+
+      this.droneStrike.timer = 0.3;
+      this.droneStrike.bombsLeft--;
     }
     droneExplosion(e, t, s, i) {
-      s || (s = this.aliveZombies), this.blasts.newDroneBlast(e, t);
-      for (let a = 0; a < s.length; a++)
-        s[a].x > e - this.droneBlastRadius &&
+      if (!s) {
+        s = this.aliveZombies;
+      }
+
+      this.blasts.newDroneBlast(e, t);
+      for (let a = 0; a < s.length; a++) {
+        if (
+          s[a].x > e - this.droneBlastRadius &&
           s[a].x < e + this.droneBlastRadius &&
           s[a].y > t - this.droneBlastRadius &&
-          s[a].y < t + this.droneBlastRadius &&
+          s[a].y < t + this.droneBlastRadius
+        ) {
           this.zombies.damageZombie(s[a], i, null);
+        }
+      }
     }
     updateDroneStrike(e, t) {
       if (this.droneStrike) {
-        if (
-          ((this.droneStrike.timer -= e),
-          this.droneStrike.startedBombing ||
-            (this.droneStrike.text ||
-              ((this.droneStrike.text = new PIXI.Text("3", {
-                fontFamily: "sans-serif",
-                fontSize: 40,
-                fill: "#F00",
-                stroke: "#000",
-                strokeThickness: 0,
-                align: "center",
-              })),
-              (this.droneStrike.text.anchor = {
-                x: 0.5,
-                y: 1,
-              }),
-              (this.droneStrike.text.scale.x = 0.5),
-              (this.droneStrike.text.scale.y = 0.5),
-              b.addChild(this.droneStrike.text),
-              (this.droneStrike.laser = new PIXI.Graphics()),
-              b.addChild(this.droneStrike.laser)),
-            (this.droneStrike.text.text = Math.ceil(this.droneStrike.timer)),
-            (this.droneStrike.text.x = this.droneStrike.target.x),
-            (this.droneStrike.text.y = this.droneStrike.target.y - 30),
-            this.droneStrike.laser.clear(),
-            this.droneStrike.laser.lineStyle(1, 16711680),
-            this.droneStrike.laser.moveTo(
-              this.droneStrike.caller.x,
-              this.droneStrike.caller.y - 10
-            ),
-            this.droneStrike.laser.lineTo(
-              this.droneStrike.target.x,
-              this.droneStrike.target.y - 10
-            )),
-          (this.droneStrike.caller.dead || this.droneStrike.target.dead) &&
-            !this.droneStrike.startedBombing)
-        )
-          return (
-            b.removeChild(this.droneStrike.text),
-            b.removeChild(this.droneStrike.laser),
-            (this.droneStrike = false),
-            void (this.droneStrikeTimer = 0)
+        this.droneStrike.timer -= e;
+
+        if (!this.droneStrike.startedBombing) {
+          if (!this.droneStrike.text) {
+            this.droneStrike.text = new PIXI.Text("3", {
+              fontFamily: "sans-serif",
+              fontSize: 40,
+              fill: "#F00",
+              stroke: "#000",
+              strokeThickness: 0,
+              align: "center",
+            });
+
+            this.droneStrike.text.anchor = {
+              x: 0.5,
+              y: 1,
+            };
+
+            this.droneStrike.text.scale.x = 0.5;
+            this.droneStrike.text.scale.y = 0.5;
+            b.addChild(this.droneStrike.text);
+            this.droneStrike.laser = new PIXI.Graphics();
+            b.addChild(this.droneStrike.laser);
+          }
+
+          this.droneStrike.text.text = Math.ceil(this.droneStrike.timer);
+          this.droneStrike.text.x = this.droneStrike.target.x;
+          this.droneStrike.text.y = this.droneStrike.target.y - 30;
+          this.droneStrike.laser.clear();
+          this.droneStrike.laser.lineStyle(1, 16711680);
+
+          this.droneStrike.laser.moveTo(
+            this.droneStrike.caller.x,
+            this.droneStrike.caller.y - 10
           );
-        this.droneStrike.timer < 0 &&
-          (this.droneStrike.startedBombing ||
-            (b.removeChild(this.droneStrike.text),
-            b.removeChild(this.droneStrike.laser),
-            (this.droneStrike.startedBombing = true)),
-          this.droneBomb(t),
-          this.droneStrike.bombsLeft <= 0 && (this.droneStrike = false));
+
+          this.droneStrike.laser.lineTo(
+            this.droneStrike.target.x,
+            this.droneStrike.target.y - 10
+          );
+        }
+
+        if (
+          (this.droneStrike.caller.dead || this.droneStrike.target.dead) &&
+          !this.droneStrike.startedBombing
+        ) {
+          b.removeChild(this.droneStrike.text);
+          b.removeChild(this.droneStrike.laser);
+          this.droneStrike = false;
+          return void (this.droneStrikeTimer = 0);
+        }
+
+        if (this.droneStrike.timer < 0) {
+          if (!this.droneStrike.startedBombing) {
+            b.removeChild(this.droneStrike.text);
+            b.removeChild(this.droneStrike.laser);
+            this.droneStrike.startedBombing = true;
+          }
+
+          this.droneBomb(t);
+
+          if (this.droneStrike.bombsLeft <= 0) {
+            this.droneStrike = false;
+          }
+        }
       }
     }
   }
+
   class Ce extends ve {
     constructor(...args) {
       super(...args);
@@ -8322,19 +8436,20 @@ var Incremancer;
   }
   class De {
     constructor() {
-      if (
-        ((this.speed = 20),
-        (this.tanks = []),
-        (this.aliveTanks = []),
-        (this.attackDamage = 0),
-        (this.attackSpeed = 3),
-        (this.scaling = 3),
-        (this.moveTargetDistance = 20),
-        (this.shootDistance = 300),
-        (this.aliveZombies = null),
-        De.instance)
-      )
+      this.speed = 20;
+      this.tanks = [];
+      this.aliveTanks = [];
+      this.attackDamage = 0;
+      this.attackSpeed = 3;
+      this.scaling = 3;
+      this.moveTargetDistance = 20;
+      this.shootDistance = 300;
+      this.aliveZombies = null;
+
+      if (De.instance) {
         return De.instance;
+      }
+
       De.instance = this;
     }
     getMaxTanks() {
@@ -8349,619 +8464,798 @@ var Incremancer;
       this.attackDamage = Math.round(this.getMaxHealth() / 10);
     }
     populate() {
-      if (
-        ((this.map = new ee()),
-        (this.gameModel = GameModel.getInstance()),
-        (this.zombies = new Zombies()),
-        (this.humans = new Humans()),
-        (this.army = new Army()),
-        (this.graveyard = new Graveyard()),
-        (this.bullets = new rt()),
-        !this.textures)
-      ) {
+      this.map = new ee();
+      this.gameModel = GameModel.getInstance();
+      this.zombies = new Zombies();
+      this.humans = new Humans();
+      this.army = new Army();
+      this.graveyard = new Graveyard();
+      this.bullets = new rt();
+
+      if (!this.textures) {
         this.textures = {
           vertical: [],
           horizontal: [],
           turret: null,
         };
-        for (let e = 0; e < 2; e++)
-          this.textures.horizontal.push(PIXI.Texture.from("tank" + e + ".png"));
-        for (let e = 2; e < 4; e++)
-          this.textures.vertical.push(PIXI.Texture.from("tank" + e + ".png"));
+        for (let e = 0; e < 2; e++) {
+          this.textures.horizontal.push(PIXI.Texture.from(`tank${e}.png`));
+        }
+        for (let e = 2; e < 4; e++) {
+          this.textures.vertical.push(PIXI.Texture.from(`tank${e}.png`));
+        }
         this.textures.turret = PIXI.Texture.from("tank4.png");
       }
+
       if (this.tanks.length > 0) {
-        for (let e = 0; e < this.tanks.length; e++)
+        for (let e = 0; e < this.tanks.length; e++) {
           g.removeChild(this.tanks[e]);
-        (this.tanks = []), (this.aliveTanks = []);
+        }
+        this.tanks = [];
+        this.aliveTanks = [];
       }
-      const e = this.getMaxTanks(),
-        t = this.getMaxHealth();
+      const e = this.getMaxTanks();
+      const t = this.getMaxHealth();
       this.getAttackDamage();
       for (let s = 0; s < e; s++) {
         const e = new Ce(this.textures.horizontal);
-        (e.flags.tank = true),
-          (e.turretSprite = new PIXI.Sprite(this.textures.turret)),
-          e.addChild(e.turretSprite),
-          (e.animationSpeed = 0.2),
-          e.anchor.set(0.5, 1),
-          e.turretSprite.anchor.set(7.5 / 16, 7.5 / 16),
-          (e.x = 0),
-          (e.y = 0),
-          e.play(),
-          (e.turretSprite.x = 0),
-          (e.turretSprite.y = -7),
-          (e.currentDirection = currentDirection.horizontal),
-          (e.currentPoi = this.map.getRandomBuilding()),
-          e.position.copyFrom(this.map.randomPositionInBuilding(e.currentPoi)),
-          (e.zIndex = e.position.y),
-          (e.xSpeed = 0),
-          (e.ySpeed = 0),
-          (e.speedMod = 1),
-          (e.flags.dead = false),
-          (e.flags.infected = false),
-          (e.flags.burning = false),
-          (e.burnDamage = 0),
-          (e.lastKnownBuilding = null),
-          (e.plagueDamage = 0),
-          (e.timer.plagueTick = Math.random() * this.humans.plagueTickTimer),
-          (e.maxSpeed = this.speed),
-          (e.visionDistance = 250),
-          (e.visible = true),
-          (e.maxHealth = e.health = t),
-          (e.timer.scan = Math.random() * this.humans.scanTime),
-          (e.target = false),
-          (e.zombieTarget = null),
-          (e.graveYardTarget = null),
-          (e.attackingGraveyard = false),
-          (e.tankState = tankState.patrolling),
-          (e.timer.attack = this.attackSpeed),
-          e.scale.set(this.scaling, this.scaling),
-          this.tanks.push(e),
-          g.addChild(e);
+        e.flags.tank = true;
+        e.turretSprite = new PIXI.Sprite(this.textures.turret);
+        e.addChild(e.turretSprite);
+        e.animationSpeed = 0.2;
+        e.anchor.set(0.5, 1);
+        e.turretSprite.anchor.set(7.5 / 16, 7.5 / 16);
+        e.x = 0;
+        e.y = 0;
+        e.play();
+        e.turretSprite.x = 0;
+        e.turretSprite.y = -7;
+        e.currentDirection = currentDirection.horizontal;
+        e.currentPoi = this.map.getRandomBuilding();
+        e.position.copyFrom(this.map.randomPositionInBuilding(e.currentPoi));
+        e.zIndex = e.position.y;
+        e.xSpeed = 0;
+        e.ySpeed = 0;
+        e.speedMod = 1;
+        e.flags.dead = false;
+        e.flags.infected = false;
+        e.flags.burning = false;
+        e.burnDamage = 0;
+        e.lastKnownBuilding = null;
+        e.plagueDamage = 0;
+        e.timer.plagueTick = Math.random() * this.humans.plagueTickTimer;
+        e.maxSpeed = this.speed;
+        e.visionDistance = 250;
+        e.visible = true;
+        e.maxHealth = t;
+        e.health = t;
+        e.timer.scan = Math.random() * this.humans.scanTime;
+        e.target = false;
+        e.zombieTarget = null;
+        e.graveYardTarget = null;
+        e.attackingGraveyard = false;
+        e.tankState = tankState.patrolling;
+        e.timer.attack = this.attackSpeed;
+        e.scale.set(this.scaling, this.scaling);
+        this.tanks.push(e);
+        g.addChild(e);
       }
     }
     update(e, t) {
-      (this.aliveZombies = t), (this.aliveTanks = []);
-      for (let s = 0; s < this.tanks.length; s++)
-        this.updateTank(this.tanks[s], e, t),
-          this.tanks[s].flags.dead ||
-            (this.humans.aliveHumans.push(this.tanks[s]),
-            this.aliveTanks.push(this.tanks[s]),
-            this.tanks[s].attackingGraveyard &&
-              this.humans.graveyardAttackers.push(this.tanks[s]));
+      this.aliveZombies = t;
+      this.aliveTanks = [];
+      for (let s = 0; s < this.tanks.length; s++) {
+        this.updateTank(this.tanks[s], e, t);
+
+        if (!this.tanks[s].flags.dead) {
+          this.humans.aliveHumans.push(this.tanks[s]);
+          this.aliveTanks.push(this.tanks[s]);
+
+          if (this.tanks[s].attackingGraveyard) {
+            this.humans.graveyardAttackers.push(this.tanks[s]);
+          }
+        }
+      }
     }
     updateTank(e, t, s) {
-      if (e.flags.dead) return this.humans.updateDeadHumanFading(e, t);
-      switch (
-        ((e.timer.attack -= t),
-        (e.timer.scan -= t),
-        e.flags.burning && this.humans.updateBurns(e, t),
+      if (e.flags.dead) {
+        return this.humans.updateDeadHumanFading(e, t);
+      }
+      e.timer.attack -= t;
+      e.timer.scan -= t;
+
+      if (e.flags.burning) {
+        this.humans.updateBurns(e, t);
+      }
+
+      if (
         !e.attackingGraveyard &&
-          (!e.zombieTarget || e.zombieTarget.flags.dead) &&
-          e.timer.scan < 0 &&
-          (this.humans.scanForZombies(e, s),
-          this.army.assaultStarted &&
-            Math.random() > 0.9 &&
-            ((e.graveYardTarget = this.graveyard.target),
-            (e.attackingGraveyard = true))),
-        this.decideStateOnZombieDistance(e),
-        e.tankState)
+        (!e.zombieTarget || e.zombieTarget.flags.dead) &&
+        e.timer.scan < 0
       ) {
-        case tankState.patrolling:
-          e.target || (e.target = this.map.randomPositionInBuilding(null)),
+        this.humans.scanForZombies(e, s);
+
+        if (this.army.assaultStarted && Math.random() > 0.9) {
+          (e.graveYardTarget = this.graveyard.target),
+            (e.attackingGraveyard = true);
+        }
+      }
+
+      this.decideStateOnZombieDistance(e);
+
+      switch (e.tankState) {
+        case tankState.patrolling: {
+          if (!e.target) {
+            e.target = this.map.randomPositionInBuilding(null);
+          }
+
+          if (
             weighted_hybrid_distance(
               e.position.x,
               e.position.y,
               e.target.x,
               e.target.y
             ) < this.moveTargetDistance
-              ? ((e.target = false), (e.zombieTarget = null))
-              : this.humans.updateHumanSpeed(e, t);
+          ) {
+            e.target = false;
+            e.zombieTarget = null;
+          } else {
+            this.humans.updateHumanSpeed(e, t);
+          }
+
           break;
-        case tankState.attacking:
-          e.attackingGraveyard
-            ? ((e.target = e.graveYardTarget),
-              this.humans.updateHumanSpeed(e, t))
-            : e.zombieTarget && !e.zombieTarget.flags.dead
-            ? this.humans.updateHumanSpeed(e, t)
-            : this.changeState(e, tankState.patrolling);
+        }
+        case tankState.attacking: {
+          if (e.attackingGraveyard) {
+            e.target = e.graveYardTarget;
+            this.humans.updateHumanSpeed(e, t);
+          } else if (e.zombieTarget && !e.zombieTarget.flags.dead) {
+            this.humans.updateHumanSpeed(e, t);
+          } else {
+            this.changeState(e, tankState.patrolling);
+          }
+
           break;
-        case tankState.shooting:
-          e.graveYardTarget || (e.zombieTarget && !e.zombieTarget.flags.dead)
-            ? e.timer.attack < 0 &&
-              ((e.timer.attack = this.attackSpeed),
+        }
+        case tankState.shooting: {
+          if (
+            e.graveYardTarget ||
+            (e.zombieTarget && !e.zombieTarget.flags.dead)
+          ) {
+            if (e.timer.attack < 0) {
+              e.timer.attack = this.attackSpeed;
+
               this.bullets.newBullet(
                 e,
                 e.graveYardTarget || e.zombieTarget,
                 this.attackDamage,
                 false,
                 true
-              ))
-            : this.changeState(e, tankState.patrolling);
+              );
+            }
+          } else {
+            this.changeState(e, tankState.patrolling);
+          }
+        }
       }
+
       this.updateTankSprites(e, t);
     }
     updateTankSprites(e, t) {
-      var s;
-      if (
-        (Math.abs(e.xSpeed) > Math.abs(e.ySpeed)
-          ? e.currentDirection != currentDirection.horizontal &&
-            ((e.currentDirection = currentDirection.horizontal),
-            (e.textures = this.textures.horizontal),
-            e.play(),
-            (e.turretSprite.y = -7))
-          : e.currentDirection != currentDirection.vertical &&
-            ((e.currentDirection = currentDirection.vertical),
-            (e.textures = this.textures.vertical),
-            e.play(),
-            (e.turretSprite.y = -8)),
-        e.graveYardTarget || e.zombieTarget)
-      ) {
-        e.target =
-          null !== (s = e.graveYardTarget) && void 0 !== s ? s : e.zombieTarget;
+      if (Math.abs(e.xSpeed) > Math.abs(e.ySpeed)) {
+        if (e.currentDirection != currentDirection.horizontal) {
+          e.currentDirection = currentDirection.horizontal;
+          e.textures = this.textures.horizontal;
+          e.play();
+          e.turretSprite.y = -7;
+        }
+      } else if (e.currentDirection != currentDirection.vertical) {
+        e.currentDirection = currentDirection.vertical;
+        e.textures = this.textures.vertical;
+        e.play();
+        e.turretSprite.y = -8;
+      }
+
+      if (e.graveYardTarget || e.zombieTarget) {
+        e.target = e.graveYardTarget ?? e.zombieTarget;
         const i = Math.atan2(e.target.x - e.x, e.y - e.target.y) + Math.PI / 2;
-        e.turretSprite.rotation > i
-          ? (e.turretSprite.rotation -= 3 * t)
-          : (e.turretSprite.rotation += 3 * t);
+
+        if (e.turretSprite.rotation > i) {
+          e.turretSprite.rotation -= 3 * t;
+        } else {
+          e.turretSprite.rotation += 3 * t;
+        }
       }
     }
     decideStateOnZombieDistance(e) {
-      var t;
       if (e.graveYardTarget || (e.zombieTarget && !e.zombieTarget.flags.dead)) {
+        e.target = e.graveYardTarget ?? e.zombieTarget;
+
         if (
-          ((e.target =
-            null !== (t = e.graveYardTarget) && void 0 !== t
-              ? t
-              : e.zombieTarget),
           weighted_hybrid_distance(
             e.position.x,
             e.position.y,
             e.target.x,
             e.target.y
-          ) > this.shootDistance)
-        )
+          ) > this.shootDistance
+        ) {
           return void this.changeState(e, tankState.attacking);
+        }
+
         this.changeState(e, tankState.shooting);
       }
     }
     changeState(e, t) {
       switch (t) {
         case tankState.patrolling:
-        case tankState.attacking:
+        case tankState.attacking: {
           e.play();
           break;
-        case tankState.shooting:
+        }
+        case tankState.shooting: {
           e.gotoAndStop(0);
+        }
       }
       e.tankState = t;
     }
   }
+
   class Pe extends Q {
-    constructor() {
-      super(...arguments),
-        (this.currentDirection = 0),
-        (this.bulletReflect = 0),
-        (this.zombieId = 0),
-        (this.lastKnownBuilding = null),
-        (this.maxSpeed = 0),
-        (this.graveyard = false),
-        (this.regenTimer = 0),
-        (this.bloodbornTimer = 0),
-        (this.level = 0),
-        (this.creatureType = 0),
-        (this.scaling = 0),
-        (this.attackDamage = 0),
-        (this.speedMultiplier = 1),
-        (this.price = 0),
-        (this.immuneToBurns = false),
-        (this.zombie = true),
-        (this.textureSet = {
-          set: false,
-          down: [],
-          up: [],
-          left: [],
-          right: [],
-          dead: [],
-        });
+    constructor(...args) {
+      super(...args);
+      this.currentDirection = 0;
+      this.bulletReflect = 0;
+      this.zombieId = 0;
+      this.lastKnownBuilding = null;
+      this.maxSpeed = 0;
+      this.graveyard = false;
+      this.regenTimer = 0;
+      this.bloodbornTimer = 0;
+      this.level = 0;
+      this.creatureType = 0;
+      this.scaling = 0;
+      this.attackDamage = 0;
+      this.speedMultiplier = 1;
+      this.price = 0;
+      this.immuneToBurns = false;
+      this.zombie = true;
+
+      this.textureSet = {
+        set: false,
+        down: [],
+        up: [],
+        left: [],
+        right: [],
+        dead: [],
+      };
     }
   }
-  !(function (e) {
-    (e[(e.lookingForTarget = 0)] = "lookingForTarget"),
-      (e[(e.movingToTarget = 1)] = "movingToTarget"),
-      (e[(e.attackingTarget = 2)] = "attackingTarget");
-  })(be || (be = {}));
+  enum zombieState {
+    lookingForTarget,
+    movingToTarget,
+    attackingTarget,
+  }
+
   class ze extends PIXI.Text {
-    constructor() {
-      super(...arguments), (this.speed = 30), (this.fadeTime = 0.5);
+    constructor(...args) {
+      super(...args);
+      this.speed = 30;
+      this.fadeTime = 0.5;
     }
-    updateCritText(e) {
-      this.visible &&
-        ((this.y -= this.speed * e),
-        (this.fadeTime -= e),
-        this.fadeTime < 0 &&
-          ((this.alpha -= 2 * e),
-          this.alpha < 0 && ((this.visible = false), Re.push(this))));
+    updateCritTeext(e) {
+      if (this.visible) {
+        this.y -= this.speed * e;
+        this.fadeTime -= e;
+
+        if (this.fadeTime < 0) {
+          this.alpha -= 2 * e;
+
+          if (this.alpha < 0) {
+            this.visible = false;
+            Re.push(this);
+          }
+        }
+      }
     }
     reset() {
-      (this.fadeTime = 0.5), (this.alpha = 1), (this.visible = true);
+      this.fadeTime = 0.5;
+      this.alpha = 1;
+      this.visible = true;
     }
   }
+
   const Ie = new PIXI.TextStyle({
-      fill: "#ef0",
-      fontSize: 64,
-    }),
-    Be = [],
-    Re = [];
+    fill: "#ef0",
+    fontSize: 64,
+  });
+
+  const Be = [];
+  const Re = [];
 
   function He(e, t, s) {
-    if (GameModel.getInstance().persistentData.particles)
+    if (GameModel.getInstance().persistentData.particles) {
       if (Re.length > 0) {
         const i = Re.pop();
-        i.reset(), (i.text = formatDecimal(s)), i.position.set(e, t);
+        i.reset();
+        i.text = formatDecimal(s);
+        i.position.set(e, t);
       } else {
         const i = new ze(formatDecimal(s), Ie);
-        b.addChild(i),
-          i.position.set(e, t),
-          i.anchor.set(0.5, 1),
-          i.scale.set(0.2, 0.2),
-          Be.push(i);
+        b.addChild(i);
+        i.position.set(e, t);
+        i.anchor.set(0.5, 1);
+        i.scale.set(0.2, 0.2);
+        Be.push(i);
       }
+    }
   }
+
   class Fe extends K {
-    constructor() {
-      super(...arguments), (this.dog = false), (this.super = false);
+    constructor(...args) {
+      super(...args);
+      this.dog = false;
+      this.super = false;
     }
   }
   class Ee extends Pe {
-    constructor() {
-      super(...arguments),
-        (this.flags = new Fe()),
-        (this.mod = 1),
-        (this.scaleMod = 1),
-        (this.textureId = 0),
-        (this.turnTimer = 0);
+    constructor(...args) {
+      super(...args);
+      this.flags = new Fe();
+      this.mod = 1;
+      this.scaleMod = 1;
+      this.textureId = 0;
+      this.turnTimer = 0;
     }
   }
+
   class Zombies {
     constructor() {
-      if (
-        ((this.zombies = []),
-        (this.discardedZombies = []),
-        (this.aliveZombies = []),
-        (this.aliveHumans = []),
-        (this.zombiePartition = []),
-        (this.scaling = 2),
-        (this.moveTargetDistance = 15),
-        (this.attackDistance = 15),
-        (this.attackSpeed = 3),
-        (this.targetDistance = 100),
-        (this.fadeSpeed = 0.1),
-        (this.refundChance = 0),
-        (this.currId = 1),
-        (this.scanTime = 3),
-        (this.textures = []),
-        (this.dogTexture = []),
-        (this.deadDogTexture = []),
-        (this.maxSpeed = 10),
-        (this.zombieCursor = null),
-        (this.zombieCursorText = null),
-        (this.zombieCursorScale = 3),
-        (this.mouseOutOfBounds = false),
-        (this.burnTickTimer = 5),
-        (this.bloodpact = 1),
-        (this.bloodborn = 0),
-        (this.gigamutagen = 0),
-        (this.gigamutationTimer = 10),
-        (this.smokeTimer = 0.3),
-        (this.fastDistance = weighted_hybrid_distance),
-        (this.magnitude = pythag),
-        (this.detonate = false),
-        (this.super = false),
-        (this.reactionTime = 0),
-        (this.graveyardAttackers = []),
-        (this.spaceNeeded = 3),
-        Zombies.instance)
-      )
+      this.zombies = [];
+      this.discardedZombies = [];
+      this.aliveZombies = [];
+      this.aliveHumans = [];
+      this.zombiePartition = [];
+      this.scaling = 2;
+      this.moveTargetDistance = 15;
+      this.attackDistance = 15;
+      this.attackSpeed = 3;
+      this.targetDistance = 100;
+      this.fadeSpeed = 0.1;
+      this.refundChance = 0;
+      this.currId = 1;
+      this.scanTime = 3;
+      this.textures = [];
+      this.dogTexture = [];
+      this.deadDogTexture = [];
+      this.maxSpeed = 10;
+      this.zombieCursor = null;
+      this.zombieCursorText = null;
+      this.zombieCursorScale = 3;
+      this.mouseOutOfBounds = false;
+      this.burnTickTimer = 5;
+      this.bloodpact = 1;
+      this.bloodborn = 0;
+      this.gigamutagen = 0;
+      this.gigamutationTimer = 10;
+      this.smokeTimer = 0.3;
+      this.fastDistance = weighted_hybrid_distance;
+      this.magnitude = pythag;
+      this.detonate = false;
+      this.super = false;
+      this.reactionTime = 0;
+      this.graveyardAttackers = [];
+      this.spaceNeeded = 3;
+
+      if (Zombies.instance) {
         return Zombies.instance;
+      }
+
       Zombies.instance = this;
     }
     populate() {
-      if (
-        ((this.map = new ee()),
-        (this.model = GameModel.getInstance()),
-        (this.humans = new Humans()),
-        (this.graveyard = new Graveyard()),
-        (this.creatureFactory = new CreatureFactory()),
-        (this.smoke = new ot()),
-        (this.blood = new _e()),
-        (this.bones = new Bones()),
-        (this.exclamations = new it()),
-        (this.blasts = new nt()),
-        (this.bullets = new rt()),
-        (this.model.zombieCount = 0),
-        0 == this.textures.length)
-      ) {
+      this.map = new ee();
+      this.model = GameModel.getInstance();
+      this.humans = new Humans();
+      this.graveyard = new Graveyard();
+      this.creatureFactory = new CreatureFactory();
+      this.smoke = new ot();
+      this.blood = new _e();
+      this.bones = new Bones();
+      this.exclamations = new it();
+      this.blasts = new nt();
+      this.bullets = new rt();
+      this.model.zombieCount = 0;
+
+      if (this.textures.length == 0) {
         for (let e = 0; e < 3; e++) {
           const t = [];
-          for (let s = 0; s < 3; s++)
-            t.push(
-              PIXI.Texture.from("zombie" + (e + 1) + "_" + (s + 1) + ".png")
-            );
+          for (let s = 0; s < 3; s++) {
+            t.push(PIXI.Texture.from(`zombie${e + 1}_${s + 1}.png`));
+          }
           this.textures.push({
             animated: t,
-            dead: [PIXI.Texture.from("zombie" + (e + 1) + "_dead.png")],
+            dead: [PIXI.Texture.from(`zombie${e + 1}_dead.png`)],
           });
         }
-        for (let e = 0; e < 2; e++)
-          this.dogTexture.push(
-            PIXI.Texture.from("zombiedog" + (e + 1) + ".png")
-          );
+        for (let e = 0; e < 2; e++) {
+          this.dogTexture.push(PIXI.Texture.from(`zombiedog${e + 1}.png`));
+        }
         this.deadDogTexture = [PIXI.Texture.from("zombiedogdead.png")];
       }
+
       if (this.zombies.length > 0) {
-        for (let e = 0; e < this.zombies.length; e++)
-          g.removeChild(this.zombies[e]), this.zombies[e].stop();
-        (this.discardedZombies = this.zombies.slice()),
-          (this.zombies.length = 0),
-          (this.aliveZombies.length = 0);
+        for (let e = 0; e < this.zombies.length; e++) {
+          g.removeChild(this.zombies[e]);
+          this.zombies[e].stop();
+        }
+        this.discardedZombies = this.zombies.slice();
+        this.zombies.length = 0;
+        this.aliveZombies.length = 0;
       }
       if (!this.zombieCursor) {
         this.zombieCursor = new PIXI.Container();
         const e = new PIXI.Sprite(PIXI.Texture.from("zombie1_1.png"));
-        (e.alpha = 0.6),
-          (e.scale.x = e.scale.y = 1),
-          e.anchor.set(35 / 80, 1),
-          (this.zombieCursorText = new PIXI.Text("1", {
-            fontFamily: "sans-serif",
-            fontSize: 40,
-            fill: "#FFF",
-            stroke: "#000",
-            strokeThickness: 0,
-            align: "center",
-          })),
-          (this.zombieCursorText.anchor = {
-            x: 0.5,
-            y: 1,
-          }),
-          (this.zombieCursorText.scale.x = this.zombieCursorText.scale.y = 0.1),
-          (this.zombieCursorText.y = -9),
-          (this.zombieCursorText.visible = false),
-          (this.zombieCursorText.alpha = 0.7),
-          this.zombieCursor.addChild(e),
-          this.zombieCursor.addChild(this.zombieCursorText),
-          m.addChild(this.zombieCursor);
+        e.alpha = 0.6;
+        e.scale.x = 1;
+        e.scale.y = 1;
+        e.anchor.set(35 / 80, 1);
+
+        this.zombieCursorText = new PIXI.Text("1", {
+          fontFamily: "sans-serif",
+          fontSize: 40,
+          fill: "#FFF",
+          stroke: "#000",
+          strokeThickness: 0,
+          align: "center",
+        });
+
+        this.zombieCursorText.anchor = {
+          x: 0.5,
+          y: 1,
+        };
+
+        this.zombieCursorText.scale.x = 0.1;
+        this.zombieCursorText.scale.y = 0.1;
+        this.zombieCursorText.y = -9;
+        this.zombieCursorText.visible = false;
+        this.zombieCursorText.alpha = 0.7;
+        this.zombieCursor.addChild(e);
+        this.zombieCursor.addChild(this.zombieCursorText);
+        m.addChild(this.zombieCursor);
       }
     }
     createZombie(e, t, s = false) {
       const i = Math.floor(Math.random() * this.textures.length);
       let a;
-      this.discardedZombies.length > 0
-        ? ((a = this.discardedZombies.pop()),
-          (a.textures = s ? this.dogTexture : this.textures[i].animated))
-        : (a = new Ee(s ? this.dogTexture : this.textures[i].animated)),
-        (a.zombie = true),
-        (a.mod = 1),
-        (a.scaleMod = 1),
-        this.super && ((a.mod = 10), (a.scaleMod = 1.5)),
-        (a.flags = new Fe()),
-        (a.flags.dog = s),
-        (a.flags.super = this.super),
-        (a.deadTexture = a.flags.dog
-          ? this.deadDogTexture
-          : this.textures[i].dead),
-        (a.textureId = i),
-        (a.burnDamage = 0),
-        (a.lastKnownBuilding = false),
-        (a.alpha = 1),
-        (a.animationSpeed = 0.15),
-        a.anchor.set(35 / 80, 1),
-        (a.bloodbornTimer = this.bloodborn),
-        a.position.set(e, t),
-        (a.target = null),
-        (a.zIndex = a.position.y),
-        (a.visible = true),
-        (a.maxHealth = a.health = this.model.zombieHealth * a.mod),
-        (a.regenTimer = 5),
-        (a.state = be.lookingForTarget);
+
+      if (this.discardedZombies.length > 0) {
+        a = this.discardedZombies.pop();
+        a.textures = s ? this.dogTexture : this.textures[i].animated;
+      } else {
+        a = new Ee(s ? this.dogTexture : this.textures[i].animated);
+      }
+
+      a.zombie = true;
+      a.mod = 1;
+      a.scaleMod = 1;
+
+      if (this.super) {
+        a.mod = 10;
+        a.scaleMod = 1.5;
+      }
+
+      a.flags = new Fe();
+      a.flags.dog = s;
+      a.flags.super = this.super;
+
+      a.deadTexture = a.flags.dog ? this.deadDogTexture : this.textures[i].dead;
+
+      a.textureId = i;
+      a.burnDamage = 0;
+      a.lastKnownBuilding = false;
+      a.alpha = 1;
+      a.animationSpeed = 0.15;
+      a.anchor.set(35 / 80, 1);
+      a.bloodbornTimer = this.bloodborn;
+      a.position.set(e, t);
+      a.target = null;
+      a.zIndex = a.position.y;
+      a.visible = true;
+      a.maxHealth = a.health = this.model.zombieHealth * a.mod;
+      a.regenTimer = 5;
+      a.state = zombieState.lookingForTarget;
       const r = s ? 0.7 : 1;
-      (a.scaling = a.scaleMod * this.scaling * r),
-        a.scale.set(
-          Math.random() > 0.5 ? a.scaling : -1 * a.scaling,
-          a.scaling
-        ),
-        (a.timer.attack = 0),
-        (a.xSpeed = 0),
-        (a.ySpeed = 0),
-        (a.speedMultiplier = 1),
-        (a.timer.scan = 0),
-        (a.timer.burnTick = this.burnTickTimer),
-        (a.timer.smoke = this.smokeTimer),
-        a.play(),
-        (a.zombieId = this.currId++),
-        this.zombies.push(a),
-        g.addChild(a),
-        this.smoke.newZombieSpawnCloud(e, t - 2);
+      a.scaling = a.scaleMod * this.scaling * r;
+      a.scale.set(Math.random() > 0.5 ? a.scaling : -1 * a.scaling, a.scaling);
+      a.timer.attack = 0;
+      a.xSpeed = 0;
+      a.ySpeed = 0;
+      a.speedMultiplier = 1;
+      a.timer.scan = 0;
+      a.timer.burnTick = this.burnTickTimer;
+      a.timer.smoke = this.smokeTimer;
+      a.play();
+      a.zombieId = this.currId++;
+      this.zombies.push(a);
+      g.addChild(a);
+      this.smoke.newZombieSpawnCloud(e, t - 2);
     }
     spawnZombie(e, t) {
-      this.model.energy < this.model.zombieCost ||
-        ((this.model.energy -= this.model.zombieCost),
-        this.createZombie(e, t, false));
+      if (this.model.energy >= this.model.zombieCost) {
+        this.model.energy -= this.model.zombieCost;
+        this.createZombie(e, t, false);
+      }
     }
     spawnAllZombies(e, t) {
       const s = Math.min(
         Math.floor(this.model.energy / this.model.zombieCost),
         100
       );
-      for (let i = 0; i < s; i++)
+      for (let i = 0; i < s; i++) {
         this.spawnZombie(
           e + 4 * (Math.random() - 1),
           t + 4 * (Math.random() - 1)
         );
+      }
     }
     damageZombie(e, t, s) {
-      if (e.graveyard) this.graveyard.damageGraveyard(t);
-      else {
-        if (e.boneshield)
-          return e.boneshield--, void this.bones.newPart(e.x, e.y, 1);
-        this.graveyard.isWithinFence(e) &&
-          ((t *= 0.5), this.exclamations.newShield(e)),
-          e.bloodbornTimer > 0 && ((t *= 0.5), this.exclamations.newShield(e)),
-          s && s.flags.infected && (t *= this.model.plagueDmgReduction),
-          (e.health -= t * this.model.runeEffects.damageReduction),
-          this.setSpeedMultiplier(e),
-          this.blood.newSplatter(e.x, e.y),
-          e.health <= 0 &&
-            !e.flags.dead &&
-            (this.bones.newBones(e.x, e.y),
-            (e.flags.dead = true),
-            e.flags.golem &&
-              this.refundChance > 0 &&
-              (this.model.sendMessage("Golem Refunded!"),
-              this.creatureFactory.refundParts(e, this.refundChance)),
-            Math.random() < this.model.infectedBlastChance &&
-              this.causePlagueExplosion(e, 0.2 * e.maxHealth, true, false),
-            (e.textures = e.deadTexture),
-            e.gotoAndStop(0),
-            Math.random() < this.model.brainRecoverChance &&
-              this.model.addBrains(1)),
-          s &&
-            this.model.runeEffects.damageReflection > 0 &&
-            this.humans.damageHuman(
-              s,
-              t * this.model.runeEffects.damageReflection
-            );
+      if (e.graveyard) {
+        this.graveyard.damageGraveyard(t);
+      } else {
+        if (e.boneshield) {
+          e.boneshield--;
+          return void this.bones.newPart(e.x, e.y, 1);
+        }
+
+        if (this.graveyard.isWithinFence(e)) {
+          t *= 0.5;
+          this.exclamations.newShield(e);
+        }
+
+        if (e.bloodbornTimer > 0) {
+          t *= 0.5;
+          this.exclamations.newShield(e);
+        }
+
+        if (s && s.flags.infected) {
+          t *= this.model.plagueDmgReduction;
+        }
+
+        e.health -= t * this.model.runeEffects.damageReduction;
+        this.setSpeedMultiplier(e);
+        this.blood.newSplatter(e.x, e.y);
+
+        if (e.health <= 0 && !e.flags.dead) {
+          this.bones.newBones(e.x, e.y);
+          e.flags.dead = true;
+
+          if (e.flags.golem && this.refundChance > 0) {
+            this.model.sendMessage("Golem Refunded!");
+            this.creatureFactory.refundParts(e, this.refundChance);
+          }
+
+          if (Math.random() < this.model.infectedBlastChance) {
+            this.causePlagueExplosion(e, 0.2 * e.maxHealth, true, false);
+          }
+
+          e.textures = e.deadTexture;
+          e.gotoAndStop(0);
+
+          if (Math.random() < this.model.brainRecoverChance) {
+            this.model.addBrains(1);
+          }
+        }
+
+        if (s && this.model.runeEffects.damageReflection > 0) {
+          this.humans.damageHuman(
+            s,
+            t * this.model.runeEffects.damageReflection
+          );
+        }
       }
     }
     causePlagueExplosion(e, t, s = true, i = false) {
       const a = i ? 75 : 50;
-      this.blood.newPlagueSplatter(e.x, e.y),
-        i
-          ? this.blasts.newDetonateBlast(e.x, e.y - 4)
-          : this.blasts.newZombieBlast(e.x, e.y - 4),
-        s && ((e.visible = false), g.removeChild(e));
-      for (let s = 0; s < this.aliveHumans.length; s++)
-        Math.abs(this.aliveHumans[s].x - e.x) < a &&
+      this.blood.newPlagueSplatter(e.x, e.y);
+
+      if (i) {
+        this.blasts.newDetonateBlast(e.x, e.y - 4);
+      } else {
+        this.blasts.newZombieBlast(e.x, e.y - 4);
+      }
+
+      if (s) {
+        e.visible = false;
+        g.removeChild(e);
+      }
+
+      for (let s = 0; s < this.aliveHumans.length; s++) {
+        if (
+          Math.abs(this.aliveHumans[s].x - e.x) < a &&
           Math.abs(this.aliveHumans[s].y - e.y) < a &&
           this.fastDistance(
             e.x,
             e.y,
             this.aliveHumans[s].x,
             this.aliveHumans[s].y
-          ) < a &&
-          (this.inflictPlague(this.aliveHumans[s]),
-          this.humans.damageHuman(this.aliveHumans[s], t));
+          ) < a
+        ) {
+          this.inflictPlague(this.aliveHumans[s]);
+          this.humans.damageHuman(this.aliveHumans[s], t);
+        }
+      }
       if (this.model.blastHealing > 0) {
         const s = t * this.model.blastHealing;
-        for (let t = 0; t < this.aliveZombies.length; t++)
-          Math.abs(this.aliveZombies[t].x - e.x) < a &&
+        for (let t = 0; t < this.aliveZombies.length; t++) {
+          if (
+            Math.abs(this.aliveZombies[t].x - e.x) < a &&
             Math.abs(this.aliveZombies[t].y - e.y) < a &&
             this.fastDistance(
               e.x,
               e.y,
               this.aliveZombies[t].x,
               this.aliveZombies[t].y
-            ) < a &&
+            ) < a
+          ) {
             this.healZombie(this.aliveZombies[t], s);
+          }
+        }
       }
     }
     partitionInsert(e, t) {
-      const s = Math.round(t.x / 10),
-        i = Math.round(t.y / 10);
-      e[s] || (e[s] = []), e[s][i] || (e[s][i] = []), e[s][i].push(t);
+      const s = Math.round(t.x / 10);
+      const i = Math.round(t.y / 10);
+
+      if (!e[s]) {
+        e[s] = [];
+      }
+
+      if (!e[s][i]) {
+        e[s][i] = [];
+      }
+
+      e[s][i].push(t);
     }
     partitionGetNeighbours(e) {
-      const t = [],
-        s = Math.round(e.x / 10),
-        i = Math.round(e.y / 10);
-      for (let e = s - 1; e <= s + 1; e++)
-        if (this.zombiePartition[e])
-          for (let s = i - 1; s <= i + 1; s++)
-            this.zombiePartition[e][s] && t.push(...this.zombiePartition[e][s]);
+      const t = [];
+      const s = Math.round(e.x / 10);
+      const i = Math.round(e.y / 10);
+      for (let e = s - 1; e <= s + 1; e++) {
+        if (this.zombiePartition[e]) {
+          for (let s = i - 1; s <= i + 1; s++) {
+            if (this.zombiePartition[e][s]) {
+              t.push(...this.zombiePartition[e][s]);
+            }
+          }
+        }
+      }
       return t;
     }
     update(e) {
-      (this.maxSpeed = this.model.zombieSpeed),
-        this.detonate && (this.maxSpeed *= 1.5),
-        (this.reactionTime = Math.max(0.2, this.aliveZombies.length / 2e3));
-      const t = [],
-        s = [];
-      (this.aliveHumans = this.humans.aliveHumans),
-        (this.graveyardAttackers = this.humans.graveyardAttackers),
-        this.gigamutagen > 0 && (this.gigamutationTimer -= e);
-      for (let i = 0; i < this.zombies.length; i++)
-        this.zombies[i].visible &&
-          (this.updateZombie(this.zombies[i], e),
-          this.zombies[i].flags.dead ||
-            (t.push(this.zombies[i]),
-            this.partitionInsert(s, this.zombies[i])));
+      this.maxSpeed = this.model.zombieSpeed;
+
+      if (this.detonate) {
+        this.maxSpeed *= 1.5;
+      }
+
+      this.reactionTime = Math.max(
+        0.2,
+        this.aliveZombies.length / 2000 /* 2e3 */
+      );
+      const t = [];
+      const s = [];
+      this.aliveHumans = this.humans.aliveHumans;
+      this.graveyardAttackers = this.humans.graveyardAttackers;
+
+      if (this.gigamutagen > 0) {
+        this.gigamutationTimer -= e;
+      }
+
+      for (let i = 0; i < this.zombies.length; i++) {
+        if (this.zombies[i].visible) {
+          this.updateZombie(this.zombies[i], e);
+
+          if (!this.zombies[i].flags.dead) {
+            t.push(this.zombies[i]);
+            this.partitionInsert(s, this.zombies[i]);
+          }
+        }
+      }
+      this.model.zombieCount = t.length;
+      this.aliveZombies = t;
+      this.zombiePartition = s;
+
       if (
-        ((this.model.zombieCount = t.length),
-        (this.aliveZombies = t),
-        (this.zombiePartition = s),
         this.model.energy >= this.model.zombieCost &&
-          this.model.currentState == this.model.states.playingLevel)
-      )
-        if (
-          ((this.zombieCursor.visible = !this.mouseOutOfBounds),
-          Y.shift && !this.mouseOutOfBounds)
-        ) {
+        this.model.currentState == this.model.states.playingLevel
+      ) {
+        this.zombieCursor.visible = !this.mouseOutOfBounds;
+
+        if (Y.shift && !this.mouseOutOfBounds) {
           this.zombieCursorText.visible = true;
           const e = Math.min(
             Math.floor(this.model.energy / this.model.zombieCost),
             100
           );
-          this.zombieCursorText.text != e && (this.zombieCursorText.text = e);
-        } else this.zombieCursorText.visible = false;
-      else this.zombieCursor.visible = false;
+
+          if (this.zombieCursorText.text != e) {
+            this.zombieCursorText.text = e;
+          }
+        } else {
+          this.zombieCursorText.visible = false;
+        }
+      } else {
+        this.zombieCursor.visible = false;
+      }
     }
     detonateZombie(e) {
-      (e.state == be.attackingTarget ||
-        (0 == this.aliveHumans.length && Math.random() < 0.05)) &&
-        (this.bones.newBones(e.x, e.y),
-        (e.flags.dead = true),
-        this.causePlagueExplosion(e, e.maxHealth, true, true),
-        Math.random() < this.model.brainRecoverChance &&
-          this.model.addBrains(1));
+      if (
+        e.state == zombieState.attackingTarget ||
+        (this.aliveHumans.length == 0 && Math.random() < 0.05)
+      ) {
+        this.bones.newBones(e.x, e.y);
+        e.flags.dead = true;
+        this.causePlagueExplosion(e, e.maxHealth, true, true);
+
+        if (Math.random() < this.model.brainRecoverChance) {
+          this.model.addBrains(1);
+        }
+      }
     }
     updateZombie(e, t) {
-      var s;
       if (e.flags.dead) {
-        if (!e.visible) return;
-        return (
-          (e.alpha -= this.fadeSpeed * t),
-          void (e.alpha < 0 && ((e.visible = false), g.removeChild(e)))
-        );
+        if (!e.visible) {
+          return;
+        }
+        e.alpha -= this.fadeSpeed * t;
+        return void (e.alpha < 0 && ((e.visible = false), g.removeChild(e)));
       }
-      switch (
-        (1 == e.mod &&
-          this.gigamutationTimer < 0 &&
-          ((e.mod = 10),
-          (e.scaling *= 1.5),
-          e.scale.set(e.scaling, e.scaling),
-          (e.maxHealth *= 10),
-          (e.health *= 10),
-          (this.gigamutationTimer = this.gigamutagen),
-          this.smoke.newZombieSpawnCloud(e.x, e.y - 2)),
-        (e.bloodbornTimer -= t),
-        (e.timer.attack -= t),
-        (e.timer.scan -= t),
-        this.model.runeEffects.healthRegen > 0 && this.updateZombieRegen(e, t),
-        this.detonate && this.detonateZombie(e),
-        e.flags.burning && this.updateBurns(e, t),
-        (!e.target || e.target.flags.dead) &&
-          e.timer.scan < 0 &&
-          (e.state = be.lookingForTarget),
-        e.state)
-      ) {
-        case be.lookingForTarget:
-          this.searchClosestTarget(
-            null !== (s = e.target) && void 0 !== s ? s : e
-          ),
-            (e.target && !e.target.flags.dead) || this.assignRandomTarget(e),
-            e.target && (e.state = be.movingToTarget);
+
+      if (e.mod == 1 && this.gigamutationTimer < 0) {
+        e.mod = 10;
+        e.scaling *= 1.5;
+        e.scale.set(e.scaling, e.scaling);
+        e.maxHealth *= 10;
+        e.health *= 10;
+        this.gigamutationTimer = this.gigamutagen;
+        this.smoke.newZombieSpawnCloud(e.x, e.y - 2);
+      }
+
+      e.bloodbornTimer -= t;
+      e.timer.attack -= t;
+      e.timer.scan -= t;
+
+      if (this.model.runeEffects.healthRegen > 0) {
+        this.updateZombieRegen(e, t);
+      }
+
+      if (this.detonate) {
+        this.detonateZombie(e);
+      }
+
+      if (e.flags.burning) {
+        this.updateBurns(e, t);
+      }
+
+      if ((!e.target || e.target.flags.dead) && e.timer.scan < 0) {
+        e.state = zombieState.lookingForTarget;
+      }
+
+      switch (e.state) {
+        case zombieState.lookingForTarget: {
+          this.searchClosestTarget(e.target ?? e);
+
+          if (!e.target || e.target.flags.dead) {
+            this.assignRandomTarget(e);
+          }
+
+          if (e.target) {
+            e.state = zombieState.movingToTarget;
+          }
+
           break;
-        case be.movingToTarget: {
+        }
+        case zombieState.movingToTarget: {
           const s = this.fastDistance(
             e.position.x,
             e.position.y,
@@ -8969,118 +9263,169 @@ var Incremancer;
             e.target.y
           );
           if (s < this.attackDistance) {
-            e.state = be.attackingTarget;
+            e.state = zombieState.attackingTarget;
             break;
           }
-          e.timer.attack < 0 &&
-            s < this.model.spitDistance &&
-            (this.bullets.newBullet(
+
+          if (e.timer.attack < 0 && s < this.model.spitDistance) {
+            this.bullets.newBullet(
               e,
               e.target,
               this.model.zombieDamage / 2,
               true
-            ),
-            (e.timer.attack =
+            );
+
+            e.timer.attack =
               this.attackSpeed *
               (1 /
-                (this.model.runeEffects.attackSpeed * this.model.ShockPCMod)))),
-            s > 3 * this.attackDistance &&
-              e.timer.scan < 0 &&
-              this.searchClosestTarget(e),
-            this.updateZombieSpeed(e, t);
+                (this.model.runeEffects.attackSpeed * this.model.ShockPCMod));
+          }
+
+          if (s > 3 * this.attackDistance && e.timer.scan < 0) {
+            this.searchClosestTarget(e);
+          }
+
+          this.updateZombieSpeed(e, t);
           break;
         }
-        case be.attackingTarget: {
+        case zombieState.attackingTarget: {
           const s = this.fastDistance(
             e.position.x,
             e.position.y,
             e.target.x,
             e.target.y
           );
-          s < this.attackDistance
-            ? ((e.scale.x = e.target.x > e.x ? e.scaling : -e.scaling),
-              e.timer.attack < 0 &&
-                (this.humans.damageHuman(e.target, this.calculateDamage(e)),
-                e.flags.dog && (e.target.timer.dogStun = 1),
-                Math.random() < this.model.infectedBiteChance &&
-                  this.inflictPlague(e.target),
-                (e.timer.attack =
-                  this.attackSpeed *
-                  (1 /
-                    (this.model.runeEffects.attackSpeed *
-                      this.model.ShockPCMod))),
-                e.flags.burning &&
-                  (e.timer.attack *= 1 / this.model.burningSpeedMod)),
-              s > this.attackDistance / 2 && this.updateZombieSpeed(e, t))
-            : (e.state = be.movingToTarget);
+
+          if (s < this.attackDistance) {
+            e.scale.x = e.target.x > e.x ? e.scaling : -e.scaling;
+
+            if (e.timer.attack < 0) {
+              this.humans.damageHuman(e.target, this.calculateDamage(e));
+
+              if (e.flags.dog) {
+                e.target.timer.dogStun = 1;
+              }
+
+              if (Math.random() < this.model.infectedBiteChance) {
+                this.inflictPlague(e.target);
+              }
+
+              e.timer.attack =
+                this.attackSpeed *
+                (1 /
+                  (this.model.runeEffects.attackSpeed * this.model.ShockPCMod));
+
+              if (e.flags.burning) {
+                e.timer.attack *= 1 / this.model.burningSpeedMod;
+              }
+            }
+
+            if (s > this.attackDistance / 2) {
+              this.updateZombieSpeed(e, t);
+            }
+          } else {
+            e.state = zombieState.movingToTarget;
+          }
+
           break;
         }
       }
     }
     setSpeedMultiplier(e) {
-      e.flags.burning
-        ? (e.speedMultiplier = this.model.burningSpeedMod)
-        : (e.speedMultiplier = Math.max(
-            Math.min(1, e.health / e.maxHealth),
-            0.4
-          ));
+      if (e.flags.burning) {
+        e.speedMultiplier = this.model.burningSpeedMod;
+      } else {
+        e.speedMultiplier = Math.max(Math.min(1, e.health / e.maxHealth), 0.4);
+      }
     }
     updateZombieRegen(e, t) {
-      (e.regenTimer -= t),
-        e.regenTimer < 0 &&
-          ((e.regenTimer = 5),
-          e.health < e.maxHealth &&
-            ((e.health += e.maxHealth * this.model.runeEffects.healthRegen),
-            e.health > e.maxHealth && (e.health = e.maxHealth),
-            this.setSpeedMultiplier(e)));
+      e.regenTimer -= t;
+
+      if (e.regenTimer < 0) {
+        e.regenTimer = 5;
+
+        if (e.health < e.maxHealth) {
+          e.health += e.maxHealth * this.model.runeEffects.healthRegen;
+
+          if (e.health > e.maxHealth) {
+            e.health = e.maxHealth;
+          }
+
+          this.setSpeedMultiplier(e);
+        }
+      }
     }
     healZombie(e, t) {
-      e.health < e.maxHealth &&
-        ((e.health += t),
-        this.exclamations.newHealing(e),
-        e.health > e.maxHealth && (e.health = e.maxHealth),
-        this.setSpeedMultiplier(e));
+      if (e.health < e.maxHealth) {
+        e.health += t;
+        this.exclamations.newHealing(e);
+
+        if (e.health > e.maxHealth) {
+          e.health = e.maxHealth;
+        }
+
+        this.setSpeedMultiplier(e);
+      }
     }
     calculateDamage(e) {
       let t = this.model.zombieDamage * e.mod;
-      return (
+
+      if (
         this.model.runeEffects.critChance > 0 &&
-          Math.random() < this.model.runeEffects.critChance &&
-          ((t *= this.model.runeEffects.critDamage), He(e.x, e.y - 20, t)),
-        this.bloodpact > 0 && this.model.addBlood(t * this.bloodpact),
-        t
-      );
+        Math.random() < this.model.runeEffects.critChance
+      ) {
+        t *= this.model.runeEffects.critDamage;
+        He(e.x, e.y - 20, t);
+      }
+
+      if (this.bloodpact > 0) {
+        this.model.addBlood(t * this.bloodpact);
+      }
+
+      return t;
     }
     inflictPlague(e) {
-      e.flags.infected
-        ? ((e.plagueDamage +=
-            (this.model.zombieDamage * this.model.PlagueVatPCMod) / 2 +
-            this.model.plagueDamageMod),
-          (e.plagueTicks = this.model.plagueticks))
-        : (this.exclamations.newPoison(e),
-          (e.plagueDamage =
-            (this.model.zombieDamage * this.model.PlagueVatPCMod) / 2 +
-            this.model.plagueDamageMod),
-          (e.plagueTicks = this.model.plagueticks)),
-        (e.flags.infected = true);
+      if (e.flags.infected) {
+        e.plagueDamage +=
+          (this.model.zombieDamage * this.model.PlagueVatPCMod) / 2 +
+          this.model.plagueDamageMod;
+
+        e.plagueTicks = this.model.plagueticks;
+      } else {
+        this.exclamations.newPoison(e);
+
+        e.plagueDamage =
+          (this.model.zombieDamage * this.model.PlagueVatPCMod) / 2 +
+          this.model.plagueDamageMod;
+
+        e.plagueTicks = this.model.plagueticks;
+      }
+
+      e.flags.infected = true;
     }
     updateBurns(e, t) {
-      (e.timer.burnTick -= t),
-        (e.timer.smoke -= t),
-        e.timer.smoke < 0 &&
-          (this.smoke.newFireSmoke(e.x, e.y - 14),
-          (e.timer.smoke = this.smokeTimer)),
-        e.timer.burnTick < 0 &&
-          (this.damageZombie(e, e.burnDamage, null),
-          (e.timer.burnTick = this.burnTickTimer),
-          this.exclamations.newFire(e));
+      e.timer.burnTick -= t;
+      e.timer.smoke -= t;
+
+      if (e.timer.smoke < 0) {
+        this.smoke.newFireSmoke(e.x, e.y - 14);
+        e.timer.smoke = this.smokeTimer;
+      }
+
+      if (e.timer.burnTick < 0) {
+        this.damageZombie(e, e.burnDamage, null);
+        e.timer.burnTick = this.burnTickTimer;
+        this.exclamations.newFire(e);
+      }
     }
     searchClosestTarget(e) {
-      if (e.timer.scan > 0) return;
+      if (e.timer.scan > 0) {
+        return;
+      }
       e.timer.scan = this.scanTime * Math.random();
       let t = 300;
-      if (this.model.isBossStage(this.model.level) && Math.random() > 0.3)
-        for (let s = 0; s < this.graveyardAttackers.length; s++)
+      if (this.model.isBossStage(this.model.level) && Math.random() > 0.3) {
+        for (let s = 0; s < this.graveyardAttackers.length; s++) {
           if (
             Math.abs(this.graveyardAttackers[s].x - e.x) < t &&
             Math.abs(this.graveyardAttackers[s].y - e.y) < t
@@ -9091,11 +9436,17 @@ var Incremancer;
               this.graveyardAttackers[s].x,
               this.graveyardAttackers[s].y
             );
-            i < t && ((e.target = this.graveyardAttackers[s]), (t = i));
+
+            if (i < t) {
+              e.target = this.graveyardAttackers[s];
+              t = i;
+            }
           }
-      if (300 == t) {
-        t = 1e4;
-        for (let s = 0; s < this.aliveHumans.length; s++)
+        }
+      }
+      if (t == 300) {
+        t = 10000 /* 1e4 */;
+        for (let s = 0; s < this.aliveHumans.length; s++) {
           if (
             Math.abs(this.aliveHumans[s].x - e.x) < t &&
             Math.abs(this.aliveHumans[s].y - e.y) < t
@@ -9106,15 +9457,22 @@ var Incremancer;
               this.aliveHumans[s].x,
               this.aliveHumans[s].y
             );
-            i < t && ((e.target = this.aliveHumans[s]), (t = i));
+
+            if (i < t) {
+              e.target = this.aliveHumans[s];
+              t = i;
+            }
           }
+        }
       }
     }
     assignRandomTarget(e) {
-      if (0 == this.aliveHumans.length) return;
+      if (this.aliveHumans.length == 0) {
+        return;
+      }
       const t = this.map.findBuilding(e);
-      if (t && this.map.isInsidePoi(e.x, e.y, t, 0))
-        for (let s = 0; s < this.aliveHumans.length; s++)
+      if (t && this.map.isInsidePoi(e.x, e.y, t, 0)) {
+        for (let s = 0; s < this.aliveHumans.length; s++) {
           if (
             this.map.isInsidePoi(
               this.aliveHumans[s].x,
@@ -9122,324 +9480,383 @@ var Incremancer;
               t,
               0
             )
-          )
+          ) {
             return void (e.target = this.aliveHumans[s]);
+          }
+        }
+      }
       e.target = sample(this.aliveHumans);
     }
     dotProduct(e, t) {
       return e * e + t * t;
     }
     updateZombieSpeed(e, t) {
-      if (e.timer.dogStun && e.timer.dogStun > 0)
+      if (e.timer.dogStun && e.timer.dogStun > 0) {
         return void (e.timer.dogStun -= t);
-      if (
-        ((e.timer.target && e.targetVector) || (e.timer.target = 0),
-        (e.timer.target -= t),
-        e.timer.target <= 0 &&
-          ((e.targetVector = this.map.howDoIGetToMyTarget(e, e.target)),
-          (e.timer.target = this.reactionTime)),
-        this.model.gameSpeed > 1 || e.flags.dog)
-      ) {
-        const t = e.flags.dog ? 1.5 : 1,
-          s = Math.max(this.maxSpeed * e.speedMultiplier * t, 8);
-        (e.xSpeed = e.targetVector.x * s), (e.ySpeed = e.targetVector.y * s);
+      }
+
+      if (!e.timer.target || !e.targetVector) {
+        e.timer.target = 0;
+      }
+
+      e.timer.target -= t;
+
+      if (e.timer.target <= 0) {
+        e.targetVector = this.map.howDoIGetToMyTarget(e, e.target);
+        e.timer.target = this.reactionTime;
+      }
+
+      if (this.model.gameSpeed > 1 || e.flags.dog) {
+        const t = e.flags.dog ? 1.5 : 1;
+        const s = Math.max(this.maxSpeed * e.speedMultiplier * t, 8);
+        e.xSpeed = e.targetVector.x * s;
+        e.ySpeed = e.targetVector.y * s;
       } else {
         const s = 5 * this.maxSpeed * t;
-        (e.xSpeed += e.targetVector.x * s), (e.ySpeed += e.targetVector.y * s);
-        const i = this.dotProduct(e.xSpeed, e.ySpeed),
-          a = Math.pow(Math.max(this.maxSpeed * e.speedMultiplier, 8), 2);
-        i > a && ((e.xSpeed *= a / i), (e.ySpeed *= a / i));
+        e.xSpeed += e.targetVector.x * s;
+        e.ySpeed += e.targetVector.y * s;
+        const i = this.dotProduct(e.xSpeed, e.ySpeed);
+        const a = Math.max(this.maxSpeed * e.speedMultiplier, 8) ** 2;
+
+        if (i > a) {
+          e.xSpeed *= a / i;
+          e.ySpeed *= a / i;
+        }
       }
+
       let s = {
         x: e.position.x + e.xSpeed * t,
         y: e.position.y + e.ySpeed * t,
       };
+      e.turnTimer -= t;
+
       if (
-        ((e.turnTimer -= t),
         e.turnTimer < 0 &&
-          ((e.turnTimer = 0.5), !this.isSpaceToMove(e, s.x, s.y)))
+        ((e.turnTimer = 0.5), !this.isSpaceToMove(e, s.x, s.y))
       ) {
         if (Math.random() > 0.5) {
           const t = {
             x: -e.ySpeed / 2 + e.xSpeed / 2,
             y: e.xSpeed / 2 + e.ySpeed / 2,
           };
-          (e.xSpeed = t.x), (e.ySpeed = t.y);
+          e.xSpeed = t.x;
+          e.ySpeed = t.y;
         } else {
           const t = {
             x: e.ySpeed / 2 + e.xSpeed / 2,
             y: -e.xSpeed / 2 + e.ySpeed / 2,
           };
-          (e.xSpeed = t.x), (e.ySpeed = t.y);
+          e.xSpeed = t.x;
+          e.ySpeed = t.y;
         }
         s = {
           x: e.position.x + e.xSpeed * t,
           y: e.position.y + e.ySpeed * t,
         };
       }
+
       const i = this.map.checkCollisions(e.position, s);
-      i &&
-        (i.x && (e.xSpeed = 0),
-        i.y && (e.ySpeed = 0),
-        (s = {
+
+      if (i) {
+        if (i.x) {
+          e.xSpeed = 0;
+        }
+
+        if (i.y) {
+          e.ySpeed = 0;
+        }
+
+        s = {
           x: e.position.x + e.xSpeed * t,
           y: e.position.y + e.ySpeed * t,
-        }),
-        i.x && (s.x = i.validX),
-        i.y && (s.y = i.validY)),
-        e.position.set(s.x, s.y),
-        (e.zIndex = e.position.y),
-        (e.scale.x = e.xSpeed > 0 ? e.scaling : -e.scaling);
+        };
+
+        if (i.x) {
+          s.x = i.validX;
+        }
+
+        if (i.y) {
+          s.y = i.validY;
+        }
+      }
+
+      e.position.set(s.x, s.y);
+      e.zIndex = e.position.y;
+      e.scale.x = e.xSpeed > 0 ? e.scaling : -e.scaling;
     }
     isSpaceToMove(e, t, s) {
       const i = this.partitionGetNeighbours(e);
-      for (let a = 0; a < i.length; a++)
+      for (let a = 0; a < i.length; a++) {
         if (
           i[a].health >= e.health &&
           i[a].zombieId != e.zombieId &&
           Math.abs(i[a].x - t) < this.spaceNeeded &&
           Math.abs(i[a].y - s) < this.spaceNeeded &&
           Math.abs(i[a].x - t) < this.spaceNeeded
-        )
+        ) {
           return (
             this.fastDistance(t, s, i[a].x, i[a].y) >
             this.fastDistance(e.x, e.y, i[a].x, i[a].y)
           );
+        }
+      }
       return true;
     }
   }
+
   class Le extends Pe {
-    constructor() {
-      super(...arguments),
-        (this.boneshieldTimer = 3),
-        (this.boneshield = 0),
-        (this.boneshieldContainer = new Ge());
+    constructor(...args) {
+      super(...args);
+      this.boneshieldTimer = 3;
+      this.boneshield = 0;
+      this.boneshieldContainer = new Ge();
     }
   }
   class Ze extends PIXI.Sprite {
-    constructor() {
-      super(...arguments),
-        (this.speed = {
-          x: 0,
-          y: 0,
-        }),
-        (this.flying = false);
+    constructor(...args) {
+      super(...args);
+
+      this.speed = {
+        x: 0,
+        y: 0,
+      };
+
+      this.flying = false;
     }
   }
   class Ge extends PIXI.Container {
-    constructor() {
-      super(...arguments),
-        (this.spacing = (2 * Math.PI) / 10),
-        (this.bones = []);
+    constructor(...args) {
+      super(...args);
+      this.spacing = (2 * Math.PI) / 10;
+      this.bones = [];
     }
     getTexture() {
-      if (this.texture) return this.texture;
+      if (this.texture) {
+        return this.texture;
+      }
       const e = document.createElement("canvas");
-      (e.width = 4), (e.height = 1);
+      e.width = 4;
+      e.height = 1;
       const t = e.getContext("2d");
-      return (
-        (t.fillStyle = "#dddddd"),
-        t.fillRect(0, 0, 4, 1),
-        (this.texture = PIXI.Texture.from(e)),
-        this.texture
-      );
+      t.fillStyle = "#dddddd";
+      t.fillRect(0, 0, 4, 1);
+      this.texture = PIXI.Texture.from(e);
+      return this.texture;
     }
     getBone() {
       const e = new Ze(this.getTexture());
-      return e.anchor.set(0.5, 20), this.addChild(e), this.bones.push(e), e;
+      e.anchor.set(0.5, 20);
+      this.addChild(e);
+      this.bones.push(e);
+      return e;
     }
     update(e) {
-      e > this.bones.length &&
-        (this.getBone().rotation = this.spacing * this.bones.length);
-      for (let t = 0; t < this.bones.length; t++) this.bones[t].visible = t < e;
+      if (e > this.bones.length) {
+        this.getBone().rotation = this.spacing * this.bones.length;
+      }
+
+      for (let t = 0; t < this.bones.length; t++) {
+        this.bones[t].visible = t < e;
+      }
     }
   }
+
   class Skeleton {
     constructor() {
-      if (
-        ((this.skeletons = []),
-        (this.aliveSkeletons = []),
-        (this.discardedSprites = []),
-        (this.aliveHumans = []),
-        (this.scaling = 1),
-        (this.moveTargetDistance = 15),
-        (this.attackDistance = 25),
-        (this.attackSpeed = 3),
-        (this.targetDistance = 100),
-        (this.fadeSpeed = 0.1),
-        (this.currId = 1),
-        (this.scanTime = 3),
-        (this.spawnTimer = 0),
-        (this.respawnTime = 10),
-        (this.moveSpeed = 40),
-        (this.lastKillingBlow = 0),
-        (this.randomSpells = []),
-        (this.lootChance = 0.001),
-        (this.spellTimer = 3),
-        (this.textures = {
-          set: false,
-          up: [],
-          down: [],
-          left: [],
-          right: [],
-          dead: [],
-        }),
-        (this.directions = {
-          down: 1,
-          up: 2,
-          right: 3,
-          left: 4,
-          dead: 5,
-        }),
-        (this.burnTickTimer = 5),
-        (this.smokeTimer = 0.3),
-        (this.fastDistance = weighted_hybrid_distance),
-        (this.magnitude = pythag),
-        (this.damageZombie = null),
-        (this.searchClosestTarget = null),
-        (this.updateBurns = null),
-        (this.updateZombieRegen = null),
-        (this.causePlagueExplosion = null),
-        (this.inflictPlague = null),
-        (this.healZombie = null),
-        (this.setSpeedMultiplier = null),
-        (this.storageName = "incremancerskele"),
-        (this.talentsStorageName = "incremancertalents"),
-        (this.persistent = {
-          xpRate: 0,
-          skeletons: 0,
-          level: 1,
-          xp: 0,
-          items: [],
-          gearSetEquipped: -1,
-          gearSets: [],
-          currItemId: 0,
-          talentReset: false,
-        }),
-        (this.talents = []),
-        (this.talentPoints = 0),
-        (this.killingBlowParts = 0),
-        (this.lootChanceMod = 1),
-        (this.increaseChance = 0),
-        (this.darkorb = 0),
-        (this.darkorbTimer = 0),
-        (this.boneshield = 0),
-        (this.aliveZombies = []),
-        (this.graveyardAttackers = []),
-        (this.lootPositions = {
-          helmet: {
-            id: 1,
-            name: "Helmet",
-          },
-          chest: {
-            id: 2,
-            name: "Chest",
-          },
-          legs: {
-            id: 3,
-            name: "Legs",
-          },
-          gloves: {
-            id: 4,
-            name: "Gloves",
-          },
-          boots: {
-            id: 5,
-            name: "Boots",
-          },
-          sword: {
-            id: 6,
-            name: "Sword",
-          },
-          shield: {
-            id: 7,
-            name: "Shield",
-          },
-        }),
-        (this.rarity = {
-          common: 1,
-          rare: 2,
-          epic: 3,
-          legendary: 4,
-          ancient: 5,
-          divine: 6,
-          chaos: 7,
-        }),
-        (this.prefixes = {
-          commonQuality: [
-            "Wooden",
-            "Sturdy",
-            "Rigid",
-            "Iron",
-            "Rusty",
-            "Flimsy",
-            "Battered",
-            "Damaged",
-            "Used",
-            "Stained",
-            "Training",
-          ],
-          rareQuality: [
-            "Steel",
-            "Shiny",
-            "Polished",
-            "Forged",
-            "Plated",
-            "Bronze",
-            "Reinforced",
-            "Veteran's",
-            "Reliable",
-          ],
-          epicQuality: [
-            "Antique",
-            "Ancient",
-            "Famous",
-            "Bejeweled",
-            "Notorious",
-            "Historic",
-            "Mythical",
-            "Extraordinary",
-          ],
-          legendaryQuality: [
-            "Monstrous",
-            "Diabolical",
-            "Withering",
-            "Terrible",
-            "Demoniacal",
-          ],
-          ancientQuality: ["Grim", "Miserable", "Luxurious"],
-          divineQuality: ["Divine"],
-          chaosQuality: ["Chaotic", "Corrupted", "Fractured", "Twisted"],
-        }),
-        (this.stats = {
-          respawnTime: {
-            id: 1,
-            scaling: 1,
-          },
-          speed: {
-            id: 2,
-            scaling: 1,
-          },
-          zombieHealth: {
-            id: 3,
-            scaling: 24,
-          },
-          zombieDamage: {
-            id: 4,
-            scaling: 3,
-          },
-          zombieSpeed: {
-            id: 5,
-            scaling: 1,
-          },
-          harpySpeed: {
-            id: 6,
-            scaling: 1,
-          },
-        }),
-        Skeleton.instance)
-      )
+      this.skeletons = [];
+      this.aliveSkeletons = [];
+      this.discardedSprites = [];
+      this.aliveHumans = [];
+      this.scaling = 1;
+      this.moveTargetDistance = 15;
+      this.attackDistance = 25;
+      this.attackSpeed = 3;
+      this.targetDistance = 100;
+      this.fadeSpeed = 0.1;
+      this.currId = 1;
+      this.scanTime = 3;
+      this.spawnTimer = 0;
+      this.respawnTime = 10;
+      this.moveSpeed = 40;
+      this.lastKillingBlow = 0;
+      this.randomSpells = [];
+      this.lootChance = 0.001;
+      this.spellTimer = 3;
+
+      this.textures = {
+        set: false,
+        up: [],
+        down: [],
+        left: [],
+        right: [],
+        dead: [],
+      };
+
+      this.directions = {
+        down: 1,
+        up: 2,
+        right: 3,
+        left: 4,
+        dead: 5,
+      };
+
+      this.burnTickTimer = 5;
+      this.smokeTimer = 0.3;
+      this.fastDistance = weighted_hybrid_distance;
+      this.magnitude = pythag;
+      this.damageZombie = null;
+      this.searchClosestTarget = null;
+      this.updateBurns = null;
+      this.updateZombieRegen = null;
+      this.causePlagueExplosion = null;
+      this.inflictPlague = null;
+      this.healZombie = null;
+      this.setSpeedMultiplier = null;
+      this.storageName = "incremancerskele";
+      this.talentsStorageName = "incremancertalents";
+
+      this.persistent = {
+        xpRate: 0,
+        skeletons: 0,
+        level: 1,
+        xp: 0,
+        items: [],
+        gearSetEquipped: -1,
+        gearSets: [],
+        currItemId: 0,
+        talentReset: false,
+      };
+
+      this.talents = [];
+      this.talentPoints = 0;
+      this.killingBlowParts = 0;
+      this.lootChanceMod = 1;
+      this.increaseChance = 0;
+      this.darkorb = 0;
+      this.darkorbTimer = 0;
+      this.boneshield = 0;
+      this.aliveZombies = [];
+      this.graveyardAttackers = [];
+
+      this.lootPositions = {
+        helmet: {
+          id: 1,
+          name: "Helmet",
+        },
+        chest: {
+          id: 2,
+          name: "Chest",
+        },
+        legs: {
+          id: 3,
+          name: "Legs",
+        },
+        gloves: {
+          id: 4,
+          name: "Gloves",
+        },
+        boots: {
+          id: 5,
+          name: "Boots",
+        },
+        sword: {
+          id: 6,
+          name: "Sword",
+        },
+        shield: {
+          id: 7,
+          name: "Shield",
+        },
+      };
+
+      this.rarity = {
+        common: 1,
+        rare: 2,
+        epic: 3,
+        legendary: 4,
+        ancient: 5,
+        divine: 6,
+        chaos: 7,
+      };
+
+      this.prefixes = {
+        commonQuality: [
+          "Wooden",
+          "Sturdy",
+          "Rigid",
+          "Iron",
+          "Rusty",
+          "Flimsy",
+          "Battered",
+          "Damaged",
+          "Used",
+          "Stained",
+          "Training",
+        ],
+        rareQuality: [
+          "Steel",
+          "Shiny",
+          "Polished",
+          "Forged",
+          "Plated",
+          "Bronze",
+          "Reinforced",
+          "Veteran's",
+          "Reliable",
+        ],
+        epicQuality: [
+          "Antique",
+          "Ancient",
+          "Famous",
+          "Bejeweled",
+          "Notorious",
+          "Historic",
+          "Mythical",
+          "Extraordinary",
+        ],
+        legendaryQuality: [
+          "Monstrous",
+          "Diabolical",
+          "Withering",
+          "Terrible",
+          "Demoniacal",
+        ],
+        ancientQuality: ["Grim", "Miserable", "Luxurious"],
+        divineQuality: ["Divine"],
+        chaosQuality: ["Chaotic", "Corrupted", "Fractured", "Twisted"],
+      };
+
+      this.stats = {
+        respawnTime: {
+          id: 1,
+          scaling: 1,
+        },
+        speed: {
+          id: 2,
+          scaling: 1,
+        },
+        zombieHealth: {
+          id: 3,
+          scaling: 24,
+        },
+        zombieDamage: {
+          id: 4,
+          scaling: 3,
+        },
+        zombieSpeed: {
+          id: 5,
+          scaling: 1,
+        },
+        harpySpeed: {
+          id: 6,
+          scaling: 1,
+        },
+      };
+
+      if (Skeleton.instance) {
         return Skeleton.instance;
+      }
+
       Skeleton.instance = this;
     }
     getUsedPoints() {
@@ -9449,7 +9866,7 @@ var Incremancer;
       return this.talentPoints - this.getUsedPoints();
     }
     xpForNextLevel() {
-      return 1e3 * Math.pow(this.persistent.level, 2);
+      return 1000 /* 1e3 */ * this.persistent.level ** 2;
     }
     addXp(e) {
       if (
@@ -9457,156 +9874,188 @@ var Incremancer;
         ((this.persistent.xp += e * this.persistent.xpRate),
         this.persistent.xp > this.xpForNextLevel())
       ) {
-        (this.persistent.xp -= this.xpForNextLevel()),
-          this.persistent.level++,
-          this.upgrades.applyUpgrades(),
-          this.model.sendMessage(
-            "Skeleton Champion reached level " + this.persistent.level + "!"
-          );
+        this.persistent.xp -= this.xpForNextLevel();
+        this.persistent.level++;
+        this.upgrades.applyUpgrades();
+
+        this.model.sendMessage(
+          `Skeleton Champion reached level ${this.persistent.level}!`
+        );
+
         const e = document.getElementById("skeleton");
-        e &&
-          (e.classList.toggle("levelup"),
-          setTimeout(function () {
+
+        if (e) {
+          e.classList.toggle("levelup");
+
+          setTimeout(() => {
             e.classList.toggle("levelup");
-          }, 3e3));
+          }, 3000 /* 3e3 */);
+        }
       }
     }
     isAlive() {
-      for (let e = 0; e < this.skeletons.length; e++)
-        if (!this.skeletons[e].flags.dead) return true;
+      for (let e = 0; e < this.skeletons.length; e++) {
+        if (!this.skeletons[e].flags.dead) {
+          return true;
+        }
+      }
       return false;
     }
     applyUpgrades() {
       if (this.persistent.skeletons > 0) {
         this.applyItemUpgrades();
-        const scalingFactor = Math.pow(1.0001, this.persistent.level);
+        const scalingFactor = 1.0001 ** this.persistent.level;
         const e = 1 + this.persistent.level / 100;
-        (this.model.bloodPCMod *= e),
-          (this.model.brainsPCMod *= e),
-          (this.model.bonesPCMod *= e),
-          (this.model.partsPCMod *= e),
-          (this.model.zombieDamagePCMod *= e),
-          (this.model.zombieHealthPCMod *= e),
-          (this.model.PlagueVatPCMod *= scalingFactor),
-          (this.model.plagueDamageMod *= scalingFactor);
+        this.model.bloodPCMod *= e;
+        this.model.brainsPCMod *= e;
+        this.model.bonesPCMod *= e;
+        this.model.partsPCMod *= e;
+        this.model.zombieDamagePCMod *= e;
+        this.model.zombieHealthPCMod *= e;
+        this.model.PlagueVatPCMod *= scalingFactor;
+        this.model.plagueDamageMod *= scalingFactor;
       }
     }
     acceptOffer() {
-      (this.model.persistentData.trophies = []),
-        this.persistent.skeletons < 1
-          ? ((this.persistent.skeletons = 1),
-            (this.persistent.xpRate = 1),
-            this.model.sendMessage("Skeleton Champion joins the fight!"))
-          : (this.persistent.xpRate *= 2),
-        this.upgrades.applyUpgrades(),
-        this.model.saveData();
+      this.model.persistentData.trophies = [];
+
+      if (this.persistent.skeletons < 1) {
+        this.persistent.skeletons = 1;
+        this.persistent.xpRate = 1;
+        this.model.sendMessage("Skeleton Champion joins the fight!");
+      } else {
+        this.persistent.xpRate *= 2;
+      }
+
+      this.upgrades.applyUpgrades();
+      this.model.saveData();
     }
     populate() {
-      if (
-        ((this.model = GameModel.getInstance()),
-        (this.map = new ee()),
-        (this.graveyard = new Graveyard()),
-        (this.exclamations = new it()),
-        (this.bullets = new rt()),
-        (this.spells = new Spells()),
-        (this.smoke = new ot()),
-        (this.upgrades = new Upgrades()),
-        (this.humans = new Humans()),
-        (this.zombies = new Zombies()),
-        (this.prestigePoints = new Je()),
-        (this.partFactory = new PartFactory()),
-        (this.bones = new Bones()),
-        (this.blasts = new nt()),
-        (this.blood = new _e()),
-        (this.damageZombie = this.zombies.damageZombie),
-        (this.searchClosestTarget = this.zombies.searchClosestTarget),
-        (this.updateBurns = this.zombies.updateBurns),
-        (this.updateZombieRegen = this.zombies.updateZombieRegen),
-        (this.causePlagueExplosion = this.zombies.causePlagueExplosion),
-        (this.inflictPlague = this.zombies.inflictPlague),
-        (this.healZombie = this.zombies.healZombie),
-        (this.setSpeedMultiplier = this.zombies.setSpeedMultiplier),
-        !this.textures.set)
-      ) {
-        (this.textures.down = []),
-          (this.textures.up = []),
-          (this.textures.right = []),
-          (this.textures.dead = []);
-        for (let e = 0; e < 3; e++)
-          this.textures.down.push(PIXI.Texture.from("skeleton" + e + ".png"));
-        for (let e = 3; e < 6; e++)
-          this.textures.up.push(PIXI.Texture.from("skeleton" + e + ".png"));
-        for (let e = 6; e < 9; e++)
-          this.textures.right.push(PIXI.Texture.from("skeleton" + e + ".png"));
-        this.textures.dead.push(PIXI.Texture.from("skeleton9.png")),
-          (this.textures.set = true);
+      this.model = GameModel.getInstance();
+      this.map = new ee();
+      this.graveyard = new Graveyard();
+      this.exclamations = new it();
+      this.bullets = new rt();
+      this.spells = new Spells();
+      this.smoke = new ot();
+      this.upgrades = new Upgrades();
+      this.humans = new Humans();
+      this.zombies = new Zombies();
+      this.prestigePoints = new Je();
+      this.partFactory = new PartFactory();
+      this.bones = new Bones();
+      this.blasts = new nt();
+      this.blood = new _e();
+      this.damageZombie = this.zombies.damageZombie;
+      this.searchClosestTarget = this.zombies.searchClosestTarget;
+      this.updateBurns = this.zombies.updateBurns;
+      this.updateZombieRegen = this.zombies.updateZombieRegen;
+      this.causePlagueExplosion = this.zombies.causePlagueExplosion;
+      this.inflictPlague = this.zombies.inflictPlague;
+      this.healZombie = this.zombies.healZombie;
+      this.setSpeedMultiplier = this.zombies.setSpeedMultiplier;
+
+      if (!this.textures.set) {
+        this.textures.down = [];
+        this.textures.up = [];
+        this.textures.right = [];
+        this.textures.dead = [];
+        for (let e = 0; e < 3; e++) {
+          this.textures.down.push(PIXI.Texture.from(`skeleton${e}.png`));
+        }
+        for (let e = 3; e < 6; e++) {
+          this.textures.up.push(PIXI.Texture.from(`skeleton${e}.png`));
+        }
+        for (let e = 6; e < 9; e++) {
+          this.textures.right.push(PIXI.Texture.from(`skeleton${e}.png`));
+        }
+        this.textures.dead.push(PIXI.Texture.from("skeleton9.png"));
+        this.textures.set = true;
       }
+
       const e = [];
-      for (let t = 0; t < this.skeletons.length; t++)
-        this.skeletons[t].flags.dead
-          ? (this.discardedSprites.push(this.skeletons[t]),
-            g.removeChild(this.skeletons[t]))
-          : (e.push(this.skeletons[t]),
-            (this.skeletons[t].x = this.graveyard.sprite.x),
-            (this.skeletons[t].zIndex = this.skeletons[t].y =
-              this.graveyard.sprite.y + (this.graveyard.level > 2 ? 8 : 0)),
-            (this.skeletons[t].target = null),
-            (this.skeletons[t].state = be.lookingForTarget),
-            (this.skeletons[t].timer.scan = 0));
-      (this.skeletons = e),
-        (this.aliveSkeletons = []),
-        (this.lootChance = 0.001),
-        this.model.level < this.persistent.level && (this.lootChance *= 0.5),
-        this.model.level > 2 * this.persistent.level &&
-          (this.lootChance *= 1.5);
+      for (let t = 0; t < this.skeletons.length; t++) {
+        if (this.skeletons[t].flags.dead) {
+          this.discardedSprites.push(this.skeletons[t]);
+          g.removeChild(this.skeletons[t]);
+        } else {
+          e.push(this.skeletons[t]);
+          this.skeletons[t].x = this.graveyard.sprite.x;
+
+          this.skeletons[t].zIndex = this.skeletons[t].y =
+            this.graveyard.sprite.y + (this.graveyard.level > 2 ? 8 : 0);
+
+          this.skeletons[t].target = null;
+          this.skeletons[t].state = zombieState.lookingForTarget;
+          this.skeletons[t].timer.scan = 0;
+        }
+      }
+      this.skeletons = e;
+      this.aliveSkeletons = [];
+      this.lootChance = 0.001;
+
+      if (this.model.level < this.persistent.level) {
+        this.lootChance *= 0.5;
+      }
+
+      if (this.model.level > 2 * this.persistent.level) {
+        this.lootChance *= 1.5;
+      }
     }
     spawnCreature() {
       let e;
-      this.discardedSprites.length > 0
-        ? ((e = this.discardedSprites.pop()), (e.textures = this.textures.down))
-        : ((e = new Le(this.textures.down)),
-          e.addChild(e.boneshieldContainer),
-          e.boneshieldContainer.position.set(0, -16)),
-        (e.tint = 15658734),
-        (e.immuneToBurns = false),
-        (e.bulletReflect = 0),
-        (e.zombie = true),
-        (e.textureSet = this.textures),
-        (e.deadTexture = this.textures.dead),
-        (e.currentDirection = this.directions.down),
-        (e.flags = new K()),
-        (e.burnDamage = 0),
-        (e.lastKnownBuilding = false),
-        (e.alpha = 1),
-        (e.animationSpeed = 0.15),
-        e.anchor.set(8.5 / 16, 1),
-        e.position.set(
-          this.graveyard.sprite.x,
-          this.graveyard.sprite.y + (this.graveyard.level > 2 ? 8 : 0)
-        ),
-        (e.target = null),
-        (e.zIndex = e.position.y),
-        (e.visible = true),
-        (e.maxHealth = e.health = 10 * this.model.zombieHealth),
-        (e.attackDamage = 10 * this.model.zombieDamage),
-        (e.regenTimer = 5),
-        (e.state = be.lookingForTarget),
-        (e.scaling = this.scaling),
-        e.scale.set(e.scaling, e.scaling),
-        (e.timer.ability = 4 * Math.random()),
-        (e.timer.attack = 0),
-        (e.timer.scan = 0),
-        (e.timer.burnTick = this.burnTickTimer),
-        (e.timer.smoke = this.smokeTimer),
-        (e.xSpeed = 0),
-        (e.ySpeed = 0),
-        (e.speedMultiplier = 1),
-        (e.maxSpeed = this.moveSpeed),
-        e.play(),
-        (e.zombieId = this.currId++),
-        this.skeletons.push(e),
-        g.addChild(e),
-        this.smoke.newZombieSpawnCloud(e.x, e.y - 2);
+
+      if (this.discardedSprites.length > 0) {
+        e = this.discardedSprites.pop();
+        e.textures = this.textures.down;
+      } else {
+        e = new Le(this.textures.down);
+        e.addChild(e.boneshieldContainer);
+        e.boneshieldContainer.position.set(0, -16);
+      }
+
+      e.tint = 15658734;
+      e.immuneToBurns = false;
+      e.bulletReflect = 0;
+      e.zombie = true;
+      e.textureSet = this.textures;
+      e.deadTexture = this.textures.dead;
+      e.currentDirection = this.directions.down;
+      e.flags = new K();
+      e.burnDamage = 0;
+      e.lastKnownBuilding = false;
+      e.alpha = 1;
+      e.animationSpeed = 0.15;
+      e.anchor.set(8.5 / 16, 1);
+
+      e.position.set(
+        this.graveyard.sprite.x,
+        this.graveyard.sprite.y + (this.graveyard.level > 2 ? 8 : 0)
+      );
+
+      e.target = null;
+      e.zIndex = e.position.y;
+      e.visible = true;
+      e.maxHealth = e.health = 10 * this.model.zombieHealth;
+      e.attackDamage = 10 * this.model.zombieDamage;
+      e.regenTimer = 5;
+      e.state = zombieState.lookingForTarget;
+      e.scaling = this.scaling;
+      e.scale.set(e.scaling, e.scaling);
+      e.timer.ability = 4 * Math.random();
+      e.timer.attack = 0;
+      e.timer.scan = 0;
+      e.timer.burnTick = this.burnTickTimer;
+      e.timer.smoke = this.smokeTimer;
+      e.xSpeed = 0;
+      e.ySpeed = 0;
+      e.speedMultiplier = 1;
+      e.maxSpeed = this.moveSpeed;
+      e.play();
+      e.zombieId = this.currId++;
+      this.skeletons.push(e);
+      g.addChild(e);
+      this.smoke.newZombieSpawnCloud(e.x, e.y - 2);
     }
     skeletonTimer() {
       return this.aliveSkeletons.length < this.persistent.skeletons
@@ -9614,22 +10063,32 @@ var Incremancer;
         : 0;
     }
     update(e) {
-      (this.aliveHumans = this.humans.aliveHumans),
-        (this.graveyardAttackers = this.humans.graveyardAttackers),
-        (this.aliveZombies = this.zombies.aliveZombies),
-        (this.aliveSkeletons = []),
-        (this.spellTimer -= e);
-      for (let t = 0; t < this.skeletons.length; t++)
-        this.skeletons[t].visible &&
-          (this.updateCreature(this.skeletons[t], e),
-          this.skeletons[t].flags.dead ||
-            (this.aliveZombies.push(this.skeletons[t]),
-            this.aliveSkeletons.push(this.skeletons[t])));
-      this.aliveSkeletons.length < this.persistent.skeletons &&
-        ((this.spawnTimer -= e),
-        this.spawnTimer < 0 &&
-          (this.spawnCreature(), (this.spawnTimer = this.respawnTime))),
-        (this.lastKillingBlow -= e);
+      this.aliveHumans = this.humans.aliveHumans;
+      this.graveyardAttackers = this.humans.graveyardAttackers;
+      this.aliveZombies = this.zombies.aliveZombies;
+      this.aliveSkeletons = [];
+      this.spellTimer -= e;
+      for (let t = 0; t < this.skeletons.length; t++) {
+        if (this.skeletons[t].visible) {
+          this.updateCreature(this.skeletons[t], e);
+
+          if (!this.skeletons[t].flags.dead) {
+            this.aliveZombies.push(this.skeletons[t]);
+            this.aliveSkeletons.push(this.skeletons[t]);
+          }
+        }
+      }
+
+      if (this.aliveSkeletons.length < this.persistent.skeletons) {
+        this.spawnTimer -= e;
+
+        if (this.spawnTimer < 0) {
+          this.spawnCreature();
+          this.spawnTimer = this.respawnTime;
+        }
+      }
+
+      this.lastKillingBlow -= e;
       if (
         this.model.persistentData.autoSellGear == true &&
         this.aliveSkeletons.length > 0
@@ -9645,55 +10104,81 @@ var Incremancer;
     }
     updateCreature(e, t) {
       if (e.flags.dead) {
-        if (!e.visible) return;
-        return (
-          (e.alpha -= this.fadeSpeed * t),
-          void (e.alpha < 0 && ((e.visible = false), g.removeChild(e)))
-        );
+        if (!e.visible) {
+          return;
+        }
+        e.alpha -= this.fadeSpeed * t;
+        return void (e.alpha < 0 && ((e.visible = false), g.removeChild(e)));
       }
-      switch (
-        (this.boneshield > 0 &&
-          e.boneshield < this.boneshield &&
-          ((e.boneshieldTimer -= t),
-          e.boneshieldTimer < 0 &&
-            ((e.boneshieldTimer = 10 / this.boneshield), e.boneshield++)),
-        this.boneshield
-          ? ((e.boneshieldContainer.visible = true),
-            e.boneshieldContainer.update(e.boneshield),
-            (e.boneshieldContainer.rotation += t))
-          : (e.boneshieldContainer.visible = false),
-        this.darkorb > 0 &&
-          ((this.darkorbTimer -= t),
-          this.darkorbTimer < 0 &&
-            e.target &&
-            !e.target.flags.dead &&
-            ((this.darkorbTimer = this.darkorb),
-            this.bullets.newBullet(
-              e,
-              e.target,
-              this.calculateDamage(e),
-              false,
-              false,
-              false,
-              true
-            ))),
-        (e.timer.attack -= t),
-        (e.timer.scan -= t),
-        (e.timer.ability -= t),
-        this.model.runeEffects.healthRegen > 0 && this.updateZombieRegen(e, t),
-        e.flags.burning && !e.immuneToBurns && this.updateBurns(e, t),
-        e.timer.ability < 0 && (e.timer.ability = 4),
-        (e.target && !e.target.flags.dead) ||
-          ((e.state = be.lookingForTarget),
-          (e.timer.target = 0),
-          (e.timer.scan = 0)),
-        e.state)
-      ) {
-        case be.lookingForTarget:
-          this.searchClosestTarget(e),
-            e.target && (e.state = be.movingToTarget);
+
+      if (this.boneshield > 0 && e.boneshield < this.boneshield) {
+        e.boneshieldTimer -= t;
+
+        if (e.boneshieldTimer < 0) {
+          e.boneshieldTimer = 10 / this.boneshield;
+          e.boneshield++;
+        }
+      }
+
+      if (this.boneshield) {
+        e.boneshieldContainer.visible = true;
+        e.boneshieldContainer.update(e.boneshield);
+        e.boneshieldContainer.rotation += t;
+      } else {
+        e.boneshieldContainer.visible = false;
+      }
+
+      if (this.darkorb > 0) {
+        this.darkorbTimer -= t;
+
+        if (this.darkorbTimer < 0 && e.target && !e.target.flags.dead) {
+          this.darkorbTimer = this.darkorb;
+
+          this.bullets.newBullet(
+            e,
+            e.target,
+            this.calculateDamage(e),
+            false,
+            false,
+            false,
+            true
+          );
+        }
+      }
+
+      e.timer.attack -= t;
+      e.timer.scan -= t;
+      e.timer.ability -= t;
+
+      if (this.model.runeEffects.healthRegen > 0) {
+        this.updateZombieRegen(e, t);
+      }
+
+      if (e.flags.burning && !e.immuneToBurns) {
+        this.updateBurns(e, t);
+      }
+
+      if (e.timer.ability < 0) {
+        e.timer.ability = 4;
+      }
+
+      if (!e.target || e.target.flags.dead) {
+        e.state = zombieState.lookingForTarget;
+        e.timer.target = 0;
+        e.timer.scan = 0;
+      }
+
+      switch (e.state) {
+        case zombieState.lookingForTarget: {
+          this.searchClosestTarget(e);
+
+          if (e.target) {
+            e.state = zombieState.movingToTarget;
+          }
+
           break;
-        case be.movingToTarget: {
+        }
+        case zombieState.movingToTarget: {
           const s = this.fastDistance(
             e.position.x,
             e.position.y,
@@ -9701,16 +10186,18 @@ var Incremancer;
             e.target.y
           );
           if (s < this.attackDistance) {
-            e.state = be.attackingTarget;
+            e.state = zombieState.attackingTarget;
             break;
           }
-          s > 3 * this.attackDistance &&
-            e.timer.scan < 0 &&
-            this.searchClosestTarget(e),
-            this.updateCreatureSpeed(e, t);
+
+          if (s > 3 * this.attackDistance && e.timer.scan < 0) {
+            this.searchClosestTarget(e);
+          }
+
+          this.updateCreatureSpeed(e, t);
           break;
         }
-        case be.attackingTarget: {
+        case zombieState.attackingTarget: {
           const s = this.fastDistance(
             e.position.x,
             e.position.y,
@@ -9731,260 +10218,352 @@ var Incremancer;
               e.flags.burning &&
                 (e.timer.attack *= 1 / this.model.burningSpeedMod),
               this.randomSpells.length > 0)
-            )
-              for (let e = 0; e < this.randomSpells.length; e++)
-                this.spellTimer < 0 &&
-                  Math.random() < 0.07 + this.increaseChance &&
-                  (this.spells.castSpellNoMana(this.randomSpells[e]),
-                  (this.spellTimer = 3));
-            s > this.attackDistance / 2 && this.updateCreatureSpeed(e, t);
-          } else e.state = be.movingToTarget;
+            ) {
+              for (let e = 0; e < this.randomSpells.length; e++) {
+                if (
+                  this.spellTimer < 0 &&
+                  Math.random() < 0.07 + this.increaseChance
+                ) {
+                  this.spells.castSpellNoMana(this.randomSpells[e]);
+                  this.spellTimer = 3;
+                }
+              }
+            }
+
+            if (s > this.attackDistance / 2) {
+              this.updateCreatureSpeed(e, t);
+            }
+          } else {
+            e.state = zombieState.movingToTarget;
+          }
           break;
         }
       }
     }
     killingBlow(e) {
-      this.killingBlowParts &&
-        (this.model.persistentData.parts +=
-          this.killingBlowParts * this.partFactory.factoryStats().partsPerSec),
-        this.lastKillingBlow <= 0 &&
-          (this.model.addPrestigePoints(
-            Math.round(
-              this.persistent.level * Math.pow(1.00025, this.persistent.level)
-            )
-          ),
-          (this.lastKillingBlow = 20),
-          this.prestigePoints.newPart(e.x, e.y));
+      if (this.killingBlowParts) {
+        this.model.persistentData.parts +=
+          this.killingBlowParts * this.partFactory.factoryStats().partsPerSec;
+      }
+
+      if (this.lastKillingBlow <= 0) {
+        this.model.addPrestigePoints(
+          Math.round(this.persistent.level * 1.00025 ** this.persistent.level)
+        );
+
+        this.lastKillingBlow = 20;
+        this.prestigePoints.newPart(e.x, e.y);
+      }
     }
     orbHit(e) {
-      if ((e.flags.dead && this.killingBlow(e), this.randomSpells.length > 0))
-        for (let e = 0; e < this.randomSpells.length; e++)
-          this.spellTimer < 0 &&
-            Math.random() < 0.04 &&
-            (this.spells.castSpellNoMana(this.randomSpells[e]),
-            (this.spellTimer = 3));
+      if (e.flags.dead) {
+        this.killingBlow(e);
+      }
+
+      if (this.randomSpells.length > 0) {
+        for (let e = 0; e < this.randomSpells.length; e++) {
+          if (this.spellTimer < 0 && Math.random() < 0.04) {
+            this.spells.castSpellNoMana(this.randomSpells[e]);
+            this.spellTimer = 3;
+          }
+        }
+      }
     }
     incinerate() {
       let e;
-      for (let t = 0; t < this.skeletons.length; t++)
-        this.skeletons[t].visible && (e = this.skeletons[t]);
-      if (e)
-        for (let t = 0; t < this.aliveHumans.length; t++)
-          Math.abs(this.aliveHumans[t].x - e.x) < 200 &&
-            Math.abs(this.aliveHumans[t].y - e.y) < 200 &&
+      for (let t = 0; t < this.skeletons.length; t++) {
+        if (this.skeletons[t].visible) {
+          e = this.skeletons[t];
+        }
+      }
+      if (e) {
+        for (let t = 0; t < this.aliveHumans.length; t++) {
+          if (
+            Math.abs(this.aliveHumans[t].x - e.x) < 200 &&
+            Math.abs(this.aliveHumans[t].y - e.y) < 200
+          ) {
             this.humans.burnHuman(this.aliveHumans[t], e.attackDamage);
+          }
+        }
+      }
     }
     getCreatureDirection(e) {
-      return Math.abs(e.xSpeed) > Math.abs(e.ySpeed)
-        ? e.xSpeed < 0
-          ? this.directions.left
-          : this.directions.right
-        : e.ySpeed < 0
-        ? this.directions.up
-        : this.directions.down;
+      if (Math.abs(e.xSpeed) > Math.abs(e.ySpeed)) {
+        if (e.xSpeed < 0) {
+          return this.directions.left;
+        }
+
+        return this.directions.right;
+      }
+
+      if (e.ySpeed < 0) {
+        return this.directions.up;
+      }
+
+      return this.directions.down;
     }
     changeTextureDirection(e) {
       const t = this.getCreatureDirection(e);
       if (t !== e.currentDirection) {
         switch (t) {
-          case this.directions.up:
-            (e.textures = e.textureSet.up), (e.scale.x = e.scaling);
+          case this.directions.up: {
+            e.textures = e.textureSet.up;
+            e.scale.x = e.scaling;
             break;
-          case this.directions.down:
-            (e.textures = e.textureSet.down), (e.scale.x = e.scaling);
+          }
+          case this.directions.down: {
+            e.textures = e.textureSet.down;
+            e.scale.x = e.scaling;
             break;
-          case this.directions.right:
-            (e.textures = e.textureSet.right), (e.scale.x = e.scaling);
+          }
+          case this.directions.right: {
+            e.textures = e.textureSet.right;
+            e.scale.x = e.scaling;
             break;
-          case this.directions.left:
-            (e.textures = e.textureSet.right), (e.scale.x = -e.scaling);
+          }
+          case this.directions.left: {
+            e.textures = e.textureSet.right;
+            e.scale.x = -e.scaling;
+          }
         }
-        (e.currentDirection = t), e.play();
+        e.currentDirection = t;
+        e.play();
       }
     }
     updateCreatureSpeed(e, t) {
-      if (e.timer.dogStun > 0) return void (e.timer.dogStun -= t);
-      (e.timer.target && e.targetVector) || (e.timer.target = 0),
-        (e.timer.target -= t),
-        e.timer.target <= 0 &&
-          ((e.targetVector = this.map.howDoIGetToMyTarget(e, e.target)),
-          (e.timer.target = 0.2));
-      const s = 4 * this.fastDistance(e.x, e.y, e.target.x, e.target.y),
-        i = Math.min(e.speedMultiplier * e.maxSpeed, s);
-      (e.xSpeed = e.targetVector.x * i),
-        (e.ySpeed = e.targetVector.y * i),
-        (e.position.x += e.xSpeed * t),
-        (e.position.y += e.ySpeed * t),
-        (e.zIndex = e.position.y),
-        this.changeTextureDirection(e);
+      if (e.timer.dogStun > 0) {
+        return void (e.timer.dogStun -= t);
+      }
+
+      if (!e.timer.target || !e.targetVector) {
+        e.timer.target = 0;
+      }
+
+      e.timer.target -= t;
+
+      if (e.timer.target <= 0) {
+        e.targetVector = this.map.howDoIGetToMyTarget(e, e.target);
+        e.timer.target = 0.2;
+      }
+
+      const s = 4 * this.fastDistance(e.x, e.y, e.target.x, e.target.y);
+      const i = Math.min(e.speedMultiplier * e.maxSpeed, s);
+      e.xSpeed = e.targetVector.x * i;
+      e.ySpeed = e.targetVector.y * i;
+      e.position.x += e.xSpeed * t;
+      e.position.y += e.ySpeed * t;
+      e.zIndex = e.position.y;
+      this.changeTextureDirection(e);
     }
     calculateDamage(e) {
-      let t = e.attackDamage;
-      return (
+      let e_attackDamage_1 = e.attackDamage;
+
+      if (
         this.model.runeEffects.critChance > 0 &&
-          Math.random() < this.model.runeEffects.critChance &&
-          ((t *= this.model.runeEffects.critDamage), He(e.x, e.y - 10, t)),
-        t
-      );
+        Math.random() < this.model.runeEffects.critChance
+      ) {
+        e_attackDamage_1 *= this.model.runeEffects.critDamage;
+        He(e.x, e.y - 10, e_attackDamage_1);
+      }
+
+      return e_attackDamage_1;
     }
     applyItemUpgrades() {
-      (this.model = GameModel.getInstance()),
-        (this.moveSpeed = 40 + this.model.SkeleMoveMod),
-        (this.respawnTime = 10),
-        (this.randomSpells = []),
-        this.persistent.items
-          .filter((e) => e.q)
-          .forEach((e) => {
-            e.e.forEach((t) => {
-              switch (t) {
-                case this.stats.respawnTime.id:
-                  this.respawnTime--;
-                  break;
-                case this.stats.speed.id:
-                  this.moveSpeed++;
-                  break;
-                case this.stats.zombieHealth.id:
-                  this.model.zombieHealth +=
-                    e.l * this.stats.zombieHealth.scaling;
-                  break;
-                case this.stats.zombieDamage.id:
-                  this.model.zombieDamage +=
-                    e.l * this.stats.zombieDamage.scaling;
-                  break;
-                case this.stats.zombieSpeed.id:
-                  this.model.zombieSpeed++;
-                  break;
-                case this.stats.harpySpeed.id:
-                  this.model.harpySpeed += 10;
+      this.model = GameModel.getInstance();
+      this.moveSpeed = 40 + this.model.SkeleMoveMod;
+      this.respawnTime = 10;
+      this.randomSpells = [];
+
+      this.persistent.items
+        .filter((e) => e.q)
+        .forEach((e) => {
+          e.e.forEach((t) => {
+            switch (t) {
+              case this.stats.respawnTime.id: {
+                this.respawnTime--;
+                break;
               }
-            }),
-              e.se &&
-                e.se.forEach((e) => {
-                  this.randomSpells.push(e);
-                });
+              case this.stats.speed.id: {
+                this.moveSpeed++;
+                break;
+              }
+              case this.stats.zombieHealth.id: {
+                this.model.zombieHealth +=
+                  e.l * this.stats.zombieHealth.scaling;
+                break;
+              }
+              case this.stats.zombieDamage.id: {
+                this.model.zombieDamage +=
+                  e.l * this.stats.zombieDamage.scaling;
+                break;
+              }
+              case this.stats.zombieSpeed.id: {
+                this.model.zombieSpeed++;
+                break;
+              }
+              case this.stats.harpySpeed.id: {
+                this.model.harpySpeed += 10;
+              }
+            }
           });
+
+          if (e.se) {
+            e.se.forEach((e) => {
+              this.randomSpells.push(e);
+            });
+          }
+        });
     }
     getLootName(e) {
       let t = "";
       switch (e.r) {
-        case this.rarity.common:
+        case this.rarity.common: {
           t = this.prefixes.commonQuality[e.p];
           break;
-        case this.rarity.rare:
+        }
+        case this.rarity.rare: {
           t = this.prefixes.rareQuality[e.p];
           break;
-        case this.rarity.epic:
+        }
+        case this.rarity.epic: {
           t = this.prefixes.epicQuality[e.p];
           break;
-        case this.rarity.legendary:
+        }
+        case this.rarity.legendary: {
           t = this.prefixes.legendaryQuality[e.p];
           break;
-        case this.rarity.ancient:
+        }
+        case this.rarity.ancient: {
           t = this.prefixes.ancientQuality[e.p];
           break;
-        case this.rarity.divine:
+        }
+        case this.rarity.divine: {
           t = this.prefixes.divineQuality[e.p];
           break;
-        case this.rarity.chaos:
+        }
+        case this.rarity.chaos: {
           t = this.prefixes.chaosQuality[e.p];
+        }
       }
       let s = "";
       switch (e.s) {
-        case this.lootPositions.helmet.id:
+        case this.lootPositions.helmet.id: {
           s = this.lootPositions.helmet.name;
           break;
-        case this.lootPositions.chest.id:
+        }
+        case this.lootPositions.chest.id: {
           s = this.lootPositions.chest.name;
           break;
-        case this.lootPositions.legs.id:
+        }
+        case this.lootPositions.legs.id: {
           s = this.lootPositions.legs.name;
           break;
-        case this.lootPositions.gloves.id:
+        }
+        case this.lootPositions.gloves.id: {
           s = this.lootPositions.gloves.name;
           break;
-        case this.lootPositions.boots.id:
+        }
+        case this.lootPositions.boots.id: {
           s = this.lootPositions.boots.name;
           break;
-        case this.lootPositions.sword.id:
+        }
+        case this.lootPositions.sword.id: {
           s = this.lootPositions.sword.name;
           break;
-        case this.lootPositions.shield.id:
+        }
+        case this.lootPositions.shield.id: {
           s = this.lootPositions.shield.name;
+        }
       }
-      return t + " " + s;
+      return `${t} ${s}`;
     }
     getLootClass(item) {
       switch (item.r /* rarity */) {
-        case this.rarity.common:
+        case this.rarity.common: {
           return "common";
-        case this.rarity.rare:
+        }
+        case this.rarity.rare: {
           return "rare";
-        case this.rarity.epic:
+        }
+        case this.rarity.epic: {
           return "epic";
-        case this.rarity.legendary:
+        }
+        case this.rarity.legendary: {
           return "legendary";
-        case this.rarity.ancient:
+        }
+        case this.rarity.ancient: {
           return "ancient";
-        case this.rarity.divine:
+        }
+        case this.rarity.divine: {
           return "divine";
-        case this.rarity.chaos:
+        }
+        case this.rarity.chaos: {
           return "chaos";
+        }
       }
     }
     getLootStats(e) {
       const t = [];
-      if (e.e)
-        for (let s = 0; s < e.e.length; s++)
+      if (e.e) {
+        for (let s = 0; s < e.e.length; s++) {
           switch (e.e[s]) {
-            case this.stats.respawnTime.id:
+            case this.stats.respawnTime.id: {
               t.push("-1 second respawn time");
               break;
-            case this.stats.speed.id:
+            }
+            case this.stats.speed.id: {
               t.push("+1 movement speed");
               break;
-            case this.stats.zombieHealth.id:
+            }
+            case this.stats.zombieHealth.id: {
               t.push(
-                "+" +
-                  formatWhole(this.stats.zombieHealth.scaling * e.l) +
-                  " zombie health"
+                `+${formatWhole(
+                  this.stats.zombieHealth.scaling * e.l
+                )} zombie health`
               );
               break;
-            case this.stats.zombieDamage.id:
+            }
+            case this.stats.zombieDamage.id: {
               t.push(
-                "+" +
-                  formatWhole(this.stats.zombieDamage.scaling * e.l) +
-                  " zombie damage"
+                `+${formatWhole(
+                  this.stats.zombieDamage.scaling * e.l
+                )} zombie damage`
               );
               break;
-            case this.stats.zombieSpeed.id:
+            }
+            case this.stats.zombieSpeed.id: {
               t.push("+1 zombie speed");
               break;
-            case this.stats.harpySpeed.id:
+            }
+            case this.stats.harpySpeed.id: {
               t.push("+10 harpy speed");
+            }
           }
+        }
+      }
       return t;
     }
     getSpecialEffects(e) {
       const t = [];
-      if (e.se)
+      if (e.se) {
         for (let s = 0; s < e.se.length; s++) {
           const i = this.spells.spells.filter((t) => t.id == e.se[s])[0];
           t.push(
             i.itemText ||
-              "Has a chance to cast " +
-                i.name +
-                " when attacking, this does not cost energy or trigger a cooldown"
+              `Has a chance to cast ${i.name} when attacking, this does not cost energy or trigger a cooldown`
           );
         }
+      }
       return t;
     }
     getSpecialEffectsName(e) {
       const t = [];
-      if (e.se)
+      if (e.se) {
         for (let s = 0; s < e.se.length; s++) {
           const i = this.spells.spells.filter((t) => t.id == e.se[s])[0];
           t.push(i.name.replace(" ", "-"));
         }
+      }
       return t;
     }
     getSpecialEffectsList() {
@@ -10019,8 +10598,8 @@ var Incremancer;
     testForLoot() {
       if (this.persistent.skeletons > 0 && Math.random() < this.lootChance) {
         const e = this.generateLoot(this.persistent.level);
-        this.model.sendMessage(this.getLootName(e) + " collected!"),
-          this.persistent.items.push(e);
+        this.model.sendMessage(`${this.getLootName(e)} collected!`);
+        this.persistent.items.push(e);
       }
     }
     generateLoot(e) {
@@ -10054,26 +10633,33 @@ var Incremancer;
 
       let r = 0;
       switch (s) {
-        case this.rarity.common:
+        case this.rarity.common: {
           r = Math.floor(Math.random() * this.prefixes.commonQuality.length);
           break;
-        case this.rarity.rare:
+        }
+        case this.rarity.rare: {
           r = Math.floor(Math.random() * this.prefixes.rareQuality.length);
           break;
-        case this.rarity.epic:
+        }
+        case this.rarity.epic: {
           r = Math.floor(Math.random() * this.prefixes.epicQuality.length);
           break;
-        case this.rarity.legendary:
+        }
+        case this.rarity.legendary: {
           r = Math.floor(Math.random() * this.prefixes.legendaryQuality.length);
           break;
-        case this.rarity.ancient:
+        }
+        case this.rarity.ancient: {
           r = Math.floor(Math.random() * this.prefixes.ancientQuality.length);
           break;
-        case this.rarity.divine:
+        }
+        case this.rarity.divine: {
           r = Math.floor(Math.random() * this.prefixes.divineQuality.length);
           break;
-        case this.rarity.chaos:
+        }
+        case this.rarity.chaos: {
           r = Math.floor(Math.random() * this.prefixes.chaosQuality.length);
+        }
       }
 
       const n = [];
@@ -10088,7 +10674,11 @@ var Incremancer;
             : this.stats.zombieDamage.id;
         for (let e = 0; e < s - 1; e++) {
           let e = Math.ceil(6 * Math.random());
-          for (; n.includes(e); ) e = Math.ceil(6 * Math.random());
+
+          while (n.includes(e)) {
+            e = Math.ceil(6 * Math.random());
+          }
+
           n.push(e);
         }
       }
@@ -10106,9 +10696,11 @@ var Incremancer;
     }
     destroyItem(e) {
       this.addXp(e.l * e.r * 10);
-      for (let t = 0; t < this.persistent.items.length; t++)
-        this.persistent.items[t].id === e.id &&
+      for (let t = 0; t < this.persistent.items.length; t++) {
+        if (this.persistent.items[t].id === e.id) {
           this.persistent.items.splice(t, 1);
+        }
+      }
     }
     destroyAllItems() {
       this.addXp(
@@ -10116,85 +10708,87 @@ var Incremancer;
           this.xpForAncient() -
           this.xpForDivine() -
           this.xpForChaos()
-      ),
-        (this.persistent.items = this.persistent.items.filter(
-          (e) =>
-            e.q ||
-            e.r == this.rarity.legendary ||
-            e.r == this.rarity.ancient ||
-            e.r == this.rarity.divine ||
-            e.r == this.rarity.chaos
-        ));
+      );
+
+      this.persistent.items = this.persistent.items.filter(
+        (e) =>
+          e.q ||
+          e.r == this.rarity.legendary ||
+          e.r == this.rarity.ancient ||
+          e.r == this.rarity.divine ||
+          e.r == this.rarity.chaos
+      );
     }
     destroyAllItemsLegendary() {
-      this.addXp(this.xpForLegendary()),
-        (this.persistent.items = this.persistent.items.filter(
-          (e) =>
-            e.q ||
-            e.r == this.rarity.common ||
-            e.r == this.rarity.rare ||
-            e.r == this.rarity.epic ||
-            e.r == this.rarity.ancient ||
-            e.r == this.rarity.divine ||
-            e.r == this.rarity.chaos
-        ));
+      this.addXp(this.xpForLegendary());
+
+      this.persistent.items = this.persistent.items.filter(
+        (e) =>
+          e.q ||
+          e.r == this.rarity.common ||
+          e.r == this.rarity.rare ||
+          e.r == this.rarity.epic ||
+          e.r == this.rarity.ancient ||
+          e.r == this.rarity.divine ||
+          e.r == this.rarity.chaos
+      );
     }
     xpForItems() {
       let e = 0;
-      return (
-        this.persistent.items
-          .filter((e) => !e.q && e.r != this.rarity.legendary)
-          .forEach(function (t) {
-            e += t.l * t.r * 10;
-          }),
-        e
-      );
+
+      this.persistent.items
+        .filter((e) => !e.q && e.r != this.rarity.legendary)
+        .forEach((t) => {
+          e += t.l * t.r * 10;
+        });
+
+      return e;
     }
 
     xpForLegendary() {
       let e = 0;
-      return (
-        this.persistent.items
-          .filter((e) => !e.q && e.r == this.rarity.legendary)
-          .forEach(function (t) {
-            e += t.l * t.r * 10;
-          }),
-        e
-      );
+
+      this.persistent.items
+        .filter((e) => !e.q && e.r == this.rarity.legendary)
+        .forEach((t) => {
+          e += t.l * t.r * 10;
+        });
+
+      return e;
     }
 
     xpForAncient() {
       let e = 0;
-      return (
-        this.persistent.items
-          .filter((e) => !e.q && e.r == this.rarity.ancient)
-          .forEach(function (t) {
-            e += t.l * t.r * 10;
-          }),
-        e
-      );
+
+      this.persistent.items
+        .filter((e) => !e.q && e.r == this.rarity.ancient)
+        .forEach((t) => {
+          e += t.l * t.r * 10;
+        });
+
+      return e;
     }
     xpForDivine() {
       let e = 0;
-      return (
-        this.persistent.items
-          .filter((e) => !e.q && e.r == this.rarity.divine)
-          .forEach(function (t) {
-            e += t.l * t.r * 10;
-          }),
-        e
-      );
+
+      this.persistent.items
+        .filter((e) => !e.q && e.r == this.rarity.divine)
+        .forEach((t) => {
+          e += t.l * t.r * 10;
+        });
+
+      return e;
     }
     xpForChaos() {
       let e = 0;
-      return (
-        this.persistent.items
-          .filter((e) => !e.q && e.r == this.rarity.chaos)
-          .forEach(function (t) {
-            e += t.l * t.r * 10;
-          }),
-        e
-      );
+
+      this.persistent.items
+        .filter((e) => !e.q && e.r == this.rarity.chaos)
+        .forEach((t) => {
+          e += t.l * t.r * 10;
+        });
+
+      return e;
     }
     xpTotal() {
       return (
@@ -10205,231 +10799,283 @@ var Incremancer;
       );
     }
   }
+
   class Creatures {
     constructor() {
-      if (
-        ((this.creatureFactory = new CreatureFactory()),
-        (this.zombies = new Zombies()),
-        (this.creatures = []),
-        (this.creatureCount = []),
-        (this.aliveCreatures = []),
-        (this.aliveZombies = []),
-        (this.graveyardAttackers = []),
-        (this.discardedSprites = []),
-        (this.aliveHumans = []),
-        (this.scaling = 1.6),
-        (this.moveTargetDistance = 15),
-        (this.attackDistance = 20),
-        (this.attackSpeed = 3),
-        (this.targetDistance = 100),
-        (this.fadeSpeed = 0.1),
-        (this.currId = 1),
-        (this.scanTime = 3),
-        (this.refundChance = 0),
-        (this.creatureTypes = this.creatureFactory.types),
-        (this.golemTextures = {
-          set: false,
-          down: [],
-          up: [],
-          left: [],
-          right: [],
-          dead: [],
-        }),
-        (this.directions = {
-          down: 1,
-          up: 2,
-          right: 3,
-          left: 4,
-          dead: 5,
-        }),
-        (this.burnTickTimer = 5),
-        (this.smokeTimer = 0.3),
-        (this.fastDistance = weighted_hybrid_distance),
-        (this.magnitude = pythag),
-        (this.damageZombie = this.zombies.damageZombie),
-        (this.searchClosestTarget = this.zombies.searchClosestTarget),
-        (this.updateBurns = this.zombies.updateBurns),
-        (this.updateZombieRegen = this.zombies.updateZombieRegen),
-        (this.causePlagueExplosion = this.zombies.causePlagueExplosion),
-        (this.inflictPlague = this.zombies.inflictPlague),
-        (this.healZombie = this.zombies.healZombie),
-        (this.setSpeedMultiplier = this.zombies.setSpeedMultiplier),
-        Creatures.instance)
-      )
+      this.creatureFactory = new CreatureFactory();
+      this.zombies = new Zombies();
+      this.creatures = [];
+      this.creatureCount = [];
+      this.aliveCreatures = [];
+      this.aliveZombies = [];
+      this.graveyardAttackers = [];
+      this.discardedSprites = [];
+      this.aliveHumans = [];
+      this.scaling = 1.6;
+      this.moveTargetDistance = 15;
+      this.attackDistance = 20;
+      this.attackSpeed = 3;
+      this.targetDistance = 100;
+      this.fadeSpeed = 0.1;
+      this.currId = 1;
+      this.scanTime = 3;
+      this.refundChance = 0;
+      this.creatureTypes = this.creatureFactory.types;
+
+      this.golemTextures = {
+        set: false,
+        down: [],
+        up: [],
+        left: [],
+        right: [],
+        dead: [],
+      };
+
+      this.directions = {
+        down: 1,
+        up: 2,
+        right: 3,
+        left: 4,
+        dead: 5,
+      };
+
+      this.burnTickTimer = 5;
+      this.smokeTimer = 0.3;
+      this.fastDistance = weighted_hybrid_distance;
+      this.magnitude = pythag;
+      this.damageZombie = this.zombies.damageZombie;
+      this.searchClosestTarget = this.zombies.searchClosestTarget;
+      this.updateBurns = this.zombies.updateBurns;
+      this.updateZombieRegen = this.zombies.updateZombieRegen;
+      this.causePlagueExplosion = this.zombies.causePlagueExplosion;
+      this.inflictPlague = this.zombies.inflictPlague;
+      this.healZombie = this.zombies.healZombie;
+      this.setSpeedMultiplier = this.zombies.setSpeedMultiplier;
+
+      if (Creatures.instance) {
         return Creatures.instance;
+      }
+
       Creatures.instance = this;
     }
     populate() {
-      if (
-        ((this.map = new ee()),
-        (this.model = GameModel.getInstance()),
-        (this.graveyard = new Graveyard()),
-        (this.smoke = new ot()),
-        (this.bullets = new rt()),
-        (this.humans = new Humans()),
-        (this.exclamations = new it()),
-        (this.blood = new _e()),
-        (this.bones = new Bones()),
-        (this.blasts = new nt()),
-        !this.golemTextures.set)
-      ) {
-        (this.golemTextures.down = []),
-          (this.golemTextures.up = []),
-          (this.golemTextures.right = []),
-          (this.golemTextures.dead = []);
-        for (let e = 0; e < 3; e++)
-          this.golemTextures.down.push(PIXI.Texture.from("golem" + e + ".png"));
-        for (let e = 3; e < 6; e++)
-          this.golemTextures.up.push(PIXI.Texture.from("golem" + e + ".png"));
-        for (let e = 6; e < 9; e++)
-          this.golemTextures.right.push(
-            PIXI.Texture.from("golem" + e + ".png")
-          );
-        this.golemTextures.dead.push(PIXI.Texture.from("golem9.png")),
-          (this.golemTextures.set = true);
+      this.map = new ee();
+      this.model = GameModel.getInstance();
+      this.graveyard = new Graveyard();
+      this.smoke = new ot();
+      this.bullets = new rt();
+      this.humans = new Humans();
+      this.exclamations = new it();
+      this.blood = new _e();
+      this.bones = new Bones();
+      this.blasts = new nt();
+
+      if (!this.golemTextures.set) {
+        this.golemTextures.down = [];
+        this.golemTextures.up = [];
+        this.golemTextures.right = [];
+        this.golemTextures.dead = [];
+        for (let e = 0; e < 3; e++) {
+          this.golemTextures.down.push(PIXI.Texture.from(`golem${e}.png`));
+        }
+        for (let e = 3; e < 6; e++) {
+          this.golemTextures.up.push(PIXI.Texture.from(`golem${e}.png`));
+        }
+        for (let e = 6; e < 9; e++) {
+          this.golemTextures.right.push(PIXI.Texture.from(`golem${e}.png`));
+        }
+        this.golemTextures.dead.push(PIXI.Texture.from("golem9.png"));
+        this.golemTextures.set = true;
       }
+
       const e = [];
-      for (let t = 0; t < this.creatures.length; t++)
-        this.model.constructions.monsterFactory
-          ? this.creatures[t].flags.dead
-            ? (this.discardedSprites.push(this.creatures[t]),
-              g.removeChild(this.creatures[t]))
-            : (e.push(this.creatures[t]),
-              (this.creatures[t].x = this.graveyard.sprite.x),
-              (this.creatures[t].zIndex = this.creatures[t].y =
-                this.graveyard.sprite.y + (this.graveyard.level > 2 ? 8 : 0)),
-              (this.creatures[t].target = null),
-              (this.creatures[t].state = be.lookingForTarget))
-          : (this.discardedSprites.push(this.creatures[t]),
-            g.removeChild(this.creatures[t]));
-      (this.creatures = e),
-        (this.aliveCreatures = []),
-        this.creatureFactory.spawnSavedCreatures();
+      for (let t = 0; t < this.creatures.length; t++) {
+        if (this.model.constructions.monsterFactory) {
+          if (this.creatures[t].flags.dead) {
+            this.discardedSprites.push(this.creatures[t]);
+            g.removeChild(this.creatures[t]);
+          } else {
+            e.push(this.creatures[t]);
+            this.creatures[t].x = this.graveyard.sprite.x;
+
+            this.creatures[t].zIndex = this.creatures[t].y =
+              this.graveyard.sprite.y + (this.graveyard.level > 2 ? 8 : 0);
+
+            this.creatures[t].target = null;
+            this.creatures[t].state = zombieState.lookingForTarget;
+          }
+        } else {
+          this.discardedSprites.push(this.creatures[t]);
+          g.removeChild(this.creatures[t]);
+        }
+      }
+      this.creatures = e;
+      this.aliveCreatures = [];
+      this.creatureFactory.spawnSavedCreatures();
     }
     spawnCreature(e, t, s, i, a, r) {
-      if (this.model.creatureCount >= this.model.creatureLimit) return;
+      if (this.model.creatureCount >= this.model.creatureLimit) {
+        return;
+      }
       let n;
-      switch (
-        (this.discardedSprites.length > 0
-          ? ((n = this.discardedSprites.pop()),
-            (n.textures = this.golemTextures.down))
-          : (n = new Pe(this.golemTextures.down)),
-        i)
-      ) {
-        case this.creatureTypes.earthGolem:
-          (n.tint = 11042610), (n.bulletReflect = this.model.bulletproofChance);
+
+      if (this.discardedSprites.length > 0) {
+        n = this.discardedSprites.pop();
+        n.textures = this.golemTextures.down;
+      } else {
+        n = new Pe(this.golemTextures.down);
+      }
+
+      switch (i) {
+        case this.creatureTypes.earthGolem: {
+          n.tint = 11042610;
+          n.bulletReflect = this.model.bulletproofChance;
           break;
-        case this.creatureTypes.airGolem:
+        }
+        case this.creatureTypes.airGolem: {
           n.tint = 10266040;
           break;
-        case this.creatureTypes.fireGolem:
-          (n.tint = 14370586), (n.immuneToBurns = true);
+        }
+        case this.creatureTypes.fireGolem: {
+          n.tint = 14370586;
+          n.immuneToBurns = true;
           break;
-        case this.creatureTypes.waterGolem:
-          (n.tint = 5080808), (n.immuneToBurns = true);
+        }
+        case this.creatureTypes.waterGolem: {
+          n.tint = 5080808;
+          n.immuneToBurns = true;
+        }
       }
-      (n.flags = new K()),
-        (n.flags.golem = true),
-        (n.burnDamage = 0),
-        (n.level = a),
-        (n.textureSet = this.golemTextures),
-        (n.deadTexture = this.golemTextures.dead),
-        (n.currentDirection = this.directions.down),
-        (n.creatureType = i),
-        (n.price = r),
-        (n.lastKnownBuilding = false),
-        (n.alpha = 1),
-        (n.animationSpeed = 0.15),
-        n.anchor.set(8.5 / 16, 1),
-        n.position.set(
-          this.graveyard.sprite.x,
-          this.graveyard.sprite.y + (this.graveyard.level > 2 ? 8 : 0)
-        ),
-        (n.target = null),
-        (n.zIndex = n.position.y),
-        (n.visible = true),
-        (n.maxHealth = n.health = e),
-        (n.attackDamage = t),
-        (n.regenTimer = 5),
-        (n.state = be.lookingForTarget),
-        (n.scaling = this.scaling),
-        n.scale.set(n.scaling, n.scaling),
-        (n.xSpeed = 0),
-        (n.ySpeed = 0),
-        (n.speedMultiplier = 1),
-        (n.maxSpeed = s),
-        (n.timer.ability = 4 * Math.random()),
-        (n.timer.attack = 0),
-        (n.timer.scan = 0),
-        (n.timer.burnTick = this.burnTickTimer),
-        (n.timer.smoke = this.smokeTimer),
-        n.play(),
-        (n.zombieId = this.currId++),
-        this.creatures.push(n),
-        g.addChild(n),
-        this.smoke.newZombieSpawnCloud(n.x, n.y - 2),
-        this.model.creatureCount++;
+
+      n.flags = new K();
+      n.flags.golem = true;
+      n.burnDamage = 0;
+      n.level = a;
+      n.textureSet = this.golemTextures;
+      n.deadTexture = this.golemTextures.dead;
+      n.currentDirection = this.directions.down;
+      n.creatureType = i;
+      n.price = r;
+      n.lastKnownBuilding = false;
+      n.alpha = 1;
+      n.animationSpeed = 0.15;
+      n.anchor.set(8.5 / 16, 1);
+
+      n.position.set(
+        this.graveyard.sprite.x,
+        this.graveyard.sprite.y + (this.graveyard.level > 2 ? 8 : 0)
+      );
+
+      n.target = null;
+      n.zIndex = n.position.y;
+      n.visible = true;
+      n.maxHealth = e;
+      n.health = e;
+      n.attackDamage = t;
+      n.regenTimer = 5;
+      n.state = zombieState.lookingForTarget;
+      n.scaling = this.scaling;
+      n.scale.set(n.scaling, n.scaling);
+      n.xSpeed = 0;
+      n.ySpeed = 0;
+      n.speedMultiplier = 1;
+      n.maxSpeed = s;
+      n.timer.ability = 4 * Math.random();
+      n.timer.attack = 0;
+      n.timer.scan = 0;
+      n.timer.burnTick = this.burnTickTimer;
+      n.timer.smoke = this.smokeTimer;
+      n.play();
+      n.zombieId = this.currId++;
+      this.creatures.push(n);
+      g.addChild(n);
+      this.smoke.newZombieSpawnCloud(n.x, n.y - 2);
+      this.model.creatureCount++;
     }
     update(e) {
       let t = 0;
-      (this.aliveHumans = this.humans.aliveHumans),
-        (this.graveyardAttackers = this.humans.graveyardAttackers),
-        (this.aliveZombies = this.zombies.aliveZombies),
-        (this.creatureCount = []);
-      for (let e = 0; e < this.creatureFactory.creatures.length; e++)
+      this.aliveHumans = this.humans.aliveHumans;
+      this.graveyardAttackers = this.humans.graveyardAttackers;
+      this.aliveZombies = this.zombies.aliveZombies;
+      this.creatureCount = [];
+      for (let e = 0; e < this.creatureFactory.creatures.length; e++) {
         this.creatureCount[this.creatureFactory.creatures[e].type] = 0;
+      }
       this.model.persistentData.savedCreatures = [];
-      for (let t = 0; t < this.creatures.length; t++)
-        this.creatures[t].visible && this.updateCreature(this.creatures[t], e);
-      for (let e = 0; e < this.creatures.length; e++)
-        this.creatures[e].visible &&
-          (this.creatures[e].flags.dead ||
-            (this.aliveZombies.push(this.creatures[e]),
-            t++,
-            this.creatureCount[this.creatures[e].creatureType]++,
+      for (let t = 0; t < this.creatures.length; t++) {
+        if (this.creatures[t].visible) {
+          this.updateCreature(this.creatures[t], e);
+        }
+      }
+      for (let e = 0; e < this.creatures.length; e++) {
+        if (this.creatures[e].visible) {
+          if (!this.creatures[e].flags.dead) {
+            this.aliveZombies.push(this.creatures[e]);
+            t++;
+            this.creatureCount[this.creatures[e].creatureType]++;
+
             this.model.persistentData.savedCreatures.push({
               t: this.creatures[e].creatureType,
               l: this.creatures[e].level,
-            })));
+            });
+          }
+        }
+      }
       this.model.creatureCount = t;
     }
     updateCreature(e, t) {
       if (e.flags.dead) {
-        if (!e.visible) return;
-        return (
-          (e.alpha -= this.fadeSpeed * t),
-          void (e.alpha < 0 && ((e.visible = false), g.removeChild(e)))
-        );
+        if (!e.visible) {
+          return;
+        }
+        e.alpha -= this.fadeSpeed * t;
+        return void (e.alpha < 0 && ((e.visible = false), g.removeChild(e)));
       }
-      if (
-        ((e.timer.attack -= t),
-        (e.timer.scan -= t),
-        (e.timer.ability -= t),
-        this.model.runeEffects.healthRegen > 0 && this.updateZombieRegen(e, t),
-        e.flags.burning && !e.immuneToBurns && this.updateBurns(e, t),
-        e.timer.ability < 0)
-      )
-        switch (((e.timer.ability = 4), e.creatureType)) {
-          case this.creatureTypes.earthGolem:
+      e.timer.attack -= t;
+      e.timer.scan -= t;
+      e.timer.ability -= t;
+
+      if (this.model.runeEffects.healthRegen > 0) {
+        this.updateZombieRegen(e, t);
+      }
+
+      if (e.flags.burning && !e.immuneToBurns) {
+        this.updateBurns(e, t);
+      }
+
+      if (e.timer.ability < 0) {
+        e.timer.ability = 4;
+
+        switch (e.creatureType) {
+          case this.creatureTypes.earthGolem: {
             this.golemTaunt(e);
             break;
-          case this.creatureTypes.waterGolem:
+          }
+          case this.creatureTypes.waterGolem: {
             this.golemHeal(e);
             break;
-          case this.creatureTypes.fireGolem:
+          }
+          case this.creatureTypes.fireGolem: {
             this.golemFireball(e);
+          }
         }
-      switch (
-        ((!e.target || e.target.flags.dead) &&
-          e.timer.scan < 0 &&
-          (e.state = be.lookingForTarget),
-        e.state)
-      ) {
-        case be.lookingForTarget:
-          this.searchClosestTarget(e),
-            e.target && (e.state = be.movingToTarget);
+      }
+
+      if ((!e.target || e.target.flags.dead) && e.timer.scan < 0) {
+        e.state = zombieState.lookingForTarget;
+      }
+
+      switch (e.state) {
+        case zombieState.lookingForTarget: {
+          this.searchClosestTarget(e);
+
+          if (e.target) {
+            e.state = zombieState.movingToTarget;
+          }
+
           break;
-        case be.movingToTarget: {
+        }
+        case zombieState.movingToTarget: {
           const s = this.fastDistance(
             e.position.x,
             e.position.y,
@@ -10437,122 +11083,180 @@ var Incremancer;
             e.target.y
           );
           if (s < this.attackDistance) {
-            e.state = be.attackingTarget;
+            e.state = zombieState.attackingTarget;
             break;
           }
-          s > 3 * this.attackDistance &&
-            e.timer.scan < 0 &&
-            this.searchClosestTarget(e),
-            this.updateCreatureSpeed(e, t);
+
+          if (s > 3 * this.attackDistance && e.timer.scan < 0) {
+            this.searchClosestTarget(e);
+          }
+
+          this.updateCreatureSpeed(e, t);
           break;
         }
-        case be.attackingTarget: {
+        case zombieState.attackingTarget: {
           const s = this.fastDistance(
             e.position.x,
             e.position.y,
             e.target.x,
             e.target.y
           );
-          s < this.attackDistance
-            ? ((e.scale.x = e.target.x > e.x ? e.scaling : -e.scaling),
-              e.timer.attack < 0 &&
-                (this.humans.damageHuman(e.target, this.calculateDamage(e)),
-                e.creatureType == this.creatureTypes.fireGolem &&
-                  this.humans.burnHuman(e.target, e.attackDamage / 2),
-                (e.timer.attack =
-                  this.attackSpeed *
-                  (1 /
-                    (this.model.runeEffects.attackSpeed *
-                      this.model.ShockPCMod))),
-                e.flags.burning &&
-                  (e.timer.attack *= 1 / this.model.burningSpeedMod)),
-              s > this.attackDistance / 2 && this.updateCreatureSpeed(e, t))
-            : (e.state = be.movingToTarget);
+
+          if (s < this.attackDistance) {
+            e.scale.x = e.target.x > e.x ? e.scaling : -e.scaling;
+
+            if (e.timer.attack < 0) {
+              this.humans.damageHuman(e.target, this.calculateDamage(e));
+
+              if (e.creatureType == this.creatureTypes.fireGolem) {
+                this.humans.burnHuman(e.target, e.attackDamage / 2);
+              }
+
+              e.timer.attack =
+                this.attackSpeed *
+                (1 /
+                  (this.model.runeEffects.attackSpeed * this.model.ShockPCMod));
+
+              if (e.flags.burning) {
+                e.timer.attack *= 1 / this.model.burningSpeedMod;
+              }
+            }
+
+            if (s > this.attackDistance / 2) {
+              this.updateCreatureSpeed(e, t);
+            }
+          } else {
+            e.state = zombieState.movingToTarget;
+          }
+
           break;
         }
       }
     }
     getCreatureDirection(e) {
-      return Math.abs(e.xSpeed) > Math.abs(e.ySpeed)
-        ? e.xSpeed < 0
-          ? this.directions.left
-          : this.directions.right
-        : e.ySpeed < 0
-        ? this.directions.up
-        : this.directions.down;
+      if (Math.abs(e.xSpeed) > Math.abs(e.ySpeed)) {
+        if (e.xSpeed < 0) {
+          return this.directions.left;
+        }
+
+        return this.directions.right;
+      }
+
+      if (e.ySpeed < 0) {
+        return this.directions.up;
+      }
+
+      return this.directions.down;
     }
     changeTextureDirection(e) {
       const t = this.getCreatureDirection(e);
       if (t !== e.currentDirection) {
         switch (t) {
-          case this.directions.up:
-            (e.textures = e.textureSet.up), (e.scale.x = e.scaling);
+          case this.directions.up: {
+            e.textures = e.textureSet.up;
+            e.scale.x = e.scaling;
             break;
-          case this.directions.down:
-            (e.textures = e.textureSet.down), (e.scale.x = e.scaling);
+          }
+          case this.directions.down: {
+            e.textures = e.textureSet.down;
+            e.scale.x = e.scaling;
             break;
-          case this.directions.right:
-            (e.textures = e.textureSet.right), (e.scale.x = e.scaling);
+          }
+          case this.directions.right: {
+            e.textures = e.textureSet.right;
+            e.scale.x = e.scaling;
             break;
-          case this.directions.left:
-            (e.textures = e.textureSet.right), (e.scale.x = -e.scaling);
+          }
+          case this.directions.left: {
+            e.textures = e.textureSet.right;
+            e.scale.x = -e.scaling;
+          }
         }
-        (e.currentDirection = t), e.play();
+        e.currentDirection = t;
+        e.play();
       }
     }
     updateCreatureSpeed(e, t) {
-      if (e.timer.dogStun && e.timer.dogStun > 0)
+      if (e.timer.dogStun && e.timer.dogStun > 0) {
         return void (e.timer.dogStun -= t);
-      (e.timer.target && e.targetVector) || (e.timer.target = 0),
-        (e.timer.target -= t),
-        e.timer.target <= 0 &&
-          ((e.targetVector = this.map.howDoIGetToMyTarget(e, e.target)),
-          (e.timer.target = 0.2));
+      }
+
+      if (!e.timer.target || !e.targetVector) {
+        e.timer.target = 0;
+      }
+
+      e.timer.target -= t;
+
+      if (e.timer.target <= 0) {
+        e.targetVector = this.map.howDoIGetToMyTarget(e, e.target);
+        e.timer.target = 0.2;
+      }
+
       const s = e.speedMultiplier * e.maxSpeed;
-      (e.xSpeed = e.targetVector.x * s),
-        (e.ySpeed = e.targetVector.y * s),
-        (e.position.x += e.xSpeed * t),
-        (e.position.y += e.ySpeed * t),
-        (e.zIndex = e.position.y),
-        this.changeTextureDirection(e);
+      e.xSpeed = e.targetVector.x * s;
+      e.ySpeed = e.targetVector.y * s;
+      e.position.x += e.xSpeed * t;
+      e.position.y += e.ySpeed * t;
+      e.zIndex = e.position.y;
+      this.changeTextureDirection(e);
     }
     calculateDamage(e) {
-      let t = e.attackDamage;
-      return (
+      let e_attackDamage = e.attackDamage;
+
+      if (
         this.model.runeEffects.critChance > 0 &&
-          Math.random() < this.model.runeEffects.critChance &&
-          ((t *= this.model.runeEffects.critDamage), He(e.x, e.y - 10, t)),
-        t
-      );
+        Math.random() < this.model.runeEffects.critChance
+      ) {
+        e_attackDamage *= this.model.runeEffects.critDamage;
+        He(e.x, e.y - 10, e_attackDamage);
+      }
+
+      return e_attackDamage;
     }
     golemTaunt(e) {
-      for (let t = 0; t < this.aliveHumans.length; t++)
-        Math.abs(this.aliveHumans[t].x - e.x) < this.targetDistance &&
-          Math.abs(this.aliveHumans[t].y - e.y) < this.targetDistance &&
-          (this.aliveHumans[t].vip ||
-            ((this.aliveHumans[t].zombieTarget = e),
-            (this.aliveHumans[t].target = e)));
+      for (let t = 0; t < this.aliveHumans.length; t++) {
+        if (
+          Math.abs(this.aliveHumans[t].x - e.x) < this.targetDistance &&
+          Math.abs(this.aliveHumans[t].y - e.y) < this.targetDistance
+        ) {
+          if (!this.aliveHumans[t].vip) {
+            this.aliveHumans[t].zombieTarget = e;
+            this.aliveHumans[t].target = e;
+          }
+        }
+      }
     }
     golemHeal(e) {
-      const t = e.attackDamage;
-      for (let s = 0; s < this.aliveZombies.length; s++)
-        Math.abs(this.aliveZombies[s].x - e.x) < this.targetDistance &&
-          Math.abs(this.aliveZombies[s].y - e.y) < this.targetDistance &&
-          this.healZombie(this.aliveZombies[s], t);
-      for (let s = 0; s < this.creatures.length; s++)
-        !this.creatures[s].flags.dead &&
+      const e_attackDamage = e.attackDamage;
+      for (let s = 0; s < this.aliveZombies.length; s++) {
+        if (
+          Math.abs(this.aliveZombies[s].x - e.x) < this.targetDistance &&
+          Math.abs(this.aliveZombies[s].y - e.y) < this.targetDistance
+        ) {
+          this.healZombie(this.aliveZombies[s], e_attackDamage);
+        }
+      }
+      for (let s = 0; s < this.creatures.length; s++) {
+        if (
+          !this.creatures[s].flags.dead &&
           this.creatures[s].visible &&
           Math.abs(this.creatures[s].x - e.x) < this.targetDistance &&
-          Math.abs(this.creatures[s].y - e.y) < this.targetDistance &&
-          this.healZombie(this.creatures[s], t);
+          Math.abs(this.creatures[s].y - e.y) < this.targetDistance
+        ) {
+          this.healZombie(this.creatures[s], e_attackDamage);
+        }
+      }
     }
     golemFireball(e) {
       let t = 5;
-      for (let s = 0; s < this.aliveHumans.length; s++)
-        t > 0 &&
+      for (let s = 0; s < this.aliveHumans.length; s++) {
+        if (
+          t > 0 &&
           Math.abs(this.aliveHumans[s].x - e.x) < this.targetDistance &&
-          Math.abs(this.aliveHumans[s].y - e.y) < this.targetDistance &&
-          (t--,
+          Math.abs(this.aliveHumans[s].y - e.y) < this.targetDistance
+        ) {
+          t--;
+
           this.bullets.newBullet(
             e,
             this.aliveHumans[s],
@@ -10560,242 +11264,335 @@ var Incremancer;
             false,
             false,
             true
-          ));
+          );
+        }
+      }
     }
   }
+
   class Ne extends PIXI.Sprite {
-    constructor() {
-      super(...arguments), (this.graveyard = true);
+    constructor(...args) {
+      super(...args);
+      this.graveyard = true;
     }
   }
+
   class Graveyard {
     constructor() {
-      if (
-        ((this.spikeSprites = []),
-        (this.level = 1),
-        (this.spikeTimer = 5),
-        (this.fenceRadius = 50),
-        (this.fastDistance = weighted_hybrid_distance),
-        (this.graveyardHealth = 0),
-        (this.graveyardMaxHealth = 0),
-        (this.target = {
-          graveyard: true,
-          x: 0,
-          y: 0,
-        }),
-        (this.healthBar = null),
-        (this.fence = null),
-        (this.fencePosts = []),
-        Graveyard.instance)
-      )
+      this.spikeSprites = [];
+      this.level = 1;
+      this.spikeTimer = 5;
+      this.fenceRadius = 50;
+      this.fastDistance = weighted_hybrid_distance;
+      this.graveyardHealth = 0;
+      this.graveyardMaxHealth = 0;
+
+      this.target = {
+        graveyard: true,
+        x: 0,
+        y: 0,
+      };
+
+      this.healthBar = null;
+      this.fence = null;
+      this.fencePosts = [];
+
+      if (Graveyard.instance) {
         return Graveyard.instance;
+      }
+
       Graveyard.instance = this;
     }
     initialize() {
-      (this.boneCollectors = new BoneCollectors()),
-        (this.zmMap = new ee()),
-        (this.zombies = new Zombies()),
-        (this.bones = new Bones()),
-        (this.gameModel = GameModel.getInstance()),
-        (this.smoke = new ot()),
-        (this.harpies = new Ke()),
-        (this.blood = new _e()),
-        (this.humans = new Humans()),
-        void 0 === this.gameModel.persistentData.graveyardZombies &&
-          (this.gameModel.persistentData.graveyardZombies = 1),
-        this.drawGraveyard(),
-        this.drawFence(),
-        this.drawHealthBar(),
-        this.bones.initialize(),
-        this.boneCollectors.populate(),
-        this.harpies.populate();
+      this.boneCollectors = new BoneCollectors();
+      this.zmMap = new ee();
+      this.zombies = new Zombies();
+      this.bones = new Bones();
+      this.gameModel = GameModel.getInstance();
+      this.smoke = new ot();
+      this.harpies = new Ke();
+      this.blood = new _e();
+      this.humans = new Humans();
+
+      if (this.gameModel.persistentData.graveyardZombies === undefined) {
+        this.gameModel.persistentData.graveyardZombies = 1;
+      }
+
+      this.drawGraveyard();
+      this.drawFence();
+      this.drawHealthBar();
+      this.bones.initialize();
+      this.boneCollectors.populate();
+      this.harpies.populate();
     }
     damageGraveyard(e) {
-      this.gameModel.isBossStage(this.gameModel.level) &&
-        ((this.graveyardHealth -= e),
-        this.graveyardHealth < 0 &&
-          ((this.gameModel.currentState = this.gameModel.states.failed),
-          (this.gameModel.startTimer = 3)));
+      if (this.gameModel.isBossStage(this.gameModel.level)) {
+        this.graveyardHealth -= e;
+
+        if (this.graveyardHealth < 0) {
+          this.gameModel.currentState = this.gameModel.states.failed;
+          this.gameModel.startTimer = 3;
+        }
+      }
     }
     drawHealthBar() {
-      this.gameModel.isBossStage(this.gameModel.level)
-        ? (this.gameModel.sendMessage("Defend the Graveyard!"),
-          (this.graveyardHealth = this.graveyardMaxHealth =
-            100 *
-            this.gameModel.zombieHealth *
-            this.gameModel.graveyardHealthMod),
-          this.healthBar ||
-            ((this.healthBar = {
-              container: new PIXI.Container(),
-              background: new PIXI.Graphics(),
-              foreground: new PIXI.Graphics(),
-              percentage: 100,
-            }),
-            this.healthBar.container.addChild(this.healthBar.background),
-            this.healthBar.container.addChild(this.healthBar.foreground),
-            b.addChild(this.healthBar.container)),
-          (this.target.x = P.x / 2),
-          (this.target.y = P.y / 2),
-          (this.healthBar.container.visible = true),
-          (this.healthBar.container.x = this.target.x - 50),
-          (this.healthBar.container.y = this.target.y - 100),
-          this.healthBar.background.clear(),
-          this.healthBar.background.lineStyle(12, 3355443),
-          this.healthBar.background.moveTo(-2, 0),
-          this.healthBar.background.lineTo(102, 0),
-          this.healthBar.foreground.clear(),
-          this.healthBar.foreground.lineStyle(8, 16601682),
-          this.healthBar.foreground.moveTo(0, 0),
-          this.healthBar.foreground.lineTo(100, 0))
-        : this.healthBar &&
-          (this.healthBar.background.clear(),
-          this.healthBar.foreground.clear(),
-          (this.healthBar.container.visible = false));
+      if (this.gameModel.isBossStage(this.gameModel.level)) {
+        this.gameModel.sendMessage("Defend the Graveyard!");
+
+        this.graveyardHealth = this.graveyardMaxHealth =
+          100 * this.gameModel.zombieHealth * this.gameModel.graveyardHealthMod;
+
+        if (!this.healthBar) {
+          this.healthBar = {
+            container: new PIXI.Container(),
+            background: new PIXI.Graphics(),
+            foreground: new PIXI.Graphics(),
+            percentage: 100,
+          };
+
+          this.healthBar.container.addChild(this.healthBar.background);
+          this.healthBar.container.addChild(this.healthBar.foreground);
+          b.addChild(this.healthBar.container);
+        }
+
+        this.target.x = P.x / 2;
+        this.target.y = P.y / 2;
+        this.healthBar.container.visible = true;
+        this.healthBar.container.x = this.target.x - 50;
+        this.healthBar.container.y = this.target.y - 100;
+        this.healthBar.background.clear();
+        this.healthBar.background.lineStyle(12, 3355443);
+        this.healthBar.background.moveTo(-2, 0);
+        this.healthBar.background.lineTo(102, 0);
+        this.healthBar.foreground.clear();
+        this.healthBar.foreground.lineStyle(8, 16601682);
+        this.healthBar.foreground.moveTo(0, 0);
+        this.healthBar.foreground.lineTo(100, 0);
+      } else if (this.healthBar) {
+        this.healthBar.background.clear();
+        this.healthBar.foreground.clear();
+        this.healthBar.container.visible = false;
+      }
     }
     updateHealthBar() {
       const e = Math.max(
         Math.round((this.graveyardHealth / this.graveyardMaxHealth) * 100),
         0
       );
-      e != this.healthBar.percentage &&
-        (this.healthBar.foreground.clear(),
-        e > 0 &&
-          (this.healthBar.foreground.lineStyle(8, 16601682),
-          this.healthBar.foreground.moveTo(0, 0),
-          this.healthBar.foreground.lineTo(e, 0)),
-        (this.healthBar.percentage = e));
+
+      if (e != this.healthBar.percentage) {
+        this.healthBar.foreground.clear();
+
+        if (e > 0) {
+          this.healthBar.foreground.lineStyle(8, 16601682);
+          this.healthBar.foreground.moveTo(0, 0);
+          this.healthBar.foreground.lineTo(e, 0);
+        }
+
+        this.healthBar.percentage = e;
+      }
     }
     drawGraveyard() {
-      this.spikeTexture ||
-        (this.spikeTexture = PIXI.Texture.from("spikes.png")),
-        this.sprite && u.removeChild(this.sprite),
-        this.fortSprite &&
-          (g.removeChild(this.fortSprite), (this.fortSprite = null)),
-        (this.level = 1);
-      let e = "graveyard1.png",
-        t = "";
-      this.gameModel.constructions.crypt &&
-        ((this.level = 2), (e = "graveyard2.png")),
-        this.gameModel.constructions.fort &&
-          ((this.level = 3),
-          (e = "sprites/megagraveyard.png"),
-          (t = "fort1.png")),
-        this.gameModel.constructions.fortress &&
-          ((this.level = 4),
-          (e = "sprites/megagraveyard.png"),
-          (t = "fort2.png")),
-        this.gameModel.constructions.citadel &&
-          ((this.level = 5),
-          (e = "sprites/megagraveyard.png"),
-          (t = "fort3.png")),
-        this.sprite
-          ? (this.sprite.texture = PIXI.Texture.from(e))
-          : (this.sprite = new Ne(PIXI.Texture.from(e)));
+      if (!this.spikeTexture) {
+        this.spikeTexture = PIXI.Texture.from("spikes.png");
+      }
+
+      if (this.sprite) {
+        u.removeChild(this.sprite);
+      }
+
+      if (this.fortSprite) {
+        g.removeChild(this.fortSprite);
+        this.fortSprite = null;
+      }
+
+      this.level = 1;
+      let e = "graveyard1.png";
+      let t = "";
+
+      if (this.gameModel.constructions.crypt) {
+        this.level = 2;
+        e = "graveyard2.png";
+      }
+
+      if (this.gameModel.constructions.fort) {
+        this.level = 3;
+        e = "sprites/megagraveyard.png";
+        t = "fort1.png";
+      }
+
+      if (this.gameModel.constructions.fortress) {
+        this.level = 4;
+        e = "sprites/megagraveyard.png";
+        t = "fort2.png";
+      }
+
+      if (this.gameModel.constructions.citadel) {
+        this.level = 5;
+        e = "sprites/megagraveyard.png";
+        t = "fort3.png";
+      }
+
+      if (this.sprite) {
+        this.sprite.texture = PIXI.Texture.from(e);
+      } else {
+        this.sprite = new Ne(PIXI.Texture.from(e));
+      }
+
       const s = this.zmMap.graveYardLocation;
-      (this.sprite.width = 32),
-        (this.sprite.height = 32),
-        this.sprite.anchor.set(0.5, 0.5),
-        this.sprite.scale.set(2, 2),
-        (this.sprite.visible = false),
-        u.addChild(this.sprite),
-        (this.sprite.x = s.x),
-        (this.sprite.y = s.y),
-        (this.zmMap.graveyardCollision = false),
-        t &&
-          (this.fortSprite
-            ? (this.fortSprite.texture = PIXI.Texture.from(t))
-            : (this.fortSprite = new PIXI.Sprite(PIXI.Texture.from(t))),
-          this.fortSprite.anchor.set(0.5, 1),
-          this.fortSprite.scale.set(2, 2),
-          (this.fortSprite.x = s.x),
-          (this.fortSprite.zIndex = this.fortSprite.y = s.y + 2),
-          (this.fortSprite.visible = false),
-          g.addChild(this.fortSprite));
+      this.sprite.width = 32;
+      this.sprite.height = 32;
+      this.sprite.anchor.set(0.5, 0.5);
+      this.sprite.scale.set(2, 2);
+      this.sprite.visible = false;
+      u.addChild(this.sprite);
+      this.sprite.x = s.x;
+      this.sprite.y = s.y;
+      this.zmMap.graveyardCollision = false;
+
+      if (t) {
+        if (this.fortSprite) {
+          this.fortSprite.texture = PIXI.Texture.from(t);
+        } else {
+          this.fortSprite = new PIXI.Sprite(PIXI.Texture.from(t));
+        }
+
+        this.fortSprite.anchor.set(0.5, 1);
+        this.fortSprite.scale.set(2, 2);
+        this.fortSprite.x = s.x;
+        this.fortSprite.zIndex = this.fortSprite.y = s.y + 2;
+        this.fortSprite.visible = false;
+        g.addChild(this.fortSprite);
+      }
     }
     drawFence() {
-      if (
-        (this.fence ||
-          ((this.fence = new PIXI.Container()), u.addChild(this.fence)),
-        (this.fenceRadius = this.gameModel.fenceRadius),
-        !this.fenceTextures)
-      ) {
-        this.fenceTextures = [];
-        for (let e = 0; e < 4; e++)
-          this.fenceTextures.push(
-            PIXI.Texture.from("fencepost" + (e + 1) + ".png")
-          );
+      if (!this.fence) {
+        this.fence = new PIXI.Container();
+        u.addChild(this.fence);
       }
-      this.fencePosts.forEach((e) => (e.visible = false)),
-        (this.fence.cacheAsBitmap = false);
-      const e = Math.round(0.4 * this.fenceRadius),
-        t = (2 * Math.PI) / e;
+
+      this.fenceRadius = this.gameModel.fenceRadius;
+
+      if (!this.fenceTextures) {
+        this.fenceTextures = [];
+        for (let e = 0; e < 4; e++) {
+          this.fenceTextures.push(PIXI.Texture.from(`fencepost${e + 1}.png`));
+        }
+      }
+
+      this.fencePosts.forEach((e) => (e.visible = false));
+
+      this.fence.cacheAsBitmap = false;
+      const e = Math.round(0.4 * this.fenceRadius);
+      const t = (2 * Math.PI) / e;
       for (let r = 0; r < e; r++) {
         let e;
-        this.fencePosts[r]
-          ? ((e = this.fencePosts[r]), (e.visible = true))
-          : ((e = new PIXI.Sprite(sample(this.fenceTextures))),
-            this.fencePosts.push(e),
-            this.fence.addChild(e)),
-          e.anchor.set(0.5, 1),
-          (e.scale.x = Math.random() > 0.5 ? 1 : -1);
-        const n = 10 * Math.random() - 5,
-          o =
-            (0,
-            (s = this.fenceRadius + n),
-            (i = t * r),
-            {
-              x: 0 * Math.cos(i) - s * Math.sin(i),
-              y: 0 * Math.sin(i) + s * Math.cos(i),
-            });
+
+        if (this.fencePosts[r]) {
+          e = this.fencePosts[r];
+          e.visible = true;
+        } else {
+          e = new PIXI.Sprite(sample(this.fenceTextures));
+          this.fencePosts.push(e);
+          this.fence.addChild(e);
+        }
+
+        e.anchor.set(0.5, 1);
+        e.scale.x = Math.random() > 0.5 ? 1 : -1;
+        const n = 10 * Math.random() - 5;
+
+        0;
+        s = this.fenceRadius + n;
+        i = t * r;
+
+        const o = {
+          x: 0 * Math.cos(i) - s * Math.sin(i),
+          y: 0 * Math.sin(i) + s * Math.cos(i),
+        };
+
         e.position.set(o.x, o.y);
       }
-      var s, i;
+      var s;
+      var i;
       this.fence.cacheAsBitmap = true;
       const r = this.zmMap.graveYardLocation;
-      (this.fence.x = r.x), (this.fence.y = r.y);
+      this.fence.x = r.x;
+      this.fence.y = r.y;
     }
     update(e) {
+      this.boneCollectors.addAndRemoveBoneCollectors();
+      this.harpies.addAndRemoveHarpies();
+
+      if (this.gameModel.isBossStage(this.gameModel.level)) {
+        this.updateHealthBar();
+      }
+
       if (
-        (this.boneCollectors.addAndRemoveBoneCollectors(),
-        this.harpies.addAndRemoveHarpies(),
-        this.gameModel.isBossStage(this.gameModel.level) &&
-          this.updateHealthBar(),
         !this.gameModel.constructions.graveyard ||
-          this.gameModel.currentState != this.gameModel.states.playingLevel)
-      )
-        return (this.sprite.visible = false), void (this.fence.visible = false);
+        this.gameModel.currentState != this.gameModel.states.playingLevel
+      ) {
+        this.sprite.visible = false;
+        return void (this.fence.visible = false);
+      }
+
       if (
-        (((this.level < 2 && this.gameModel.constructions.crypt) ||
-          (this.level < 3 && this.gameModel.constructions.fort) ||
-          (this.level < 4 && this.gameModel.constructions.fortress) ||
-          (this.level < 5 && this.gameModel.constructions.citadel)) &&
-          this.drawGraveyard(),
-        (this.sprite.visible = true),
-        this.fortSprite && (this.fortSprite.visible = true),
-        5 == this.level &&
-          Math.random() > 0.9 &&
-          (Math.random() > 0.5
-            ? this.smoke.newFireSmoke(this.sprite.x - 20, this.sprite.y - 113)
-            : this.smoke.newFireSmoke(this.sprite.x + 20, this.sprite.y - 113)),
+        (this.level < 2 && this.gameModel.constructions.crypt) ||
+        (this.level < 3 && this.gameModel.constructions.fort) ||
+        (this.level < 4 && this.gameModel.constructions.fortress) ||
+        (this.level < 5 && this.gameModel.constructions.citadel)
+      ) {
+        this.drawGraveyard();
+      }
+
+      this.sprite.visible = true;
+
+      if (this.fortSprite) {
+        this.fortSprite.visible = true;
+      }
+
+      if (this.level == 5 && Math.random() > 0.9) {
+        if (Math.random() > 0.5) {
+          this.smoke.newFireSmoke(this.sprite.x - 20, this.sprite.y - 113);
+        } else {
+          this.smoke.newFireSmoke(this.sprite.x + 20, this.sprite.y - 113);
+        }
+      }
+
+      if (
         this.gameModel.energy >= this.gameModel.energyMax &&
-          !this.gameModel.hidden)
-      )
-        for (let e = 0; e < this.gameModel.persistentData.graveyardZombies; e++)
+        !this.gameModel.hidden
+      ) {
+        for (
+          let e = 0;
+          e < this.gameModel.persistentData.graveyardZombies;
+          e++
+        ) {
           this.zombies.spawnZombie(
             this.sprite.x,
             this.sprite.y + (this.level > 2 ? 8 : 0)
           );
-      this.bones.update(e),
-        this.boneCollectors.update(e),
-        this.harpies.update(e),
+        }
+      }
+
+      this.bones.update(e);
+      this.boneCollectors.update(e);
+      this.harpies.update(e);
+
+      if (
         this.gameModel.constructions.fence &&
         this.gameModel.currentState == this.gameModel.states.playingLevel
-          ? (this.fenceRadius !== this.gameModel.fenceRadius &&
-              this.drawFence(),
-            (this.fence.visible = true))
-          : (this.fence.visible = false),
-        this.updatePlagueSpikes(e),
-        this.updateSpikeSprites(e);
+      ) {
+        if (this.fenceRadius !== this.gameModel.fenceRadius) {
+          this.drawFence();
+        }
+
+        this.fence.visible = true;
+      } else {
+        this.fence.visible = false;
+      }
+
+      this.updatePlagueSpikes(e);
+      this.updateSpikeSprites(e);
     }
     updatePlagueSpikes(e) {
       if (
@@ -10804,43 +11601,55 @@ var Incremancer;
       ) {
         this.spikeTimer = this.gameModel.spikeDelay;
         const e = this.humans.aliveHumans;
-        for (let t = 0; t < e.length; t++)
-          Math.abs(e[t].x - this.sprite.x) < this.fenceRadius &&
+        for (let t = 0; t < e.length; t++) {
+          if (
+            Math.abs(e[t].x - this.sprite.x) < this.fenceRadius &&
             Math.abs(e[t].y - this.sprite.y) < this.fenceRadius &&
             this.fastDistance(this.sprite.x, this.sprite.y, e[t].x, e[t].y) <
-              this.fenceRadius &&
-            (this.zombies.inflictPlague(e[t]),
-            this.humans.damageHuman(e[t], this.gameModel.zombieDamage),
-            this.blood.newPlagueSplatter(e[t].x, e[t].y),
-            this.addSpikeSprite(e[t]));
+              this.fenceRadius
+          ) {
+            this.zombies.inflictPlague(e[t]);
+            this.humans.damageHuman(e[t], this.gameModel.zombieDamage);
+            this.blood.newPlagueSplatter(e[t].x, e[t].y);
+            this.addSpikeSprite(e[t]);
+          }
+        }
       }
     }
     addSpikeSprite(e) {
       let t = null;
-      for (let e = 0; e < this.spikeSprites.length; e++)
+      for (let e = 0; e < this.spikeSprites.length; e++) {
         if (!this.spikeSprites[e].visible) {
           t = this.spikeSprites[e];
           break;
         }
-      t ||
-        ((t = new PIXI.Sprite(this.spikeTexture)),
-        this.spikeSprites.push(t),
-        g.addChild(t),
-        t.anchor.set(0.5, 1)),
-        (t.visible = true),
-        (t.alpha = 1),
-        (t.x = e.x),
-        (t.y = e.y + 2),
-        (t.zIndex = t.y),
-        (t.scale.y = 2),
-        (t.scale.x = Math.random() > 0.5 ? 1.5 : -1.5);
+      }
+
+      if (!t) {
+        t = new PIXI.Sprite(this.spikeTexture);
+        this.spikeSprites.push(t);
+        g.addChild(t);
+        t.anchor.set(0.5, 1);
+      }
+
+      t.visible = true;
+      t.alpha = 1;
+      t.x = e.x;
+      t.y = e.y + 2;
+      t.zIndex = t.y;
+      t.scale.y = 2;
+      t.scale.x = Math.random() > 0.5 ? 1.5 : -1.5;
     }
     updateSpikeSprites(e) {
-      for (let t = 0; t < this.spikeSprites.length; t++)
-        this.spikeSprites[t].visible &&
-          ((this.spikeSprites[t].alpha -= 0.4 * e),
-          this.spikeSprites[t].alpha <= 0 &&
-            (this.spikeSprites[t].visible = false));
+      for (let t = 0; t < this.spikeSprites.length; t++) {
+        if (this.spikeSprites[t].visible) {
+          this.spikeSprites[t].alpha -= 0.4 * e;
+
+          if (this.spikeSprites[t].alpha <= 0) {
+            this.spikeSprites[t].visible = false;
+          }
+        }
+      }
     }
     isWithinFence(e) {
       return (
@@ -10857,319 +11666,399 @@ var Incremancer;
       );
     }
   }
+
   class Ye extends PIXI.AnimatedSprite {
     constructor(e) {
-      super(e),
-        (this.xSpeed = 0),
-        (this.ySpeed = 0),
-        (this.bones = 0),
-        (this.speedFactor = 0),
-        (this.boneList = []),
-        (this.target = null),
-        (this.animationSpeed = 0.2);
+      super(e);
+      this.xSpeed = 0;
+      this.ySpeed = 0;
+      this.bones = 0;
+      this.speedFactor = 0;
+      this.boneList = [];
+      this.target = null;
+      this.animationSpeed = 0.2;
     }
   }
-  var We, qe;
-  !(function (e) {
-    (e[(e.collecting = 0)] = "collecting"),
-      (e[(e.returning = 1)] = "returning"),
-      (e[(e.waiting = 2)] = "waiting");
-  })(We || (We = {}));
+
+  enum boneCollectorState {
+    collecting,
+    returning,
+    waiting,
+  }
   class BoneCollectors {
     constructor() {
-      if (
-        ((this.sprites = []),
-        (this.maxSpeed = 125),
-        (this.scaling = 2),
-        (this.collectDistance = 10),
-        (this.fastDistance = weighted_hybrid_distance),
-        BoneCollectors.instance)
-      )
+      this.sprites = [];
+      this.maxSpeed = 125;
+      this.scaling = 2;
+      this.collectDistance = 10;
+      this.fastDistance = weighted_hybrid_distance;
+
+      if (BoneCollectors.instance) {
         return BoneCollectors.instance;
+      }
+
       BoneCollectors.instance = this;
     }
     populate() {
-      if (
-        ((this.graveyard = new Graveyard()),
-        (this.gameModel = GameModel.getInstance()),
-        (this.bones = new Bones()),
-        !this.texture)
-      ) {
+      this.graveyard = new Graveyard();
+      this.gameModel = GameModel.getInstance();
+      this.bones = new Bones();
+
+      if (!this.texture) {
         this.texture = [];
-        for (let e = 0; e < 2; e++)
-          this.texture.push(
-            PIXI.Texture.from("bonecollector" + (e + 1) + ".png")
-          );
+        for (let e = 0; e < 2; e++) {
+          this.texture.push(PIXI.Texture.from(`bonecollector${e + 1}.png`));
+        }
       }
-      for (let e = 0; e < this.sprites.length; e++)
-        (this.sprites[e].boneList = []),
-          (this.sprites[e].target = false),
-          this.sprites[e].position.set(
-            this.graveyard.sprite.x,
-            this.graveyard.sprite.y
-          ),
-          (this.sprites[e].state = We.collecting);
+
+      for (let e = 0; e < this.sprites.length; e++) {
+        this.sprites[e].boneList = [];
+        this.sprites[e].target = false;
+
+        this.sprites[e].position.set(
+          this.graveyard.sprite.x,
+          this.graveyard.sprite.y
+        );
+
+        this.sprites[e].state = boneCollectorState.collecting;
+      }
     }
     addAndRemoveBoneCollectors() {
       if (this.sprites.length > this.gameModel.persistentData.boneCollectors) {
         const e = this.sprites.pop();
-        if (e.boneList)
-          for (let t = 0; t < e.boneList.length; t++)
-            (e.boneList[t].collector = false),
-              e.target && e.target.collector && (e.target.collector = false);
-        this.gameModel.addBones(e.bones), g.removeChild(e);
+        if (e.boneList) {
+          for (let t = 0; t < e.boneList.length; t++) {
+            e.boneList[t].collector = false;
+
+            if (e.target && e.target.collector) {
+              e.target.collector = false;
+            }
+          }
+        }
+        this.gameModel.addBones(e.bones);
+        g.removeChild(e);
       }
       if (this.sprites.length < this.gameModel.persistentData.boneCollectors) {
         const e = new Ye(this.texture);
-        (e.animationSpeed = 0.2),
-          e.anchor.set(0.5, 1),
-          e.position.set(this.graveyard.sprite.x, this.graveyard.sprite.y),
-          (e.zIndex = e.position.y),
-          (e.visible = true),
-          e.scale.set(
-            Math.random() > 0.5 ? this.scaling : -1 * this.scaling,
-            this.scaling
-          ),
-          (e.xSpeed = 0),
-          (e.ySpeed = 0),
-          (e.bones = 0),
-          (e.speedFactor = 0),
-          (e.state = We.collecting),
-          e.play(),
-          (e.boneList = []),
-          this.sprites.push(e),
-          g.addChild(e);
+        e.animationSpeed = 0.2;
+        e.anchor.set(0.5, 1);
+        e.position.set(this.graveyard.sprite.x, this.graveyard.sprite.y);
+        e.zIndex = e.position.y;
+        e.visible = true;
+
+        e.scale.set(
+          Math.random() > 0.5 ? this.scaling : -1 * this.scaling,
+          this.scaling
+        );
+
+        e.xSpeed = 0;
+        e.ySpeed = 0;
+        e.bones = 0;
+        e.speedFactor = 0;
+        e.state = boneCollectorState.collecting;
+        e.play();
+        e.boneList = [];
+        this.sprites.push(e);
+        g.addChild(e);
       }
     }
     update(e) {
-      for (let t = 0; t < this.sprites.length; t++)
+      for (let t = 0; t < this.sprites.length; t++) {
         this.updateBoneCollector(this.sprites[t], e);
+      }
     }
     findNearestBone(e) {
-      if ((e.boneList || (e.boneList = []), 0 == e.boneList.length)) {
-        let t = e.x,
-          s = e.y;
+      if (!e.boneList) {
+        e.boneList = [];
+      }
+
+      if (e.boneList.length == 0) {
+        let { x, y } = e;
+
         for (let i = 0; i < 3; i++) {
-          let i = null,
-            a = 2e3;
-          for (let e = 0; e < this.bones.uncollected.length; e++)
+          let i = null;
+          let a = 2000; /* 2e3 */
+          for (let e = 0; e < this.bones.uncollected.length; e++) {
             if (
               this.bones.uncollected[e].value > 0 &&
               !this.bones.uncollected[e].collector
             ) {
               const r = this.fastDistance(
-                t,
-                s,
+                x,
+                y,
                 this.bones.uncollected[e].x,
                 this.bones.uncollected[e].y
               );
-              r < a && ((a = r), (i = this.bones.uncollected[e]));
+
+              if (r < a) {
+                (a = r), (i = this.bones.uncollected[e]);
+              }
             }
-          if (!i) break;
-          e.boneList.push(i), (i.collector = true), (t = i.x), (s = i.y);
+          }
+          if (!i) {
+            break;
+          }
+          e.boneList.push(i);
+          i.collector = true;
+          x = i.x;
+          y = i.y;
         }
       }
-      e.boneList.length > 0
-        ? (e.target = e.boneList.shift())
-        : (e.target = false);
+
+      if (e.boneList.length > 0) {
+        e.target = e.boneList.shift();
+      } else {
+        e.target = false;
+      }
     }
     updateBoneCollector(e, t) {
-      switch (
-        (!e.target ||
-          (e.target.graveyard && e.state == We.collecting) ||
-          this.updateSpeed(e, t),
-        e.state)
+      if (
+        e.target &&
+        (!e.target.graveyard || e.state != boneCollectorState.collecting)
       ) {
-        case We.collecting:
+        this.updateSpeed(e, t);
+      }
+
+      switch (e.state) {
+        case boneCollectorState.collecting: {
+          if (!e.target || !e.target.value || !e.target.visible) {
+            this.findNearestBone(e);
+          }
+
           if (
-            ((e.target && e.target.value && e.target.visible) ||
-              this.findNearestBone(e),
             e.target &&
-              e.target.value > 0 &&
-              this.fastDistance(
-                e.position.x,
-                e.position.y,
-                e.target.x,
-                e.target.y
-              ) < this.collectDistance &&
-              ((e.bones += e.target.value),
-              (e.target.value = 0),
-              (e.speedFactor = 0)),
-            e.bones >= this.gameModel.boneCollectorCapacity || !e.target)
-          )
-            return (
-              (e.state = We.returning), void (e.target = this.graveyard.sprite)
-            );
-          break;
-        case We.returning:
-          e.target || (e.target = this.graveyard.sprite),
+            e.target.value > 0 &&
             this.fastDistance(
               e.position.x,
               e.position.y,
               e.target.x,
               e.target.y
-            ) < this.collectDistance &&
-              ((e.target = false),
+            ) < this.collectDistance
+          ) {
+            (e.bones += e.target.value),
+              (e.target.value = 0),
+              (e.speedFactor = 0);
+          }
+
+          if (e.bones >= this.gameModel.boneCollectorCapacity || !e.target) {
+            e.state = boneCollectorState.returning;
+            return void (e.target = this.graveyard.sprite);
+          }
+
+          break;
+        }
+        case boneCollectorState.returning: {
+          if (!e.target) {
+            e.target = this.graveyard.sprite;
+          }
+
+          if (
+            this.fastDistance(
+              e.position.x,
+              e.position.y,
+              e.target.x,
+              e.target.y
+            ) < this.collectDistance
+          ) {
+            (e.target = false),
               this.gameModel.addBones(e.bones),
               (e.bones = 0),
-              (e.state = We.collecting),
-              (e.speedFactor = 0));
+              (e.state = boneCollectorState.collecting),
+              (e.speedFactor = 0);
+          }
+        }
       }
     }
     updateSpeed(e, t) {
       e.speedFactor = Math.min(1, (e.speedFactor += 3 * t));
-      const s = e.target.x - e.x,
-        i = e.target.y - e.y,
-        a = Math.abs(s),
-        r = Math.abs(i);
-      if (0 == Math.max(a, r)) return;
+      const s = e.target.x - e.x;
+      const i = e.target.y - e.y;
+      const a = Math.abs(s);
+      const r = Math.abs(i);
+      if (Math.max(a, r) == 0) {
+        return;
+      }
       let n = 1 / Math.max(a, r);
-      (n *= 1.29289 - (a + r) * n * 0.29289),
-        (e.xSpeed = s * n * this.maxSpeed * e.speedFactor),
-        (e.ySpeed = i * n * this.maxSpeed * e.speedFactor),
-        (e.position.x += e.xSpeed * t),
-        (e.position.y += e.ySpeed * t),
-        (e.zIndex = e.position.y);
+      n *= 1.29289 - (a + r) * n * 0.29289;
+      e.xSpeed = s * n * this.maxSpeed * e.speedFactor;
+      e.ySpeed = i * n * this.maxSpeed * e.speedFactor;
+      e.position.x += e.xSpeed * t;
+      e.position.y += e.ySpeed * t;
+      e.zIndex = e.position.y;
     }
   }
-  !(function (e) {
-    (e[(e.bombing = 0)] = "bombing"), (e[(e.returning = 1)] = "returning");
-  })(qe || (qe = {}));
+
+  enum harpyState {
+    bombing,
+    returning,
+  }
+
   class je extends PIXI.AnimatedSprite {
     constructor(e) {
-      super(e),
-        (this.target = null),
-        (this.xSpeed = 0),
-        (this.ySpeed = 0),
-        (this.bombs = 0),
-        (this.speedFactor = 0),
-        (this.animationSpeed = 0.2),
-        this.anchor.set(0.5, 1),
-        (this.visible = true);
+      super(e);
+      this.target = null;
+      this.xSpeed = 0;
+      this.ySpeed = 0;
+      this.bombs = 0;
+      this.speedFactor = 0;
+      this.animationSpeed = 0.2;
+      this.anchor.set(0.5, 1);
+      this.visible = true;
     }
   }
+
   class $e extends PIXI.Sprite {
     constructor(e) {
-      super(e),
-        (this.dropped = false),
-        (this.floor = 0),
-        (this.rotSpeed = 0),
-        (this.xSpeed = 0),
-        (this.ySpeed = 0),
-        (this.fire = false),
-        this.anchor.set(0.5, 0.5);
+      super(e);
+      this.dropped = false;
+      this.floor = 0;
+      this.rotSpeed = 0;
+      this.xSpeed = 0;
+      this.ySpeed = 0;
+      this.fire = false;
+      this.anchor.set(0.5, 0.5);
     }
   }
+
   class Ke {
     constructor() {
-      if (
-        ((this.sprites = []),
-        (this.discardedSprites = []),
-        (this.bombSprites = []),
-        (this.discardedBombSprites = []),
-        (this.bombHeight = 100),
-        (this.scaling = 2.5),
-        (this.fastDistance = weighted_hybrid_distance),
-        Ke.instance)
-      )
+      this.sprites = [];
+      this.discardedSprites = [];
+      this.bombSprites = [];
+      this.discardedBombSprites = [];
+      this.bombHeight = 100;
+      this.scaling = 2.5;
+      this.fastDistance = weighted_hybrid_distance;
+
+      if (Ke.instance) {
         return Ke.instance;
+      }
+
       Ke.instance = this;
     }
     populate() {
-      if (
-        ((this.model = GameModel.getInstance()),
-        (this.graveyard = new Graveyard()),
-        (this.zombies = new Zombies()),
-        (this.humans = new Humans()),
-        (this.tanks = new De()),
-        !this.textures)
-      ) {
+      this.model = GameModel.getInstance();
+      this.graveyard = new Graveyard();
+      this.zombies = new Zombies();
+      this.humans = new Humans();
+      this.tanks = new De();
+
+      if (!this.textures) {
         this.textures = [];
-        for (let e = 0; e < 2; e++)
-          this.textures.push(PIXI.Texture.from("harpy" + (e + 1) + ".png"));
+        for (let e = 0; e < 2; e++) {
+          this.textures.push(PIXI.Texture.from(`harpy${e + 1}.png`));
+        }
         this.bombTexture = PIXI.Texture.from("harpybomb.png");
       }
-      void 0 === this.model.persistentData.harpies &&
-        (this.model.persistentData.harpies = 0);
-      for (let e = 0; e < this.bombSprites.length; e++)
-        this.bombSprites[e].visible &&
-          ((this.bombSprites[e].visible = false),
-          this.discardedBombSprites.push(this.bombSprites[e]));
-      for (let e = 0; e < this.sprites.length; e++)
-        (this.sprites[e].bomb = null),
-          (this.sprites[e].target = false),
-          this.sprites[e].position.set(
-            this.graveyard.sprite.x,
-            this.graveyard.sprite.y - this.bombHeight
-          ),
-          (this.sprites[e].state = qe.returning);
+
+      if (this.model.persistentData.harpies === undefined) {
+        this.model.persistentData.harpies = 0;
+      }
+
+      for (let e = 0; e < this.bombSprites.length; e++) {
+        if (this.bombSprites[e].visible) {
+          this.bombSprites[e].visible = false;
+          this.discardedBombSprites.push(this.bombSprites[e]);
+        }
+      }
+      for (let e = 0; e < this.sprites.length; e++) {
+        this.sprites[e].bomb = null;
+        this.sprites[e].target = false;
+
+        this.sprites[e].position.set(
+          this.graveyard.sprite.x,
+          this.graveyard.sprite.y - this.bombHeight
+        );
+
+        this.sprites[e].state = harpyState.returning;
+      }
     }
     addAndRemoveHarpies() {
       if (this.sprites.length > this.model.persistentData.harpies) {
         const e = this.sprites.pop();
-        (e.target = false),
-          e.bomb &&
-            ((e.bomb.dropped = true),
-            (e.bomb.floor = e.bomb.y + this.bombHeight)),
-          b.removeChild(e),
-          this.discardedSprites.push(e);
+        e.target = false;
+
+        if (e.bomb) {
+          e.bomb.dropped = true;
+          e.bomb.floor = e.bomb.y + this.bombHeight;
+        }
+
+        b.removeChild(e);
+        this.discardedSprites.push(e);
       }
       if (this.sprites.length < this.model.persistentData.harpies) {
         const e =
           this.discardedSprites.length > 0
             ? this.discardedSprites.pop()
             : new je(this.textures);
+
         e.position.set(
           this.graveyard.sprite.x,
           this.graveyard.sprite.y - this.bombHeight
-        ),
-          (e.zIndex = e.position.y),
-          e.scale.set(
-            Math.random() > 0.5 ? this.scaling : -1 * this.scaling,
-            this.scaling
-          ),
-          (e.state = qe.returning),
-          e.play(),
-          this.sprites.push(e),
-          b.addChild(e);
+        );
+
+        e.zIndex = e.position.y;
+
+        e.scale.set(
+          Math.random() > 0.5 ? this.scaling : -1 * this.scaling,
+          this.scaling
+        );
+
+        e.state = harpyState.returning;
+        e.play();
+        this.sprites.push(e);
+        b.addChild(e);
       }
     }
     update(e) {
-      for (let t = 0; t < this.sprites.length; t++)
+      for (let t = 0; t < this.sprites.length; t++) {
         this.updateHarpy(this.sprites[t], e);
-      for (let t = 0; t < this.bombSprites.length; t++)
-        this.bombSprites[t].visible && this.updateBomb(this.bombSprites[t], e);
+      }
+      for (let t = 0; t < this.bombSprites.length; t++) {
+        if (this.bombSprites[t].visible) {
+          this.updateBomb(this.bombSprites[t], e);
+        }
+      }
     }
     updateBomb(e, t) {
-      e.dropped
-        ? ((e.rotation += t * e.rotSpeed),
-          (e.ySpeed += 50 * t),
-          (e.scale.x = e.scale.y -= 0.2 * t),
-          (e.y += e.ySpeed * t),
-          e.y >= e.floor - 2 &&
-            ((e.visible = false),
-            this.discardedBombSprites.push(e),
-            e.fire &&
-              this.humans.burnHuman(e.target, 0.1 * this.model.zombieHealth),
-            this.zombies.causePlagueExplosion(
-              e,
-              0.2 * this.model.zombieHealth,
-              false,
-              false
-            )))
-        : ((e.x = e.harpy.x), (e.y = e.harpy.y));
+      if (e.dropped) {
+        e.rotation += t * e.rotSpeed;
+        e.ySpeed += 50 * t;
+        e.scale.x = e.scale.y -= 0.2 * t;
+        e.y += e.ySpeed * t;
+
+        if (e.y >= e.floor - 2) {
+          e.visible = false;
+          this.discardedBombSprites.push(e);
+
+          if (e.fire) {
+            this.humans.burnHuman(e.target, 0.1 * this.model.zombieHealth);
+          }
+
+          this.zombies.causePlagueExplosion(
+            e,
+            0.2 * this.model.zombieHealth,
+            false,
+            false
+          );
+        }
+      } else {
+        e.x = e.harpy.x;
+        e.y = e.harpy.y;
+      }
     }
     updateHarpy(e, t) {
       switch (e.state) {
-        case qe.bombing:
-          if (!e.target || e.target.graveyard || e.target.dead)
+        case harpyState.bombing: {
+          if (!e.target || e.target.graveyard || e.target.dead) {
             if (
               this.model.tankBuster &&
               this.model.isBossStage(this.model.level) &&
               this.tanks.aliveTanks.length > 0
-            )
-              (e.target = sample(this.tanks.aliveTanks)), (e.bomb.fire = true);
-            else {
+            ) {
+              e.target = sample(this.tanks.aliveTanks);
+              e.bomb.fire = true;
+            } else {
               for (
                 let t = 0;
                 t < 8 &&
@@ -11184,256 +12073,355 @@ var Incremancer;
                     ) < 500
                   ));
                 t++
-              );
+              ) {}
               e.bomb.fire = false;
             }
-          if (!e.target) return void (e.state = qe.returning);
-          this.fastDistance(
-            e.x,
-            e.y,
-            e.target.x,
-            e.target.y - this.bombHeight
-          ) < 10
-            ? (e.bombs--,
-              (e.bomb.dropped = true),
-              (e.bomb.floor = e.target.y),
-              (e.bomb.target = e.target),
-              (e.bomb = null),
-              (e.speedFactor = 0),
-              (e.target = false),
-              e.bombs <= 0 ? (e.state = qe.returning) : this.getBomb(e))
-            : this.updateHarpySpeed(e, t);
-          break;
-        case qe.returning:
-          e.target || (e.target = this.graveyard.sprite),
+          }
+          if (!e.target) {
+            return void (e.state = harpyState.returning);
+          }
+
+          if (
             this.fastDistance(
               e.x,
               e.y,
               e.target.x,
               e.target.y - this.bombHeight
             ) < 10
-              ? ((e.bombs = this.model.harpyBombs),
-                e.bomb || this.getBomb(e),
-                (e.state = qe.bombing),
-                (e.speedFactor = 0))
-              : this.updateHarpySpeed(e, t);
+          ) {
+            e.bombs--;
+            e.bomb.dropped = true;
+            e.bomb.floor = e.target.y;
+            e.bomb.target = e.target;
+            e.bomb = null;
+            e.speedFactor = 0;
+            e.target = false;
+
+            if (e.bombs <= 0) {
+              e.state = harpyState.returning;
+            } else {
+              this.getBomb(e);
+            }
+          } else {
+            this.updateHarpySpeed(e, t);
+          }
+
+          break;
+        }
+        case harpyState.returning: {
+          if (!e.target) {
+            e.target = this.graveyard.sprite;
+          }
+
+          if (
+            this.fastDistance(
+              e.x,
+              e.y,
+              e.target.x,
+              e.target.y - this.bombHeight
+            ) < 10
+          ) {
+            e.bombs = this.model.harpyBombs;
+
+            if (!e.bomb) {
+              this.getBomb(e);
+            }
+
+            e.state = harpyState.bombing;
+            e.speedFactor = 0;
+          } else {
+            this.updateHarpySpeed(e, t);
+          }
+        }
       }
     }
     getBomb(e) {
       let t;
-      this.discardedBombSprites.length > 0
-        ? (t = this.discardedBombSprites.pop())
-        : ((t = new $e(this.bombTexture)),
-          this.bombSprites.push(t),
-          b.addChild(t)),
-        (t.scale.x = t.scale.y = 2),
-        (t.rotation = 0),
-        (t.rotSpeed = Math.random() > 0.5 ? 4 : -4),
-        (t.ySpeed = 0),
-        (t.visible = true),
-        (t.dropped = false),
-        (t.harpy = e),
-        (e.bomb = t);
+
+      if (this.discardedBombSprites.length > 0) {
+        t = this.discardedBombSprites.pop();
+      } else {
+        t = new $e(this.bombTexture);
+        this.bombSprites.push(t);
+        b.addChild(t);
+      }
+
+      t.scale.x = 2;
+      t.scale.y = 2;
+      t.rotation = 0;
+      t.rotSpeed = Math.random() > 0.5 ? 4 : -4;
+      t.ySpeed = 0;
+      t.visible = true;
+      t.dropped = false;
+      t.harpy = e;
+      e.bomb = t;
     }
     updateHarpySpeed(e, t) {
       e.speedFactor = Math.min(1, (e.speedFactor += 2 * t));
-      const s = e.target.x - e.x,
-        i = e.target.y - this.bombHeight - e.y,
-        a = Math.abs(s),
-        r = Math.abs(i);
-      if (0 == Math.max(a, r)) return;
+      const s = e.target.x - e.x;
+      const i = e.target.y - this.bombHeight - e.y;
+      const a = Math.abs(s);
+      const r = Math.abs(i);
+      if (Math.max(a, r) == 0) {
+        return;
+      }
       let n = 1 / Math.max(a, r);
-      (n *= 1.29289 - (a + r) * n * 0.29289),
-        (e.xSpeed = s * n * this.model.harpySpeed * e.speedFactor),
-        (e.ySpeed = i * n * this.model.harpySpeed * e.speedFactor),
-        (e.position.x += e.xSpeed * t),
-        (e.position.y += e.ySpeed * t),
-        (e.scale.x = e.xSpeed > 0 ? this.scaling : -1 * this.scaling);
+      n *= 1.29289 - (a + r) * n * 0.29289;
+      e.xSpeed = s * n * this.model.harpySpeed * e.speedFactor;
+      e.ySpeed = i * n * this.model.harpySpeed * e.speedFactor;
+      e.position.x += e.xSpeed * t;
+      e.position.y += e.ySpeed * t;
+      e.scale.x = e.xSpeed > 0 ? this.scaling : -1 * this.scaling;
     }
   }
+
   class Particles {
     constructor() {
-      if (
-        ((this.blood = new _e()),
-        (this.smoke = new ot()),
-        (this.prestigePoints = new Je()),
-        (this.bullets = new rt()),
-        (this.exclamations = new it()),
-        (this.blasts = new nt()),
-        (this.fragments = new lt()),
-        Particles.instance)
-      )
+      this.blood = new _e();
+      this.smoke = new ot();
+      this.prestigePoints = new Je();
+      this.bullets = new rt();
+      this.exclamations = new it();
+      this.blasts = new nt();
+      this.fragments = new lt();
+
+      if (Particles.instance) {
         return Particles.instance;
+      }
+
       Particles.instance = this;
     }
     initialize() {
-      this.blood.initialize(),
-        this.bullets.initialize(),
-        this.exclamations.initialize(),
-        this.blasts.initialize(),
-        this.smoke.initialize(),
-        this.fragments.initialize(),
-        this.prestigePoints.initialize();
+      this.blood.initialize();
+      this.bullets.initialize();
+      this.exclamations.initialize();
+      this.blasts.initialize();
+      this.smoke.initialize();
+      this.fragments.initialize();
+      this.prestigePoints.initialize();
     }
     update(e) {
-      this.blood.update(e),
-        this.bullets.update(e),
-        this.exclamations.update(e),
-        this.blasts.update(e),
-        this.smoke.update(e),
-        this.fragments.update(e),
-        this.prestigePoints.update(e),
-        (function (e) {
-          for (let t = 0; t < Be.length; t++) Be[t].updateCritText(e);
-        })(e);
+      this.blood.update(e);
+      this.bullets.update(e);
+      this.exclamations.update(e);
+      this.blasts.update(e);
+      this.smoke.update(e);
+      this.fragments.update(e);
+      this.prestigePoints.update(e);
+
+      ((e) => {
+        for (let t = 0; t < Be.length; t++) {
+          Be[t].updateCritText(e);
+        }
+      })(e);
     }
   }
+
   class Je extends _ {
     constructor() {
-      if ((super(), (this.zmMap = new ee()), (this.speed = 20), Je.instance))
+      super();
+      this.zmMap = new ee();
+      this.speed = 20;
+
+      if (Je.instance) {
         return Je.instance;
-      (Je.instance = this), (this.create = (e) => new J(e));
+      }
+
+      Je.instance = this;
+
+      this.create = (e) => new J(e);
     }
     initialize() {
-      (this.gameModel = GameModel.getInstance()),
-        this.container ||
-          (this.setup(new PIXI.Container(), PIXI.Texture.from("pp.png")),
-          b.addChild(this.container)),
-        (this.targetElement = document.getElementById("prestige-button")),
-        (this.animElement = document.getElementById("prestige-bg"));
+      this.gameModel = GameModel.getInstance();
+
+      if (!this.container) {
+        this.setup(new PIXI.Container(), PIXI.Texture.from("pp.png"));
+        b.addChild(this.container);
+      }
+
+      this.targetElement = document.getElementById("prestige-button");
+      this.animElement = document.getElementById("prestige-bg");
     }
     update(e) {
-      if (!this.gameModel.persistentData.particles)
+      if (!this.gameModel.persistentData.particles) {
         return void (this.container.visible = false);
+      }
       this.container.visible = true;
       let t = {
         x: 0,
         y: 0,
       };
-      if (null != this.targetElement) {
+      if (this.targetElement != null) {
         const e = this.targetElement.getBoundingClientRect();
-        (t = {
+
+        t = {
           x: e.x + e.width / 2,
           y: e.y + e.height / 2,
-        }),
-          (t.x -= c.x),
-          (t.y -= c.y),
-          (t.x = t.x / c.scale.x),
-          (t.y = t.y / c.scale.y);
+        };
+
+        t.x -= c.x;
+        t.y -= c.y;
+        t.x = t.x / c.scale.x;
+        t.y = t.y / c.scale.y;
       }
-      for (let s = 0; s < this.sprites.length; s++)
-        this.sprites[s].visible && this.updatePart(this.sprites[s], e, t);
+      for (let s = 0; s < this.sprites.length; s++) {
+        if (this.sprites[s].visible) {
+          this.updatePart(this.sprites[s], e, t);
+        }
+      }
     }
     updatePart(e, t, s) {
       const a = this.zmMap.normalizeVector({
-          x: s.x - e.x,
-          y: s.y - e.y,
-        }),
-        r = 300 * a.x - e.xSpeed,
-        n = 300 * a.y - e.ySpeed;
+        x: s.x - e.x,
+        y: s.y - e.y,
+      });
+
+      const r = 300 * a.x - e.xSpeed;
+      const n = 300 * a.y - e.ySpeed;
+      e.xSpeed += r * t;
+      e.ySpeed += n * t;
+      e.x += e.xSpeed * t;
+      e.y += e.ySpeed * t;
+
       if (
-        ((e.xSpeed += r * t),
-        (e.ySpeed += n * t),
-        (e.x += e.xSpeed * t),
-        (e.y += e.ySpeed * t),
         weighted_hybrid_distance(e.x, e.y, s.x, s.y) < 30 &&
-          ((e.visible = false), (e.x = 100), (e.y = 100), this.animElement))
+        ((e.visible = false), (e.x = 100), (e.y = 100), this.animElement)
       ) {
         const e = this.animElement;
-        e.classList.toggle("levelup"),
-          setTimeout(function () {
-            e.classList.toggle("levelup");
-          }, 3e3);
+        e.classList.toggle("levelup");
+
+        setTimeout(() => {
+          e.classList.toggle("levelup");
+        }, 3000 /* 3e3 */);
       }
     }
     newPart(e, t) {
-      if (!this.container.visible) return;
+      if (!this.container.visible) {
+        return;
+      }
       const s = this.getSprite();
-      (s.x = e),
-        (s.y = t - 10),
-        (s.visible = true),
-        s.scale.set(2, 2),
-        (s.xSpeed = 0),
-        (s.ySpeed = -100);
+      s.x = e;
+      s.y = t - 10;
+      s.visible = true;
+      s.scale.set(2, 2);
+      s.xSpeed = 0;
+      s.ySpeed = -100;
     }
   }
+
   class _e {
     constructor() {
-      if (
-        ((this.maxParts = 500),
-        (this.partCounter = 0),
-        (this.partsPerSplatter = 6),
-        (this.ecoPartsPerSplatter = 3),
-        (this.container = null),
-        (this.sprites = []),
-        (this.gravity = 100),
-        (this.spraySpeed = 20),
-        (this.fadeSpeed = 0.7),
-        (this.visibleParts = 0),
-        (this.viewableArea = null),
-        _e.instance)
-      )
+      this.maxParts = 500;
+      this.partCounter = 0;
+      this.partsPerSplatter = 6;
+      this.ecoPartsPerSplatter = 3;
+      this.container = null;
+      this.sprites = [];
+      this.gravity = 100;
+      this.spraySpeed = 20;
+      this.fadeSpeed = 0.7;
+      this.visibleParts = 0;
+      this.viewableArea = null;
+
+      if (_e.instance) {
         return _e.instance;
+      }
+
       _e.instance = this;
     }
     getTexture(e) {
       const t = document.createElement("canvas");
-      (t.width = 1), (t.height = 1);
+      t.width = 1;
+      t.height = 1;
       const s = t.getContext("2d");
-      return (s.fillStyle = e), s.fillRect(0, 0, 1, 1), PIXI.Texture.from(t);
+      s.fillStyle = e;
+      s.fillRect(0, 0, 1, 1);
+      return PIXI.Texture.from(t);
     }
     initialize() {
-      if (
-        ((this.gameModel = GameModel.getInstance()),
-        (this.viewableArea = G),
-        this.container ||
-          ((this.container = new PIXI.Container()),
-          p.addChild(this.container),
-          (this.texture = this.getTexture("#ff0000")),
-          (this.plagueTexture = this.getTexture("#00ff00"))),
-        this.sprites.length < this.maxParts)
-      )
+      this.gameModel = GameModel.getInstance();
+      this.viewableArea = G;
+
+      if (!this.container) {
+        this.container = new PIXI.Container();
+        p.addChild(this.container);
+        this.texture = this.getTexture("#ff0000");
+        this.plagueTexture = this.getTexture("#00ff00");
+      }
+
+      if (this.sprites.length < this.maxParts) {
         for (let e = 0; e < this.maxParts; e++) {
           const e = new ht(this.texture);
-          this.sprites.push(e),
-            (e.visible = false),
-            Math.random() > 0.5 && e.scale.set(2, 2),
-            this.container.addChild(e);
+          this.sprites.push(e);
+          e.visible = false;
+
+          if (Math.random() > 0.5) {
+            e.scale.set(2, 2);
+          }
+
+          this.container.addChild(e);
         }
+      }
     }
     update(e) {
       if (this.gameModel.persistentData.particles) {
-        (this.container.visible = true), (this.visibleParts = 0);
-        for (let t = 0; t < this.sprites.length; t++)
-          this.sprites[t].visible &&
-            (this.updatePart(this.sprites[t], e), this.visibleParts++);
-      } else this.container.visible = false;
+        this.container.visible = true;
+        this.visibleParts = 0;
+        for (let t = 0; t < this.sprites.length; t++) {
+          if (this.sprites[t].visible) {
+            this.updatePart(this.sprites[t], e);
+            this.visibleParts++;
+          }
+        }
+      } else {
+        this.container.visible = false;
+      }
     }
     updatePart(e, t) {
-      e.hitFloor
-        ? ((e.alpha -= this.fadeSpeed * t), e.alpha <= 0 && (e.visible = false))
-        : ((e.ySpeed += this.gravity * t),
-          (e.x += e.xSpeed * t),
-          (e.y += e.ySpeed * t),
-          e.y >= e.floor && (e.hitFloor = true));
+      if (e.hitFloor) {
+        e.alpha -= this.fadeSpeed * t;
+
+        if (e.alpha <= 0) {
+          e.visible = false;
+        }
+      } else {
+        e.ySpeed += this.gravity * t;
+        e.x += e.xSpeed * t;
+        e.y += e.ySpeed * t;
+
+        if (e.y >= e.floor) {
+          e.hitFloor = true;
+        }
+      }
     }
     newPart(e, t, s) {
-      if (this.viewableArea.hideParticle(e, t)) return;
+      if (this.viewableArea.hideParticle(e, t)) {
+        return;
+      }
       const i = this.sprites[this.partCounter++];
-      this.partCounter >= this.maxParts && (this.partCounter = 0),
-        (i.texture = s ? this.plagueTexture : this.texture),
-        (i.x = e),
-        (i.y = t - (8 + 10 * Math.random())),
-        (i.floor = t),
-        (i.hitFloor = false),
-        (i.visible = true),
-        (i.alpha = 1),
-        i.scale.set(1, 1),
-        Math.random() > 0.5 && i.scale.set(2, 2);
+
+      if (this.partCounter >= this.maxParts) {
+        this.partCounter = 0;
+      }
+
+      i.texture = s ? this.plagueTexture : this.texture;
+      i.x = e;
+      i.y = t - (8 + 10 * Math.random());
+      i.floor = t;
+      i.hitFloor = false;
+      i.visible = true;
+      i.alpha = 1;
+      i.scale.set(1, 1);
+
+      if (Math.random() > 0.5) {
+        i.scale.set(2, 2);
+      }
+
       const a = Math.random() * (s ? 1.5 * this.spraySpeed : this.spraySpeed);
-      (i.xSpeed = Math.random() > 0.5 ? -1 * a : a),
-        (i.ySpeed = -1 * (s ? 1.5 * this.spraySpeed : this.spraySpeed));
+      i.xSpeed = Math.random() > 0.5 ? -1 * a : a;
+      i.ySpeed = -1 * (s ? 1.5 * this.spraySpeed : this.spraySpeed);
     }
+
     newSplatter(e, t) {
       if (this.container.visible)
         if (this.visibleParts < 0.9 * this.maxParts)
@@ -11450,175 +12438,224 @@ var Incremancer;
     }
   }
   class et extends J {
-    constructor() {
-      super(...arguments),
-        (this.fadeTime = 0),
-        (this.floor = 0),
-        (this.rotSpeed = 0),
-        (this.value = 1),
-        (this.collector = null),
-        (this.hitFloor = false);
+    constructor(...args) {
+      super(...args);
+      this.fadeTime = 0;
+      this.floor = 0;
+      this.rotSpeed = 0;
+      this.value = 1;
+      this.collector = null;
+      this.hitFloor = false;
     }
   }
+
   class Bones {
     constructor() {
-      if (
-        ((this.partsLimit = 100),
-        (this.partsPerSplatter = 3),
-        (this.container = null),
-        (this.sprites = []),
-        (this.discardedSprites = []),
-        (this.uncollected = []),
-        (this.gravity = 100),
-        (this.spraySpeed = 20),
-        (this.fadeTime = 40),
-        (this.fadeSpeed = 0.2),
-        (this.fadeBones = false),
-        (this.texture = null),
-        (this.gameModel = null),
-        Bones.instance)
-      )
+      this.partsLimit = 100;
+      this.partsPerSplatter = 3;
+      this.container = null;
+      this.sprites = [];
+      this.discardedSprites = [];
+      this.uncollected = [];
+      this.gravity = 100;
+      this.spraySpeed = 20;
+      this.fadeTime = 40;
+      this.fadeSpeed = 0.2;
+      this.fadeBones = false;
+      this.texture = null;
+      this.gameModel = null;
+
+      if (Bones.instance) {
         return Bones.instance;
+      }
+
       Bones.instance = this;
     }
     getTexture() {
       const e = document.createElement("canvas");
-      (e.width = 4), (e.height = 1);
+      e.width = 4;
+      e.height = 1;
       const t = e.getContext("2d");
-      return (
-        (t.fillStyle = "#dddddd"), t.fillRect(0, 0, 4, 1), PIXI.Texture.from(e)
-      );
+      t.fillStyle = "#dddddd";
+      t.fillRect(0, 0, 4, 1);
+      return PIXI.Texture.from(e);
     }
     initialize() {
-      (this.gameModel = GameModel.getInstance()),
-        this.container ||
-          ((this.container = new PIXI.Container()),
-          p.addChild(this.container),
-          (this.texture = this.getTexture()));
-      for (let e = 0; e < this.sprites.length; e++)
-        (this.sprites[e].value = 0),
-          (this.sprites[e].visible = false),
-          this.container.removeChild(this.sprites[e]);
+      this.gameModel = GameModel.getInstance();
+
+      if (!this.container) {
+        this.container = new PIXI.Container();
+        p.addChild(this.container);
+        this.texture = this.getTexture();
+      }
+
+      for (let e = 0; e < this.sprites.length; e++) {
+        this.sprites[e].value = 0;
+        this.sprites[e].visible = false;
+        this.container.removeChild(this.sprites[e]);
+      }
       this.discardedSprites = this.sprites.slice();
     }
     update(e) {
       const t = [];
-      for (let s = 0; s < this.sprites.length; s++)
-        this.sprites[s].visible &&
-          (this.updatePart(this.sprites[s], e), t.push(this.sprites[s]));
-      (this.uncollected = t), (this.fadeBones = t.length > 200);
+      for (let s = 0; s < this.sprites.length; s++) {
+        if (this.sprites[s].visible) {
+          this.updatePart(this.sprites[s], e);
+          t.push(this.sprites[s]);
+        }
+      }
+      this.uncollected = t;
+      this.fadeBones = t.length > 200;
     }
     updatePart(e, t) {
-      if (e.value <= 0)
-        return (
-          (e.visible = false),
-          this.discardedSprites.push(e),
-          void this.container.removeChild(e)
-        );
-      e.hitFloor
-        ? (this.fadeBones && (e.fadeTime -= t),
-          e.fadeTime < 0 &&
-            !e.collector &&
-            ((e.alpha -= this.fadeSpeed * t),
+      if (e.value <= 0) {
+        e.visible = false;
+        this.discardedSprites.push(e);
+        return void this.container.removeChild(e);
+      }
+
+      if (e.hitFloor) {
+        if (this.fadeBones) {
+          e.fadeTime -= t;
+        }
+
+        if (e.fadeTime < 0 && !e.collector) {
+          (e.alpha -= this.fadeSpeed * t),
             e.alpha <= 0 &&
               ((e.visible = false),
               this.discardedSprites.push(e),
-              this.container.removeChild(e))))
-        : ((e.ySpeed += this.gravity * t),
-          (e.rotation += e.rotSpeed * t),
-          (e.x += e.xSpeed * t),
-          (e.y += e.ySpeed * t),
-          e.y >= e.floor && (e.hitFloor = true));
+              this.container.removeChild(e));
+        }
+      } else {
+        e.ySpeed += this.gravity * t;
+        e.rotation += e.rotSpeed * t;
+        e.x += e.xSpeed * t;
+        e.y += e.ySpeed * t;
+
+        if (e.y >= e.floor) {
+          e.hitFloor = true;
+        }
+      }
     }
     newPart(e, t, s) {
       let i = null;
-      this.discardedSprites.length > 0
-        ? (i = this.discardedSprites.pop())
-        : ((i = new et(this.texture)), this.sprites.push(i)),
-        this.container.addChild(i),
-        (i.x = e),
-        (i.y = t - (8 + 10 * Math.random())),
-        (i.fadeTime = Math.random() * this.fadeTime),
-        (i.rotation = 5 * Math.random()),
-        (i.rotSpeed = 4 * Math.random() - 2),
-        (i.floor = t),
-        (i.hitFloor = false),
-        (i.collector = false),
-        (i.visible = true),
-        (i.value = s),
-        (i.alpha = 1),
-        i.scale.set(1, 1),
-        Math.random() > 0.5 && i.scale.set(1.5, 1.5);
+
+      if (this.discardedSprites.length > 0) {
+        i = this.discardedSprites.pop();
+      } else {
+        i = new et(this.texture);
+        this.sprites.push(i);
+      }
+
+      this.container.addChild(i);
+      i.x = e;
+      i.y = t - (8 + 10 * Math.random());
+      i.fadeTime = Math.random() * this.fadeTime;
+      i.rotation = 5 * Math.random();
+      i.rotSpeed = 4 * Math.random() - 2;
+      i.floor = t;
+      i.hitFloor = false;
+      i.collector = false;
+      i.visible = true;
+      i.value = s;
+      i.alpha = 1;
+      i.scale.set(1, 1);
+
+      if (Math.random() > 0.5) {
+        i.scale.set(1.5, 1.5);
+      }
+
       const a = Math.random() * this.spraySpeed;
-      (i.xSpeed = Math.random() > 0.5 ? -1 * a : a),
-        (i.ySpeed = -1 * this.spraySpeed);
+      i.xSpeed = Math.random() > 0.5 ? -1 * a : a;
+      i.ySpeed = -1 * this.spraySpeed;
     }
     newBones(e, t) {
-      if (this.gameModel.constructions.graveyard)
+      if (this.gameModel.constructions.graveyard) {
         if (
           this.sprites.length - this.discardedSprites.length >
           this.partsLimit
-        )
+        ) {
           this.newPart(e, t, 3);
-        else
-          for (let s = 0; s < this.partsPerSplatter; s++) this.newPart(e, t, 1);
+        } else {
+          for (let s = 0; s < this.partsPerSplatter; s++) {
+            this.newPart(e, t, 1);
+          }
+        }
+      }
     }
   }
+
   class st extends PIXI.Sprite {
-    constructor() {
-      super(...arguments), (this.time = 0), (this.target = null);
+    constructor(...args) {
+      super(...args);
+      this.time = 0;
+      this.target = null;
     }
   }
+
   class it {
     constructor() {
-      if (
-        ((this.sprites = []),
-        (this.discardedSprites = []),
-        (this.maxSprites = 10),
-        (this.height = 20),
-        (this.fadeSpeed = 4),
-        it.instance)
-      )
+      this.sprites = [];
+      this.discardedSprites = [];
+      this.maxSprites = 10;
+      this.height = 20;
+      this.fadeSpeed = 4;
+
+      if (it.instance) {
         return it.instance;
+      }
+
       it.instance = this;
     }
     initialize() {
-      this.container ||
-        ((this.container = new PIXI.Container()),
-        b.addChild(this.container),
-        (this.healTexture = PIXI.Texture.from("healing.png")),
-        (this.exclamationTexture = PIXI.Texture.from("exclamation.png")),
-        (this.radioTexture = PIXI.Texture.from("radio.png")),
-        (this.fireTexture = PIXI.Texture.from("fire.png")),
-        (this.shieldTexture = PIXI.Texture.from("shield.png")),
-        (this.poisonTexture = PIXI.Texture.from("poison.png")));
-      for (let e = 0; e < this.sprites.length; e++)
+      if (!this.container) {
+        this.container = new PIXI.Container();
+        b.addChild(this.container);
+        this.healTexture = PIXI.Texture.from("healing.png");
+        this.exclamationTexture = PIXI.Texture.from("exclamation.png");
+        this.radioTexture = PIXI.Texture.from("radio.png");
+        this.fireTexture = PIXI.Texture.from("fire.png");
+        this.shieldTexture = PIXI.Texture.from("shield.png");
+        this.poisonTexture = PIXI.Texture.from("poison.png");
+      }
+
+      for (let e = 0; e < this.sprites.length; e++) {
         this.container.removeChild(this.sprites[e]);
-      if (this.sprites.length < this.maxSprites)
+      }
+      if (this.sprites.length < this.maxSprites) {
         for (let e = 0; e < this.maxSprites; e++) {
           const e = new st(this.exclamationTexture);
-          e.anchor.set(0.5, 1), this.sprites.push(e), (e.visible = false);
+          e.anchor.set(0.5, 1);
+          this.sprites.push(e);
+          e.visible = false;
         }
+      }
       this.discardedSprites = this.sprites.slice();
     }
     newIcon(e, t, s) {
-      if (e.hasIcon) return;
+      if (e.hasIcon) {
+        return;
+      }
       let i;
-      this.discardedSprites.length > 0
-        ? (i = this.discardedSprites.pop())
-        : ((i = new st(this.exclamationTexture)),
-          i.anchor.set(0.5, 1),
-          this.sprites.push(i)),
-        this.container.addChild(i),
-        (i.texture = t),
-        (i.target = e),
-        (i.target.hasIcon = true),
-        (i.x = e.x),
-        (i.y = e.y - this.height),
-        (i.visible = true),
-        (i.time = s),
-        (i.alpha = 1),
-        i.scale.set(1.5, 1.5);
+
+      if (this.discardedSprites.length > 0) {
+        i = this.discardedSprites.pop();
+      } else {
+        i = new st(this.exclamationTexture);
+        i.anchor.set(0.5, 1);
+        this.sprites.push(i);
+      }
+
+      this.container.addChild(i);
+      i.texture = t;
+      i.target = e;
+      i.target.hasIcon = true;
+      i.x = e.x;
+      i.y = e.y - this.height;
+      i.visible = true;
+      i.time = s;
+      i.alpha = 1;
+      i.scale.set(1.5, 1.5);
     }
     newHealing(e) {
       this.newIcon(e, this.healTexture, 1);
@@ -11639,1688 +12676,2125 @@ var Incremancer;
       this.newIcon(e, this.poisonTexture, 1);
     }
     update(e) {
-      for (let t = 0; t < this.sprites.length; t++)
-        this.sprites[t].visible && this.updateSprite(this.sprites[t], e);
+      for (let t = 0; t < this.sprites.length; t++) {
+        if (this.sprites[t].visible) {
+          this.updateSprite(this.sprites[t], e);
+        }
+      }
     }
     updateSprite(e, t) {
-      (e.x = e.target.x),
-        (e.y = e.target.y - this.height),
-        (e.time -= t),
-        e.time < 0 &&
-          ((e.alpha -= t * this.fadeSpeed),
-          e.alpha < 0 &&
-            ((e.visible = false),
-            (e.target.hasIcon = false),
-            this.discardedSprites.push(e)));
+      e.x = e.target.x;
+      e.y = e.target.y - this.height;
+      e.time -= t;
+
+      if (e.time < 0) {
+        e.alpha -= t * this.fadeSpeed;
+
+        if (e.alpha < 0) {
+          e.visible = false;
+          e.target.hasIcon = false;
+          this.discardedSprites.push(e);
+        }
+      }
     }
   }
   class at extends J {
-    constructor() {
-      super(...arguments),
-        (this.plague = false),
-        (this.rocket = false),
-        (this.fireball = false),
-        (this.darkorb = false),
-        (this.target = null),
-        (this.source = null),
-        (this.hitbox = 0),
-        (this.damage = 0);
+    constructor(...args) {
+      super(...args);
+      this.plague = false;
+      this.rocket = false;
+      this.fireball = false;
+      this.darkorb = false;
+      this.target = null;
+      this.source = null;
+      this.hitbox = 0;
+      this.damage = 0;
     }
   }
+
   class rt {
     constructor() {
-      if (
-        ((this.zombies = new Zombies()),
-        (this.humans = new Humans()),
-        (this.graveyard = new Graveyard()),
-        (this.army = new Army()),
-        (this.maxParts = 20),
-        (this.speed = 150),
-        (this.hitbox = 12),
-        (this.sprites = []),
-        (this.discardedSprites = []),
-        (this.fadeSpeed = 0.2),
-        rt.instance)
-      )
+      this.zombies = new Zombies();
+      this.humans = new Humans();
+      this.graveyard = new Graveyard();
+      this.army = new Army();
+      this.maxParts = 20;
+      this.speed = 150;
+      this.hitbox = 12;
+      this.sprites = [];
+      this.discardedSprites = [];
+      this.fadeSpeed = 0.2;
+
+      if (rt.instance) {
         return rt.instance;
+      }
+
       rt.instance = this;
     }
     getTexture() {
       const e = document.createElement("canvas");
-      (e.width = 1), (e.height = 1);
+      e.width = 1;
+      e.height = 1;
       const t = e.getContext("2d");
-      return (
-        (t.fillStyle = "#ffffff"), t.fillRect(0, 0, 1, 1), PIXI.Texture.from(e)
-      );
+      t.fillStyle = "#ffffff";
+      t.fillRect(0, 0, 1, 1);
+      return PIXI.Texture.from(e);
     }
     getFireballTexture() {
       const e = document.createElement("canvas");
-      (e.width = 8), (e.height = 8);
-      const t = e.getContext("2d"),
-        s = t.createRadialGradient(4, 4, 0, 4, 4, 4);
-      return (
-        s.addColorStop(0, "rgba(255,255,0,1)"),
-        s.addColorStop(0.8, "rgba(255,0,0,0.2)"),
-        s.addColorStop(1, "rgba(255,0,0,0)"),
-        (t.fillStyle = s),
-        t.fillRect(0, 0, 8, 8),
-        PIXI.Texture.from(e)
-      );
+      e.width = 8;
+      e.height = 8;
+      const t = e.getContext("2d");
+      const s = t.createRadialGradient(4, 4, 0, 4, 4, 4);
+      s.addColorStop(0, "rgba(255,255,0,1)");
+      s.addColorStop(0.8, "rgba(255,0,0,0.2)");
+      s.addColorStop(1, "rgba(255,0,0,0)");
+      t.fillStyle = s;
+      t.fillRect(0, 0, 8, 8);
+      return PIXI.Texture.from(e);
     }
     getDarkOrbTexture() {
       const e = document.createElement("canvas");
-      (e.width = 8), (e.height = 8);
-      const t = e.getContext("2d"),
-        s = t.createRadialGradient(4, 4, 0, 4, 4, 4);
-      return (
-        s.addColorStop(0, "rgba(0,0,0,1)"),
-        s.addColorStop(0.8, "rgba(0,0,128,0.5)"),
-        s.addColorStop(1, "rgba(0,0,255,0)"),
-        (t.fillStyle = s),
-        t.fillRect(0, 0, 8, 8),
-        PIXI.Texture.from(e)
-      );
+      e.width = 8;
+      e.height = 8;
+      const t = e.getContext("2d");
+      const s = t.createRadialGradient(4, 4, 0, 4, 4, 4);
+      s.addColorStop(0, "rgba(0,0,0,1)");
+      s.addColorStop(0.8, "rgba(0,0,128,0.5)");
+      s.addColorStop(1, "rgba(0,0,255,0)");
+      t.fillStyle = s;
+      t.fillRect(0, 0, 8, 8);
+      return PIXI.Texture.from(e);
     }
     initialize() {
-      this.texture ||
-        ((this.texture = this.getTexture()),
-        (this.fireballTexture = this.getFireballTexture()),
-        (this.darkOrbTexture = this.getDarkOrbTexture()));
-      for (let e = 0; e < this.sprites.length; e++)
+      if (!this.texture) {
+        this.texture = this.getTexture();
+        this.fireballTexture = this.getFireballTexture();
+        this.darkOrbTexture = this.getDarkOrbTexture();
+      }
+
+      for (let e = 0; e < this.sprites.length; e++) {
         g.removeChild(this.sprites[e]);
-      if (this.sprites.length < this.maxParts)
+      }
+      if (this.sprites.length < this.maxParts) {
         for (let e = 0; e < this.maxParts; e++) {
           const e = new at(this.texture);
-          (e.scale.x = e.scale.y = 2),
-            (e.visible = false),
-            this.sprites.push(e);
+          e.scale.x = 2;
+          e.scale.y = 2;
+          e.visible = false;
+          this.sprites.push(e);
         }
+      }
       this.discardedSprites = this.sprites.slice();
     }
     update(e) {
-      for (let t = 0; t < this.sprites.length; t++)
-        this.sprites[t].visible && this.updatePart(this.sprites[t], e);
+      for (let t = 0; t < this.sprites.length; t++) {
+        if (this.sprites[t].visible) {
+          this.updatePart(this.sprites[t], e);
+        }
+      }
     }
     updatePart(e, t) {
-      weighted_hybrid_distance(e.x, e.y + 8, e.target.x, e.target.y) < e.hitbox
-        ? (e.plague
-            ? (this.zombies.inflictPlague(e.target),
-              this.humans.damageHuman(e.target, e.damage))
-            : e.fireball
-            ? (this.humans.burnHuman(e.target, e.damage),
-              this.humans.damageHuman(e.target, e.damage))
-            : e.darkorb
-            ? e.target.flags.dead ||
-              (this.humans.damageHuman(e.target, e.damage),
-              (e.target.timer.dogStun = 5),
-              new Skeleton().orbHit(e.target))
-            : !e.rocket &&
-              e.target.bulletReflect &&
-              Math.random() < e.target.bulletReflect
-            ? this.newBullet(e.target, e.source, e.damage, false, false, false)
-            : e.rocket
-            ? (e.target.graveyard && this.graveyard.damageGraveyard(e.damage),
-              this.army.droneExplosion(e.target.x, e.target.y, null, e.damage))
-            : (e.target.zombie &&
-                this.zombies.damageZombie(e.target, e.damage, e.source),
-              e.target.human && this.humans.damageHuman(e.target, e.damage)),
-          (e.visible = false),
-          this.discardedSprites.push(e),
-          g.removeChild(e))
-        : ((e.x += e.xSpeed * t), (e.y += e.ySpeed * t), (e.zIndex = e.y)),
-        e.darkorb
-          ? (e.alpha -= this.fadeSpeed * t * 0.4)
-          : (e.alpha -= this.fadeSpeed * t),
-        e.alpha < 0 &&
-          ((e.visible = false),
-          this.discardedSprites.push(e),
-          g.removeChild(e));
+      if (
+        weighted_hybrid_distance(e.x, e.y + 8, e.target.x, e.target.y) <
+        e.hitbox
+      ) {
+        if (e.plague) {
+          this.zombies.inflictPlague(e.target);
+          this.humans.damageHuman(e.target, e.damage);
+        } else if (e.fireball) {
+          this.humans.burnHuman(e.target, e.damage);
+          this.humans.damageHuman(e.target, e.damage);
+        } else if (e.darkorb) {
+          if (!e.target.flags.dead) {
+            this.humans.damageHuman(e.target, e.damage);
+            e.target.timer.dogStun = 5;
+            new Skeleton().orbHit(e.target);
+          }
+        } else if (
+          !e.rocket &&
+          e.target.bulletReflect &&
+          Math.random() < e.target.bulletReflect
+        ) {
+          this.newBullet(e.target, e.source, e.damage, false, false, false);
+        } else if (e.rocket) {
+          if (e.target.graveyard) {
+            this.graveyard.damageGraveyard(e.damage);
+          }
+
+          this.army.droneExplosion(e.target.x, e.target.y, null, e.damage);
+        } else {
+          if (e.target.zombie) {
+            this.zombies.damageZombie(e.target, e.damage, e.source);
+          }
+
+          if (e.target.human) {
+            this.humans.damageHuman(e.target, e.damage);
+          }
+        }
+
+        e.visible = false;
+        this.discardedSprites.push(e);
+        g.removeChild(e);
+      } else {
+        e.x += e.xSpeed * t;
+        e.y += e.ySpeed * t;
+        e.zIndex = e.y;
+      }
+
+      if (e.darkorb) {
+        e.alpha -= this.fadeSpeed * t * 0.4;
+      } else {
+        e.alpha -= this.fadeSpeed * t;
+      }
+
+      if (e.alpha < 0) {
+        e.visible = false;
+        this.discardedSprites.push(e);
+        g.removeChild(e);
+      }
     }
     newBullet(e, t, s, i = false, a = false, r = false, n = false) {
       let o;
-      this.discardedSprites.length > 0
-        ? (o = this.discardedSprites.pop())
-        : ((o = new at(this.texture)),
-          (o.scale.x = o.scale.y = 2),
-          this.sprites.push(o)),
-        g.addChild(o),
-        (o.texture = n
-          ? this.darkOrbTexture
-          : r
-          ? this.fireballTexture
-          : this.texture),
-        (o.source = e),
-        (o.x = e.x),
-        (o.y = e.y - 8),
-        i && (o.y = e.y - 12),
-        (o.target = t),
-        (o.damage = s),
-        (o.visible = true),
-        (o.alpha = 1),
-        (o.hitbox = a ? 1.5 * this.hitbox : this.hitbox),
-        (o.plague = i),
-        (o.rocket = a),
-        (o.fireball = r),
-        (o.darkorb = n),
-        (o.tint = i ? 65280 : a ? 16772096 : 16777215),
-        (o.scale.x = o.scale.y = a ? 2.5 : 2),
-        r && (o.scale.x = o.scale.y = 1.5);
-      const h = t.x - o.x,
-        l = t.y - 8 - o.y,
-        d = Math.abs(h),
-        c = Math.abs(l);
+
+      if (this.discardedSprites.length > 0) {
+        o = this.discardedSprites.pop();
+      } else {
+        o = new at(this.texture);
+        o.scale.x = 2;
+        o.scale.y = 2;
+        this.sprites.push(o);
+      }
+
+      g.addChild(o);
+
+      o.texture = n
+        ? this.darkOrbTexture
+        : r
+        ? this.fireballTexture
+        : this.texture;
+
+      o.source = e;
+      o.x = e.x;
+      o.y = e.y - 8;
+
+      if (i) {
+        o.y = e.y - 12;
+      }
+
+      o.target = t;
+      o.damage = s;
+      o.visible = true;
+      o.alpha = 1;
+      o.hitbox = a ? 1.5 * this.hitbox : this.hitbox;
+      o.plague = i;
+      o.rocket = a;
+      o.fireball = r;
+      o.darkorb = n;
+      o.tint = i ? 65280 : a ? 16772096 : 16777215;
+      o.scale.x = o.scale.y = a ? 2.5 : 2;
+
+      if (r) {
+        o.scale.x = 1.5;
+        o.scale.y = 1.5;
+      }
+
+      const h = t.x - o.x;
+      const l = t.y - 8 - o.y;
+      const d = Math.abs(h);
+      const c = Math.abs(l);
       let u = 1 / Math.max(d, c);
-      (u *= 1.29289 - (d + c) * u * 0.29289),
-        (o.xSpeed = h * u * this.speed),
-        (o.ySpeed = l * u * this.speed),
-        (o.rotation = Math.atan2(o.ySpeed, o.xSpeed));
+      u *= 1.29289 - (d + c) * u * 0.29289;
+      o.xSpeed = h * u * this.speed;
+      o.ySpeed = l * u * this.speed;
+      o.rotation = Math.atan2(o.ySpeed, o.xSpeed);
     }
   }
+
   class nt extends _ {
     constructor() {
-      if ((super(), (this.viewableArea = null), nt.instance))
+      super();
+      this.viewableArea = null;
+
+      if (nt.instance) {
         return nt.instance;
-      (nt.instance = this), (this.create = (e) => new J(e));
+      }
+
+      nt.instance = this;
+
+      this.create = (e) => new J(e);
     }
     getTexture() {
       const e = document.createElement("canvas");
-      (e.width = 32), (e.height = 32);
-      const t = e.getContext("2d"),
-        s = t.createRadialGradient(16, 16, 0, 16, 16, 16);
-      return (
-        s.addColorStop(0, "rgba(255,255,255,1)"),
-        s.addColorStop(0.8, "rgba(255,255,128,0.2)"),
-        s.addColorStop(1, "rgba(255,180,0,0)"),
-        (t.fillStyle = s),
-        t.fillRect(0, 0, 32, 32),
-        PIXI.Texture.from(e)
-      );
+      e.width = 32;
+      e.height = 32;
+      const t = e.getContext("2d");
+      const s = t.createRadialGradient(16, 16, 0, 16, 16, 16);
+      s.addColorStop(0, "rgba(255,255,255,1)");
+      s.addColorStop(0.8, "rgba(255,255,128,0.2)");
+      s.addColorStop(1, "rgba(255,180,0,0)");
+      t.fillStyle = s;
+      t.fillRect(0, 0, 32, 32);
+      return PIXI.Texture.from(e);
     }
     initialize() {
-      (this.viewableArea = G),
-        this.texture ||
-          ((this.texture = this.getTexture()),
-          (this.container = new PIXI.Container()),
-          b.addChild(this.container),
-          this.setup(this.container, this.texture));
+      this.viewableArea = G;
+
+      if (!this.texture) {
+        this.texture = this.getTexture();
+        this.container = new PIXI.Container();
+        b.addChild(this.container);
+        this.setup(this.container, this.texture);
+      }
     }
     update(e) {
-      for (let t = 0; t < this.sprites.length; t++)
-        this.sprites[t].visible && this.updatePart(this.sprites[t], e);
+      for (let t = 0; t < this.sprites.length; t++) {
+        if (this.sprites[t].visible) {
+          this.updatePart(this.sprites[t], e);
+        }
+      }
     }
     updatePart(e, t) {
-      e.visible &&
-        ((e.scale.y -= 10 * t),
-        (e.scale.x = e.scale.y),
-        e.scale.x <= 0 && this.discardSprite(e));
+      if (e.visible) {
+        e.scale.y -= 10 * t;
+        e.scale.x = e.scale.y;
+
+        if (e.scale.x <= 0) {
+          this.discardSprite(e);
+        }
+      }
     }
     newBlast(e, t) {
-      if (this.viewableArea.hideParticle(e, t)) return;
+      if (this.viewableArea.hideParticle(e, t)) {
+        return;
+      }
       const s = this.getSprite();
-      s.anchor.set(0.5, 0.5),
-        (s.tint = 16777215),
-        (s.scale.x = s.scale.y = 2),
-        (s.x = e),
-        (s.y = t),
-        new ot().newCloud(e, t);
+      s.anchor.set(0.5, 0.5);
+      s.tint = 16777215;
+      s.scale.x = 2;
+      s.scale.y = 2;
+      s.x = e;
+      s.y = t;
+      new ot().newCloud(e, t);
     }
     newZombieBlast(e, t) {
-      if (this.viewableArea.hideParticle(e, t)) return;
+      if (this.viewableArea.hideParticle(e, t)) {
+        return;
+      }
       const s = this.getSprite();
-      s.anchor.set(0.5, 0.5),
-        (s.tint = 11206570),
-        (s.scale.x = s.scale.y = 2),
-        (s.x = e),
-        (s.y = t),
-        new ot().newCloud(e, t);
+      s.anchor.set(0.5, 0.5);
+      s.tint = 11206570;
+      s.scale.x = 2;
+      s.scale.y = 2;
+      s.x = e;
+      s.y = t;
+      new ot().newCloud(e, t);
     }
     newDetonateBlast(e, t) {
-      if (this.viewableArea.hideParticle(e, t)) return;
+      if (this.viewableArea.hideParticle(e, t)) {
+        return;
+      }
       const s = this.getSprite();
-      s.anchor.set(0.5, 0.5),
-        (s.tint = 6750054),
-        (s.scale.x = s.scale.y = 2.5),
-        (s.x = e),
-        (s.y = t),
-        new ot().newCloud(e, t);
+      s.anchor.set(0.5, 0.5);
+      s.tint = 6750054;
+      s.scale.x = 2.5;
+      s.scale.y = 2.5;
+      s.x = e;
+      s.y = t;
+      new ot().newCloud(e, t);
     }
     newDroneBlast(e, t) {
       const s = this.getSprite();
-      s.anchor.set(0.5, 0.5),
-        (s.scale.x = s.scale.y = 2),
-        (s.tint = 16777215),
-        (s.x = e),
-        (s.y = t),
-        new ot().newDroneCloud(e, t);
+      s.anchor.set(0.5, 0.5);
+      s.scale.x = 2;
+      s.scale.y = 2;
+      s.tint = 16777215;
+      s.x = e;
+      s.y = t;
+      new ot().newDroneCloud(e, t);
     }
   }
+
   class ot extends _ {
     constructor() {
-      if (
-        (super(),
-        (this.tint = 16777215),
-        (this.viewableArea = null),
-        (this.allowTint = false),
-        (this.gameModel = null),
-        (this.sizeVariance = 0.2),
-        ot.instance)
-      )
+      super();
+      this.tint = 16777215;
+      this.viewableArea = null;
+      this.allowTint = false;
+      this.gameModel = null;
+      this.sizeVariance = 0.2;
+
+      if (ot.instance) {
         return ot.instance;
-      (ot.instance = this), (this.create = (e) => new J(e));
+      }
+
+      ot.instance = this;
+
+      this.create = (e) => new J(e);
     }
     getTexture() {
       const e = document.createElement("canvas");
-      (e.width = 12), (e.height = 12);
+      e.width = 12;
+      e.height = 12;
       const t = e.getContext("2d");
-      (t.shadowBlur = 5), (t.shadowColor = "white");
+      t.shadowBlur = 5;
+      t.shadowColor = "white";
       const s = t.createRadialGradient(6, 6, 0, 6, 6, 4);
-      return (
-        s.addColorStop(0, "rgba(255,255,255,0.05)"),
-        s.addColorStop(0.5, "rgba(255,255,255,0.1)"),
-        s.addColorStop(1, "rgba(255,255,255,0)"),
-        (t.fillStyle = s),
-        t.fillRect(0, 0, 12, 12),
-        PIXI.Texture.from(e)
-      );
+      s.addColorStop(0, "rgba(255,255,255,0.05)");
+      s.addColorStop(0.5, "rgba(255,255,255,0.1)");
+      s.addColorStop(1, "rgba(255,255,255,0)");
+      t.fillStyle = s;
+      t.fillRect(0, 0, 12, 12);
+      return PIXI.Texture.from(e);
     }
     initialize() {
-      (this.gameModel = GameModel.getInstance()),
-        (this.viewableArea = G),
-        (this.allowTint =
-          this.gameModel.app &&
-          this.gameModel.app.renderer &&
-          1 == this.gameModel.app.renderer.type),
-        this.texture ||
-          (this.setup(new PIXI.Container(), this.getTexture()),
-          b.addChild(this.container));
+      this.gameModel = GameModel.getInstance();
+      this.viewableArea = G;
+
+      this.allowTint =
+        this.gameModel.app &&
+        this.gameModel.app.renderer &&
+        this.gameModel.app.renderer.type == 1;
+
+      if (!this.texture) {
+        this.setup(new PIXI.Container(), this.getTexture());
+        b.addChild(this.container);
+      }
     }
     update(e) {
       if (this.gameModel.persistentData.particles) {
         this.container.visible = true;
-        for (let t = 0; t < this.sprites.length; t++)
-          this.sprites[t].visible && this.updatePart(this.sprites[t], e);
-      } else this.container.visible = false;
+        for (let t = 0; t < this.sprites.length; t++) {
+          if (this.sprites[t].visible) {
+            this.updatePart(this.sprites[t], e);
+          }
+        }
+      } else {
+        this.container.visible = false;
+      }
     }
     updatePart(e, t) {
-      (e.scale.y -= 1.5 * t),
-        (e.scale.x = e.scale.y),
-        (e.y += e.ySpeed * t),
-        e.scale.x <= 0 && this.discardSprite(e);
+      e.scale.y -= 1.5 * t;
+      e.scale.x = e.scale.y;
+      e.y += e.ySpeed * t;
+
+      if (e.scale.x <= 0) {
+        this.discardSprite(e);
+      }
     }
     newSmoke(e, t, s = 0) {
-      if (this.viewableArea.hideParticle(e, t)) return;
+      if (this.viewableArea.hideParticle(e, t)) {
+        return;
+      }
       const i = this.getSprite();
-      this.allowTint && (i.tint = this.tint),
-        (i.ySpeed = -30),
-        i.anchor.set(0.5, 0.5),
-        (i.scale.x = i.scale.y =
-          1.6 - this.sizeVariance + Math.random() * this.sizeVariance * 2),
-        (i.visible = true),
-        (i.x = e - s + Math.random() * s * 2),
-        (i.y = t - s + Math.random() * s * 2);
+
+      if (this.allowTint) {
+        i.tint = this.tint;
+      }
+
+      i.ySpeed = -30;
+      i.anchor.set(0.5, 0.5);
+
+      i.scale.x = i.scale.y =
+        1.6 - this.sizeVariance + Math.random() * this.sizeVariance * 2;
+
+      i.visible = true;
+      i.x = e - s + Math.random() * s * 2;
+      i.y = t - s + Math.random() * s * 2;
     }
     newFireSmoke(e, t) {
-      this.container.visible &&
-        ((this.tint = 16777215), this.newSmoke(e, t, 3));
+      if (this.container.visible) {
+        this.tint = 16777215;
+        this.newSmoke(e, t, 3);
+      }
     }
     newCloud(e, t) {
       if (this.container.visible) {
         this.tint = 65280;
-        for (let s = 0; s < 10; s++) this.newSmoke(e, t, 16);
+        for (let s = 0; s < 10; s++) {
+          this.newSmoke(e, t, 16);
+        }
       }
     }
     newDroneCloud(e, t) {
       if (this.container.visible) {
         this.tint = 16777215;
-        for (let s = 0; s < 10; s++) this.newSmoke(e, t, 24);
+        for (let s = 0; s < 10; s++) {
+          this.newSmoke(e, t, 24);
+        }
       }
     }
     newZombieSpawnCloud(e, t) {
       if (this.container.visible) {
         this.tint = 65280;
-        for (let s = 0; s < 5; s++) this.newSmoke(e, t, 6);
+        for (let s = 0; s < 5; s++) {
+          this.newSmoke(e, t, 6);
+        }
       }
     }
   }
+
   class ht extends J {
-    constructor() {
-      super(...arguments), (this.hitFloor = false);
+    constructor(...args) {
+      super(...args);
+      this.hitFloor = false;
     }
   }
+
   class lt extends _ {
     constructor() {
-      if (
-        (super(),
-        (this.partsPerSplatter = 15),
-        (this.gravity = 100),
-        (this.spraySpeed = 50),
-        (this.fadeSpeed = 0.7),
-        (this.viewableArea = G),
-        lt.instance)
-      )
+      super();
+      this.partsPerSplatter = 15;
+      this.gravity = 100;
+      this.spraySpeed = 50;
+      this.fadeSpeed = 0.7;
+      this.viewableArea = G;
+
+      if (lt.instance) {
         return lt.instance;
-      (lt.instance = this), (this.create = (e) => new ht(e));
+      }
+
+      lt.instance = this;
+
+      this.create = (e) => new ht(e);
     }
     getTexture() {
       const e = document.createElement("canvas");
-      (e.width = 5), (e.height = 1);
+      e.width = 5;
+      e.height = 1;
       const t = e.getContext("2d");
-      return (
-        (t.fillStyle = "#FFFFFF"), t.fillRect(0, 0, 5, 1), PIXI.Texture.from(e)
-      );
+      t.fillStyle = "#FFFFFF";
+      t.fillRect(0, 0, 5, 1);
+      return PIXI.Texture.from(e);
     }
     initialize() {
-      (this.gameModel = GameModel.getInstance()),
-        (this.viewableArea = G),
-        this.container ||
-          ((this.container = new PIXI.Container()),
-          p.addChild(this.container),
-          (this.texture = this.getTexture()),
-          this.setup(this.container, this.texture));
+      this.gameModel = GameModel.getInstance();
+      this.viewableArea = G;
+
+      if (!this.container) {
+        this.container = new PIXI.Container();
+        p.addChild(this.container);
+        this.texture = this.getTexture();
+        this.setup(this.container, this.texture);
+      }
     }
     update(e) {
       if (this.gameModel.persistentData.particles) {
         this.container.visible = true;
-        for (let t = 0; t < this.sprites.length; t++)
-          this.sprites[t].visible && this.updatePart(this.sprites[t], e);
-      } else this.container.visible = false;
+        for (let t = 0; t < this.sprites.length; t++) {
+          if (this.sprites[t].visible) {
+            this.updatePart(this.sprites[t], e);
+          }
+        }
+      } else {
+        this.container.visible = false;
+      }
     }
     updatePart(e, t) {
-      e.hitFloor
-        ? ((e.alpha -= this.fadeSpeed * t),
-          e.alpha <= 0 && this.discardSprite(e))
-        : ((e.ySpeed += this.gravity * t),
-          (e.x += e.xSpeed * t),
-          (e.y += e.ySpeed * t),
-          e.y >= e.floor && (e.hitFloor = true),
-          (e.rotation += e.rotSpeed * t));
+      if (e.hitFloor) {
+        e.alpha -= this.fadeSpeed * t;
+
+        if (e.alpha <= 0) {
+          this.discardSprite(e);
+        }
+      } else {
+        e.ySpeed += this.gravity * t;
+        e.x += e.xSpeed * t;
+        e.y += e.ySpeed * t;
+
+        if (e.y >= e.floor) {
+          e.hitFloor = true;
+        }
+
+        e.rotation += e.rotSpeed * t;
+      }
     }
     newPart(e, t, s) {
-      if (!this.container.visible) return;
-      if (this.viewableArea.hideParticle(e, t)) return;
+      if (!this.container.visible) {
+        return;
+      }
+      if (this.viewableArea.hideParticle(e, t)) {
+        return;
+      }
       const i = this.getSprite();
-      (i.tint = s),
-        (i.x = e),
-        (i.y = t - (8 + 10 * Math.random())),
-        (i.floor = t),
-        (i.hitFloor = false),
-        (i.rotation = 5 * Math.random()),
-        (i.rotSpeed = 4 * Math.random() - 2),
-        (i.alpha = 1),
-        i.scale.set(2, 2);
+      i.tint = s;
+      i.x = e;
+      i.y = t - (8 + 10 * Math.random());
+      i.floor = t;
+      i.hitFloor = false;
+      i.rotation = 5 * Math.random();
+      i.rotSpeed = 4 * Math.random() - 2;
+      i.alpha = 1;
+      i.scale.set(2, 2);
       const a = Math.random() * this.spraySpeed;
-      (i.xSpeed = Math.random() > 0.5 ? -1 * a : a),
-        (i.ySpeed = -1 * (10 + Math.random() * this.spraySpeed));
+      i.xSpeed = Math.random() > 0.5 ? -1 * a : a;
+      i.ySpeed = -1 * (10 + Math.random() * this.spraySpeed);
     }
     newFragmentExplosion(e, t, s) {
-      if (this.container.visible)
-        for (let i = 0; i < this.partsPerSplatter; i++) this.newPart(e, t, s);
+      if (this.container.visible) {
+        for (let i = 0; i < this.partsPerSplatter; i++) {
+          this.newPart(e, t, s);
+        }
+      }
     }
   }
-  const dt = new Skeleton(),
-    ct = new Zombies(),
-    ut = new Creatures(),
-    pt = new CreatureFactory(),
-    gt = new Spells(),
-    mt = "Golem Mastery",
-    bt = "Zombie Mastery",
-    ft = "Skeleton Mastery",
-    yt = "Spell Mastery";
+
+  const dt = new Skeleton();
+  const ct = new Zombies();
+  const ut = new Creatures();
+  const pt = new CreatureFactory();
+  const gt = new Spells();
+  const mt = "Golem Mastery";
+  const bt = "Zombie Mastery";
+  const ft = "Skeleton Mastery";
+  const yt = "Spell Mastery";
+
   class xt {
     constructor(e, t, s, i, a, r) {
-      (this.id = 0),
-        (this.maxPoints = 0),
-        (this.active = function () {
-          return dt.talents[this.id] && dt.talents[this.id] > 0;
-        }),
-        (this.full = function () {
-          return dt.talents[this.id] && 10 == dt.talents[this.id];
-        }),
-        (this.reset = function () {
+      this.id = 0;
+      this.maxPoints = 0;
+
+      this.active = function () {
+        return dt.talents[this.id] && dt.talents[this.id] > 0;
+      };
+
+      this.full = function () {
+        return dt.talents[this.id] && dt.talents[this.id] == 10;
+      };
+
+      this.reset = function () {
+        dt.talents[this.id] = 0;
+      };
+
+      this.max = function () {
+        dt.talents[this.id] = this.maxPoints;
+
+        if (dt.getAvailablePoints() < 0) {
+          dt.talents[this.id] += dt.getAvailablePoints();
+        }
+      };
+
+      this.set = function (e) {
+        if (!dt.talents[this.id]) {
           dt.talents[this.id] = 0;
-        }),
-        (this.max = function () {
-          (dt.talents[this.id] = this.maxPoints),
-            dt.getAvailablePoints() < 0 &&
-              (dt.talents[this.id] += dt.getAvailablePoints());
-        }),
-        (this.set = function (e) {
-          dt.talents[this.id] || (dt.talents[this.id] = 0),
-            (e < 0 || (e > 0 && dt.getAvailablePoints() > 0)) &&
-              ((dt.talents[this.id] += e),
-              dt.talents[this.id] < 0 && (dt.talents[this.id] = 0),
-              dt.talents[this.id] > this.maxPoints &&
-                (dt.talents[this.id] = this.maxPoints));
-        }),
-        (this.id = e),
-        (this.name = t),
-        (this.description = r),
-        (this.group = s),
-        (this.maxPoints = i),
-        (this.apply = a);
+        }
+
+        if (e < 0 || (e > 0 && dt.getAvailablePoints() > 0)) {
+          dt.talents[this.id] += e;
+
+          if (dt.talents[this.id] < 0) {
+            dt.talents[this.id] = 0;
+          }
+
+          if (dt.talents[this.id] > this.maxPoints) {
+            dt.talents[this.id] = this.maxPoints;
+          }
+        }
+      };
+
+      this.id = e;
+      this.name = t;
+      this.description = r;
+      this.group = s;
+      this.maxPoints = i;
+      this.apply = a;
     }
   }
   class vt {
     constructor(e, t) {
-      (this.talents = []), (this.name = e), (this.class = t);
+      this.talents = [];
+      this.name = e;
+      this.class = t;
     }
   }
+
   const St = [
-      new xt(
-        1,
-        "Efficiency",
-        mt,
-        12,
-        function () {
-          pt.creatureCostReduction = 1;
-          const e = dt.talents[this.id];
-          e && e > 0 && (pt.creatureCostReduction -= 0.075 * e);
-        },
-        function () {
-          const e = dt.talents[this.id];
-          return e && e > 0
-            ? `Golem upgrade and summoning cost reduced by ${7.5 * e}%`
-            : "Reduces golem upgrade and summoning cost by 7.5%";
+    new xt(
+      1,
+      "Efficiency",
+      mt,
+      12,
+      function () {
+        pt.creatureCostReduction = 1;
+        const e = dt.talents[this.id];
+
+        if (e && e > 0) {
+          pt.creatureCostReduction -= 0.075 * e;
         }
-      ),
-      new xt(
-        2,
-        "Thrifty",
-        mt,
-        12,
-        function () {
-          dt.killingBlowParts = 0;
-          const e = dt.talents[this.id];
-          e && e > 0 && (dt.killingBlowParts = 10 * e);
-        },
-        function () {
-          const e = dt.talents[this.id];
-          return e && e > 0
-            ? `Skeleton killing blows reward ${
-                10 * e
-              }x of your current parts per second`
-            : "Skeleton killing blows reward 10x of your current parts per second";
+      },
+      function () {
+        const e = dt.talents[this.id];
+        return e && e > 0
+          ? `Golem upgrade and summoning cost reduced by ${7.5 * e}%`
+          : "Reduces golem upgrade and summoning cost by 7.5%";
+      }
+    ),
+    new xt(
+      2,
+      "Thrifty",
+      mt,
+      12,
+      function () {
+        dt.killingBlowParts = 0;
+        const e = dt.talents[this.id];
+
+        if (e && e > 0) {
+          dt.killingBlowParts = 10 * e;
         }
-      ),
-      new xt(
-        3,
-        "Fatal Bargain",
-        mt,
-        12,
-        function () {
-          (ut.refundChance = 0), (ct.refundChance = 0);
-          const e = dt.talents[this.id];
-          e &&
-            e > 0 &&
-            ((ut.refundChance = 0.08 * e), (ct.refundChance = 0.08 * e));
-        },
-        function () {
-          const e = dt.talents[this.id];
-          return e && e > 0
-            ? 8 * e + "% parts refund on golem death"
-            : "Grants 8% parts refund on golem death";
+      },
+      function () {
+        const e = dt.talents[this.id];
+        return e && e > 0
+          ? `Skeleton killing blows reward ${
+              10 * e
+            }x of your current parts per second`
+          : "Skeleton killing blows reward 10x of your current parts per second";
+      }
+    ),
+    new xt(
+      3,
+      "Fatal Bargain",
+      mt,
+      12,
+      function () {
+        ut.refundChance = 0;
+        ct.refundChance = 0;
+        const e = dt.talents[this.id];
+
+        if (e && e > 0) {
+          ut.refundChance = 0.08 * e;
+          ct.refundChance = 0.08 * e;
         }
-      ),
-      new xt(
-        4,
-        "Recovery",
-        yt,
-        12,
-        function () {
-          gt.cooldownReduction = 1;
-          const e = dt.talents[this.id];
-          e && e > 0 && (gt.cooldownReduction = 1 - 0.05 * e);
-        },
-        function () {
-          const e = dt.talents[this.id];
-          return e && e > 0
-            ? `Spell cooldown time reduced by ${5 * e}%`
-            : "Reduces spell cooldown time by 5%";
+      },
+      function () {
+        const e = dt.talents[this.id];
+        return e && e > 0
+          ? `${8 * e}% parts refund on golem death`
+          : "Grants 8% parts refund on golem death";
+      }
+    ),
+    new xt(
+      4,
+      "Recovery",
+      yt,
+      12,
+      function () {
+        gt.cooldownReduction = 1;
+        const e = dt.talents[this.id];
+
+        if (e && e > 0) {
+          gt.cooldownReduction = 1 - 0.05 * e;
         }
-      ),
-      new xt(
-        5,
-        "Endurance",
-        yt,
-        12,
-        function () {
-          gt.timeExtension = 0;
-          const e = dt.talents[this.id];
-          e && e > 0 && (gt.timeExtension = e);
-        },
-        function () {
-          const e = dt.talents[this.id];
-          return e && e > 0
-            ? `Spell duration increased by ${e} seconds`
-            : "Increases spell duration by 1 second";
+      },
+      function () {
+        const e = dt.talents[this.id];
+        return e && e > 0
+          ? `Spell cooldown time reduced by ${5 * e}%`
+          : "Reduces spell cooldown time by 5%";
+      }
+    ),
+    new xt(
+      5,
+      "Endurance",
+      yt,
+      12,
+      function () {
+        gt.timeExtension = 0;
+        const e = dt.talents[this.id];
+
+        if (e && e > 0) {
+          gt.timeExtension = e;
         }
-      ),
-      new xt(
-        6,
-        "Opportunist",
-        yt,
-        12,
-        function () {
-          gt.costReduction = 0;
-          dt.increaseChance = 0;
-          const e = dt.talents[this.id];
-          e && e > 0 && (dt.increaseChance = 0.02 * e);
-        },
-        function () {
-          const e = dt.talents[this.id];
-          return e && e > 0
-            ? `Gear spell activation chance increased by ${2 * e}%`
-            : "Increases spell activation chance by 2%";
+      },
+      function () {
+        const e = dt.talents[this.id];
+        return e && e > 0
+          ? `Spell duration increased by ${e} seconds`
+          : "Increases spell duration by 1 second";
+      }
+    ),
+    new xt(
+      6,
+      "Opportunist",
+      yt,
+      12,
+      function () {
+        gt.costReduction = 0;
+        dt.increaseChance = 0;
+        const e = dt.talents[this.id];
+
+        if (e && e > 0) {
+          dt.increaseChance = 0.02 * e;
         }
-      ),
-      new xt(
-        7,
-        "Shiny",
-        ft,
-        12,
-        function () {
-          dt.lootChanceMod = 1;
-          const e = dt.talents[this.id];
-          e && e > 0 && (dt.lootChanceMod = 1 + 0.1 * e);
-        },
-        function () {
-          const e = dt.talents[this.id];
-          return e && e > 0
-            ? `Rare loot chance increased by ${10 * e}%`
-            : "Increases the chance for rare loot by 10%";
+      },
+      function () {
+        const e = dt.talents[this.id];
+        return e && e > 0
+          ? `Gear spell activation chance increased by ${2 * e}%`
+          : "Increases spell activation chance by 2%";
+      }
+    ),
+    new xt(
+      7,
+      "Shiny",
+      ft,
+      12,
+      function () {
+        dt.lootChanceMod = 1;
+        const e = dt.talents[this.id];
+
+        if (e && e > 0) {
+          dt.lootChanceMod = 1 + 0.1 * e;
         }
-      ),
-      new xt(
-        8,
-        "Dark Orb",
-        ft,
-        10,
-        function () {
-          dt.darkorb = 0;
-          const e = dt.talents[this.id];
-          e && e > 0 && (dt.darkorb = 12 - e);
-        },
-        function () {
-          const e = dt.talents[this.id];
-          return e && e > 0
-            ? `Dark orb released every ${12 - e} seconds`
-            : "Releases a dark orb of energy every 11 seconds";
+      },
+      function () {
+        const e = dt.talents[this.id];
+        return e && e > 0
+          ? `Rare loot chance increased by ${10 * e}%`
+          : "Increases the chance for rare loot by 10%";
+      }
+    ),
+    new xt(
+      8,
+      "Dark Orb",
+      ft,
+      10,
+      function () {
+        dt.darkorb = 0;
+        const e = dt.talents[this.id];
+
+        if (e && e > 0) {
+          dt.darkorb = 12 - e;
         }
-      ),
-      new xt(
-        9,
-        "Bone Shield",
-        ft,
-        12,
-        function () {
-          dt.boneshield = 0;
-          const e = dt.talents[this.id];
-          e && e > 0 && (dt.boneshield = e);
-        },
-        function () {
-          const e = dt.talents[this.id];
-          return e && e > 0
-            ? `Gains a shield of ${e} bones every 10 seconds`
-            : "Gain a shield of 1 bone to protect the skeleton every 10 seconds";
+      },
+      function () {
+        const e = dt.talents[this.id];
+        return e && e > 0
+          ? `Dark orb released every ${12 - e} seconds`
+          : "Releases a dark orb of energy every 11 seconds";
+      }
+    ),
+    new xt(
+      9,
+      "Bone Shield",
+      ft,
+      12,
+      function () {
+        dt.boneshield = 0;
+        const e = dt.talents[this.id];
+
+        if (e && e > 0) {
+          dt.boneshield = e;
         }
-      ),
-      new xt(
-        10,
-        "Gigamutagen",
-        bt,
-        12,
-        function () {
-          ct.gigamutagen = 0;
-          const e = dt.talents[this.id];
-          e && e > 0 && (ct.gigamutagen = 14 - e);
-        },
-        function () {
-          const e = dt.talents[this.id];
-          return e && e > 0
-            ? `Gigazombie mutation every ${14 - e} seconds`
-            : "Mutates a random zombie into a gigazombie every 13 seconds";
+      },
+      function () {
+        const e = dt.talents[this.id];
+        return e && e > 0
+          ? `Gains a shield of ${e} bones every 10 seconds`
+          : "Gain a shield of 1 bone to protect the skeleton every 10 seconds";
+      }
+    ),
+    new xt(
+      10,
+      "Gigamutagen",
+      bt,
+      12,
+      function () {
+        ct.gigamutagen = 0;
+        const e = dt.talents[this.id];
+
+        if (e && e > 0) {
+          ct.gigamutagen = 14 - e;
         }
-      ),
-      new xt(
-        11,
-        "Blood Pact",
-        bt,
-        12,
-        function () {
-          ct.bloodpact = 0;
-          const e = dt.talents[this.id];
-          e && e > 0 && (ct.bloodpact = 0.05 * e);
-        },
-        function () {
-          const e = dt.talents[this.id];
-          return e && e > 0
-            ? 5 * e + "% of zombie damage converted to blood"
-            : "Converts an additional 5% of zombie damage to blood";
+      },
+      function () {
+        const e = dt.talents[this.id];
+        return e && e > 0
+          ? `Gigazombie mutation every ${14 - e} seconds`
+          : "Mutates a random zombie into a gigazombie every 13 seconds";
+      }
+    ),
+    new xt(
+      11,
+      "Blood Pact",
+      bt,
+      12,
+      function () {
+        ct.bloodpact = 0;
+        const e = dt.talents[this.id];
+
+        if (e && e > 0) {
+          ct.bloodpact = 0.05 * e;
         }
-      ),
-      new xt(
-        12,
-        "Blood Born",
-        bt,
-        12,
-        function () {
-          ct.bloodborn = 0;
-          const e = dt.talents[this.id];
-          e && e > 0 && (ct.bloodborn = e);
-        },
-        function () {
-          const e = dt.talents[this.id];
-          return e && e > 0
-            ? `${e} seconds of additional 50% damage reduction`
-            : "Grants 1 second of additional 50% damage reduction to newly spawned zombies";
+      },
+      function () {
+        const e = dt.talents[this.id];
+        return e && e > 0
+          ? `${5 * e}% of zombie damage converted to blood`
+          : "Converts an additional 5% of zombie damage to blood";
+      }
+    ),
+    new xt(
+      12,
+      "Blood Born",
+      bt,
+      12,
+      function () {
+        ct.bloodborn = 0;
+        const e = dt.talents[this.id];
+
+        if (e && e > 0) {
+          ct.bloodborn = e;
         }
-      ),
-    ],
-    Mt = [];
+      },
+      function () {
+        const e = dt.talents[this.id];
+        return e && e > 0
+          ? `${e} seconds of additional 50% damage reduction`
+          : "Grants 1 second of additional 50% damage reduction to newly spawned zombies";
+      }
+    ),
+  ];
+
+  const Mt = [];
 
   function kt() {
     St.forEach((e) => {
       const t = dt.talents[e.id];
-      t && t < 0 && (dt.talents[e.id] = 0);
-    }),
-      dt.talentPoints < dt.getUsedPoints() && wt(),
-      St.forEach((e) => e.apply());
+
+      if (t && t < 0) {
+        dt.talents[e.id] = 0;
+      }
+    });
+
+    if (dt.talentPoints < dt.getUsedPoints()) {
+      wt();
+    }
+
+    St.forEach((e) => e.apply());
   }
 
   function wt() {
-    dt.persistent.talentReset &&
-      (St.forEach((e) => e.reset()), (dt.persistent.talentReset = false));
-  }
-  St.forEach((e) => {
-    if (0 == Mt.filter((t) => t.name == e.group).length) {
-      let t = "blood";
-      e.group == mt && (t = "parts"),
-        e.group == ft && (t = "bones"),
-        e.group == yt && (t = "energy"),
-        e.group == bt && (t = "brains"),
-        Mt.push(new vt(e.group, t));
+    if (dt.persistent.talentReset) {
+      St.forEach((e) => e.reset());
+
+      dt.persistent.talentReset = false;
     }
-    Mt.filter((t) => t.name == e.group)[0].talents.push(e),
-      dt.talents[e.id] || (dt.talents[e.id] = 0);
-  }),
-    angular
-      .module("zombieApp", [])
-      .filter("decimal", function () {
-        return formatDecimal;
-      })
-      .filter("whole", function () {
-        return formatWhole;
-      })
-      .config([
-        "$compileProvider",
-        function (e) {
-          e.aHrefSanitizationWhitelist(
-            /^\s*(https?|ftp|mailto|javascript|data|blob):/
-          ),
-            e.debugInfoEnabled(false);
-        },
-      ])
-      .controller("ZombieController", [
-        "$scope",
-        "$interval",
-        "$document",
-        function (e, t, s) {
-          const i = new Skeleton(),
-            partFactory = new PartFactory(),
-            o = new CreatureFactory(),
-            h = new Upgrades(),
-            l = new Trophies();
+  }
 
-          function u() {
-            const e = new Date().getTime();
-            !(function (e, t) {
-              this.model.update(e, t),
-                this.updateMessages(e),
-                this.sidePanels.factory &&
-                  (this.factoryStats = factory.factoryStats());
-            })(Math.min(1e3, Math.max(e - this.lastUpdate, 0)) / 1e3, e),
-              (this.lastUpdate = e);
-          }
-          (this.model = GameModel.getInstance()),
-            (this.skeleton = function () {
-              return i.persistent;
-            }),
-            (this.spells = new Spells()),
-            (this.keysPressed = Y),
-            (this.files = []),
-            (this.messageTimer = 4),
-            (this.message = false),
-            (this.lastUpdate = 0),
-            (this.sidePanels = {}),
-            (this.upgrades = []),
-            (this.currentShopFilter = "blood"),
-            (this.currentConstructionFilter = "available"),
-            (this.graveyardTab = "minions"),
-            (this.trophyTab = "all"),
-            (this.factoryTab = "parts"),
-            (this.factoryStats = {}),
-            (this.moveTooltip = d),
-            (this.confirmMessage = ""),
-            (this.confirmCancel = function () {
-              this.confirmCallback = false;
-            }),
-            (this.closeSidePanels = function () {
-              (this.currentShopFilter = "blood"),
-                (this.currentConstructionFilter = "available"),
-                (this.graveyardTab = "minions"),
-                (this.factoryTab = "parts"),
-                (this.sidePanels.options = false),
-                (this.sidePanels.graveyard = false),
-                (this.sidePanels.runesmith = false),
-                (this.sidePanels.prestige = false),
-                (this.sidePanels.construction = false),
-                (this.sidePanels.shop = false),
-                (this.sidePanels.open = false),
-                (this.sidePanels.factory = false),
-                (this.levelSelect.shown = false);
-            }),
-            (this.openSidePanel = function (e) {
-              switch ((this.closeSidePanels(), e)) {
-                case "shop":
-                  this.filterShop(this.currentShopFilter),
-                    (this.sidePanels.shop = true);
-                  break;
-                case "construction":
-                  this.filterConstruction(this.currentConstructionFilter),
-                    (this.sidePanels.construction = true);
-                  break;
-                case "graveyard":
-                  (this.sidePanels.graveyard = true),
-                    (this.graveyardTab = "minions"),
-                    (this.trophyTab = "all");
-                  break;
-                case "runesmith":
-                  this.sidePanels.runesmith = true;
-                  break;
-                case "factory":
-                  (this.sidePanels.factory = true),
-                    (this.upgrades = factory.generators),
-                    (this.factoryStats = factory.factoryStats()),
-                    this.factory.updateDelays();
-                  break;
-                case "prestige":
-                  (this.upgrades = h.prestigeUpgrades.filter(
-                    (e) => 0 == e.cap || this.currentRank(e) < e.cap
-                  )),
-                    this.upgrades.push(
-                      ...h.prestigeUpgrades.filter(
-                        (e) => 0 !== e.cap && this.currentRank(e) >= e.cap
-                      )
-                    ),
-                    (this.upgrades = this.upgrades.filter((e) => 115 !== e.id)),
-                    (this.sidePanels.prestige = true);
-                  break;
-                case "options":
-                  (this.sidePanels.options = true),
-                    this.model.downloadSaveGame();
-              }
-              this.sidePanels.open = true;
-            }),
-            (this.graveyardTabSelect = function (e) {
-              (this.graveyardTab = e),
-                "trophies" == e &&
-                  ((this.trophies = l.getTrophyList()),
-                  (this.trophyTab = "all"));
-            }),
-            (this.trophyTabSelect = function (e) {
-              switch (((this.trophyTab = e), e)) {
-                case "all":
-                  this.trophies = l.getTrophyList();
-                  break;
-                case "collected":
-                  this.trophies = l.getTrophyList().filter((e) => e.owned);
-                  break;
-                case "uncollected":
-                  this.trophies = l.getTrophyList().filter((e) => !e.owned);
-                  break;
-                case "totals":
-                  this.trophies = l.getTrophyTotals();
-              }
-            }),
-            (this.filterShop = function (e) {
-              (this.currentShopFilter = e), (this.upgrades = h.getUpgrades(e));
-            }),
-            (this.filterConstruction = function (e) {
-              switch (((this.currentConstructionFilter = e), e)) {
-                case "available":
-                  this.upgrades = h.getAvailableConstructions();
-                  break;
-                case "completed":
-                  this.upgrades = h.getCompletedConstructions();
-              }
-            }),
-            (this.resetGame = function () {
-              (this.confirmMessage =
-                "Are you sure you want to reset everything? If you have a cloud save it will also be deleted. Make sure you export your save game first."),
-                (this.confirmCallback = function () {
-                  this.model.resetData(), (this.confirmCallback = false);
-                });
-            }),
-            (this.addBoneCollector = function () {
-              this.model.getEnergyRate() >= 1 &&
-                this.model.persistentData.boneCollectors++;
-            }),
-            (this.subtractBoneCollector = function () {
-              this.model.persistentData.boneCollectors > 0 &&
-                this.model.persistentData.boneCollectors--;
-            }),
-            (this.maxBoneCollectors = function () {
-              return Math.floor(
-                this.model.getEnergyRate() +
-                  this.model.persistentData.boneCollectors
+  St.forEach((e) => {
+    if (Mt.filter((t) => t.name == e.group).length == 0) {
+      let t = "blood";
+
+      if (e.group == mt) {
+        t = "parts";
+      }
+
+      if (e.group == ft) {
+        t = "bones";
+      }
+
+      if (e.group == yt) {
+        t = "energy";
+      }
+
+      if (e.group == bt) {
+        t = "brains";
+      }
+
+      Mt.push(new vt(e.group, t));
+    }
+
+    Mt.filter((t) => t.name == e.group)[0].talents.push(e);
+
+    if (!dt.talents[e.id]) {
+      dt.talents[e.id] = 0;
+    }
+  });
+  angular
+    .module("zombieApp", [])
+    .filter("decimal", () => formatDecimal)
+    .filter("whole", () => formatWhole)
+    .config([
+      "$compileProvider",
+      (e) => {
+        e.aHrefSanitizationWhitelist(
+          /^\s*(https?|ftp|mailto|javascript|data|blob):/
+        );
+
+        e.debugInfoEnabled(false);
+      },
+    ])
+    .controller("ZombieController", [
+      "$scope",
+      "$interval",
+      "$document",
+      function (e, t, s) {
+        const i = new Skeleton();
+        const partFactory = new PartFactory();
+        const o = new CreatureFactory();
+        const h = new Upgrades();
+        const l = new Trophies();
+
+        function u() {
+          const e = new Date().getTime();
+
+          !(function (e, t) {
+            this.model.update(e, t);
+            this.updateMessages(e);
+
+            if (this.sidePanels.factory) {
+              this.factoryStats = factory.factoryStats();
+            }
+          })(
+            Math.min(1000 /* 1e3 */, Math.max(e - this.lastUpdate, 0)) /
+              1000 /* 1e3 */,
+            e
+          );
+
+          this.lastUpdate = e;
+        }
+        this.model = GameModel.getInstance();
+
+        this.skeleton = () => i.persistent;
+
+        this.spells = new Spells();
+        this.keysPressed = Y;
+        this.files = [];
+        this.messageTimer = 4;
+        this.message = false;
+        this.lastUpdate = 0;
+        this.sidePanels = {};
+        this.upgrades = [];
+        this.currentShopFilter = "blood";
+        this.currentConstructionFilter = "available";
+        this.graveyardTab = "minions";
+        this.trophyTab = "all";
+        this.factoryTab = "parts";
+        this.factoryStats = {};
+        this.moveTooltip = d;
+        this.confirmMessage = "";
+
+        this.confirmCancel = function () {
+          this.confirmCallback = false;
+        };
+
+        this.closeSidePanels = function () {
+          this.currentShopFilter = "blood";
+          this.currentConstructionFilter = "available";
+          this.graveyardTab = "minions";
+          this.factoryTab = "parts";
+          this.sidePanels.options = false;
+          this.sidePanels.graveyard = false;
+          this.sidePanels.runesmith = false;
+          this.sidePanels.prestige = false;
+          this.sidePanels.construction = false;
+          this.sidePanels.shop = false;
+          this.sidePanels.open = false;
+          this.sidePanels.factory = false;
+          this.levelSelect.shown = false;
+        };
+
+        this.openSidePanel = function (e) {
+          this.closeSidePanels();
+
+          switch (e) {
+            case "shop": {
+              this.filterShop(this.currentShopFilter);
+              this.sidePanels.shop = true;
+              break;
+            }
+            case "construction": {
+              this.filterConstruction(this.currentConstructionFilter);
+              this.sidePanels.construction = true;
+              break;
+            }
+            case "graveyard": {
+              this.sidePanels.graveyard = true;
+              this.graveyardTab = "minions";
+              this.trophyTab = "all";
+              break;
+            }
+            case "runesmith": {
+              this.sidePanels.runesmith = true;
+              break;
+            }
+            case "factory": {
+              this.sidePanels.factory = true;
+              this.upgrades = factory.generators;
+              this.factoryStats = factory.factoryStats();
+              this.factory.updateDelays();
+              break;
+            }
+            case "prestige": {
+              this.upgrades = h.prestigeUpgrades.filter(
+                (e) => e.cap == 0 || this.currentRank(e) < e.cap
               );
-            }),
-            (this.setBoneCollectors = function (e) {
-              e >= 0 &&
-                this.model.getEnergyRate() >=
-                  e - this.model.persistentData.boneCollectors &&
-                (this.model.persistentData.boneCollectors = e);
-            }),
-            (this.setHarpies = function (e) {
-              ((e >= 0 && e < this.model.persistentData.harpies) ||
-                (this.model.getEnergyRate() >= 1 && e > 0)) &&
-                (this.model.persistentData.harpies = e);
-            }),
-            (this.maxHarpies = function () {
-              return Math.floor(
-                this.model.getEnergyRate() + this.model.persistentData.harpies
-              );
-            }),
-            (this.setGraveyardZombies = function (e) {
-              e <= this.maxGraveyardZombies() &&
-                e >= 0 &&
-                (this.model.persistentData.graveyardZombies = e);
-            }),
-            (this.maxGraveyardZombies = function () {
-              return Math.floor(this.model.energyMax / this.model.zombieCost);
-            }),
-            (this.upgradePrice = function (e) {
-              return this.sidePanels.factory && "prestigePoints" != e.costType
-                ? factory.purchasePrice(e)
-                : h.upgradePrice(e);
-            }),
-            (this.factory = {
-              delays: [],
-              changeFactoryTab(e) {
-                (this.factoryTab = e),
-                  "parts" == e
-                    ? ((this.upgrades = factory.generators),
-                      this.updateDelays())
-                    : (this.upgrades = o.creatures);
-              },
-              buyGenerator(e) {
-                this.keysPressed.shift
-                  ? factory.purchaseMaxGenerators(e)
-                  : factory.purchaseGenerator(e),
-                  (this.factoryStats = factory.factoryStats());
-              },
-              generatorPrice: (e) => factory.purchasePrice(e),
-              creaturePrice: (e) => o.purchasePrice(e),
-              creatureLevelPrice: (e) => o.levelPrice(e),
-              creaturePercent(e) {
-                return Math.min(
-                  Math.round(
-                    (this.model.persistentData.parts / this.creaturePrice(e)) *
-                      100
-                  ),
-                  100
-                );
-              },
-              creatureLevelPercent(e) {
-                return Math.min(
-                  Math.round(
-                    (this.model.persistentData.parts /
-                      this.creatureLevelPrice(e)) *
-                      100
-                  ),
-                  100
-                );
-              },
-              buyCreature: (e) => o.startBuilding(e),
-              creatureTooExpensive: (e) => !o.canAffordCreature(e),
-              creatureButtonText(e) {
-                return e.building
-                  ? "Building..."
-                  : this.creatureTooExpensive(e)
-                  ? formatWhole(
-                      this.creaturePrice(e) - this.model.persistentData.parts
-                    ) + " parts required"
-                  : "Build (" + formatWhole(this.creaturePrice(e)) + " parts)";
-              },
-              creatureLevelButtonText(e) {
-                return this.canLevelCreature(e)
-                  ? "Upgrade Level " +
-                      (e.level + 1) +
-                      " (" +
-                      formatWhole(this.creatureLevelPrice(e)) +
-                      " parts)"
-                  : formatWhole(
-                      this.creatureLevelPrice(e) -
-                        this.model.persistentData.parts
-                    ) + " parts required";
-              },
-              canBuildCreature(e) {
-                return (
-                  !this.creatureTooExpensive(e) &&
-                  !e.building &&
-                  o.creaturesBuildingCount() + this.model.creatureCount <
-                    this.model.creatureLimit
-                );
-              },
-              canLevelCreature(e) {
-                return (
-                  this.creatureLevelPrice(e) < this.model.persistentData.parts
-                );
-              },
-              levelCreature(e) {
-                o.levelCreature(e);
-              },
-              autoBuild(e, t) {
-                e.autobuild + t >= 0 &&
-                  e.autobuild + t <= this.model.creatureLimit &&
-                  o.creatureAutoBuildNumber(e, t);
-              },
-              creatureStats: (e) => o.creatureStats(e),
-              updateDelays() {
-                this.delays = [];
-                for (let e = 0; e < factory.generatorsApplied.length; e++)
-                  this.delays[factory.generatorsApplied[e].id] = (
-                    -1 *
-                    (factory.generatorsApplied[e].time -
-                      factory.generatorsApplied[e].timeLeft)
-                  ).toFixed(2);
-              },
-            }),
-            (this.levelSelect = {
-              shown: false,
-              levelsPerPage: 50,
-              levels: [],
-              levelRanges: [],
-              start: 1,
-              showButton: () =>
-                this.model.persistentData.allTimeHighestLevel > 1,
-              show() {
-                this.shown
-                  ? (this.shown = false)
-                  : (this.closeSidePanels(),
-                    (this.shown = true),
-                    (this.level = this.model.levelInfo(this.model.level)),
-                    (this.start =
-                      Math.floor((this.level.level - 1) / this.levelsPerPage) *
-                        this.levelsPerPage +
-                      1),
-                    this.populate());
-              },
-              populate() {
-                (this.levels = []),
-                  (this.levelRanges = []),
-                  this.start > this.levelsPerPage &&
-                    this.levelRanges.push(this.start - this.levelsPerPage),
-                  this.levelRanges.push(this.start),
-                  this.start + this.levelsPerPage <=
-                    this.model.persistentData.allTimeHighestLevel + 1 &&
-                    this.levelRanges.push(this.start + this.levelsPerPage);
-                for (
-                  let e = this.start;
-                  e < this.start + this.levelsPerPage;
-                  e++
+
+              this.upgrades.push(
+                ...h.prestigeUpgrades.filter(
+                  (e) => e.cap !== 0 && this.currentRank(e) >= e.cap
                 )
-                  this.levels.push(this.model.levelInfo(e));
-              },
-              selectRange(e) {
-                (this.start = e), this.populate();
-              },
-              select(e) {
-                this.level = e;
-              },
-              startLevel() {
-                this.model.startLevel(this.level.level), (this.shown = false);
-              },
-            }),
-            (this.addToHomeScreen = function () {
-              this.model.deferredPrompt;
-            }),
-            (this.constructionPercent = function () {
-              if (this.model.persistentData.currentConstruction) {
-                const e =
-                  this.model.persistentData.currentConstruction.time -
-                  this.model.persistentData.currentConstruction.timeRemaining;
-                return Math.round(
-                  (e / this.model.persistentData.currentConstruction.time) * 100
+              );
+
+              this.upgrades = this.upgrades.filter((e) => e.id !== 115);
+
+              this.sidePanels.prestige = true;
+              break;
+            }
+            case "options": {
+              this.sidePanels.options = true;
+              this.model.downloadSaveGame();
+            }
+          }
+
+          this.sidePanels.open = true;
+        };
+
+        this.graveyardTabSelect = function (e) {
+          this.graveyardTab = e;
+
+          if (e == "trophies") {
+            this.trophies = l.getTrophyList();
+            this.trophyTab = "all";
+          }
+        };
+
+        this.trophyTabSelect = function (e) {
+          this.trophyTab = e;
+
+          switch (e) {
+            case "all": {
+              this.trophies = l.getTrophyList();
+              break;
+            }
+            case "collected": {
+              this.trophies = l.getTrophyList().filter((e) => e.owned);
+              break;
+            }
+            case "uncollected": {
+              this.trophies = l.getTrophyList().filter((e) => !e.owned);
+              break;
+            }
+            case "totals": {
+              this.trophies = l.getTrophyTotals();
+            }
+          }
+        };
+
+        this.filterShop = function (e) {
+          this.currentShopFilter = e;
+          this.upgrades = h.getUpgrades(e);
+        };
+
+        this.filterConstruction = function (e) {
+          this.currentConstructionFilter = e;
+
+          switch (e) {
+            case "available": {
+              this.upgrades = h.getAvailableConstructions();
+              break;
+            }
+            case "completed": {
+              this.upgrades = h.getCompletedConstructions();
+            }
+          }
+        };
+
+        this.resetGame = function () {
+          this.confirmMessage =
+            "Are you sure you want to reset everything? If you have a cloud save it will also be deleted. Make sure you export your save game first.";
+
+          this.confirmCallback = function () {
+            this.model.resetData();
+            this.confirmCallback = false;
+          };
+        };
+
+        this.addBoneCollector = function () {
+          if (this.model.getEnergyRate() >= 1) {
+            this.model.persistentData.boneCollectors++;
+          }
+        };
+
+        this.subtractBoneCollector = function () {
+          if (this.model.persistentData.boneCollectors > 0) {
+            this.model.persistentData.boneCollectors--;
+          }
+        };
+
+        this.maxBoneCollectors = function () {
+          return Math.floor(
+            this.model.getEnergyRate() +
+              this.model.persistentData.boneCollectors
+          );
+        };
+
+        this.setBoneCollectors = function (e) {
+          if (
+            e >= 0 &&
+            this.model.getEnergyRate() >=
+              e - this.model.persistentData.boneCollectors
+          ) {
+            this.model.persistentData.boneCollectors = e;
+          }
+        };
+
+        this.setHarpies = function (e) {
+          if (
+            (e >= 0 && e < this.model.persistentData.harpies) ||
+            (this.model.getEnergyRate() >= 1 && e > 0)
+          ) {
+            this.model.persistentData.harpies = e;
+          }
+        };
+
+        this.maxHarpies = function () {
+          return Math.floor(
+            this.model.getEnergyRate() + this.model.persistentData.harpies
+          );
+        };
+
+        this.setGraveyardZombies = function (e) {
+          if (e <= this.maxGraveyardZombies() && e >= 0) {
+            this.model.persistentData.graveyardZombies = e;
+          }
+        };
+
+        this.maxGraveyardZombies = function () {
+          return Math.floor(this.model.energyMax / this.model.zombieCost);
+        };
+
+        this.upgradePrice = function (e) {
+          return this.sidePanels.factory && e.costType != "prestigePoints"
+            ? factory.purchasePrice(e)
+            : h.upgradePrice(e);
+        };
+
+        this.factory = {
+          delays: [],
+          changeFactoryTab(e) {
+            this.factoryTab = e;
+
+            if (e == "parts") {
+              this.upgrades = factory.generators;
+              this.updateDelays();
+            } else {
+              this.upgrades = o.creatures;
+            }
+          },
+          buyGenerator(e) {
+            if (this.keysPressed.shift) {
+              factory.purchaseMaxGenerators(e);
+            } else {
+              factory.purchaseGenerator(e);
+            }
+
+            this.factoryStats = factory.factoryStats();
+          },
+          generatorPrice: (e) => factory.purchasePrice(e),
+          creaturePrice: (e) => o.purchasePrice(e),
+          creatureLevelPrice: (e) => o.levelPrice(e),
+          creaturePercent(e) {
+            return Math.min(
+              Math.round(
+                (this.model.persistentData.parts / this.creaturePrice(e)) * 100
+              ),
+              100
+            );
+          },
+          creatureLevelPercent(e) {
+            return Math.min(
+              Math.round(
+                (this.model.persistentData.parts / this.creatureLevelPrice(e)) *
+                  100
+              ),
+              100
+            );
+          },
+          buyCreature: (e) => o.startBuilding(e),
+          creatureTooExpensive: (e) => !o.canAffordCreature(e),
+          creatureButtonText(e) {
+            return e.building
+              ? "Building..."
+              : this.creatureTooExpensive(e)
+              ? `${formatWhole(
+                  this.creaturePrice(e) - this.model.persistentData.parts
+                )} parts required`
+              : `Build (${formatWhole(this.creaturePrice(e))} parts)`;
+          },
+          creatureLevelButtonText(e) {
+            return this.canLevelCreature(e)
+              ? `Upgrade Level ${e.level + 1} (${formatWhole(
+                  this.creatureLevelPrice(e)
+                )} parts)`
+              : `${formatWhole(
+                  this.creatureLevelPrice(e) - this.model.persistentData.parts
+                )} parts required`;
+          },
+          canBuildCreature(e) {
+            return (
+              !this.creatureTooExpensive(e) &&
+              !e.building &&
+              o.creaturesBuildingCount() + this.model.creatureCount <
+                this.model.creatureLimit
+            );
+          },
+          canLevelCreature(e) {
+            return this.creatureLevelPrice(e) < this.model.persistentData.parts;
+          },
+          levelCreature(e) {
+            o.levelCreature(e);
+          },
+          autoBuild(e, t) {
+            if (
+              e.autobuild + t >= 0 &&
+              e.autobuild + t <= this.model.creatureLimit
+            ) {
+              o.creatureAutoBuildNumber(e, t);
+            }
+          },
+          creatureStats: (e) => o.creatureStats(e),
+          updateDelays() {
+            this.delays = [];
+            for (let e = 0; e < factory.generatorsApplied.length; e++) {
+              this.delays[factory.generatorsApplied[e].id] = (
+                -1 *
+                (factory.generatorsApplied[e].time -
+                  factory.generatorsApplied[e].timeLeft)
+              ).toFixed(2);
+            }
+          },
+        };
+
+        this.levelSelect = {
+          shown: false,
+          levelsPerPage: 50,
+          levels: [],
+          levelRanges: [],
+          start: 1,
+          showButton: () => this.model.persistentData.allTimeHighestLevel > 1,
+          show() {
+            if (this.shown) {
+              this.shown = false;
+            } else {
+              this.closeSidePanels();
+              this.shown = true;
+              this.level = this.model.levelInfo(this.model.level);
+
+              this.start =
+                Math.floor((this.level.level - 1) / this.levelsPerPage) *
+                  this.levelsPerPage +
+                1;
+
+              this.populate();
+            }
+          },
+          populate() {
+            this.levels = [];
+            this.levelRanges = [];
+
+            if (this.start > this.levelsPerPage) {
+              this.levelRanges.push(this.start - this.levelsPerPage);
+            }
+
+            this.levelRanges.push(this.start);
+
+            if (
+              this.start + this.levelsPerPage <=
+              this.model.persistentData.allTimeHighestLevel + 1
+            ) {
+              this.levelRanges.push(this.start + this.levelsPerPage);
+            }
+
+            for (let e = this.start; e < this.start + this.levelsPerPage; e++) {
+              this.levels.push(this.model.levelInfo(e));
+            }
+          },
+          selectRange(e) {
+            this.start = e;
+            this.populate();
+          },
+          select(e) {
+            this.level = e;
+          },
+          startLevel() {
+            this.model.startLevel(this.level.level);
+            this.shown = false;
+          },
+        };
+
+        this.addToHomeScreen = function () {
+          this.model.deferredPrompt;
+        };
+
+        this.constructionPercent = function () {
+          if (this.model.persistentData.currentConstruction) {
+            const e =
+              this.model.persistentData.currentConstruction.time -
+              this.model.persistentData.currentConstruction.timeRemaining;
+            return Math.round(
+              (e / this.model.persistentData.currentConstruction.time) * 100
+            );
+          }
+          return 0;
+        };
+
+        this.updateConstructionUpgrades = function () {
+          if (this.sidePanels.construction == 1) {
+            this.upgrades = h.getAvailableConstructions();
+          }
+        };
+
+        this.startConstruction = function (e) {
+          h.startConstruction(e);
+          this.upgrades = h.getAvailableConstructions();
+        };
+
+        this.playPauseConstruction = () => {
+          h.playPauseConstruction();
+        };
+
+        this.cancelConstruction = function () {
+          this.confirmMessage =
+            "Are you sure you want to cancel construction? Used materials will not be refunded";
+
+          this.confirmCallback = function () {
+            h.cancelConstruction();
+            this.upgrades = h.getAvailableConstructions();
+            this.confirmCallback = false;
+          };
+        };
+
+        this.upgradeSubtitle = (e) => {
+          switch (e.type) {
+            case h.types.energyRate: {
+              return `+${e.effect} energy per second`;
+            }
+            case h.types.energyCap: {
+              return `+${e.effect} max energy`;
+            }
+            case h.types.bloodCap: {
+              return `+${formatWhole(e.effect)} max blood`;
+            }
+            case h.types.bloodStoragePC: {
+              return `+${Math.round(100 * e.effect)}% max blood`;
+            }
+            case h.types.bloodGainPC: {
+              return `+${Math.round(100 * e.effect)}% blood income`;
+            }
+            case h.types.brainsGainPC: {
+              return `+${Math.round(100 * e.effect)}% brains income`;
+            }
+            case h.types.bonesGainPC: {
+              return `+${Math.round(100 * e.effect)}% bones income`;
+            }
+            case h.types.partsGainPC: {
+              return `+${Math.round(100 * e.effect)}% parts income`;
+            }
+            case h.types.brainsStoragePC: {
+              return `+${Math.round(100 * e.effect)}% max brains`;
+            }
+            case h.types.energyCost: {
+              return `-${e.effect} zombie energy cost`;
+            }
+            case h.types.brainsCap: {
+              return `+${e.effect} max brains`;
+            }
+            case h.types.damage: {
+              return `+${e.effect} zombie damage`;
+            }
+            case h.types.speed: {
+              return `+${e.effect} zombie speed`;
+            }
+            case h.types.health: {
+              return `+${e.effect} zombie health`;
+            }
+            case h.types.brainRecoverChance: {
+              return `+${Math.round(100 * e.effect)}% chance to recover brain`;
+            }
+            case h.types.riseFromTheDeadChance: {
+              return `+${Math.round(
+                100 * e.effect
+              )}% chance for corpse to become zombie`;
+            }
+            case h.types.infectedBite: {
+              return `+${Math.round(
+                100 * e.effect
+              )}% chance for zombies to infect their targets`;
+            }
+            case h.types.infectedBlast: {
+              return `+${Math.round(
+                100 * e.effect
+              )}% chance for zombies to explode on death`;
+            }
+            case h.types.boneCollectorCapacity: {
+              return `+${e.effect} bone collector capacity`;
+            }
+            case h.types.zombieDmgPC: {
+              return `+${formatWhole(
+                Math.round(100 * e.effect)
+              )}% zombie damage`;
+            }
+            case h.types.zombieHealthPC: {
+              return `+${formatWhole(
+                Math.round(100 * e.effect)
+              )}% zombie health`;
+            }
+            case h.types.bonesRate: {
+              return `+${e.effect} bones per second`;
+            }
+            case h.types.brainsRate: {
+              return `+${e.effect} brains per second`;
+            }
+            case h.types.plagueDamage: {
+              return `+${formatWhole(e.effect)} plague damage`;
+            }
+            case h.types.plagueTicks: {
+              return `+${formatWhole(e.effect)} plague ticks`;
+            }
+            case h.types.spitDistance: {
+              return `+${e.effect} spit distance`;
+            }
+            case h.types.blastHealing: {
+              return `+${Math.round(100 * e.effect)}% plague healing`;
+            }
+            case h.types.plagueArmor: {
+              return `+${Math.round(100 * e.effect)}% damage reduction`;
+            }
+            case h.types.monsterLimit: {
+              return `+${e.effect} creature limit`;
+            }
+            case h.types.runicSyphon: {
+              return `+${Math.round(100 * e.effect)}% runic syphon`;
+            }
+            case h.types.gigazombies: {
+              return "Unlock more gigazombies";
+            }
+            case h.types.bulletproof: {
+              return `+${Math.round(
+                100 * e.effect
+              )}% earth golem bullet reflect`;
+            }
+            case h.types.harpySpeed: {
+              return `+${e.effect} harpy speed`;
+            }
+            case h.types.harpyBombs: {
+              return `+${e.effect} harpy bombs`;
+            }
+            case h.types.tankBuster: {
+              return "Anti tank harpies";
+            }
+            case h.types.spikeDelay: {
+              return "-20% spike delay";
+            }
+          }
+          return "";
+        };
+
+        this.currentRank = function (e) {
+          return this.sidePanels.factory
+            ? factory.currentRank(e)
+            : h.currentRank(e);
+        };
+
+        this.currentRankConstruction = (e) => h.currentRankConstruction(e);
+
+        this.upgradeTooExpensive = function (e) {
+          return this.sidePanels.factory
+            ? !factory.canAffordGenerator(e)
+            : !h.canAffordUpgrade(e) ||
+                (e.cap != 0 && h.currentRank(e) >= e.cap);
+        };
+
+        this.requiredForUpgrade = function (e) {
+          const t = this.upgradePrice(e);
+          switch (e.costType) {
+            case h.costs.energy: {
+              return `${formatWhole(t - this.model.energy)} energy required`;
+            }
+            case h.costs.blood:
+            case factory.costs.blood: {
+              return `${formatWhole(
+                t - this.model.persistentData.blood
+              )} blood required`;
+            }
+            case h.costs.brains: {
+              return `${formatWhole(
+                t - this.model.persistentData.brains
+              )} brains required`;
+            }
+            case h.costs.bones: {
+              return `${formatWhole(
+                t - this.model.persistentData.bones
+              )} bones required`;
+            }
+            case h.costs.prestigePoints: {
+              return `${formatWhole(
+                t - this.model.persistentData.prestigePointsToSpend
+              )} prestige points required`;
+            }
+            case factory.costs.parts: {
+              return `${formatWhole(
+                t - this.model.persistentData.parts
+              )} parts required`;
+            }
+          }
+        };
+
+        this.purchaseText = function (e) {
+          if (this.keysPressed.shift) {
+            if (this.sidePanels.factory) {
+              const maxAffordableUpgrades = factory.upgradeMaxAffordable(e);
+              return `Purchase ${maxAffordableUpgrades} (${formatWhole(
+                factory.upgradeMaxPrice(e, maxAffordableUpgrades)
+              )} ${this.costTranslate(e.costType)})`;
+            }
+            {
+              const maxAffordableUpgrades = h.upgradeMaxAffordable(e);
+              return `Purchase ${maxAffordableUpgrades} (${formatWhole(
+                h.upgradeMaxPrice(e, maxAffordableUpgrades)
+              )} ${this.costTranslate(e.costType)})`;
+            }
+          }
+          return `Purchase (${formatWhole(
+            this.upgradePrice(e)
+          )} ${this.costTranslate(e.costType)})`;
+        };
+
+        this.costTranslate = (e) =>
+          e == h.costs.prestigePoints ? "points" : e;
+
+        this.buyUpgrade = function (e) {
+          if (this.keysPressed.shift) {
+            h.purchaseMaxUpgrades(e);
+          } else {
+            h.purchaseUpgrade(e);
+          }
+        };
+
+        this.destroyUpgrade = (e) => {
+          h.removeUpgrade(e);
+        };
+
+        this.upgradeStatInfo = (e) => h.displayStatValue(e);
+
+        this.startGame = function () {
+          this.model.startGame();
+        };
+
+        this.nextLevel = function () {
+          this.model.nextLevel();
+        };
+
+        this.toggleAutoStart = function () {
+          if (this.model.persistentData.autoStart) {
+            this.model.persistentData.autoStart = false;
+          } else {
+            this.model.persistentData.autoStart = true;
+          }
+        };
+
+        this.toggleAutoStartWait = function () {
+          if (this.model.persistentData.autoStartWait) {
+            this.model.persistentData.autoStartWait = false;
+          } else {
+            this.model.persistentData.autoStartWait = true;
+          }
+        };
+
+        this.toggleAutoSellGear = function () {
+          if (this.model.persistentData.autoSellGear) {
+            this.model.persistentData.autoSellGear = false;
+          } else {
+            this.model.persistentData.autoSellGear = true;
+          }
+        };
+
+        this.toggleAutoSellGearLegendary = function () {
+          if (this.model.persistentData.autoSellGearLegendary) {
+            this.model.persistentData.autoSellGearLegendary = false;
+          } else {
+            this.model.persistentData.autoSellGearLegendary = true;
+          }
+        };
+
+        this.toggleResolution = function (e) {
+          this.model.persistentData.resolution = e;
+          this.model.setResolution(this.model.persistentData.resolution);
+        };
+
+        this.getResolution = function () {
+          return this.model.persistentData.resolution || 1;
+        };
+
+        this.toggleZoomButtons = function () {
+          this.model.persistentData.zoomButtons =
+            !this.model.persistentData.zoomButtons;
+        };
+
+        this.zoom = function (e) {
+          this.model.zoom(e);
+        };
+
+        this.resetZoom = function () {
+          this.model.centerGameContainer(true);
+        };
+
+        this.toggleShowFps = function () {
+          this.model.persistentData.showfps =
+            !this.model.persistentData.showfps;
+        };
+
+        this.toggleParticles = function () {
+          this.model.persistentData.particles =
+            !this.model.persistentData.particles;
+        };
+
+        this.isShowPrestige = function () {
+          return (
+            this.model.persistentData.prestigePointsEarned !== undefined &&
+            this.model.persistentData.allTimeHighestLevel > 5
+          );
+        };
+
+        this.doPrestige = function () {
+          this.confirmMessage = "Are you sure you want to prestige now?";
+
+          this.confirmCallback = function () {
+            this.model.prestige();
+            this.confirmCallback = false;
+          };
+        };
+
+        this.constructionLeadsTo = (e) => h.constructionLeadsTo(e);
+
+        this.howToPlay = [
+          "This started as Chalice's Mod, expanded by CirusDane (called Danemancer), for incremancer - We hope you enjoy the qol changes!",
+          "Energy refills over time. You need 10 energy to spawn a zombie by clicking on the ground.",
+          "Hold shift or control to spawn multiple zombies with a single click.",
+          "Whenever one of your zombies attacks a human you will collect some blood.",
+          "Killing a human or turning them into a zombie will earn you 1 brain.",
+          "You can spend these currencies in the shop to purchase upgrades for your zombie horde.",
+          "Hold shift to buy the maximum affordable number of upgrades.",
+          "The world can be dragged with the mouse to explore it. Or by using the WASD or arrow keys.",
+          "You can zoom in and out using your mouse wheel. Pinch to zoom on mobile.",
+        ];
+
+        this.updateMessages = function (e) {
+          if (this.message) {
+            this.messageTimer -= e;
+
+            if (this.model.messageQueue.length > 0) {
+              this.messageTimer -= e;
+            }
+
+            if (this.messageTimer < 0) {
+              (this.message = false), (this.messageTimer = 4);
+            }
+          } else if (this.model.messageQueue.length > 0) {
+            this.message = this.model.messageQueue.shift();
+            this.messageTimer = 4;
+          }
+        };
+
+        this.infusionAmount = 1000 /* 1e3 */;
+        this.infusionMax = false;
+
+        this.infuseRune = function (e, t) {
+          if (this.infusionMax) {
+            switch (t) {
+              case "blood": {
+                h.infuseRune(e, t, this.model.persistentData.blood);
+                break;
+              }
+              case "brains": {
+                h.infuseRune(e, t, this.model.persistentData.brains);
+                break;
+              }
+              case "bones": {
+                h.infuseRune(e, t, this.model.persistentData.bones);
+              }
+            }
+          } else {
+            h.infuseRune(e, t, this.infusionAmount);
+          }
+        };
+
+        this.shatterPercent = (e) => h.shatterPercent(e);
+
+        this.shatterBloodCost = (e) => h.shatterBloodCost(e);
+
+        this.shatterSatiate = function (e, t) {
+          h.infuseRune(e, "blood", this.shatterBloodCost(t));
+        };
+
+        this.canShatter = () => h.canShatter();
+
+        this.doShatter = () => {
+          h.doShatter();
+        };
+
+        this.shatterEffect = () => 100 * h.shatterEffect();
+
+        this.infuseButtonText = function () {
+          return this.infusionMax ? "Max" : formatWhole(this.infusionAmount);
+        };
+
+        this.energyPercent = function () {
+          return Math.min(
+            Math.round((this.model.energy / this.model.energyMax) * 100),
+            100
+          );
+        };
+
+        this.bloodPercent = function () {
+          return Math.min(
+            Math.round(
+              (this.model.persistentData.blood / this.model.bloodMax) * 100
+            ),
+            100
+          );
+        };
+
+        this.brainsPercent = function () {
+          return Math.min(
+            Math.round(
+              (this.model.persistentData.brains / this.model.brainsMax) * 100
+            ),
+            100
+          );
+        };
+
+        this.costAboveCap = function (e, t) {
+          switch (e.costType) {
+            case "blood": {
+              if (t > this.model.bloodMax) {
+                return "Blood capacity too low";
+              }
+              break;
+            }
+            case "brains": {
+              if (t > this.model.brainsMax) {
+                return "Brains capacity too low";
+              }
+            }
+          }
+          return false;
+        };
+
+        this.upgradeButtonText = function (e) {
+          if (e.cap != 0 && this.currentRank(e) >= e.cap) {
+            return "Sold Out";
+          }
+          const t = this.upgradePrice(e);
+          if (this.upgradeTooExpensive(e)) {
+            return this.costAboveCap(e, t) || this.requiredForUpgrade(e);
+          }
+          return this.purchaseText(e, t);
+        };
+
+        this.upgradePercent = function (e) {
+          switch (e.costType) {
+            case "blood": {
+              return Math.round(
+                100 *
+                  Math.min(
+                    1,
+                    this.model.persistentData.blood / this.upgradePrice(e)
+                  )
+              );
+            }
+            case "brains": {
+              return Math.round(
+                100 *
+                  Math.min(
+                    1,
+                    this.model.persistentData.brains / this.upgradePrice(e)
+                  )
+              );
+            }
+            case "bones": {
+              return Math.round(
+                100 *
+                  Math.min(
+                    1,
+                    this.model.persistentData.bones / this.upgradePrice(e)
+                  )
+              );
+            }
+            case "parts": {
+              return Math.round(
+                100 *
+                  Math.min(
+                    1,
+                    this.model.persistentData.parts / this.upgradePrice(e)
+                  )
+              );
+            }
+            case "prestigePoints": {
+              return Math.round(
+                100 *
+                  Math.min(
+                    1,
+                    this.model.persistentData.prestigePointsToSpend /
+                      this.upgradePrice(e)
+                  )
+              );
+            }
+          }
+        };
+
+        this.skeletonTimer = () => i.skeletonTimer();
+
+        this.skeletonMenu = {
+          isShown: false,
+          isNewGearSetShown: false,
+          showFilters: false,
+          tab: "inventory",
+          newGearSetName: "New Set",
+          maxGearSet: 5,
+          itemsFilters: { se: [], r: [], t: [] },
+          changeTab(e) {
+            this.tab = e;
+          },
+          equipped: [],
+          show() {
+            this.tab = "inventory";
+
+            this.upgrade = h.prestigeUpgrades.filter((e) => e.id == 115)[0];
+
+            this.upgrades = Mt;
+            this.isShown = !this.isShown;
+
+            if (this.isShown) {
+              this.updateEquippedItems();
+            }
+          },
+          showNewGearSet() {
+            this.newGearSetName = "New Set";
+            this.isNewGearSetShown = !this.isNewGearSetShown;
+            Y.canType = this.isNewGearSetShown;
+          },
+          selectGearSet(index) {
+            i.persistent.gearSetEquipped = index;
+
+            if (i.persistent.gearSetEquipped == -1) {
+              return;
+            }
+
+            i.persistent.gearSets[i.persistent.gearSetEquipped].slots.forEach(
+              (t) => {
+                i.persistent.items.filter(
+                  (e) => e.s == t.s && (e.q = t.id == e.id)
                 );
               }
-              return 0;
-            }),
-            (this.updateConstructionUpgrades = function () {
-              1 == this.sidePanels.construction &&
-                (this.upgrades = h.getAvailableConstructions());
-            }),
-            (this.startConstruction = function (e) {
-              h.startConstruction(e),
-                (this.upgrades = h.getAvailableConstructions());
-            }),
-            (this.playPauseConstruction = function () {
-              h.playPauseConstruction();
-            }),
-            (this.cancelConstruction = function () {
-              (this.confirmMessage =
-                "Are you sure you want to cancel construction? Used materials will not be refunded"),
-                (this.confirmCallback = function () {
-                  h.cancelConstruction(),
-                    (this.upgrades = h.getAvailableConstructions()),
-                    (this.confirmCallback = false);
-                });
-            }),
-            (this.upgradeSubtitle = function (e) {
-              switch (e.type) {
-                case h.types.energyRate:
-                  return "+" + e.effect + " energy per second";
-                case h.types.energyCap:
-                  return "+" + e.effect + " max energy";
-                case h.types.bloodCap:
-                  return "+" + formatWhole(e.effect) + " max blood";
-                case h.types.bloodStoragePC:
-                  return "+" + Math.round(100 * e.effect) + "% max blood";
-                case h.types.bloodGainPC:
-                  return "+" + Math.round(100 * e.effect) + "% blood income";
-                case h.types.brainsGainPC:
-                  return "+" + Math.round(100 * e.effect) + "% brains income";
-                case h.types.bonesGainPC:
-                  return "+" + Math.round(100 * e.effect) + "% bones income";
-                case h.types.partsGainPC:
-                  return "+" + Math.round(100 * e.effect) + "% parts income";
-                case h.types.brainsStoragePC:
-                  return "+" + Math.round(100 * e.effect) + "% max brains";
-                case h.types.energyCost:
-                  return "-" + e.effect + " zombie energy cost";
-                case h.types.brainsCap:
-                  return "+" + e.effect + " max brains";
-                case h.types.damage:
-                  return "+" + e.effect + " zombie damage";
-                case h.types.speed:
-                  return "+" + e.effect + " zombie speed";
-                case h.types.health:
-                  return "+" + e.effect + " zombie health";
-                case h.types.brainRecoverChance:
-                  return (
-                    "+" +
-                    Math.round(100 * e.effect) +
-                    "% chance to recover brain"
-                  );
-                case h.types.riseFromTheDeadChance:
-                  return (
-                    "+" +
-                    Math.round(100 * e.effect) +
-                    "% chance for corpse to become zombie"
-                  );
-                case h.types.infectedBite:
-                  return (
-                    "+" +
-                    Math.round(100 * e.effect) +
-                    "% chance for zombies to infect their targets"
-                  );
-                case h.types.infectedBlast:
-                  return (
-                    "+" +
-                    Math.round(100 * e.effect) +
-                    "% chance for zombies to explode on death"
-                  );
-                case h.types.boneCollectorCapacity:
-                  return "+" + e.effect + " bone collector capacity";
-                case h.types.zombieDmgPC:
-                  return (
-                    "+" +
-                    formatWhole(Math.round(100 * e.effect)) +
-                    "% zombie damage"
-                  );
-                case h.types.zombieHealthPC:
-                  return (
-                    "+" +
-                    formatWhole(Math.round(100 * e.effect)) +
-                    "% zombie health"
-                  );
-                case h.types.bonesRate:
-                  return "+" + e.effect + " bones per second";
-                case h.types.brainsRate:
-                  return "+" + e.effect + " brains per second";
-                case h.types.plagueDamage:
-                  return "+" + formatWhole(e.effect) + " plague damage";
-                case h.types.plagueTicks:
-                  return "+" + formatWhole(e.effect) + " plague ticks";
-                case h.types.spitDistance:
-                  return "+" + e.effect + " spit distance";
-                case h.types.blastHealing:
-                  return "+" + Math.round(100 * e.effect) + "% plague healing";
-                case h.types.plagueArmor:
-                  return (
-                    "+" + Math.round(100 * e.effect) + "% damage reduction"
-                  );
-                case h.types.monsterLimit:
-                  return "+" + e.effect + " creature limit";
-                case h.types.runicSyphon:
-                  return "+" + Math.round(100 * e.effect) + "% runic syphon";
-                case h.types.gigazombies:
-                  return "Unlock more gigazombies";
-                case h.types.bulletproof:
-                  return (
-                    "+" +
-                    Math.round(100 * e.effect) +
-                    "% earth golem bullet reflect"
-                  );
-                case h.types.harpySpeed:
-                  return "+" + e.effect + " harpy speed";
-                case h.types.harpyBombs:
-                  return "+" + e.effect + " harpy bombs";
-                case h.types.tankBuster:
-                  return "Anti tank harpies";
-                case h.types.spikeDelay:
-                  return "-20% spike delay";
-              }
-              return "";
-            }),
-            (this.currentRank = function (e) {
-              return this.sidePanels.factory
-                ? factory.currentRank(e)
-                : h.currentRank(e);
-            }),
-            (this.currentRankConstruction = function (e) {
-              return h.currentRankConstruction(e);
-            }),
-            (this.upgradeTooExpensive = function (e) {
-              return this.sidePanels.factory
-                ? !factory.canAffordGenerator(e)
-                : !h.canAffordUpgrade(e) ||
-                    (0 != e.cap && h.currentRank(e) >= e.cap);
-            }),
-            (this.requiredForUpgrade = function (e) {
-              const t = this.upgradePrice(e);
-              switch (e.costType) {
-                case h.costs.energy:
-                  return (
-                    formatWhole(t - this.model.energy) + " energy required"
-                  );
-                case h.costs.blood:
-                case factory.costs.blood:
-                  return (
-                    formatWhole(t - this.model.persistentData.blood) +
-                    " blood required"
-                  );
-                case h.costs.brains:
-                  return (
-                    formatWhole(t - this.model.persistentData.brains) +
-                    " brains required"
-                  );
-                case h.costs.bones:
-                  return (
-                    formatWhole(t - this.model.persistentData.bones) +
-                    " bones required"
-                  );
-                case h.costs.prestigePoints:
-                  return (
-                    formatWhole(
-                      t - this.model.persistentData.prestigePointsToSpend
-                    ) + " prestige points required"
-                  );
-                case factory.costs.parts:
-                  return (
-                    formatWhole(t - this.model.persistentData.parts) +
-                    " parts required"
-                  );
-              }
-            }),
-            (this.purchaseText = function (e) {
-              if (this.keysPressed.shift) {
-                if (this.sidePanels.factory) {
-                  const maxAffordableUpgrades = factory.upgradeMaxAffordable(e);
-                  return (
-                    "Purchase " +
-                    maxAffordableUpgrades +
-                    " (" +
-                    formatWhole(
-                      factory.upgradeMaxPrice(e, maxAffordableUpgrades)
-                    ) +
-                    " " +
-                    this.costTranslate(e.costType) +
-                    ")"
-                  );
-                }
+            );
+
+            h.applyUpgrades();
+            this.updateEquippedItems();
+          },
+          canCreateGearSets() {
+            return i.persistent.gearSets.length < this.maxGearSet;
+          },
+          canDeleteGearSets: () =>
+            i.persistent.gearSets.length > 0 &&
+            i.persistent.gearSetEquipped != -1,
+          gearSets: () => i.persistent.gearSets,
+          gearSetEquipped: () => i.persistent.gearSetEquipped,
+          createGearSet() {
+            if (this.newGearSetName == null) {
+              return;
+            }
+            let name = this.newGearSetName.replace(/[^\w^\S]*$/gi, "");
+            if (name.length == 0) {
+              return;
+            }
+            let newGearSet = { name, slots: [] };
+            const e = i.persistent.items.filter(
+              (e) => e.q && e.s == i.lootPositions.helmet.id
+            );
+
+            if (e.length > 0) {
+              newGearSet.slots.push({ s: e[0].s, id: e[0].id });
+            } else {
+              newGearSet.slots.push([
                 {
-                  const maxAffordableUpgrades = h.upgradeMaxAffordable(e);
-                  return (
-                    "Purchase " +
-                    maxAffordableUpgrades +
-                    " (" +
-                    formatWhole(h.upgradeMaxPrice(e, maxAffordableUpgrades)) +
-                    " " +
-                    this.costTranslate(e.costType) +
-                    ")"
-                  );
-                }
-              }
-              return (
-                "Purchase (" +
-                formatWhole(this.upgradePrice(e)) +
-                " " +
-                this.costTranslate(e.costType) +
-                ")"
-              );
-            }),
-            (this.costTranslate = function (e) {
-              return e == h.costs.prestigePoints ? "points" : e;
-            }),
-            (this.buyUpgrade = function (e) {
-              this.keysPressed.shift
-                ? h.purchaseMaxUpgrades(e)
-                : h.purchaseUpgrade(e);
-            }),
-            (this.destroyUpgrade = function (e) {
-              h.removeUpgrade(e);
-            }),
-            (this.upgradeStatInfo = function (e) {
-              return h.displayStatValue(e);
-            }),
-            (this.startGame = function () {
-              this.model.startGame();
-            }),
-            (this.nextLevel = function () {
-              this.model.nextLevel();
-            }),
-            (this.toggleAutoStart = function () {
-              this.model.persistentData.autoStart
-                ? (this.model.persistentData.autoStart = false)
-                : (this.model.persistentData.autoStart = true);
-            }),
-            (this.toggleAutoStartWait = function () {
-              this.model.persistentData.autoStartWait
-                ? (this.model.persistentData.autoStartWait = false)
-                : (this.model.persistentData.autoStartWait = true);
-            }),
-            (this.toggleAutoSellGear = function () {
-              this.model.persistentData.autoSellGear
-                ? (this.model.persistentData.autoSellGear = false)
-                : (this.model.persistentData.autoSellGear = true);
-            }),
-            (this.toggleAutoSellGearLegendary = function () {
-              this.model.persistentData.autoSellGearLegendary
-                ? (this.model.persistentData.autoSellGearLegendary = false)
-                : (this.model.persistentData.autoSellGearLegendary = true);
-            }),
-            (this.toggleResolution = function (e) {
-              (this.model.persistentData.resolution = e),
-                this.model.setResolution(this.model.persistentData.resolution);
-            }),
-            (this.getResolution = function () {
-              return this.model.persistentData.resolution || 1;
-            }),
-            (this.toggleZoomButtons = function () {
-              this.model.persistentData.zoomButtons =
-                !this.model.persistentData.zoomButtons;
-            }),
-            (this.zoom = function (e) {
-              this.model.zoom(e);
-            }),
-            (this.resetZoom = function () {
-              this.model.centerGameContainer(true);
-            }),
-            (this.toggleShowFps = function () {
-              this.model.persistentData.showfps =
-                !this.model.persistentData.showfps;
-            }),
-            (this.toggleParticles = function () {
-              this.model.persistentData.particles =
-                !this.model.persistentData.particles;
-            }),
-            (this.isShowPrestige = function () {
-              return (
-                void 0 !== this.model.persistentData.prestigePointsEarned &&
-                this.model.persistentData.allTimeHighestLevel > 5
-              );
-            }),
-            (this.doPrestige = function () {
-              (this.confirmMessage = "Are you sure you want to prestige now?"),
-                (this.confirmCallback = function () {
-                  this.model.prestige(), (this.confirmCallback = false);
-                });
-            }),
-            (this.constructionLeadsTo = function (e) {
-              return h.constructionLeadsTo(e);
-            }),
-            (this.howToPlay = [
-              "This started as Chalice's Mod, expanded by CirusDane (called Danemancer), for incremancer - We hope you enjoy the qol changes!",
-              "Energy refills over time. You need 10 energy to spawn a zombie by clicking on the ground.",
-              "Hold shift or control to spawn multiple zombies with a single click.",
-              "Whenever one of your zombies attacks a human you will collect some blood.",
-              "Killing a human or turning them into a zombie will earn you 1 brain.",
-              "You can spend these currencies in the shop to purchase upgrades for your zombie horde.",
-              "Hold shift to buy the maximum affordable number of upgrades.",
-              "The world can be dragged with the mouse to explore it. Or by using the WASD or arrow keys.",
-              "You can zoom in and out using your mouse wheel. Pinch to zoom on mobile.",
-            ]),
-            (this.updateMessages = function (e) {
-              this.message
-                ? ((this.messageTimer -= e),
-                  this.model.messageQueue.length > 0 &&
-                    (this.messageTimer -= e),
-                  this.messageTimer < 0 &&
-                    ((this.message = false), (this.messageTimer = 4)))
-                : this.model.messageQueue.length > 0 &&
-                  ((this.message = this.model.messageQueue.shift()),
-                  (this.messageTimer = 4));
-            }),
-            (this.infusionAmount = 1e3),
-            (this.infusionMax = false),
-            (this.infuseRune = function (e, t) {
-              if (this.infusionMax)
-                switch (t) {
-                  case "blood":
-                    h.infuseRune(e, t, this.model.persistentData.blood);
-                    break;
-                  case "brains":
-                    h.infuseRune(e, t, this.model.persistentData.brains);
-                    break;
-                  case "bones":
-                    h.infuseRune(e, t, this.model.persistentData.bones);
-                }
-              else h.infuseRune(e, t, this.infusionAmount);
-            }),
-            (this.shatterPercent = function (e) {
-              return h.shatterPercent(e);
-            }),
-            (this.shatterBloodCost = function (e) {
-              return h.shatterBloodCost(e);
-            }),
-            (this.shatterSatiate = function (e, t) {
-              h.infuseRune(e, "blood", this.shatterBloodCost(t));
-            }),
-            (this.canShatter = function () {
-              return h.canShatter();
-            }),
-            (this.doShatter = function () {
-              h.doShatter();
-            }),
-            (this.shatterEffect = function () {
-              return 100 * h.shatterEffect();
-            }),
-            (this.infuseButtonText = function () {
-              return this.infusionMax
-                ? "Max"
-                : formatWhole(this.infusionAmount);
-            }),
-            (this.energyPercent = function () {
-              return Math.min(
-                Math.round((this.model.energy / this.model.energyMax) * 100),
-                100
-              );
-            }),
-            (this.bloodPercent = function () {
-              return Math.min(
-                Math.round(
-                  (this.model.persistentData.blood / this.model.bloodMax) * 100
-                ),
-                100
-              );
-            }),
-            (this.brainsPercent = function () {
-              return Math.min(
-                Math.round(
-                  (this.model.persistentData.brains / this.model.brainsMax) *
-                    100
-                ),
-                100
-              );
-            }),
-            (this.costAboveCap = function (e, t) {
-              switch (e.costType) {
-                case "blood":
-                  if (t > this.model.bloodMax) return "Blood capacity too low";
-                  break;
-                case "brains":
-                  if (t > this.model.brainsMax)
-                    return "Brains capacity too low";
-              }
-              return false;
-            }),
-            (this.upgradeButtonText = function (e) {
-              if (0 != e.cap && this.currentRank(e) >= e.cap) return "Sold Out";
-              const t = this.upgradePrice(e);
-              if (this.upgradeTooExpensive(e)) {
-                return this.costAboveCap(e, t) || this.requiredForUpgrade(e);
-              }
-              return this.purchaseText(e, t);
-            }),
-            (this.upgradePercent = function (e) {
-              switch (e.costType) {
-                case "blood":
-                  return Math.round(
-                    100 *
-                      Math.min(
-                        1,
-                        this.model.persistentData.blood / this.upgradePrice(e)
-                      )
-                  );
-                case "brains":
-                  return Math.round(
-                    100 *
-                      Math.min(
-                        1,
-                        this.model.persistentData.brains / this.upgradePrice(e)
-                      )
-                  );
-                case "bones":
-                  return Math.round(
-                    100 *
-                      Math.min(
-                        1,
-                        this.model.persistentData.bones / this.upgradePrice(e)
-                      )
-                  );
-                case "parts":
-                  return Math.round(
-                    100 *
-                      Math.min(
-                        1,
-                        this.model.persistentData.parts / this.upgradePrice(e)
-                      )
-                  );
-                case "prestigePoints":
-                  return Math.round(
-                    100 *
-                      Math.min(
-                        1,
-                        this.model.persistentData.prestigePointsToSpend /
-                          this.upgradePrice(e)
-                      )
-                  );
-              }
-            }),
-            (this.skeletonTimer = function () {
-              return i.skeletonTimer();
-            }),
-            (this.skeletonMenu = {
-              isShown: false,
-              isNewGearSetShown: false,
-              showFilters: false,
-              tab: "inventory",
-              newGearSetName: "New Set",
-              maxGearSet: 5,
-              itemsFilters: { se: [], r: [], t: [] },
-              changeTab(e) {
-                this.tab = e;
-              },
-              equipped: [],
-              show() {
-                (this.tab = "inventory"),
-                  (this.upgrade = h.prestigeUpgrades.filter(
-                    (e) => 115 == e.id
-                  )[0]),
-                  (this.upgrades = Mt),
-                  (this.isShown = !this.isShown),
-                  this.isShown && this.updateEquippedItems();
-              },
-              showNewGearSet() {
-                (this.newGearSetName = "New Set"),
-                  (this.isNewGearSetShown = !this.isNewGearSetShown),
-                  (Y.canType = this.isNewGearSetShown);
-              },
-              selectGearSet(index) {
-                i.persistent.gearSetEquipped = index;
+                  s: i.lootPositions.helmet.id,
+                  id: -1,
+                },
+              ]);
+            }
 
-                if (i.persistent.gearSetEquipped == -1) return;
+            const s = i.persistent.items.filter(
+              (e) => e.q && e.s == i.lootPositions.sword.id
+            );
 
-                i.persistent.gearSets[
-                  i.persistent.gearSetEquipped
-                ].slots.forEach((t) => {
-                  i.persistent.items.filter(
-                    (e) => e.s == t.s && (e.q = t.id == e.id)
-                  );
-                }),
-                  h.applyUpgrades(),
-                  this.updateEquippedItems();
-              },
-              canCreateGearSets() {
-                return i.persistent.gearSets.length < this.maxGearSet;
-              },
-              canDeleteGearSets: () =>
-                i.persistent.gearSets.length > 0 &&
-                i.persistent.gearSetEquipped != -1,
-              gearSets: () => i.persistent.gearSets,
-              gearSetEquipped: () => i.persistent.gearSetEquipped,
-              createGearSet() {
-                if (this.newGearSetName == null) return;
-                let name = this.newGearSetName.replace(/[^\w^\S]*$/gi, "");
-                if (name.length == 0) return;
-                let newGearSet = { name: name, slots: [] };
-                const e = i.persistent.items.filter(
-                  (e) => e.q && e.s == i.lootPositions.helmet.id
-                );
-                e.length > 0
-                  ? newGearSet.slots.push({ s: e[0].s, id: e[0].id })
-                  : newGearSet.slots.push([
-                      {
-                        s: i.lootPositions.helmet.id,
-                        id: -1,
-                      },
-                    ]);
-                const s = i.persistent.items.filter(
-                  (e) => e.q && e.s == i.lootPositions.sword.id
-                );
-                s.length > 0
-                  ? newGearSet.slots.push({ s: s[0].s, id: s[0].id })
-                  : newGearSet.slots.push({
-                      s: i.lootPositions.sword.id,
-                      id: -2,
-                    });
-                const a = i.persistent.items.filter(
-                  (e) => e.q && e.s == i.lootPositions.chest.id
-                );
-                a.length > 0
-                  ? newGearSet.slots.push({ s: a[0].s, id: a[0].id })
-                  : newGearSet.slots.push({
-                      s: i.lootPositions.chest.id,
-                      id: -3,
-                    });
-                const r = i.persistent.items.filter(
-                  (e) => e.q && e.s == i.lootPositions.shield.id
-                );
-                r.length > 0
-                  ? newGearSet.slots.push({ s: r[0].s, id: r[0].id })
-                  : newGearSet.slots.push({
-                      s: i.lootPositions.shield.id,
-                      id: -4,
-                    });
-                const o = i.persistent.items.filter(
-                  (e) => e.q && e.s == i.lootPositions.gloves.id
-                );
-                o.length > 0
-                  ? newGearSet.slots.push({ s: o[0].s, id: o[0].id })
-                  : newGearSet.slots.push({
-                      s: i.lootPositions.gloves.id,
-                      id: -5,
-                    });
-                const h = i.persistent.items.filter(
-                  (e) => e.q && e.s == i.lootPositions.legs.id
-                );
-                h.length > 0
-                  ? newGearSet.slots.push({ s: h[0].s, id: h[0].id })
-                  : newGearSet.slots.push({
-                      s: i.lootPositions.legs.id,
-                      id: -6,
-                    });
-                const l = i.persistent.items.filter(
-                  (e) => e.q && e.s == i.lootPositions.boots.id
-                );
-                l.length > 0
-                  ? newGearSet.slots.push({ s: l[0].s, id: l[0].id })
-                  : newGearSet.slots.push({
-                      s: i.lootPositions.boots.id,
-                      id: -7,
-                    });
-                i.persistent.gearSets.push(newGearSet),
-                  this.selectGearSet(i.persistent.gearSets.length - 1),
-                  this.showNewGearSet();
-              },
-              deleteGearSet() {
-                i.persistent.gearSets.splice(i.persistent.gearSetEquipped, 1);
-                i.persistent.gearSets.length > 0
-                  ? this.selectGearSet(0)
-                  : this.selectGearSet(-1);
-              },
-              filterItemsBySpecialEffect(i) {
-                this.itemsFilters.se.includes(i)
-                  ? this.itemsFilters.se.splice(
-                      this.itemsFilters.se.indexOf(i),
-                      1
-                    )
-                  : this.itemsFilters.se.push(i);
-              },
-              filterItemsByRarity(i) {
-                this.itemsFilters.r.includes(i)
-                  ? this.itemsFilters.r.splice(
-                      this.itemsFilters.r.indexOf(i),
-                      1
-                    )
-                  : this.itemsFilters.r.push(i);
-              },
-              filterItemsByType(i) {
-                this.itemsFilters.t.includes(i)
-                  ? this.itemsFilters.t.splice(
-                      this.itemsFilters.t.indexOf(i),
-                      1
-                    )
-                  : this.itemsFilters.t.push(i);
-              },
-              isFiltered(i) {
-                return (
-                  (this.itemsFilters.se.length > 0
-                    ? i.se.length > 0
-                      ? this.itemsFilters.se.includes(i.se[0])
-                      : false
-                    : true) &&
-                  (this.itemsFilters.r.length > 0
-                    ? this.itemsFilters.r.includes(i.r)
-                    : true) &&
-                  (this.itemsFilters.t.length > 0
-                    ? this.itemsFilters.t.includes(i.s)
-                    : true)
-                );
-              },
-              resetFilter() {
-                (this.itemsFilters.se = []),
-                  (this.itemsFilters.r = []),
-                  (this.itemsFilters.t = []);
-              },
-              acceptOffer() {
-                i.acceptOffer(), (this.isShown = false);
-              },
-              anotherOffer: () =>
-                i.persistent.skeletons > 0 &&
-                this.model.persistentData.trophies.length >=
-                  (i.persistent.xpRate < 4
+            if (s.length > 0) {
+              newGearSet.slots.push({ s: s[0].s, id: s[0].id });
+            } else {
+              newGearSet.slots.push({
+                s: i.lootPositions.sword.id,
+                id: -2,
+              });
+            }
+
+            const a = i.persistent.items.filter(
+              (e) => e.q && e.s == i.lootPositions.chest.id
+            );
+
+            if (a.length > 0) {
+              newGearSet.slots.push({ s: a[0].s, id: a[0].id });
+            } else {
+              newGearSet.slots.push({
+                s: i.lootPositions.chest.id,
+                id: -3,
+              });
+            }
+
+            const r = i.persistent.items.filter(
+              (e) => e.q && e.s == i.lootPositions.shield.id
+            );
+
+            if (r.length > 0) {
+              newGearSet.slots.push({ s: r[0].s, id: r[0].id });
+            } else {
+              newGearSet.slots.push({
+                s: i.lootPositions.shield.id,
+                id: -4,
+              });
+            }
+
+            const o = i.persistent.items.filter(
+              (e) => e.q && e.s == i.lootPositions.gloves.id
+            );
+
+            if (o.length > 0) {
+              newGearSet.slots.push({ s: o[0].s, id: o[0].id });
+            } else {
+              newGearSet.slots.push({
+                s: i.lootPositions.gloves.id,
+                id: -5,
+              });
+            }
+
+            const h = i.persistent.items.filter(
+              (e) => e.q && e.s == i.lootPositions.legs.id
+            );
+
+            if (h.length > 0) {
+              newGearSet.slots.push({ s: h[0].s, id: h[0].id });
+            } else {
+              newGearSet.slots.push({
+                s: i.lootPositions.legs.id,
+                id: -6,
+              });
+            }
+
+            const l = i.persistent.items.filter(
+              (e) => e.q && e.s == i.lootPositions.boots.id
+            );
+
+            if (l.length > 0) {
+              newGearSet.slots.push({ s: l[0].s, id: l[0].id });
+            } else {
+              newGearSet.slots.push({
+                s: i.lootPositions.boots.id,
+                id: -7,
+              });
+            }
+
+            i.persistent.gearSets.push(newGearSet);
+            this.selectGearSet(i.persistent.gearSets.length - 1);
+            this.showNewGearSet();
+          },
+          deleteGearSet() {
+            i.persistent.gearSets.splice(i.persistent.gearSetEquipped, 1);
+
+            if (i.persistent.gearSets.length > 0) {
+              this.selectGearSet(0);
+            } else {
+              this.selectGearSet(-1);
+            }
+          },
+          filterItemsBySpecialEffect(i) {
+            if (this.itemsFilters.se.includes(i)) {
+              this.itemsFilters.se.splice(this.itemsFilters.se.indexOf(i), 1);
+            } else {
+              this.itemsFilters.se.push(i);
+            }
+          },
+          filterItemsByRarity(i) {
+            if (this.itemsFilters.r.includes(i)) {
+              this.itemsFilters.r.splice(this.itemsFilters.r.indexOf(i), 1);
+            } else {
+              this.itemsFilters.r.push(i);
+            }
+          },
+          filterItemsByType(i) {
+            if (this.itemsFilters.t.includes(i)) {
+              this.itemsFilters.t.splice(this.itemsFilters.t.indexOf(i), 1);
+            } else {
+              this.itemsFilters.t.push(i);
+            }
+          },
+          isFiltered(i) {
+            return (
+              (this.itemsFilters.se.length > 0
+                ? i.se.length > 0
+                  ? this.itemsFilters.se.includes(i.se[0])
+                  : false
+                : true) &&
+              (this.itemsFilters.r.length > 0
+                ? this.itemsFilters.r.includes(i.r)
+                : true) &&
+              (this.itemsFilters.t.length > 0
+                ? this.itemsFilters.t.includes(i.s)
+                : true)
+            );
+          },
+          resetFilter() {
+            this.itemsFilters.se = [];
+            this.itemsFilters.r = [];
+            this.itemsFilters.t = [];
+          },
+          acceptOffer() {
+            i.acceptOffer();
+            this.isShown = false;
+          },
+          anotherOffer: () =>
+            i.persistent.skeletons > 0 &&
+            this.model.persistentData.trophies.length >=
+              (i.persistent.xpRate < 4
+                ? 20 * i.persistent.xpRate
+                : i.persistent.xpRate < 8
+                ? 70
+                : i.persistent.xpRate < 16
+                ? 110
+                : i.persistent.xpRate < 32
+                ? 160
+                : i.persistent.xpRate < 64
+                ? 220
+                : i.persistent.xpRate < 128
+                ? 290
+                : i.persistent.xpRate < 256
+                ? 370
+                : i.persistent.xpRate < 512
+                ? 460
+                : i.persistent.xpRate < 1024
+                ? 560
+                : i.persistent.xpRate < 2048
+                ? 670
+                : i.persistent.xpRate < 4096
+                ? 790
+                : 720 +
+                  (Math.log2(i.persistent.xpRate) - 7) *
+                    (Math.log2(i.persistent.xpRate) - 7) *
+                    10),
+          trophies: () =>
+            i.persistent.skeletons > 0
+              ? ` - ${this.model.persistentData.trophies.length} / ${
+                  i.persistent.xpRate < 4
                     ? 20 * i.persistent.xpRate
                     : i.persistent.xpRate < 8
                     ? 70
@@ -13345,465 +14819,526 @@ var Incremancer;
                     : 720 +
                       (Math.log2(i.persistent.xpRate) - 7) *
                         (Math.log2(i.persistent.xpRate) - 7) *
-                        10),
-              trophies: () =>
-                i.persistent.skeletons > 0
-                  ? ` - ${this.model.persistentData.trophies.length} / ${
-                      i.persistent.xpRate < 4
-                        ? 20 * i.persistent.xpRate
-                        : i.persistent.xpRate < 8
-                        ? 70
-                        : i.persistent.xpRate < 16
-                        ? 110
-                        : i.persistent.xpRate < 32
-                        ? 160
-                        : i.persistent.xpRate < 64
-                        ? 220
-                        : i.persistent.xpRate < 128
-                        ? 290
-                        : i.persistent.xpRate < 256
-                        ? 370
-                        : i.persistent.xpRate < 512
-                        ? 460
-                        : i.persistent.xpRate < 1024
-                        ? 560
-                        : i.persistent.xpRate < 2048
-                        ? 670
-                        : i.persistent.xpRate < 4096
-                        ? 790
-                        : 720 +
-                          (Math.log2(i.persistent.xpRate) - 7) *
-                            (Math.log2(i.persistent.xpRate) - 7) *
-                            10
-                    } Trophies`
-                  : "",
-              talentPoints: () => i.talentPoints,
-              talentsAssigned: () => i.getUsedPoints(),
-              talentValue: (e) => i.talents[e.id] + " / " + e.maxPoints,
-              talentSet(e, t) {
-                e.set(t), kt();
-              },
-              talentReset(e) {
-                e.reset(), kt();
-              },
-              canReset: () => i.persistent.talentReset,
-              talentsReset() {
-                wt(), kt();
-              },
-              talentMax(e) {
-                e.max(), kt();
-              },
-              xpPercent: () =>
-                Math.round(
-                  100 * Math.min(1, this.skeleton().xp / i.xpForNextLevel())
-                ),
-              xpForNextLevel: () => i.xpForNextLevel(),
-              xpRate: () => 100 * i.persistent.xpRate,
-              prestigePointsPerKill: () =>
-                1.00025 ** this.skeleton().level * this.skeleton().level,
-              isAlive: () => i.isAlive(),
-              timer: () => Math.ceil(i.skeletonTimer()),
-              updateEquippedItems() {
-                this.equipped = [];
-                const e = i.persistent.items.filter(
-                  (e) => e.q && e.s == i.lootPositions.helmet.id
-                );
-                e.length > 0
-                  ? this.equipped.push([e[0]])
-                  : this.equipped.push([
-                      {
-                        name: "Helmet Slot",
-                        s: i.lootPositions.helmet.id,
-                        id: -1,
-                      },
-                    ]);
-                const t = [],
-                  s = i.persistent.items.filter(
-                    (e) => e.q && e.s == i.lootPositions.sword.id
-                  );
-                s.length > 0
-                  ? t.push(s[0])
-                  : t.push({
-                      name: "Sword Slot",
-                      s: i.lootPositions.sword.id,
-                      id: -2,
-                    });
-                const a = i.persistent.items.filter(
-                  (e) => e.q && e.s == i.lootPositions.chest.id
-                );
-                a.length > 0
-                  ? t.push(a[0])
-                  : t.push({
-                      name: "Chest Slot",
-                      s: i.lootPositions.chest.id,
-                      id: -3,
-                    });
-                const r = i.persistent.items.filter(
-                  (e) => e.q && e.s == i.lootPositions.shield.id
-                );
-                r.length > 0
-                  ? t.push(r[0])
-                  : t.push({
-                      name: "Shield Slot",
-                      s: i.lootPositions.shield.id,
-                      id: -4,
-                    }),
-                  this.equipped.push(t);
-                const n = [],
-                  o = i.persistent.items.filter(
-                    (e) => e.q && e.s == i.lootPositions.gloves.id
-                  );
-                o.length > 0
-                  ? n.push(o[0])
-                  : n.push({
-                      name: "Gloves Slot",
-                      s: i.lootPositions.gloves.id,
-                      id: -5,
-                    });
-                const h = i.persistent.items.filter(
-                  (e) => e.q && e.s == i.lootPositions.legs.id
-                );
-                h.length > 0
-                  ? n.push(h[0])
-                  : n.push({
-                      name: "Legs Slot",
-                      s: i.lootPositions.legs.id,
-                      id: -6,
-                    });
-                const l = i.persistent.items.filter(
-                  (e) => e.q && e.s == i.lootPositions.boots.id
-                );
-                l.length > 0
-                  ? n.push(l[0])
-                  : n.push({
-                      name: "Boots Slot",
-                      s: i.lootPositions.boots.id,
-                      id: -7,
-                    }),
-                  this.equipped.push(n),
-                  this.equipped.push([
-                    {
-                      name: "Destroy Items",
-                      s: -1,
-                      id: -8,
-                    },
-                  ]);
-              },
-              inventoryItems: () =>
-                i.persistent.items
-                  .filter((e) => !e.q)
-                  .sort((e, t) => t.r * t.l - e.r * e.l),
-              itemName: (e) => e.name || i.getLootName(e),
-              itemSubName(e) {
-                if (!e.name)
-                  switch (e.r) {
-                    case i.rarity.common:
-                      return "Common level " + e.l + " " + this.itemType(e);
-                    case i.rarity.rare:
-                      return "Rare level " + e.l + " " + this.itemType(e);
-                    case i.rarity.epic:
-                      return "Epic level " + e.l + " " + this.itemType(e);
-                    case i.rarity.legendary:
-                      return "Legendary level " + e.l + " " + this.itemType(e);
-                    case i.rarity.ancient:
-                      return "Ancient level " + e.l + " " + this.itemType(e);
-                    case i.rarity.divine:
-                      return "Divine level " + e.l + " " + this.itemType(e);
-                    case i.rarity.chaos:
-                      return "Chaos level " + e.l + " " + this.itemType(e);
-                  }
-                if (-1 == e.s)
-                  return "Click this to destroy all non-equipped items (legendary items will not be automatically destroyed). Or drag items here to destroy them.";
-              },
-              itemStats: (e) => i.getLootStats(e),
-              itemEffects: (e) => i.getSpecialEffects(e),
-              itemEffectsNamesClass: (e) =>
-                i.getSpecialEffectsName(e).join(" ").toLowerCase(),
-              itemEffectsList: () => i.getSpecialEffectsList(),
-              itemEffectsListClass: (e) => e.replace(" ", "-").toLowerCase(),
-              itemRarityList: () => i.getRarityList(),
-              itemRarityClass: (e) => i.getLootClass({ r: e }),
-              itemTypeList: () => i.getTypeList(),
-              itemTypeClass(e) {
-                return this.itemType({ s: e });
-              },
-              itemRarityName(r) {
-                switch (r) {
-                  case i.rarity.common:
-                    return "Common";
-                  case i.rarity.rare:
-                    return "Rare";
-                  case i.rarity.epic:
-                    return "Epic";
-                  case i.rarity.legendary:
-                    return "Legendary";
-                  case i.rarity.ancient:
-                    return "Ancient";
-                  case i.rarity.divine:
-                    return "Divine";
-                  case i.rarity.chaos:
-                    return "Chaos";
-                }
-              },
-              itemType(e) {
-                switch (e.s) {
-                  case -1:
-                    return "trash";
-                  case i.lootPositions.helmet.id:
-                    return "helmet";
-                  case i.lootPositions.chest.id:
-                    return "chest";
-                  case i.lootPositions.gloves.id:
-                    return "gloves";
-                  case i.lootPositions.legs.id:
-                    return "legs";
-                  case i.lootPositions.boots.id:
-                    return "boots";
-                  case i.lootPositions.sword.id:
-                    return "sword";
-                  case i.lootPositions.shield.id:
-                    return "shield";
-                }
-              },
-              itemClass: (e) => (e.name ? "empty" : i.getLootClass(e)),
-              itemById(e) {
-                let t = null;
-                return (
-                  i.persistent.items.forEach(function (s) {
-                    s.id == e && (t = s);
-                  }),
-                  t
-                );
-              },
-              itemDropped(e, t) {
-                let s = null;
-                i.persistent.items.forEach(function (t) {
-                  t.id == e && (s = t);
-                }),
-                  -1 == t
-                    ? i.destroyItem(s)
-                    : (s.s == t &&
-                        (i.persistent.items.forEach(function (e) {
-                          e.s == t && (e.q = false);
-                        }),
-                        (s.q = true),
-                        h.applyUpgrades()),
-                      this.updateEquippedItems());
-                i.persistent.gearSetEquipped != -1 &&
-                  -1 != t &&
-                  i.persistent.gearSets[
-                    i.persistent.gearSetEquipped
-                  ].slots.forEach(function (t) {
-                    t.s == s.s && (t.id = s.id);
-                  });
-              },
-              equipItem(e) {
-                if (this.isShown && Y.shift) {
-                  this.itemDropped(e.id, -1);
-                  return;
-                }
-                i.persistent.items.forEach(function (t) {
-                  t.s == e.s && (t.q = false);
-                }),
-                  (e.q = true),
-                  h.applyUpgrades(),
-                  this.updateEquippedItems();
-                i.persistent.gearSetEquipped != -1 &&
-                  i.persistent.gearSets[
-                    i.persistent.gearSetEquipped
-                  ].slots.forEach(function (t) {
-                    t.s == e.s && (t.id = e.id);
-                  });
-              },
-              trashAll() {
-                (this.confirmMessage =
-                  "Are you sure you want to destroy all non-equipped items? You will earn " +
-                  formatWhole(i.xpTotal()) +
-                  " xp"),
-                  (this.confirmCallback = function () {
-                    (this.confirmCallback = false), i.destroyAllItems();
-                  });
-              },
-            }),
-            s.ready(function () {
-              (e.updatePromise = t(u, 200)), (h.angularModel = this), kt();
-            });
-        },
-      ])
-      .directive("levelSelect", function () {
-        return {
-          templateUrl: "./templates/levelselect.html",
-        };
-      })
-      .directive("levelStats", function () {
-        return {
-          templateUrl: "./templates/levelstats.html",
-        };
-      })
-      .directive("graveyardMenu", function () {
-        return {
-          templateUrl: "./templates/graveyardmenu.html",
-        };
-      })
-      .directive("runesmithMenu", function () {
-        return {
-          templateUrl: "./templates/runesmithmenu.html",
-        };
-      })
-      .directive("optionsMenu", function () {
-        return {
-          templateUrl: "./templates/optionsmenu.html",
-        };
-      })
-      .directive("shopMenu", function () {
-        return {
-          templateUrl: "./templates/shopmenu.html",
-        };
-      })
-      .directive("constructionMenu", function () {
-        return {
-          templateUrl: "./templates/constructionmenu.html",
-        };
-      })
-      .directive("prestigeMenu", function () {
-        return {
-          templateUrl: "./templates/prestigemenu.html",
-        };
-      })
-      .directive("championsHoldMenu", function () {
-        return {
-          templateUrl: "./templates/championshold.html",
-        };
-      })
-      .directive("factoryMenu", function () {
-        return {
-          templateUrl: "./templates/factorymenu.html",
-        };
-      })
-      .directive("customOnChange", function () {
-        return {
-          restrict: "A",
-          link: function (e, t, s) {
-            const i = e.$eval(s.customOnChange);
-            t.on("change", i),
-              t.on("$destroy", function () {
-                t.off();
+                        10
+                } Trophies`
+              : "",
+          talentPoints: () => i.talentPoints,
+          talentsAssigned: () => i.getUsedPoints(),
+          talentValue: (e) => `${i.talents[e.id]} / ${e.maxPoints}`,
+          talentSet(e, t) {
+            e.set(t);
+            kt();
+          },
+          talentReset(e) {
+            e.reset();
+            kt();
+          },
+          canReset: () => i.persistent.talentReset,
+          talentsReset() {
+            wt();
+            kt();
+          },
+          talentMax(e) {
+            e.max();
+            kt();
+          },
+          xpPercent: () =>
+            Math.round(
+              100 * Math.min(1, this.skeleton().xp / i.xpForNextLevel())
+            ),
+          xpForNextLevel: () => i.xpForNextLevel(),
+          xpRate: () => 100 * i.persistent.xpRate,
+          prestigePointsPerKill: () =>
+            1.00025 ** this.skeleton().level * this.skeleton().level,
+          isAlive: () => i.isAlive(),
+          timer: () => Math.ceil(i.skeletonTimer()),
+          updateEquippedItems() {
+            this.equipped = [];
+            const e = i.persistent.items.filter(
+              (e) => e.q && e.s == i.lootPositions.helmet.id
+            );
+
+            if (e.length > 0) {
+              this.equipped.push([e[0]]);
+            } else {
+              this.equipped.push([
+                {
+                  name: "Helmet Slot",
+                  s: i.lootPositions.helmet.id,
+                  id: -1,
+                },
+              ]);
+            }
+
+            const t = [];
+
+            const s = i.persistent.items.filter(
+              (e) => e.q && e.s == i.lootPositions.sword.id
+            );
+
+            if (s.length > 0) {
+              t.push(s[0]);
+            } else {
+              t.push({
+                name: "Sword Slot",
+                s: i.lootPositions.sword.id,
+                id: -2,
               });
+            }
+
+            const a = i.persistent.items.filter(
+              (e) => e.q && e.s == i.lootPositions.chest.id
+            );
+
+            if (a.length > 0) {
+              t.push(a[0]);
+            } else {
+              t.push({
+                name: "Chest Slot",
+                s: i.lootPositions.chest.id,
+                id: -3,
+              });
+            }
+
+            const r = i.persistent.items.filter(
+              (e) => e.q && e.s == i.lootPositions.shield.id
+            );
+
+            if (r.length > 0) {
+              t.push(r[0]);
+            } else {
+              t.push({
+                name: "Shield Slot",
+                s: i.lootPositions.shield.id,
+                id: -4,
+              });
+            }
+
+            this.equipped.push(t);
+            const n = [];
+
+            const o = i.persistent.items.filter(
+              (e) => e.q && e.s == i.lootPositions.gloves.id
+            );
+
+            if (o.length > 0) {
+              n.push(o[0]);
+            } else {
+              n.push({
+                name: "Gloves Slot",
+                s: i.lootPositions.gloves.id,
+                id: -5,
+              });
+            }
+
+            const h = i.persistent.items.filter(
+              (e) => e.q && e.s == i.lootPositions.legs.id
+            );
+
+            if (h.length > 0) {
+              n.push(h[0]);
+            } else {
+              n.push({
+                name: "Legs Slot",
+                s: i.lootPositions.legs.id,
+                id: -6,
+              });
+            }
+
+            const l = i.persistent.items.filter(
+              (e) => e.q && e.s == i.lootPositions.boots.id
+            );
+
+            if (l.length > 0) {
+              n.push(l[0]);
+            } else {
+              n.push({
+                name: "Boots Slot",
+                s: i.lootPositions.boots.id,
+                id: -7,
+              });
+            }
+
+            this.equipped.push(n);
+
+            this.equipped.push([
+              {
+                name: "Destroy Items",
+                s: -1,
+                id: -8,
+              },
+            ]);
+          },
+          inventoryItems: () =>
+            i.persistent.items
+              .filter((e) => !e.q)
+              .sort((e, t) => t.r * t.l - e.r * e.l),
+          itemName: (e) => e.name || i.getLootName(e),
+          itemSubName(e) {
+            if (!e.name) {
+              switch (e.r) {
+                case i.rarity.common: {
+                  return `Common level ${e.l} ${this.itemType(e)}`;
+                }
+                case i.rarity.rare: {
+                  return `Rare level ${e.l} ${this.itemType(e)}`;
+                }
+                case i.rarity.epic: {
+                  return `Epic level ${e.l} ${this.itemType(e)}`;
+                }
+                case i.rarity.legendary: {
+                  return `Legendary level ${e.l} ${this.itemType(e)}`;
+                }
+                case i.rarity.ancient: {
+                  return `Ancient level ${e.l} ${this.itemType(e)}`;
+                }
+                case i.rarity.divine: {
+                  return `Divine level ${e.l} ${this.itemType(e)}`;
+                }
+                case i.rarity.chaos: {
+                  return `Chaos level ${e.l} ${this.itemType(e)}`;
+                }
+              }
+            }
+            if (-1 == e.s) {
+              return "Click this to destroy all non-equipped items (legendary items will not be automatically destroyed). Or drag items here to destroy them.";
+            }
+          },
+          itemStats: (e) => i.getLootStats(e),
+          itemEffects: (e) => i.getSpecialEffects(e),
+          itemEffectsNamesClass: (e) =>
+            i.getSpecialEffectsName(e).join(" ").toLowerCase(),
+          itemEffectsList: () => i.getSpecialEffectsList(),
+          itemEffectsListClass: (e) => e.replace(" ", "-").toLowerCase(),
+          itemRarityList: () => i.getRarityList(),
+          itemRarityClass: (e) => i.getLootClass({ r: e }),
+          itemTypeList: () => i.getTypeList(),
+          itemTypeClass(e) {
+            return this.itemType({ s: e });
+          },
+          itemRarityName(r) {
+            switch (r) {
+              case i.rarity.common: {
+                return "Common";
+              }
+              case i.rarity.rare: {
+                return "Rare";
+              }
+              case i.rarity.epic: {
+                return "Epic";
+              }
+              case i.rarity.legendary: {
+                return "Legendary";
+              }
+              case i.rarity.ancient: {
+                return "Ancient";
+              }
+              case i.rarity.divine: {
+                return "Divine";
+              }
+              case i.rarity.chaos: {
+                return "Chaos";
+              }
+            }
+          },
+          itemType(e) {
+            switch (e.s) {
+              case -1: {
+                return "trash";
+              }
+              case i.lootPositions.helmet.id: {
+                return "helmet";
+              }
+              case i.lootPositions.chest.id: {
+                return "chest";
+              }
+              case i.lootPositions.gloves.id: {
+                return "gloves";
+              }
+              case i.lootPositions.legs.id: {
+                return "legs";
+              }
+              case i.lootPositions.boots.id: {
+                return "boots";
+              }
+              case i.lootPositions.sword.id: {
+                return "sword";
+              }
+              case i.lootPositions.shield.id: {
+                return "shield";
+              }
+            }
+          },
+          itemClass: (e) => (e.name ? "empty" : i.getLootClass(e)),
+          itemById(e) {
+            let t = null;
+
+            i.persistent.items.forEach((s) => {
+              if (s.id == e) {
+                t = s;
+              }
+            });
+
+            return t;
+          },
+          itemDropped(e, t) {
+            let s = null;
+
+            i.persistent.items.forEach((t) => {
+              if (t.id == e) {
+                s = t;
+              }
+            });
+
+            if (-1 == t) {
+              i.destroyItem(s);
+            } else {
+              if (s.s == t) {
+                i.persistent.items.forEach((e) => {
+                  if (e.s == t) {
+                    e.q = false;
+                  }
+                }),
+                  (s.q = true),
+                  h.applyUpgrades();
+              }
+
+              this.updateEquippedItems();
+            }
+
+            if (i.persistent.gearSetEquipped != -1 && -1 != t) {
+              i.persistent.gearSets[i.persistent.gearSetEquipped].slots.forEach(
+                (t) => {
+                  if (t.s == s.s) {
+                    t.id = s.id;
+                  }
+                }
+              );
+            }
+          },
+          equipItem(e) {
+            if (this.isShown && Y.shift) {
+              this.itemDropped(e.id, -1);
+              return;
+            }
+
+            i.persistent.items.forEach((t) => {
+              if (t.s == e.s) {
+                t.q = false;
+              }
+            });
+
+            e.q = true;
+            h.applyUpgrades();
+            this.updateEquippedItems();
+
+            if (i.persistent.gearSetEquipped != -1) {
+              i.persistent.gearSets[i.persistent.gearSetEquipped].slots.forEach(
+                (t) => {
+                  if (t.s == e.s) {
+                    t.id = e.id;
+                  }
+                }
+              );
+            }
+          },
+          trashAll() {
+            this.confirmMessage = `Are you sure you want to destroy all non-equipped items? You will earn ${formatWhole(
+              i.xpTotal()
+            )} xp`;
+
+            this.confirmCallback = function () {
+              this.confirmCallback = false;
+              i.destroyAllItems();
+            };
           },
         };
-      })
-      .directive("draggableItem", [
-        "$rootScope",
-        function (e) {
-          return {
-            restrict: "A",
-            link: function (t, s, i, a) {
-              const r = t.item.id;
-              "true" == i.draggableItem &&
-                (angular.element(s).attr("draggable", "true"),
-                s.bind("dragstart", function (t) {
-                  document
-                    .getElementById("champ-hold")
-                    .classList.toggle("no-tooltip"),
-                    t.dataTransfer.setData("text", r);
-                  const i = s[0].getBoundingClientRect();
-                  t.dataTransfer.setDragImage(s[0], i.width / 2, i.height / 2),
-                    e.$emit("item-drag-start", r),
-                    setTimeout(function () {
-                      angular.element(s)[0].style.opacity = "0.3";
-                    });
-                }),
-                s.bind("dragend", function (t) {
-                  document
-                    .getElementById("champ-hold")
-                    .classList.toggle("no-tooltip"),
-                    (angular.element(s)[0].style.opacity = ""),
-                    e.$emit("item-drag-end", r);
-                }));
-            },
-          };
+
+        s.ready(function () {
+          e.updatePromise = t(u, 200);
+          h.angularModel = this;
+          kt();
+        });
+      },
+    ])
+    .directive("levelSelect", () => ({
+      templateUrl: "./templates/levelselect.html",
+    }))
+    .directive("levelStats", () => ({
+      templateUrl: "./templates/levelstats.html",
+    }))
+    .directive("graveyardMenu", () => ({
+      templateUrl: "./templates/graveyardmenu.html",
+    }))
+    .directive("runesmithMenu", () => ({
+      templateUrl: "./templates/runesmithmenu.html",
+    }))
+    .directive("optionsMenu", () => ({
+      templateUrl: "./templates/optionsmenu.html",
+    }))
+    .directive("shopMenu", () => ({
+      templateUrl: "./templates/shopmenu.html",
+    }))
+    .directive("constructionMenu", () => ({
+      templateUrl: "./templates/constructionmenu.html",
+    }))
+    .directive("prestigeMenu", () => ({
+      templateUrl: "./templates/prestigemenu.html",
+    }))
+    .directive("championsHoldMenu", () => ({
+      templateUrl: "./templates/championshold.html",
+    }))
+    .directive("factoryMenu", () => ({
+      templateUrl: "./templates/factorymenu.html",
+    }))
+    .directive("customOnChange", () => ({
+      restrict: "A",
+
+      link(e, t, s) {
+        const i = e.$eval(s.customOnChange);
+        t.on("change", i);
+
+        t.on("$destroy", () => {
+          t.off();
+        });
+      },
+    }))
+    .directive("draggableItem", [
+      "$rootScope",
+      (e) => ({
+        restrict: "A",
+
+        link(t, s, i, a) {
+          const r = t.item.id;
+
+          if (i.draggableItem == "true") {
+            angular.element(s).attr("draggable", "true");
+
+            s.bind("dragstart", (t) => {
+              document
+                .getElementById("champ-hold")
+                .classList.toggle("no-tooltip");
+
+              t.dataTransfer.setData("text", r);
+              const i = s[0].getBoundingClientRect();
+              t.dataTransfer.setDragImage(s[0], i.width / 2, i.height / 2);
+              e.$emit("item-drag-start", r);
+
+              setTimeout(() => {
+                angular.element(s)[0].style.opacity = "0.3";
+              });
+            });
+
+            s.bind("dragend", (t) => {
+              document
+                .getElementById("champ-hold")
+                .classList.toggle("no-tooltip");
+
+              angular.element(s)[0].style.opacity = "";
+              e.$emit("item-drag-end", r);
+            });
+          }
         },
-      ])
-      .directive("shiftDeleteItem", [
-        "$rootScope",
-        function (e) {
-          return {
-            restrict: "A",
-            link: function (t, s, i, a) {
-              s.bind("mouseenter", function () {
-                Y.shift && s.addClass("shift-trash");
-              }),
-                s.bind("mouseleave", function () {
-                  s.removeClass("shift-trash");
-                });
-            },
-          };
+      }),
+    ])
+    .directive("shiftDeleteItem", [
+      "$rootScope",
+      (e) => ({
+        restrict: "A",
+
+        link(t, s, i, a) {
+          s.bind("mouseenter", () => {
+            if (Y.shift) {
+              s.addClass("shift-trash");
+            }
+          });
+
+          s.bind("mouseleave", () => {
+            s.removeClass("shift-trash");
+          });
         },
-      ])
-      .directive("droppableTarget", [
-        "$rootScope",
-        function (e) {
-          return {
-            restrict: "A",
-            link: function (t, s, i, a) {
-              const r = t.item.s;
-              s.bind("dragover", function (e) {
-                return (
-                  e.preventDefault && e.preventDefault(),
-                  (e.dataTransfer.dropEffect = "move"),
-                  false
-                );
-              }),
-                s.bind("dragenter", function (e) {
-                  e.target &&
-                    e.target.classList &&
-                    e.target.classList.contains("icon") &&
-                    angular.element(e.target.parentElement).addClass("over");
-                }),
-                s.bind("dragleave", function (e) {
-                  e.target &&
-                    e.target.classList &&
-                    e.target.classList.contains("icon") &&
-                    angular.element(e.target.parentElement).removeClass("over");
-                }),
-                s.bind("drop", function (e) {
-                  e.preventDefault && e.preventDefault(),
-                    e.stopPropagation && e.stopPropagation(),
-                    e.target.classList.contains("icon") &&
-                      angular
-                        .element(e.target.parentElement)
-                        .removeClass("over");
-                  const s = e.dataTransfer.getData("text"),
-                    i = t.zm.skeletonMenu.itemById(s);
-                  if (i) {
-                    const e = t.zm.skeletonMenu.itemType(i);
-                    document
-                      .getElementsByClassName("equipped")[0]
-                      .classList.remove(e);
-                  }
-                  t.zm.skeletonMenu.itemDropped(s, r);
-                }),
-                e.$on("item-drag-start", function (e, s) {
-                  const i = t.zm.skeletonMenu.itemById(s);
-                  if (i) {
-                    const e = t.zm.skeletonMenu.itemType(i);
-                    document
-                      .getElementsByClassName("equipped")[0]
-                      .classList.add(e);
-                  }
-                }),
-                e.$on("item-drag-end", function (e, s) {
-                  const i = t.zm.skeletonMenu.itemById(s);
-                  if (i) {
-                    const e = t.zm.skeletonMenu.itemType(i);
-                    document
-                      .getElementsByClassName("equipped")[0]
-                      .classList.remove(e);
-                  }
-                });
-            },
-          };
+      }),
+    ])
+    .directive("droppableTarget", [
+      "$rootScope",
+      (e) => ({
+        restrict: "A",
+
+        link(t, s, i, a) {
+          const r = t.item.s;
+
+          s.bind("dragover", (e) => {
+            if (e.preventDefault) {
+              e.preventDefault();
+            }
+
+            e.dataTransfer.dropEffect = "move";
+            return false;
+          });
+
+          s.bind("dragenter", (e) => {
+            if (
+              e.target &&
+              e.target.classList &&
+              e.target.classList.contains("icon")
+            ) {
+              angular.element(e.target.parentElement).addClass("over");
+            }
+          });
+
+          s.bind("dragleave", (e) => {
+            if (
+              e.target &&
+              e.target.classList &&
+              e.target.classList.contains("icon")
+            ) {
+              angular.element(e.target.parentElement).removeClass("over");
+            }
+          });
+
+          s.bind("drop", (e) => {
+            if (e.preventDefault) {
+              e.preventDefault();
+            }
+
+            if (e.stopPropagation) {
+              e.stopPropagation();
+            }
+
+            if (e.target.classList.contains("icon")) {
+              angular.element(e.target.parentElement).removeClass("over");
+            }
+
+            const s = e.dataTransfer.getData("text");
+            const i = t.zm.skeletonMenu.itemById(s);
+            if (i) {
+              const e = t.zm.skeletonMenu.itemType(i);
+              document
+                .getElementsByClassName("equipped")[0]
+                .classList.remove(e);
+            }
+            t.zm.skeletonMenu.itemDropped(s, r);
+          });
+
+          e.$on("item-drag-start", (e, s) => {
+            const i = t.zm.skeletonMenu.itemById(s);
+            if (i) {
+              const e = t.zm.skeletonMenu.itemType(i);
+              document.getElementsByClassName("equipped")[0].classList.add(e);
+            }
+          });
+
+          e.$on("item-drag-end", (e, s) => {
+            const i = t.zm.skeletonMenu.itemById(s);
+            if (i) {
+              const e = t.zm.skeletonMenu.itemType(i);
+              document
+                .getElementsByClassName("equipped")[0]
+                .classList.remove(e);
+            }
+          });
         },
-      ]),
-    (Incremancer = e);
+      }),
+    ]);
+  Incremancer = e;
 })();
