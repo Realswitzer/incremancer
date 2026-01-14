@@ -1,4 +1,5 @@
-import * as PIXI from "pixi.js-legacy";
+import * as PIXI from "pixi.js";
+window.PIXI = PIXI
 import LZString from "lz-string";
 import angular from "angular";
 import { kongregateAPI, PlayFab, PlayFabClientSDK } from "./lib/shim"; // until full removal of kong dependency
@@ -15363,7 +15364,3 @@ window.onresize = () => {
     ]);
   Incremancer = e;
 })();
-
-angular.element(document).ready(() => {
-  angular.bootstrap(document, ['incremancer']);
-});
