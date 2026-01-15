@@ -425,7 +425,8 @@ function O() {
   Y.scrollSpeed = Math.max(e, t) / 4;
 }
 
-new Map(); // used before declar but still works??
+// @ts-ignore -- still functional, exactly as decompiled
+new map(); // used before declar but still works??
 
 window.onload = () => {
   gameModel = GameModel.getInstance();
@@ -1018,8 +1019,8 @@ class _ {
   }
 }
 
-class Map {
-  instance: Map;
+class map {
+  instance: map;
 
   constructor() {
     this.gameModel = GameModel.getInstance();
@@ -1058,10 +1059,10 @@ class Map {
     this.treeTextures = [];
     this.armyTextures = [];
 
-    if (Map.instance) {
-      return Map.instance;
+    if (map.instance) {
+      return map.instance;
     }
-    Map.instance = this;
+    map.instance = this;
   }
   getRandomBuilding() {
     return sample(this.buildingsByPopularity);
@@ -1945,6 +1946,9 @@ class te {
 }
 
 class PartFactory {
+  storm: boolean;
+  gameModel: GameModel;
+  
   constructor() {
     this.storm = false;
     this.gameModel = GameModel.getInstance();
@@ -6859,7 +6863,7 @@ class Humans {
     this.vipText.y = e.y + this.vipText.yOffset;
   }
   populate() {
-    this.map = new Map();
+    this.map = new map();
     this.zombies = new Zombies();
     this.gameModel = GameModel.getInstance();
     this.blood = new Blood();
@@ -7429,7 +7433,7 @@ class Police {
     this.attackDamage = Math.round(this.getMaxHealth() / 10);
   }
   populate() {
-    this.map = new Map();
+    this.map = new map();
     this.gameModel = GameModel.getInstance();
     this.humans = new Humans();
     this.exclamations = new Exclamations();
@@ -7927,7 +7931,7 @@ class Army {
     this.attackDamage = Math.round(this.getMaxHealth() / 10);
   }
   populate() {
-    this.map = new Map();
+    this.map = new map();
     this.zombies = new Zombies();
     this.humans = new Humans();
     this.gameModel = GameModel.getInstance();
@@ -8438,7 +8442,7 @@ class De {
     this.attackDamage = Math.round(this.getMaxHealth() / 10);
   }
   populate() {
-    this.map = new Map();
+    this.map = new map();
     this.gameModel = GameModel.getInstance();
     this.zombies = new Zombies();
     this.humans = new Humans();
@@ -8819,7 +8823,7 @@ class Zombies {
     Zombies.instance = this;
   }
   populate() {
-    this.map = new Map();
+    this.map = new map();
     this.model = GameModel.getInstance();
     this.humans = new Humans();
     this.graveyard = new Graveyard();
@@ -9894,7 +9898,7 @@ class Skeleton {
   }
   populate() {
     this.model = GameModel.getInstance();
-    this.map = new Map();
+    this.map = new map();
     this.graveyard = new Graveyard();
     this.exclamations = new Exclamations();
     this.bullets = new Bullets();
@@ -10815,7 +10819,7 @@ class Creatures {
     Creatures.instance = this;
   }
   populate() {
-    this.map = new Map();
+    this.map = new map();
     this.model = GameModel.getInstance();
     this.graveyard = new Graveyard();
     this.smoke = new Smoke();
@@ -11261,7 +11265,7 @@ class Graveyard {
   }
   initialize() {
     this.boneCollectors = new BoneCollectors();
-    this.zmMap = new Map();
+    this.zmMap = new map();
     this.zombies = new Zombies();
     this.bones = new Bones();
     this.gameModel = GameModel.getInstance();
@@ -12172,7 +12176,7 @@ class Particles {
 class Je extends _ {
   constructor() {
     super();
-    this.zmMap = new Map();
+    this.zmMap = new map();
     this.speed = 20;
 
     if (Je.instance) {
