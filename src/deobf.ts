@@ -657,6 +657,9 @@ class Spell {
   timer: number;
   onCooldown: boolean;
   active: boolean;
+  unlocked: boolean;
+  cooldownLeft: number;
+
 
   constructor(
     id: number,
@@ -685,6 +688,7 @@ class Spell {
   }
 }
 class Spells {
+  static instance: Spells;
   cooldownReduction: number;
   timeExtension: number;
   costReduction: number;
@@ -904,6 +908,11 @@ class Spells {
   }
 }
 class V extends PIXI.TilingSprite {
+  collisionX : number;
+    collisionY : number;
+    collisionWidth : number;
+    collisionHeight : number;
+
   constructor(e) {
     super(e);
     this.collisionX = 0;
@@ -913,23 +922,38 @@ class V extends PIXI.TilingSprite {
   }
 }
 
-class j {
-  constructor(e, t, s, i, a) {
+class Building {
+  id: number;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  entrance: null; /* TODO: redefined later probably, havent looked into exec chain */
+
+  constructor(id: number, x: number, y: number, width: number, height: number) {
     this.id = 0;
     this.x = 0;
     this.y = 0;
     this.width = 0;
     this.height = 0;
     this.entrance = null;
-    this.id = e;
-    this.x = t;
-    this.y = s;
-    this.width = i;
-    this.height = a;
+    this.id = id;
+    this.x = x;
+    this.y = y;
+    this.width = width;
+    this.height = height;
   }
 }
 
-class $ {
+class Timer {
+  attack: number;
+  scan: number;
+  smoke: number;
+  burnTick: number;
+  ability: number;
+  dogStun: number;
+  target: number;
+
   constructor() {
     this.attack = 0;
     this.scan = 0;
@@ -941,7 +965,12 @@ class $ {
   }
 }
 
-class K {
+class Flags {
+  burning: boolean;
+  infected: boolean;
+  dead: boolean;
+  golem: boolean;
+
   constructor() {
     this.burning = false;
     this.infected = false;
@@ -951,6 +980,17 @@ class K {
 }
 
 class Q extends PIXI.AnimatedSprite {
+  xSpeed: number;
+  ySpeed: number;
+  health: number;
+  maxHealth: number;
+  zombie: boolean;
+  targetVector: {x: number, y: number}
+  burnDamage: number;
+  hasIcon: boolean;
+  flags: Flags
+  timer: Timer
+  currentPoi: null;
   constructor(e) {
     super(e);
     this.xSpeed = 0;
@@ -966,8 +1006,8 @@ class Q extends PIXI.AnimatedSprite {
 
     this.burnDamage = 0;
     this.hasIcon = false;
-    this.flags = new K();
-    this.timer = new $();
+    this.flags = new Flags();
+    this.timer = new Timer();
   }
   reset() {
     this.xSpeed = 0;
@@ -1020,7 +1060,29 @@ class _ {
 }
 
 class map {
-  instance: map;
+  static instance: map;
+  gameModel: GameModel
+  humans: Humans
+  discardedWalls: any[] /* TODO: Fix typing */
+  discardedContainers: any[] /* TODO: Fix typing */
+  discardedFloorSprites: any[] /* TODO: Fix typing */
+  buildings: any[] /* TODO: Fix typing */
+  buildingsByPopularity: any[] /* TODO: Fix typing */
+  buildingMap: any[] /* TODO: Fix typing */
+  roadSprite: null; roadTexture: null; entranceWidth: number; entranceDepth: number;
+  cornerDistance: number; minBuildings: number; wallWidth: number;
+  graveyardCollision: null;
+  graveYardLocation: {x: number, y: number}
+  graveYardPosition: null;
+  wallCollisionBuffer: number;
+  fastDistance: Function;
+  pathFindStepSize: number;
+  dx: number; dy: number; stepsToTake: number; hasHit: boolean;
+  vector: null; corner: null; hitbuilding: boolean; insideBuilding: boolean;
+  treeSprites: any[] /* TODO: Fix typing */
+  treeTextures: any[] /* TODO: Fix typing */
+  armyTextures: any[] /* TODO: Fix typing */
+
 
   constructor() {
     this.gameModel = GameModel.getInstance();
@@ -1430,14 +1492,14 @@ class map {
       }
 
       if (o) {
-        const t = new j(e++, n.x, n.y, r, r);
-        this.addBuilding(t);
+        const building = new Building(e++, n.x, n.y, r, r);
+        this.addBuilding(building);
         const s = Math.max(Math.round(r / 10), 1);
         for (let e = 0; e < s; e++) {
-          this.buildingsByPopularity.push(t);
+          this.buildingsByPopularity.push(building);
         }
-        this.buildings.push(t);
-        this.addCorners(t);
+        this.buildings.push(building);
+        this.addCorners(building);
       }
     }
 
@@ -1937,6 +1999,11 @@ class map {
   }
 }
 class te {
+  x: boolean;
+  y: boolean;
+  validX: number;
+  validY: number;
+
   constructor() {
     this.x = false;
     this.y = false;
@@ -6594,7 +6661,7 @@ class fe extends PIXI.Text {
   }
 }
 
-class ye extends $ {
+class ye extends Timer {
   constructor(...args) {
     super(...args);
     this.flee = 0;
@@ -6605,7 +6672,7 @@ class ye extends $ {
   }
 }
 
-class xe extends K {
+class xe extends Flags {
   constructor(...args) {
     super(...args);
     this.dog = false;
@@ -6632,6 +6699,42 @@ class ve extends Q {
 }
 
 class Humans {
+  instance: Humans
+
+    maxWalkSpeed : number;
+    maxRunSpeed : number;
+    minSecondsTostand : number;
+    maxSecondsToStand : number;
+    chanceToStayInCurrentBuilding : number;
+    // textures : [];
+    // doctorTextures : [];
+    // humans : [];
+    // discardedHumans : [];
+    // aliveHumans : [];
+    // graveyardAttackers : [];
+    humansPerLevel : number;
+    maxHumans : number;
+    scaling : number;
+    visionDistance : number;
+    vipEscaping : boolean;
+    fleeChancePerZombie : number;
+    fleeTime : number;
+    scanTime : number;
+    attackDistance : number;
+    moveTargetDistance : number;
+    attackSpeed : number;
+    attackDamage : number;
+    fadeSpeed : number;
+    plagueTickTimer : number;
+    healTickTimer : number;
+    burnTickTimer : number;
+    smokeTimer : number;
+    fastDistance : function;
+    frozen : boolean;
+    pandemic : boolean;
+    // graveYardPosition : null;
+    drawTargets : boolean;
+
   constructor() {
     this.maxWalkSpeed = 15;
     this.maxRunSpeed = 35;
@@ -8760,7 +8863,7 @@ function He(e, t, s) {
   }
 }
 
-class Fe extends K {
+class Fe extends Flags {
   constructor(...args) {
     super(...args);
     this.dog = false;
@@ -8779,6 +8882,42 @@ class Ee extends Pe {
 }
 
 class Zombies {
+  instance: Zombies;
+    // zombies : [];
+    // discardedZombies : [];
+    // aliveZombies : [];
+    // aliveHumans : [];
+    // zombiePartition : [];
+    scaling : number;
+    moveTargetDistance : number;
+    attackDistance : number;
+    attackSpeed : number;
+    targetDistance : number;
+    fadeSpeed : number;
+    refundChance : number;
+    currId : number;
+    scanTime : number;
+    // textures : [];
+    // dogTexture : [];
+    // deadDogTexture : [];
+    maxSpeed : number;
+    // zombieCursor : null;
+    // zombieCursorText : null;
+    zombieCursorScale : number;
+    mouseOutOfBounds : boolean;
+    burnTickTimer : number;
+    bloodpact : number;
+    bloodborn : number;
+    gigamutagen : number;
+    gigamutationTimer : number;
+    smokeTimer : number;
+    fastDistance : function;
+    magnitude : function;
+    detonate : boolean;
+    super : boolean;
+    reactionTime : number;
+    // graveyardAttackers : [];
+    spaceNeeded : number;
   constructor() {
     this.zombies = [];
     this.discardedZombies = [];
@@ -9987,7 +10126,7 @@ class Skeleton {
     e.textureSet = this.textures;
     e.deadTexture = this.textures.dead;
     e.currentDirection = this.directions.down;
-    e.flags = new K();
+    e.flags = new Flags();
     e.burnDamage = 0;
     e.lastKnownBuilding = false;
     e.alpha = 1;
@@ -10907,7 +11046,7 @@ class Creatures {
       }
     }
 
-    n.flags = new K();
+    n.flags = new Flags();
     n.flags.golem = true;
     n.burnDamage = 0;
     n.level = a;
