@@ -538,9 +538,7 @@ window.onload = () => {
   })();
 
   if (window.self !== window.top) {
-    if (
-      document.referrer != "" && !document.referrer.includes("gti.nz")
-    ) {
+    if (document.referrer != "" && !document.referrer.includes("gti.nz")) {
       window.location.href = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
     }
   }
@@ -646,7 +644,6 @@ class Spell {
   active: boolean;
   unlocked: boolean;
   cooldownLeft: number;
-
 
   constructor(
     id: number,
@@ -895,10 +892,10 @@ class Spells {
   }
 }
 class V extends PIXI.TilingSprite {
-  collisionX : number;
-    collisionY : number;
-    collisionWidth : number;
-    collisionHeight : number;
+  collisionX: number;
+  collisionY: number;
+  collisionWidth: number;
+  collisionHeight: number;
 
   constructor(e) {
     super(e);
@@ -972,11 +969,11 @@ class Q extends PIXI.AnimatedSprite {
   health: number;
   maxHealth: number;
   zombie: boolean;
-  targetVector: {x: number, y: number}
+  targetVector: { x: number; y: number };
   burnDamage: number;
   hasIcon: boolean;
-  flags: Flags
-  timer: Timer
+  flags: Flags;
+  timer: Timer;
   currentPoi: null;
   constructor(e) {
     super(e);
@@ -1021,6 +1018,13 @@ class J extends PIXI.Sprite {
 }
 
 class _ {
+  sprites: any[]; // TODO: Fix typing
+  discardedSprites: any[]; // TODO: Fix typing
+  container: any; // TODO: Fix typing
+  texture: any; // TODO: Fix typing
+
+  create!: (texture: any) => any;
+
   constructor() {
     this.sprites = [];
     this.discardedSprites = [];
@@ -1048,28 +1052,39 @@ class _ {
 
 class map {
   static instance: map;
-  gameModel: GameModel
-  humans: Humans
-  discardedWalls: any[] /* TODO: Fix typing */
-  discardedContainers: any[] /* TODO: Fix typing */
-  discardedFloorSprites: any[] /* TODO: Fix typing */
-  buildings: any[] /* TODO: Fix typing */
-  buildingsByPopularity: any[] /* TODO: Fix typing */
-  buildingMap: any[] /* TODO: Fix typing */
-  roadSprite: null; roadTexture: null; entranceWidth: number; entranceDepth: number;
-  cornerDistance: number; minBuildings: number; wallWidth: number;
+  gameModel: GameModel;
+  humans: Humans;
+  discardedWalls: any[]; /* TODO: Fix typing */
+  discardedContainers: any[]; /* TODO: Fix typing */
+  discardedFloorSprites: any[]; /* TODO: Fix typing */
+  buildings: any[]; /* TODO: Fix typing */
+  buildingsByPopularity: any[]; /* TODO: Fix typing */
+  buildingMap: any[]; /* TODO: Fix typing */
+  roadSprite: null|PIXI.TilingSprite;
+  roadTexture: null;
+  entranceWidth: number;
+  entranceDepth: number;
+  cornerDistance: number;
+  minBuildings: number;
+  wallWidth: number;
   graveyardCollision: null;
-  graveYardLocation: {x: number, y: number}
-  graveYardPosition: null;
+  graveYardLocation: { x: number; y: number };
+  graveYardPosition: null | {x: number, y: number, height: number, width: number};
   wallCollisionBuffer: number;
   fastDistance: Function;
   pathFindStepSize: number;
-  dx: number; dy: number; stepsToTake: number; hasHit: boolean;
-  vector: null; corner: null; hitbuilding: boolean; insideBuilding: boolean;
-  treeSprites: any[] /* TODO: Fix typing */
-  treeTextures: any[] /* TODO: Fix typing */
-  armyTextures: any[] /* TODO: Fix typing */
-
+  dx: number;
+  dy: number;
+  stepsToTake: number;
+  hasHit: boolean;
+  vector: null| {x:number,y:number,distance:number};
+  corner: null;
+  hitbuilding: boolean;
+  insideBuilding: boolean;
+  treeSprites: any[]; /* TODO: Fix typing */
+  treeTextures: any[]; /* TODO: Fix typing */
+  armyTextures: any[]; /* TODO: Fix typing */
+  buildingTextures: any[]; /* TODO: Fix typing */
 
   constructor() {
     this.gameModel = GameModel.getInstance();
@@ -2002,7 +2017,7 @@ class te {
 class PartFactory {
   storm: boolean;
   gameModel: GameModel;
-  
+
   constructor() {
     this.storm = false;
     this.gameModel = GameModel.getInstance();
@@ -2536,10 +2551,185 @@ class Golem {
 }
 
 class GameModel {
+  static instance: GameModel;
+
+  storageName: string;
+  hidden: boolean;
+  autoShatter: boolean;
+  energy: number;
+  energyMax: number;
+  energyRate: number;
+  brainsRate: number;
+  bonesRate: number;
+  endLevelBones: number;
+  energySpellMultiplier: number;
+  prestigePointsEarned: number;
+  zombieCost: number;
+  bonesPCMod: number;
+  partsPCMod: number;
+  bloodMax: number;
+  bloodPCMod: number;
+  bloodStorePCMod: number;
+  brainsMax: number;
+  brainsPCMod: number;
+  brainsStorePCMod: number;
+  zombieHealth: number;
+  zombieHealthPCMod: number;
+  HshellHealthPCMod: number;
+  CyroVatPCMod: number;
+  PlagueVatPCMod: number;
+  CloningRep1PCMod: number;
+  BloodSynPCMod: number;
+  SynBonePCMod: number;
+  SmolPartsPCMod: number;
+  AvionicsPCMod: number;
+  ShockPCMod: number;
+  EnergyCostMod: number;
+  zombieDamage: number;
+  zombieDamagePCMod: number;
+  HstrengthDmgPCMod: number;
+  zombieSpeed: number;
+  zombieCages: number;
+  zombiesInCages: number;
+  golemDamagePCMod: number;
+  golemHealthPCMod: number;
+  plagueDamageMod: number;
+  plagueticks: number;
+  graveyardHealthMod: number;
+  burningSpeedMod: number;
+  startingResources: number;
+  blastHealing: number;
+  plagueDmgReduction: number;
+  brainRecoverChance: number;
+  riseFromTheDeadChance: number;
+  infectedBiteChance: number;
+  infectedBlastChance: number;
+  spitDistance: number;
+  spikeDelay: number;
+  startTimer: number;
+  fenceRadius: number;
+  constructions: any; // TODO: fix typing
+  construction: number;
+  boneCollectorCapacity: number;
+  frameRate: number;
+  humanCount: number;
+  zombieCount: number;
+  creatureCount: number;
+  creatureLimit: number;
+  harpySpeed: number;
+  tankBuster: boolean;
+  harpyBombs: number;
+  stats: null;
+  runicSyphon: {
+    percentage: number;
+    blood: number;
+    bones: number;
+    brains: number;
+  };
+  gigazombies: boolean;
+  endLevelTimer: number;
+  endLevelDelay: number;
+  messageQueue: any[]; //TODO: fix typing
+  offlineMessage: string;
+  runeEffects: {
+    attackSpeed: number;
+    critChance: number;
+    critDamage: number;
+    damageReduction: number;
+    healthRegen: number;
+    damageReflection: number;
+  };
+  encodedContent: string;
+  savefilename: string;
+  autoUpgrades: boolean;
+  autoconstruction: boolean;
+  autoconstructionUnlocked: boolean;
+  levelResourcesAdded: boolean;
+  bulletproofChance: number;
+  gameSpeed: number;
+  level: number;
+  currentState: string;
+  states: {
+    playingLevel: string;
+    levelCompleted: string;
+    startGame: string;
+    prestiged: string;
+    failed: string;
+  };
+  baseStats: {
+    energyRate: number;
+    brainsRate: number;
+    bonesRate: number;
+    energyMax: number;
+    bloodMax: number;
+    brainsMax: number;
+    zombieCost: number;
+    zombieHealth: number;
+    zombieDamage: number;
+    zombieSpeed: number;
+    level: number;
+    graveyard: number;
+    construction: number;
+    boneCollectorCapacity: number;
+  };
+  zoom: Function;
+  centerGameContainer: Function;
+  lastSave: number;
+  persistentData: {
+    saveCreated: number;
+    dateOfSave: number;
+    autoStart: boolean;
+    autoStartWait: boolean;
+    autoSellGear: boolean;
+    autoSellGearLegendary: boolean;
+    levelUnlocked: number;
+    allTimeHighestLevel: number;
+    blood: number;
+    brains: number;
+    bones: number;
+    parts: number;
+    bonesTotal: number;
+    upgrades: any[]; // TODO: fix typing
+    constructions: any[]; //TODO: fix typing
+    prestigePointsEarned: number;
+    prestigePointsToSpend: number;
+    boneCollectors: number;
+    graveyardZombies: number;
+    harpies: number;
+    resolution: number;
+    zoomButtons: boolean;
+    particles: boolean;
+    generators: any[]; // TODO: fix typing
+    currentConstruction: null;
+    creatureLevels: any[]; // TODO: fix typing
+    creatures: any[]; // TODO: fix typing
+    creatureAutobuild: any[]; // TODO: fix typing
+    savedCreatures: any[]; // TODO: fix typing
+    levelsCompleted: any[]; // TODO: fix typing
+    showfps: boolean;
+    runeshatter: number;
+    runes: {
+      life: {
+        blood: number;
+        brains: number;
+        bones: number;
+      };
+      death: {
+        blood: number;
+        brains: number;
+        bones: number;
+      };
+    };
+    trophies: number[];
+    vipEscaped: number[];
+    autoRelease: boolean;
+    autoMaxHarpies: boolean;
+    skeleton: null; // TODO: fix typing
+    skeletonTalents: any[]; // TODO: fix typing
+  };
+
   constructor() {
     this.storageName = "ZombieData";
-    this.playFabId = null;
-    this.titleId = "772D8";
     this.hidden = false;
     this.autoShatter = false;
     this.energy = 0;
@@ -2661,7 +2851,6 @@ class GameModel {
     this.zoom = zoom;
     this.centerGameContainer = centerGameContainer;
     this.lastSave = 0;
-    this.lastPlayFabSave = Date.now() - 15e3;
     this.persistentData = {
       saveCreated: Date.now(),
       dateOfSave: Date.now(),
@@ -2905,10 +3094,6 @@ class GameModel {
         this.lastSave = t;
       }
 
-      if (this.lastPlayFabSave + 1200000 /* 12e5 */ < t) {
-        this.saveToPlayFab();
-      }
-
       if (this.getHumanCount() <= 0) {
         if (this.endLevelTimer < 0) {
           if (
@@ -2936,7 +3121,6 @@ class GameModel {
             this.level > this.persistentData.allTimeHighestLevel
           ) {
             this.persistentData.allTimeHighestLevel = this.level;
-
           }
         } else {
           this.endLevelTimer -= e;
@@ -3337,10 +3521,9 @@ class GameModel {
 
   resetData() {
     try {
-      localStorage.removeItem(this.storageName),
-        localStorage.removeItem(this.skeleton.storageName),
-        localStorage.removeItem(this.skeleton.talentsStorageName),
-        this.saveToPlayFab(true);
+      localStorage.removeItem(this.storageName);
+      localStorage.removeItem(this.skeleton.storageName);
+      localStorage.removeItem(this.skeleton.talentsStorageName);
     } catch (e) {
       console.log(e);
     }
@@ -3467,7 +3650,6 @@ class GameModel {
 
           i.persistentData = t;
           i.updatePersistentData();
-          i.saveToPlayFab();
           i.level = i.persistentData.levelUnlocked;
           i.creatureFactory.spawnedSavedCreatures = false;
           i.setupLevel();
@@ -6257,23 +6439,35 @@ class ConstructionUpgrade {
   }
 }
 class Upgrade {
-  constructor(e, t, s, i, a, r, n, o, h, l, d) {
-    this.id = e;
-    this.name = t;
-    this.type = s;
-    this.costType = i;
-    this.basePrice = a;
-    this.multiplier = r;
-    this.effect = n;
-    this.cap = o;
-    this.description = h;
+  id: number
+   name: string
+    type: string
+     costType: string
+     basePrice: number
+      multiplier: number ;effect: number; cap: number; description: string; purchaseMessage: string; requires: number
+
+
+
+  constructor(id: number, name: string, type: string, costType: string, basePrice: number, multiplier: number, effect: number, cap: number, description: string, purchaseMessage: string, requires: number) {
+    this.id = id;
+    this.name = name;
+    this.type = type;
+    this.costType = costType;
+    this.basePrice = basePrice;
+    this.multiplier = multiplier;
+    this.effect = effect;
+    this.cap = cap;
+    this.description = description;
     this.rank = 1;
-    this.purchaseMessage = l;
-    this.requires = d;
+    this.purchaseMessage = purchaseMessage;
+    this.requires = requires;
   }
 }
 
 class Trophies {
+  gameModel: GameModel
+  upgrades: Upgrades
+
   constructor() {
     this.gameModel = GameModel.getInstance();
     this.upgrades = new Upgrades();
@@ -6384,8 +6578,6 @@ class Trophies {
       this.gameModel.persistentData.trophies.sort();
       this.gameModel.saveData();
       this.upgrades.applyUpgrades();
-
-      
 
       this.gameModel.sendMessage(
         "The VIP has been killed! - New Trophy Aquired"
@@ -6510,41 +6702,41 @@ class ve extends Q {
 }
 
 class Humans {
-  instance: Humans
+  instance: Humans;
 
-    maxWalkSpeed : number;
-    maxRunSpeed : number;
-    minSecondsTostand : number;
-    maxSecondsToStand : number;
-    chanceToStayInCurrentBuilding : number;
-    // textures : [];
-    // doctorTextures : [];
-    // humans : [];
-    // discardedHumans : [];
-    // aliveHumans : [];
-    // graveyardAttackers : [];
-    humansPerLevel : number;
-    maxHumans : number;
-    scaling : number;
-    visionDistance : number;
-    vipEscaping : boolean;
-    fleeChancePerZombie : number;
-    fleeTime : number;
-    scanTime : number;
-    attackDistance : number;
-    moveTargetDistance : number;
-    attackSpeed : number;
-    attackDamage : number;
-    fadeSpeed : number;
-    plagueTickTimer : number;
-    healTickTimer : number;
-    burnTickTimer : number;
-    smokeTimer : number;
-    fastDistance : function;
-    frozen : boolean;
-    pandemic : boolean;
-    // graveYardPosition : null;
-    drawTargets : boolean;
+  maxWalkSpeed: number;
+  maxRunSpeed: number;
+  minSecondsTostand: number;
+  maxSecondsToStand: number;
+  chanceToStayInCurrentBuilding: number;
+  // textures : [];
+  // doctorTextures : [];
+  // humans : [];
+  // discardedHumans : [];
+  // aliveHumans : [];
+  // graveyardAttackers : [];
+  humansPerLevel: number;
+  maxHumans: number;
+  scaling: number;
+  visionDistance: number;
+  vipEscaping: boolean;
+  fleeChancePerZombie: number;
+  fleeTime: number;
+  scanTime: number;
+  attackDistance: number;
+  moveTargetDistance: number;
+  attackSpeed: number;
+  attackDamage: number;
+  fadeSpeed: number;
+  plagueTickTimer: number;
+  healTickTimer: number;
+  burnTickTimer: number;
+  smokeTimer: number;
+  fastDistance: Function;
+  frozen: boolean;
+  pandemic: boolean;
+  // graveYardPosition : null;
+  drawTargets: boolean;
 
   constructor() {
     this.maxWalkSpeed = 15;
@@ -8694,41 +8886,41 @@ class Ee extends Pe {
 
 class Zombies {
   instance: Zombies;
-    // zombies : [];
-    // discardedZombies : [];
-    // aliveZombies : [];
-    // aliveHumans : [];
-    // zombiePartition : [];
-    scaling : number;
-    moveTargetDistance : number;
-    attackDistance : number;
-    attackSpeed : number;
-    targetDistance : number;
-    fadeSpeed : number;
-    refundChance : number;
-    currId : number;
-    scanTime : number;
-    // textures : [];
-    // dogTexture : [];
-    // deadDogTexture : [];
-    maxSpeed : number;
-    // zombieCursor : null;
-    // zombieCursorText : null;
-    zombieCursorScale : number;
-    mouseOutOfBounds : boolean;
-    burnTickTimer : number;
-    bloodpact : number;
-    bloodborn : number;
-    gigamutagen : number;
-    gigamutationTimer : number;
-    smokeTimer : number;
-    fastDistance : function;
-    magnitude : function;
-    detonate : boolean;
-    super : boolean;
-    reactionTime : number;
-    // graveyardAttackers : [];
-    spaceNeeded : number;
+  // zombies : [];
+  // discardedZombies : [];
+  // aliveZombies : [];
+  // aliveHumans : [];
+  // zombiePartition : [];
+  scaling: number;
+  moveTargetDistance: number;
+  attackDistance: number;
+  attackSpeed: number;
+  targetDistance: number;
+  fadeSpeed: number;
+  refundChance: number;
+  currId: number;
+  scanTime: number;
+  // textures : [];
+  // dogTexture : [];
+  // deadDogTexture : [];
+  maxSpeed: number;
+  // zombieCursor : null;
+  // zombieCursorText : null;
+  zombieCursorScale: number;
+  mouseOutOfBounds: boolean;
+  burnTickTimer: number;
+  bloodpact: number;
+  bloodborn: number;
+  gigamutagen: number;
+  gigamutationTimer: number;
+  smokeTimer: number;
+  fastDistance: function;
+  magnitude: function;
+  detonate: boolean;
+  super: boolean;
+  reactionTime: number;
+  // graveyardAttackers : [];
+  spaceNeeded: number;
   constructor() {
     this.zombies = [];
     this.discardedZombies = [];
