@@ -1,7 +1,6 @@
 import * as PIXI from "pixi.js";
 import LZString from "lz-string";
 import angular from "angular";
-import { kongregateAPI, PlayFab, PlayFabClientSDK } from "./lib/shim"; // until full removal of kong dependency
 
 /**
  * Distance thing, finds hypo given legs??
@@ -413,16 +412,16 @@ function N() {
 }
 
 function O() {
-  const e = document.body.clientWidth;
-  const t = document.body.clientHeight;
+  const clientWidth = document.body.clientWidth;
+  const clientHeight = document.body.clientHeight;
 
   D = {
-    x: e,
-    y: t,
-    defaultScale: Math.max(e, t) / 1000 /* 1e3 */,
+    x: clientWidth,
+    y: clientHeight,
+    defaultScale: Math.max(clientWidth, clientHeight) / 1000 /* 1e3 */,
   };
 
-  Y.scrollSpeed = Math.max(e, t) / 4;
+  Y.scrollSpeed = Math.max(clientWidth, clientHeight) / 4;
 }
 
 // @ts-ignore -- still functional, exactly as decompiled
@@ -540,21 +539,9 @@ window.onload = () => {
 
   if (window.self !== window.top) {
     if (
-      document.referrer != "" &&
-      !document.referrer.includes("kongregate.com") &&
-      !document.referrer.includes("konggames.com") &&
-      !document.referrer.includes("gti.nz")
+      document.referrer != "" && !document.referrer.includes("gti.nz")
     ) {
       window.location.href = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
-    } else if (
-      document.referrer.includes("kongregate.com") ||
-      document.referrer.includes("konggames.com")
-    ) {
-      kongregateAPI.loadAPI(() => {
-        window.kongregate = kongregateAPI.getAPI();
-        gameModel.kongregate = true;
-        gameModel.loginInUsingPlayFab();
-      });
     }
   }
 
@@ -2551,7 +2538,6 @@ class Golem {
 class GameModel {
   constructor() {
     this.storageName = "ZombieData";
-    this.kongregate = null;
     this.playFabId = null;
     this.titleId = "772D8";
     this.hidden = false;
@@ -2951,12 +2937,6 @@ class GameModel {
           ) {
             this.persistentData.allTimeHighestLevel = this.level;
 
-            if (window.kongregate) {
-              window.kongregate.stats.submit(
-                "level",
-                this.persistentData.allTimeHighestLevel
-              );
-            }
           }
         } else {
           this.endLevelTimer -= e;
@@ -3554,170 +3534,6 @@ class GameModel {
       locked: this.levelLocked(e),
       trophy: this.trophies.doesLevelHaveTrophy(e),
     };
-  }
-  loginInUsingPlayFab() {
-    if (window.kongregate) {
-      try {
-        PlayFab.settings.titleId = this.titleId;
-
-        const e = {
-          TitleId: PlayFab.settings.titleId,
-          AuthTicket: window.kongregate.services.getGameAuthToken(),
-          KongregateId: window.kongregate.services.getUserId(),
-          CreateAccount: true,
-        };
-
-        const t = this;
-        PlayFabClientSDK.LoginWithKongregate(
-          e,
-          (e) => {
-            if (e && e.data && e.data.PlayFabId) {
-              t.playFabId = e.data.PlayFabId;
-              t.loadFromPlayFab();
-            }
-          },
-          (e) => {
-            console.log(e);
-          }
-        );
-      } catch (e) {
-        console.error(e);
-      }
-    }
-  }
-
-  saveToPlayFab(e = false) {
-    this.lastPlayFabSave = Date.now();
-
-    if (this.playFabId) {
-      const t = this.persistentData.trophies;
-      delete this.persistentData.trophies;
-      const s = {
-        TitleId: this.titleId,
-        PlayFabId: this.playFabId,
-        Data: {
-          save:
-            !e &&
-            LZString.compressToEncodedURIComponent(
-              JSON.stringify(this.persistentData)
-            ),
-          trophies:
-            !e && LZString.compressToEncodedURIComponent(JSON.stringify(t)),
-          skeleton:
-            !e &&
-            LZString.compressToEncodedURIComponent(
-              JSON.stringify(this.skeleton.persistent)
-            ),
-          talents:
-            !e &&
-            LZString.compressToEncodedURIComponent(
-              JSON.stringify(this.skeleton.talents)
-            ),
-        },
-      };
-      this.persistentData.trophies = t;
-      try {
-        const t = this;
-        PlayFab.ClientApi.UpdateUserData(
-          s,
-          (s) => {
-            if (e) {
-              t.resetToBaseStats();
-              t.setupLevel();
-              window.location.reload();
-            } else {
-              t.messageQueue.push("Game Saved to Cloud");
-            }
-          },
-          (e) => {
-            console.log(e);
-          }
-        );
-      } catch (e) {
-        console.log(e);
-      }
-    } else {
-      if (e) {
-        this.resetToBaseStats();
-        this.setupLevel();
-        window.location.reload();
-      }
-    }
-  }
-
-  loadFromPlayFab(e = false) {
-    if (this.playFabId) {
-      const t = {
-        TitleId: this.titleId,
-        PlayFabId: this.playFabId,
-        Keys: ["save", "trophies", "skeleton", "talents"],
-      };
-      try {
-        const s = this;
-        PlayFab.ClientApi.GetUserData(
-          t,
-          (t) => {
-            if (t.data.Data.save) {
-              const i = JSON.parse(
-                LZString.decompressFromEncodedURIComponent(
-                  t.data.Data.save.Value
-                )
-              );
-
-              if (
-                e ||
-                i.saveCreated < s.persistentData.saveCreated ||
-                (i.saveCreated == s.persistentData.saveCreated &&
-                  i.dateOfSave > s.persistentData.dateOfSave)
-              ) {
-                s.persistentData = i;
-
-                if (t.data.Data.trophies) {
-                  s.persistentData.trophies = JSON.parse(
-                    LZString.decompressFromEncodedURIComponent(
-                      t.data.Data.trophies.Value
-                    )
-                  );
-                }
-
-                if (t.data.Data.skeleton) {
-                  s.skeleton.persistent = JSON.parse(
-                    LZString.decompressFromEncodedURIComponent(
-                      t.data.Data.skeleton.Value
-                    )
-                  );
-                }
-
-                if (t.data.Data.talents) {
-                  s.skeleton.talents = JSON.parse(
-                    LZString.decompressFromEncodedURIComponent(
-                      t.data.Data.talents.Value
-                    )
-                  );
-                } else {
-                  s.skeleton.talents = [];
-                }
-
-                s.level = s.persistentData.levelUnlocked;
-                s.updatePersistentData();
-                s.calcOfflineProgress();
-                s.setupLevel();
-                s.messageQueue.push("Game Loaded from Cloud");
-              }
-            }
-          },
-          (e) => {
-            console.log(e);
-          }
-        );
-      } catch (e) {
-        console.log(e);
-      }
-    }
-  }
-
-  allowPlayFabAction() {
-    return this.lastPlayFabSave + 15e3 < Date.now();
   }
 }
 class Upgrades {
@@ -6569,12 +6385,7 @@ class Trophies {
       this.gameModel.saveData();
       this.upgrades.applyUpgrades();
 
-      if (window.kongregate) {
-        window.kongregate.stats.submit(
-          "trophies",
-          this.gameModel.persistentData.trophies.length
-        );
-      }
+      
 
       this.gameModel.sendMessage(
         "The VIP has been killed! - New Trophy Aquired"
