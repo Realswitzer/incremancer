@@ -1085,6 +1085,9 @@ class map {
   treeTextures: any[]; /* TODO: Fix typing */
   armyTextures: any[]; /* TODO: Fix typing */
   buildingTextures: any[]; /* TODO: Fix typing */
+  mapCols:number
+  mapRows: number
+  step: undefined|{x:number,y:number}
 
   constructor() {
     this.gameModel = GameModel.getInstance();
@@ -1773,29 +1776,33 @@ class map {
       distance: i,
     };
 
-    return s
-      ? ((this.hitbuilding = this.willVectorHitBuilding(e, t, s, i)),
-        this.hitbuilding
-          ? ((this.corner = this.findNearestCorner(t, s.corners)),
-            (this.hitbuilding = this.willVectorHitBuilding(
-              e,
-              this.corner,
-              s,
-              i
-            )),
-            this.hitbuilding
-              ? ((this.corner = this.findNearestCorner(
-                  e,
-                  this.findAdjacentCorners(this.corner, s)
-                )),
-                (this.vector.x = this.corner.x - e.x),
-                (this.vector.y = this.corner.y - e.y),
-                this.modifyVectorForCollision(this.vector, s, e))
-              : ((this.vector.x = this.corner.x - e.x),
-                (this.vector.y = this.corner.y - e.y),
-                this.modifyVectorForCollision(this.vector, s, e)))
-          : this.modifyVectorForCollision(this.vector, s, e))
-      : this.normalizeVector(this.vector);
+    if (s) {
+      this.hitbuilding = this.willVectorHitBuilding(e, t, s, i);
+    
+      if (this.hitbuilding) {
+        this.corner = this.findNearestCorner(t, s.corners);
+        this.hitbuilding = this.willVectorHitBuilding(e, this.corner, s, i);
+    
+        if (this.hitbuilding) {
+          this.corner = this.findNearestCorner(
+            e,
+            this.findAdjacentCorners(this.corner, s)
+          );
+    
+          this.vector.x = this.corner.x - e.x;
+          this.vector.y = this.corner.y - e.y;
+          return this.modifyVectorForCollision(this.vector, s, e);
+        } else {
+          this.vector.x = this.corner.x - e.x;
+          this.vector.y = this.corner.y - e.y;
+          return this.modifyVectorForCollision(this.vector, s, e);
+        }
+      } else {
+        return this.modifyVectorForCollision(this.vector, s, e);
+      }
+    } else {
+      return this.normalizeVector(this.vector);
+    }
   }
 
   howDoIGetToMyTarget(e, t) {
