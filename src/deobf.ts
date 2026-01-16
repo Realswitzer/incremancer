@@ -1060,7 +1060,7 @@ class map {
   buildings: any[]; /* TODO: Fix typing */
   buildingsByPopularity: any[]; /* TODO: Fix typing */
   buildingMap: any[]; /* TODO: Fix typing */
-  roadSprite: null|PIXI.TilingSprite;
+  roadSprite: null | PIXI.TilingSprite;
   roadTexture: null;
   entranceWidth: number;
   entranceDepth: number;
@@ -1069,7 +1069,12 @@ class map {
   wallWidth: number;
   graveyardCollision: null;
   graveYardLocation: { x: number; y: number };
-  graveYardPosition: null | {x: number, y: number, height: number, width: number};
+  graveYardPosition: null | {
+    x: number;
+    y: number;
+    height: number;
+    width: number;
+  };
   wallCollisionBuffer: number;
   fastDistance: Function;
   pathFindStepSize: number;
@@ -1077,7 +1082,7 @@ class map {
   dy: number;
   stepsToTake: number;
   hasHit: boolean;
-  vector: null| {x:number,y:number,distance:number};
+  vector: null | { x: number; y: number; distance: number };
   corner: null;
   hitbuilding: boolean;
   insideBuilding: boolean;
@@ -1085,9 +1090,9 @@ class map {
   treeTextures: any[]; /* TODO: Fix typing */
   armyTextures: any[]; /* TODO: Fix typing */
   buildingTextures: any[]; /* TODO: Fix typing */
-  mapCols:number
-  mapRows: number
-  step: undefined|{x:number,y:number}
+  mapCols: number;
+  mapRows: number;
+  step: undefined | { x: number; y: number };
 
   constructor() {
     this.gameModel = GameModel.getInstance();
@@ -1778,17 +1783,17 @@ class map {
 
     if (s) {
       this.hitbuilding = this.willVectorHitBuilding(e, t, s, i);
-    
+
       if (this.hitbuilding) {
         this.corner = this.findNearestCorner(t, s.corners);
         this.hitbuilding = this.willVectorHitBuilding(e, this.corner, s, i);
-    
+
         if (this.hitbuilding) {
           this.corner = this.findNearestCorner(
             e,
             this.findAdjacentCorners(this.corner, s)
           );
-    
+
           this.vector.x = this.corner.x - e.x;
           this.vector.y = this.corner.y - e.y;
           return this.modifyVectorForCollision(this.vector, s, e);
@@ -3726,6 +3731,30 @@ class GameModel {
   }
 }
 class Upgrades {
+  constructionTypes: {
+    graveyard: string;
+    crypt: string;
+    fort: string;
+    fortress: string;
+    citadel: string;
+    fence: string;
+    fenceSize: string;
+    plagueWorkshop: string;
+    plagueLaboratory: string;
+    plagueSpikes: string;
+    spellTower: string;
+    runesmith: string;
+    aviary: string;
+    zombieCage: string;
+    partFactory: string;
+    monsterFactory: string;
+    pit: string;
+    harpy: string;
+    HybridLab: string;
+    AdvHybridLab: string;
+    MiniAssembLine: string;
+    TechThinkTank: string;
+  };
   constructor() {
     this.gameModel = GameModel.getInstance();
     this.spells = new Spells();
@@ -6430,32 +6459,72 @@ class Upgrades {
   }
 }
 
+type _Currencies = "bones" | "blood" | "parts" | "brains";
+
 class ConstructionUpgrade {
-  constructor(e, t, s, i, a, r, n, o, h, l, d) {
-    this.id = e;
-    this.name = t;
-    this.type = s;
-    this.costs = i;
-    this.time = a;
-    this.multiplier = r;
-    this.effect = n;
-    this.cap = o;
-    this.requires = h;
-    this.description = l;
-    this.completeMessage = d;
+  id: string;
+  name: string;
+  type: string; /* keyof Upgrades.constructionTypes */
+  costs: { [k in _Currencies]: number };
+  time: number;
+  multiplier: number;
+  effect: number;
+  cap: number;
+  requires: number;
+  description: string;
+  completeMessage: string;
+  constructor(
+    id: string,
+    name: string,
+    type: string /* keyof Upgrades.constructionTypes */,
+    costs: { [k in _Currencies]?: number },
+    time: number,
+    multiplier: number,
+    effect: number,
+    cap: number,
+    requires: number,
+    description: string,
+    completeMessage: string
+  ) {
+    this.id = id;
+    this.name = name;
+    this.type = type;
+    this.costs = costs;
+    this.time = time;
+    this.multiplier = multiplier;
+    this.effect = effect;
+    this.cap = cap;
+    this.requires = requires;
+    this.description = description;
+    this.completeMessage = completeMessage;
   }
 }
 class Upgrade {
-  id: number
-   name: string
-    type: string
-     costType: string
-     basePrice: number
-      multiplier: number ;effect: number; cap: number; description: string; purchaseMessage: string; requires: number
+  id: number;
+  name: string;
+  type: string;
+  costType: string;
+  basePrice: number;
+  multiplier: number;
+  effect: number;
+  cap: number;
+  description: string;
+  purchaseMessage: string;
+  requires: number;
 
-
-
-  constructor(id: number, name: string, type: string, costType: string, basePrice: number, multiplier: number, effect: number, cap: number, description: string, purchaseMessage: string, requires: number) {
+  constructor(
+    id: number,
+    name: string,
+    type: string,
+    costType: string,
+    basePrice: number,
+    multiplier: number,
+    effect: number,
+    cap: number,
+    description: string,
+    purchaseMessage: string,
+    requires: number
+  ) {
     this.id = id;
     this.name = name;
     this.type = type;
@@ -6472,8 +6541,8 @@ class Upgrade {
 }
 
 class Trophies {
-  gameModel: GameModel
-  upgrades: Upgrades
+  gameModel: GameModel;
+  upgrades: Upgrades;
 
   constructor() {
     this.gameModel = GameModel.getInstance();
