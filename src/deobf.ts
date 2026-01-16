@@ -9990,6 +9990,115 @@ class Skeleton {
   inflictPlague: null;
   healZombie: null;
   setSpeedMultiplier: null;
+  storageName: "incremancerskele";
+  talentsStorageName: "incremancertalents";
+  persistent: {
+    xpRate: number;
+    skeletons: number;
+    level: number;
+    xp: number;
+    items: any[]; // TODO: find item class
+    gearSetEquipped: number;
+    gearSets: any[]; // TODO: reverse gearSets formatting
+    currItemId: number;
+    talentReset: boolean;
+  };
+  talents: any[]; // TODO: figure out talents
+  talentPoins: number;
+  killingBlowParts: number;
+  lootChangeMod: number;
+  increaseChance: number;
+  darkorb: number;
+  darkorbTimer: number;
+  boneshield: number;
+  aliveZombies: any[]; // TODO: plsfix
+  graveyardAttackers: any[]; // TODO: plsfix
+
+  lootPositions: {
+    helmet: {
+      id: 1;
+      name: "Helmet";
+    };
+    chest: {
+      id: 2;
+      name: "Chest";
+    };
+    legs: {
+      id: 3;
+      name: "Legs";
+    };
+    gloves: {
+      id: 4;
+      name: "Gloves";
+    };
+    boots: {
+      id: 5;
+      name: "Boots";
+    };
+    sword: {
+      id: 6;
+      name: "Sword";
+    };
+    shield: {
+      id: 7;
+      name: "Shield";
+    };
+  };
+  rarity = {
+    common: 1,
+    rare: 2,
+    epic: 3,
+    legendary: 4,
+    ancient: 5,
+    divine: 6,
+    chaos: 7,
+  };
+  prefixes = {
+    commonQuality: [
+      "Wooden",
+      "Sturdy",
+      "Rigid",
+      "Iron",
+      "Rusty",
+      "Flimsy",
+      "Battered",
+      "Damaged",
+      "Used",
+      "Stained",
+      "Training",
+    ],
+    rareQuality: [
+      "Steel",
+      "Shiny",
+      "Polished",
+      "Forged",
+      "Plated",
+      "Bronze",
+      "Reinforced",
+      "Veteran's",
+      "Reliable",
+    ],
+    epicQuality: [
+      "Antique",
+      "Ancient",
+      "Famous",
+      "Bejeweled",
+      "Notorious",
+      "Historic",
+      "Mythical",
+      "Extraordinary",
+    ],
+    legendaryQuality: [
+      "Monstrous",
+      "Diabolical",
+      "Withering",
+      "Terrible",
+      "Demoniacal",
+    ],
+    ancientQuality: ["Grim", "Miserable", "Luxurious"],
+    divineQuality: ["Divine"],
+    chaosQuality: ["Chaotic", "Corrupted", "Fractured", "Twisted"],
+  };
 
   constructor() {
     this.skeletons = [];
