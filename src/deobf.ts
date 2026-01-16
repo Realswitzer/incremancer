@@ -2689,6 +2689,7 @@ class GameModel {
       health: number;
       damage: number;
       speed: number;
+      count?: number;
     };
     human: {
       health: number;
@@ -2788,7 +2789,7 @@ class GameModel {
     zoomButtons: boolean;
     particles: boolean;
     generators: any[]; // TODO: fix typing
-    currentConstruction: null;
+    currentConstruction: null|false; // TODO: fix typing
     creatureLevels: any[]; // TODO: fix typing
     creatures: any[]; // TODO: fix typing
     creatureAutobuild: any[]; // TODO: fix typing
@@ -2814,6 +2815,7 @@ class GameModel {
     autoMaxHarpies: boolean;
     skeleton: null; // TODO: fix typing
     skeletonTalents: any[]; // TODO: fix typing
+    autoUpgrades?: any[]; // TODO: fix typing
   };
   particles: Particles;
   trophies: Trophies;
@@ -3825,6 +3827,89 @@ class GameModel {
   }
 }
 class Upgrades {
+  static instance: Upgrades;
+  gameModel: GameModel;
+  spells: Spells;
+  skeleton: Skeleton;
+  partFactory: PartFactory;
+
+  types: {
+    energyRate: "energyRate";
+    energyCap: "energyCap";
+    damage: "damage";
+    health: "health";
+    speed: "speed";
+    brainsRate: "brainsRate";
+    bonesRate: "bonesRate";
+    bloodCap: "bloodCap";
+    brainsCap: "brainsCap";
+    brainRecoverChance: "brainRecoverChance";
+    riseFromTheDeadChance: "riseFromTheDeadChance";
+    boneCollectorCapacity: "boneCollectorCapacity";
+    construction: "construction";
+    infectedBite: "infectedBite";
+    infectedBlast: "infectedBlast";
+    plagueDamage: "plagueDamage";
+    plagueTicks: "plagueTicks";
+    burningSpeedPC: "burningSpeedPC";
+    unlockSpell: "unlockSpell";
+    spitDistance: "spitDistance";
+    blastHealing: "blastHealing";
+    plagueArmor: "plagueArmor";
+    monsterLimit: "monsterLimit";
+    runicSyphon: "runicSyphon";
+    gigazombies: "gigazombies";
+    bulletproof: "bulletproof";
+    harpySpeed: "harpySpeed";
+    tankBuster: "tankBuster";
+    harpyBombs: "harpyBombs";
+    spikeDelay: "spikeDelay";
+    bloodGainPC: "bloodGainPC";
+    bloodStoragePC: "bloodStoragePC";
+    brainsGainPC: "brainsGainPC";
+    brainsStoragePC: "brainsStoragePC";
+    bonesGainPC: "bonesGainPC";
+    partsGainPC: "partsGainPC";
+    zombieDmgPC: "zombieDmgPC";
+    zombieHealthPC: "zombieHealthPC";
+    HstrengthDmgPC: "HstrengthDmgPC";
+    HshellHealthPC: "HshellHealthPC";
+    CyroVatPC: "CyroVatPC";
+    PlagueVatPC: "PlagueVatPC";
+    CloningRep1PC: "CloningRep1PC";
+    BloodSynPC: "BloodSynPC";
+    SynBonePC: "SynBonePC";
+    SmolPartsPC: "SmolPartsPC";
+    AvionicsPC: "AvionicsPC";
+    SkeleMove: "SkeleMove";
+    ShockPC: "ShockPC";
+    EnergyCost: "EnergyCost";
+    golemHealthPC: "golemHealthPC";
+    golemDamagePC: "golemDamagePC";
+    prest_multPC: "prest_multPC";
+    startingPC: "startingPC";
+    energyCost: "energyCost";
+    autoconstruction: "autoconstruction";
+    autoshop: "autoshop";
+    graveyardHealth: "graveyardHealth";
+    talentPoint: "talentPoint";
+  };
+
+  costs: {
+    energy: "energy";
+    blood: "blood";
+    brains: "brains";
+    bones: "bones";
+    prestigePoints: "prestigePoints";
+    parts: "parts";
+  };
+
+  constructionStates: {
+    building: "building";
+    paused: "paused";
+    autoPaused: "autoPaused";
+  };
+
   constructionTypes: {
     graveyard: string;
     crypt: string;
@@ -7661,6 +7746,35 @@ enum policeState {
   "hunting",
 }
 class Police {
+  static instance: Police;
+
+  maxWalkSpeed: number;
+  maxRunSpeed: number;
+  police: any[]; // TODO: plsfix
+  discardedPolice: any[]; // TODO: plsfix
+  walkTexture: any[]; // TODO: plsfix
+  deadTexture: any[]; // TODO: plsfix
+  dogTexture: any[]; // TODO: plsfix
+  deadDogTexture: any[]; // TODO: plsfix
+  policeDogLevel: number;
+  policePerLevel: number;
+  attackSpeed: number;
+  attackDamage: number;
+  attackDistance: number;
+  moveTargetDistance: number;
+  shootDistance: number;
+  visionDistance: number;
+  scaling: number;
+  dogScaling: number;
+  radioTime: number;
+
+  map: map;
+  gameModel: GameModel;
+  humans: Humans;
+  exclamations: Exclamations;
+  zombies: Zombies;
+  bullets: Bullets;
+
   constructor() {
     this.maxWalkSpeed = 15;
     this.maxRunSpeed = 40;
@@ -7734,11 +7848,11 @@ class Police {
       this.discardedPolice = this.police.slice();
       this.police = [];
     }
-    const e = this.getMaxPolice();
-    const t = this.getMaxHealth();
-    const s = 0.6 * t;
+    const maxPolice = this.getMaxPolice();
+    const maxHealth = this.getMaxHealth();
+    const s = 0.6 * maxHealth;
     this.getAttackDamage();
-    for (let i = 0; i < e; i++) {
+    for (let i = 0; i < maxPolice; i++) {
       let e;
 
       if (this.discardedPolice.length > 0) {
@@ -7772,8 +7886,8 @@ class Police {
       e.maxSpeed = this.maxWalkSpeed;
       e.visionDistance = this.visionDistance;
       e.visible = true;
-      e.maxHealth = t;
-      e.health = t;
+      e.maxHealth = maxHealth;
+      e.health = maxHealth;
       e.timer.scan = Math.random() * this.humans.scanTime;
       e.timer.standing = Math.random() * this.humans.randomSecondsToStand();
       e.target = false;
@@ -8155,6 +8269,38 @@ enum armyState {
   "standing",
 }
 class Army {
+  static instance: Army;
+  maxWalkSpeed: number;
+  maxRunSpeed: number;
+  armymen: any[]; // TODO: fix typing
+  discardedArmymen: any[]; // TODO: fix typing
+  textures: any[]; // TODO: fix typing
+  aliveZombies: any[]; // TODO: fix typing
+  armyPerLevel: number;
+  attackSpeed: number;
+  attackDamage: number;
+  attackDistance: number;
+  moveTargetDistance: number;
+  shootDistance: number;
+  visionDistance: number;
+  scaling: number;
+  shotsPerBurst: number;
+  droneStrikeTimer: number;
+  droneStrikeTime: number;
+  assaultStarted: boolean;
+  droneStrike: null;
+  droneActive: boolean;
+  droneBlastRadius: number;
+
+  map: map;
+  zombies: Zombies;
+  humans: Humans;
+  gameModel: GameModel;
+  graveyard: Graveyard;
+  bullets: Bullets;
+  blasts: Blasts;
+  exclamations: Exclamations;
+
   constructor() {
     this.maxWalkSpeed = 20;
     this.maxRunSpeed = 50;
@@ -9997,11 +10143,11 @@ class Skeleton {
     skeletons: number;
     level: number;
     xp: number;
-    items: any[]; // TODO: find item class
+    items: any[]|any; // TODO: find item class
     gearSetEquipped: number;
-    gearSets: any[]; // TODO: reverse gearSets formatting
+    gearSets: any[]|any; // TODO: reverse gearSets formatting
     currItemId: number;
-    talentReset: boolean;
+    talentReset: boolean; // TODO: idk.
   };
   talents: any[]; // TODO: figure out talents
   talentPoins: number;
