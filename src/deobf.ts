@@ -103,7 +103,7 @@ function d(e, t) {
   }
 }
 
-let c, u, p, g, m, b, f, y, x;
+let c, u, p, g, m, b, f, y, grass;
 
 let gameModel;
 let particles;
@@ -146,9 +146,9 @@ let R = 0;
 function H(e) {
   if (zombies.zombieCursor) {
     zombies.zombieCursor.position = e.data.getLocalPosition(this.parent);
-    const t = e.data.getLocalPosition(x);
+    const t = e.data.getLocalPosition(grass);
     zombies.mouseOutOfBounds =
-      t.x < 0 || t.y < 0 || t.x > x.width || t.y > x.height;
+      t.x < 0 || t.y < 0 || t.x > grass.width || t.y > grass.height;
   }
   if (e.data.originalEvent.touches && e.data.originalEvent.touches.length > 1) {
     ((e) => {
@@ -404,16 +404,16 @@ function N() {
     y: e - t,
   };
 
-  if (x) {
-    (x.width = P.x), (x.height = P.y);
+  if (grass) {
+    (grass.width = P.x), (grass.height = P.y);
   }
 
   c.hitArea = new PIXI.Rectangle(0, 0, P.x, P.y);
 }
 
-function O() {
-  const clientWidth = document.body.clientWidth;
-  const clientHeight = document.body.clientHeight;
+function O(): void {
+  const clientWidth: number = document.body.clientWidth;
+  const clientHeight: number = document.body.clientHeight;
 
   D = {
     x: clientWidth,
@@ -427,7 +427,7 @@ function O() {
 // @ts-ignore -- still functional, exactly as decompiled
 new map(); // used before declar but still works??
 
-window.onload = () => {
+window.onload = (): void => {
   gameModel = GameModel.getInstance();
   particles = new Particles();
   graveyard = new Graveyard();
@@ -519,11 +519,11 @@ window.onload = () => {
       .load(() => {
         gameModel.app = e;
         N();
-        x = new PIXI.TilingSprite(PIXI.Texture.from("grass.png"));
-        x.texture.baseTexture.mipmap = PIXI.MIPMAP_MODES.OFF;
-        x.width = P.x;
-        x.height = P.y;
-        u.addChild(x);
+        grass = new PIXI.TilingSprite(PIXI.Texture.from("grass.png"));
+        grass.texture.baseTexture.mipmap = PIXI.MIPMAP_MODES.OFF;
+        grass.width = P.x;
+        grass.height = P.y;
+        u.addChild(grass);
         gameModel.setupLevel();
 
         setTimeout(() => {
@@ -556,7 +556,7 @@ window.onload = () => {
   );
 };
 
-window.onresize = () => {
+window.onresize = (): void => {
   O();
 };
 
@@ -905,14 +905,35 @@ class V extends PIXI.TilingSprite {
     this.collisionHeight = 0;
   }
 }
-
+type _direction = "north" | "south" | "west" | "east";
 class Building {
   id: number;
   x: number;
   y: number;
   width: number;
   height: number;
-  entrance: null; /* TODO: redefined later probably, havent looked into exec chain */
+  entrance: null | {
+    x: number;
+    y: number;
+    north?: true;
+    south?: true;
+    west?: true;
+    east?: true;
+    inside: {
+      x: number;
+      y: number;
+      entrance: true;
+    };
+    outside: {
+      x: number;
+      y: number;
+      entrance: true;
+    };
+  };
+  /* TODO: redefined later probably, havent looked into exec chain */
+  container: any; /* TODO: fix these */
+  walls: any;
+  floorSprite: any;
 
   constructor(id: number, x: number, y: number, width: number, height: number) {
     this.id = 0;
@@ -1057,7 +1078,7 @@ class map {
   discardedWalls: any[]; /* TODO: Fix typing */
   discardedContainers: any[]; /* TODO: Fix typing */
   discardedFloorSprites: any[]; /* TODO: Fix typing */
-  buildings: any[]; /* TODO: Fix typing */
+  buildings: Building[]; /* TODO: Fix typing */
   buildingsByPopularity: any[]; /* TODO: Fix typing */
   buildingMap: any[]; /* TODO: Fix typing */
   roadSprite: null | PIXI.TilingSprite;
@@ -1083,7 +1104,7 @@ class map {
   stepsToTake: number;
   hasHit: boolean;
   vector: null | { x: number; y: number; distance: number };
-  corner: null;
+  corner: null | { x: number; y: number };
   hitbuilding: boolean;
   insideBuilding: boolean;
   treeSprites: any[]; /* TODO: Fix typing */
@@ -1093,6 +1114,9 @@ class map {
   mapCols: number;
   mapRows: number;
   step: undefined | { x: number; y: number };
+  testPosition: { x: number; y: number };
+  distanceToTarget: number;
+  closeBuilding: Building;
 
   constructor() {
     this.gameModel = GameModel.getInstance();
@@ -1225,16 +1249,16 @@ class map {
       ? this.discardedFloorSprites.pop()
       : new PIXI.TilingSprite(PIXI.Texture.WHITE);
   }
-  addBuilding(e) {
-    var t;
-    let s;
+  addBuilding(e): void {
+    // NOTE: when it creates the entrance later on, it will get the midpoint of each edge then use the one with the least distance to the graveyard (center of map)
     e.container = this.getContainer();
     e.container.cacheAsBitmap = false;
     e.floorSprite = this.getFloorSprite();
-    e.floorSprite.tint =
-      ((t = 10 + Math.round(50 * Math.random())),
-      (s = 10 + Math.round(50 * Math.random())),
-      (10 + Math.round(50 * Math.random())) | (s << 8) | (t << 16));
+    // NOTE: random color generator
+    let red = 10 + Math.round(50 * Math.random());
+    let green = 10 + Math.round(50 * Math.random());
+    let blue = 10 + Math.round(50 * Math.random());
+    e.floorSprite.tint = (red << 16) | (green << 8) | blue;
     e.floorSprite.alpha = 0.2;
     e.container.x = e.x;
     e.container.y = e.y;
@@ -1359,9 +1383,9 @@ class map {
     for (let t = 0; t < e.walls.length; t++) {
       e.walls[t].collisionX = e.x + e.walls[t].x;
     }
-    e.walls[t].collisionY = e.y + e.walls[t].y;
-    e.walls[t].collisionWidth = e.walls[t].width;
-    e.walls[t].collisionHeight = e.walls[t].height;
+    e.walls[red].collisionY = e.y + e.walls[red].y;
+    e.walls[red].collisionWidth = e.walls[red].width;
+    e.walls[red].collisionHeight = e.walls[red].height;
   }
 
   addCorners(e) {
@@ -1660,7 +1684,7 @@ class map {
     };
   }
 
-  findBuilding(e) {
+  findBuilding(e): Building {
     return this.getBuildingFromMap(e.x, e.y);
   }
   normalizeVector(e) {
@@ -2027,8 +2051,12 @@ class te {
 }
 
 class PartFactory {
+  static instance: PartFactory;
   storm: boolean;
   gameModel: GameModel;
+  costs: { blood: "blood"; parts: "parts" };
+  generatorsApplied: any[]; // TODO: fix typing
+  generators: Generator[];
 
   constructor() {
     this.storm = false;
@@ -2265,7 +2293,7 @@ class PartFactory {
 class Generator {
   id: number;
   name: string;
-  costType: number; // TODO: costs.* enum
+  costType: string; // TODO: costs.* enum
   basePrice: number;
   multi: number;
   produces: number;
@@ -2275,7 +2303,7 @@ class Generator {
   constructor(
     id: number,
     name: string,
-    costType: number,
+    costType: string,
     basePrice: number,
     multi: number,
     produces: number,
@@ -2295,6 +2323,19 @@ class Generator {
 }
 
 class CreatureFactory {
+  static instance: CreatureFactory;
+  gameModel: GameModel;
+  spawnedSavedCreatures: boolean;
+  types: {
+    earthGolem: 1;
+    airGolem: 2;
+    fireGolem: 3;
+    waterGolem: 4;
+  };
+  creatures: Golem[];
+  creatureScaling: number;
+  creatureCostScaling: number;
+  creatureCostReduction: number;
   constructor() {
     this.gameModel = GameModel.getInstance();
     this.spawnedSavedCreatures = false;
@@ -2361,7 +2402,7 @@ class CreatureFactory {
     CreatureFactory.instance = this;
   }
   update(e) {
-    const t = new Creatures().creatureCount;
+    const creatureCount = new Creatures().creatureCount;
     for (let s = 0; s < this.creatures.length; s++) {
       if (this.creatures[s].building) {
         this.creatures[s].timeLeft -= e;
@@ -2371,8 +2412,8 @@ class CreatureFactory {
             (this.creatures[s].building = false);
         }
       } else if (
-        t[this.creatures[s].type] !== undefined &&
-        t[this.creatures[s].type] < this.creatures[s].autobuild
+        creatureCount[this.creatures[s].type] !== undefined &&
+        creatureCount[this.creatures[s].type] < this.creatures[s].autobuild
       ) {
         this.startBuilding(this.creatures[s]);
       }
@@ -2536,6 +2577,12 @@ class Golem {
   speed: number;
   baseCost: number;
   description: string;
+  time: number;
+  building: boolean;
+  timeLeft: number;
+  autobuild: number;
+  level: number;
+
   constructor(
     id: number,
     type: number,
@@ -2631,7 +2678,36 @@ class GameModel {
   harpySpeed: number;
   tankBuster: boolean;
   harpyBombs: number;
-  stats: null;
+  stats: null | {
+    skeleton: {
+      show: boolean;
+      health: number;
+      damage: number;
+      speed: number;
+    };
+    zombie: {
+      health: number;
+      damage: number;
+      speed: number;
+    };
+    human: {
+      health: number;
+      damage: number;
+      speed: number;
+    };
+    police: {
+      show: boolean;
+      health: number;
+      damage: number;
+      speed: number;
+    };
+    army: {
+      show: boolean;
+      health: number;
+      damage: number;
+      speed: number;
+    };
+  };
   runicSyphon: {
     percentage: number;
     blood: number;
@@ -2739,6 +2815,24 @@ class GameModel {
     skeleton: null; // TODO: fix typing
     skeletonTalents: any[]; // TODO: fix typing
   };
+  particles: Particles;
+  trophies: Trophies;
+  bones: Bones;
+  creatureFactory: CreatureFactory;
+  creatures: Creatures;
+  boneCollectors: BoneCollectors;
+  graveyard: Graveyard;
+  spells: Spells;
+  partFactory: PartFactory;
+  skeleton: Skeleton;
+  upgrades: Upgrades;
+  zombies: Zombies;
+  humans: Humans;
+  police: Police;
+  army: Army;
+  SkeleMoveMod: number;
+  app: PIXI.Application;
+  prest_multPCMod: number;
 
   constructor() {
     this.storageName = "ZombieData";
@@ -2999,69 +3093,69 @@ class GameModel {
     this.tankBuster = false;
     this.harpyBombs = 1;
   }
-  addEnergy(e) {
-    this.energy += e;
+  addEnergy(energy: number): void {
+    this.energy += energy;
     if (this.energy > this.energyMax) {
       this.energy = this.energyMax;
     }
   }
-  addBlood(e) {
+  addBlood(blood: number): void {
     if (isNaN(this.persistentData.blood)) {
       this.persistentData.blood = 0;
     }
 
-    if (!isNaN(e)) {
-      this.persistentData.blood += e * this.bloodPCMod;
+    if (!isNaN(blood)) {
+      this.persistentData.blood += blood * this.bloodPCMod;
 
       if (this.persistentData.blood > this.bloodMax) {
         this.persistentData.blood = this.bloodMax;
 
         if (this.constructions.runesmith && this.runicSyphon.percentage > 0) {
-          this.runicSyphon.blood += e * this.bloodPCMod;
+          this.runicSyphon.blood += blood * this.bloodPCMod;
         }
       }
 
       if (this.runicSyphon.percentage > 0) {
         this.runicSyphon.blood +=
-          e * this.bloodPCMod * this.runicSyphon.percentage;
+          blood * this.bloodPCMod * this.runicSyphon.percentage;
       }
     }
   }
 
-  addBrains(e) {
+  addBrains(brains: number): void {
     if (isNaN(this.persistentData.brains)) {
       this.persistentData.brains = 0;
     }
 
-    if (!isNaN(e)) {
-      this.persistentData.brains += e * this.brainsPCMod;
+    if (!isNaN(brains)) {
+      this.persistentData.brains += brains * this.brainsPCMod;
 
       if (this.persistentData.brains > this.brainsMax) {
         (this.persistentData.brains = this.brainsMax),
           this.constructions.runesmith &&
             this.runicSyphon.percentage > 0 &&
-            (this.runicSyphon.brains += e * this.brainsPCMod);
+            (this.runicSyphon.brains += brains * this.brainsPCMod);
       }
 
       if (this.runicSyphon.percentage > 0) {
         this.runicSyphon.brains +=
-          e * this.brainsPCMod * this.runicSyphon.percentage;
+          brains * this.brainsPCMod * this.runicSyphon.percentage;
       }
     }
   }
 
-  addBones(e) {
+  addBones(bones: number): void {
     if (isNaN(this.persistentData.bones)) {
       this.persistentData.bones = 0;
     }
 
-    if (!isNaN(e)) {
-      this.persistentData.bones += e * this.bonesPCMod;
-      this.persistentData.bonesTotal += e * this.bonesPCMod;
+    if (!isNaN(bones)) {
+      this.persistentData.bones += bones * this.bonesPCMod;
+      this.persistentData.bonesTotal += bones * this.bonesPCMod;
 
       if (this.runicSyphon.percentage > 0) {
         this.runicSyphon.bones +=
-          e * this.bonesPCMod * this.runicSyphon.percentage;
+          bones * this.bonesPCMod * this.runicSyphon.percentage;
       }
     }
   }
@@ -3291,7 +3385,7 @@ class GameModel {
     this.populateStats();
   }
 
-  populateStats() {
+  populateStats(): void {
     this.stats = {
       skeleton: {
         show: this.skeleton.persistent.skeletons > 0,
@@ -9846,6 +9940,57 @@ class Ge extends PIXI.Container {
 }
 
 class Skeleton {
+  static instance: Skeleton;
+
+  skeletons: any[]; // TODO: fix typing
+  aliveSkeletons: any[]; // TODO: fix typing
+  discardedSprites: any[]; // TODO: fix typing
+  aliveHumans: any[]; // TODO: fix typing
+  scaling: number;
+  moveTargetDistance: number;
+  attackDistance: number;
+  attackSpeed: number;
+  targetDistance: number;
+  fadeSpeed: number;
+  currId: number;
+  scanTime: number;
+  spawnTimer: number;
+  respawnTime: number;
+  moveSpeed: number;
+  lastKillingBlow: number;
+  randomSpells: any[]; // TODO: fix typing
+  lootChance: number;
+  spellTimer: number;
+
+  textures: {
+    set: boolean;
+    up: any[]; //TODO: fix typing
+    down: any[]; //TODO: fix typing
+    left: any[]; //TODO: fix typing
+    right: any[]; //TODO: fix typing
+    dead: any[]; //TODO: fix typing
+  };
+  directions: {
+    down: 1;
+    up: 2;
+    right: 3;
+    left: 4;
+    dead: 5;
+  };
+
+  burnTickTimer: number;
+  smokeTimer: number;
+  fastDistance: Function;
+  magnitude: Function;
+  damageZombie: null;
+  searchClosestTarget: null;
+  updateBurns: null;
+  updateZombieRegen: null;
+  causePlagueExplosion: null;
+  inflictPlague: null;
+  healZombie: null;
+  setSpeedMultiplier: null;
+
   constructor() {
     this.skeletons = [];
     this.aliveSkeletons = [];
@@ -10979,6 +11124,12 @@ class Skeleton {
 }
 
 class Creatures {
+  static instance: Creatures;
+  creatureFactory: CreatureFactory;
+  zombies: Zombies;
+  creatures: any[]; // TODO: plsfix
+  creatureCount: any[]; // TODO: pklsfix
+
   constructor() {
     this.creatureFactory = new CreatureFactory();
     this.zombies = new Zombies();
@@ -11456,6 +11607,30 @@ class Ne extends PIXI.Sprite {
 }
 
 class Graveyard {
+  static instance: Graveyard;
+  spikeSprites: any[]; // TODO: fix typing
+  level: number;
+  spikeTimer: number;
+  fenceRadius: number;
+  fastDistance: Function;
+  graveyardHealth: number;
+  graveyardMaxHealth: number;
+  target: { graveyard: true; x: 0; y: 0 };
+  healthBar: null;
+  fence: null;
+  fencePosts: any[];
+
+  boneCollectors: BoneCollectors;
+  zmMap: map;
+  zombies: Zombies;
+  bones: Bones;
+  gameModel: GameModel;
+  smoke: Smoke;
+  harpies: Harpies;
+  blood: Blood;
+  humans: Humans;
+
+  sprite: any; // TODO: fix typing
   constructor() {
     this.spikeSprites = [];
     this.level = 1;
@@ -11488,7 +11663,7 @@ class Graveyard {
     this.bones = new Bones();
     this.gameModel = GameModel.getInstance();
     this.smoke = new Smoke();
-    this.harpies = new Ke();
+    this.harpies = new Harpies();
     this.blood = new Blood();
     this.humans = new Humans();
 
@@ -12094,7 +12269,7 @@ class $e extends PIXI.Sprite {
   }
 }
 
-class Ke {
+class Harpies {
   constructor() {
     this.sprites = [];
     this.discardedSprites = [];
@@ -12104,11 +12279,11 @@ class Ke {
     this.scaling = 2.5;
     this.fastDistance = fastDistance;
 
-    if (Ke.instance) {
-      return Ke.instance;
+    if (Harpies.instance) {
+      return Harpies.instance;
     }
 
-    Ke.instance = this;
+    Harpies.instance = this;
   }
   populate() {
     this.model = GameModel.getInstance();
@@ -12611,6 +12786,13 @@ class Blood {
   }
 }
 class et extends J {
+  fadeTime: number;
+  floor: number;
+  rotSpeed: number;
+  value: number;
+  collector: null;
+  hitFloor: boolean;
+
   constructor(...args) {
     super(...args);
     this.fadeTime = 0;
@@ -12623,6 +12805,22 @@ class et extends J {
 }
 
 class Bones {
+  static instance = Bones;
+
+  partsLimit: number;
+  partsPerSplatter: number;
+  container: null | PIXI.Container;
+  sprites: []; // TODO: fix typing
+  discardedSprites: []; // TODO: fix typing
+  uncollected: any[]; // TODO: fix typing
+  gravity: number;
+  spraySpeed: number;
+  fadeTime: number;
+  fadeSpeed: number;
+  fadeBones: boolean;
+  texture: null | PIXI.Texture;
+  gameModel: null | GameModel;
+
   constructor() {
     this.partsLimit = 100;
     this.partsPerSplatter = 3;
@@ -12644,16 +12842,16 @@ class Bones {
 
     Bones.instance = this;
   }
-  getTexture() {
-    const e = document.createElement("canvas");
-    e.width = 4;
-    e.height = 1;
-    const t = e.getContext("2d");
-    t.fillStyle = "#dddddd";
-    t.fillRect(0, 0, 4, 1);
-    return PIXI.Texture.from(e);
+  getTexture(): PIXI.Texture {
+    const canvas = document.createElement("canvas");
+    canvas.width = 4;
+    canvas.height = 1;
+    const context = canvas.getContext("2d");
+    context.fillStyle = "#dddddd";
+    context.fillRect(0, 0, 4, 1);
+    return PIXI.Texture.from(canvas);
   }
-  initialize() {
+  initialize(): void {
     this.gameModel = GameModel.getInstance();
 
     if (!this.container) {
@@ -13800,24 +13998,25 @@ angular
     "$interval",
     "$document",
     function (e, t, s) {
-      const i = new Skeleton();
+      const skeleton = new Skeleton();
       const partFactory = new PartFactory();
-      const o = new CreatureFactory();
-      const h = new Upgrades();
-      const l = new Trophies();
+      const creatureFactory = new CreatureFactory();
+      const upgrades = new Upgrades();
+      const trophies = new Trophies();
 
       function u() {
-        const e = new Date().getTime();
-        const c = Math.min(1000, Math.max(e - this.lastUpdate, 0)) / 1000;
+        const currentTime = new Date().getTime();
+        const c =
+          Math.min(1000, Math.max(currentTime - this.lastUpdate, 0)) / 1000;
         if (this.sidePanels.factory) {
           this.factoryStats = factory.factoryStats();
         }
 
-        this.lastUpdate = e;
+        this.lastUpdate = currentTime;
       }
       this.model = GameModel.getInstance();
 
-      this.skeleton = () => i.persistent;
+      this.skeleton = () => skeleton.persistent;
 
       this.spells = new Spells();
       this.keysPressed = Y;
@@ -13888,12 +14087,12 @@ angular
             break;
           }
           case "prestige": {
-            this.upgrades = h.prestigeUpgrades.filter(
+            this.upgrades = upgrades.prestigeUpgrades.filter(
               (e) => e.cap == 0 || this.currentRank(e) < e.cap
             );
 
             this.upgrades.push(
-              ...h.prestigeUpgrades.filter(
+              ...upgrades.prestigeUpgrades.filter(
                 (e) => e.cap !== 0 && this.currentRank(e) >= e.cap
               )
             );
@@ -13916,7 +14115,7 @@ angular
         this.graveyardTab = e;
 
         if (e == "trophies") {
-          this.trophies = l.getTrophyList();
+          this.trophies = trophies.getTrophyList();
           this.trophyTab = "all";
         }
       };
@@ -13926,26 +14125,26 @@ angular
 
         switch (e) {
           case "all": {
-            this.trophies = l.getTrophyList();
+            this.trophies = trophies.getTrophyList();
             break;
           }
           case "collected": {
-            this.trophies = l.getTrophyList().filter((e) => e.owned);
+            this.trophies = trophies.getTrophyList().filter((e) => e.owned);
             break;
           }
           case "uncollected": {
-            this.trophies = l.getTrophyList().filter((e) => !e.owned);
+            this.trophies = trophies.getTrophyList().filter((e) => !e.owned);
             break;
           }
           case "totals": {
-            this.trophies = l.getTrophyTotals();
+            this.trophies = trophies.getTrophyTotals();
           }
         }
       };
 
       this.filterShop = function (e) {
         this.currentShopFilter = e;
-        this.upgrades = h.getUpgrades(e);
+        this.upgrades = upgrades.getUpgrades(e);
       };
 
       this.filterConstruction = function (e) {
@@ -13953,11 +14152,11 @@ angular
 
         switch (e) {
           case "available": {
-            this.upgrades = h.getAvailableConstructions();
+            this.upgrades = upgrades.getAvailableConstructions();
             break;
           }
           case "completed": {
-            this.upgrades = h.getCompletedConstructions();
+            this.upgrades = upgrades.getCompletedConstructions();
           }
         }
       };
@@ -14028,7 +14227,7 @@ angular
       this.upgradePrice = function (e) {
         return this.sidePanels.factory && e.costType != "prestigePoints"
           ? factory.purchasePrice(e)
-          : h.upgradePrice(e);
+          : upgrades.upgradePrice(e);
       };
 
       this.factory = {
@@ -14040,7 +14239,7 @@ angular
             this.upgrades = factory.generators;
             this.updateDelays();
           } else {
-            this.upgrades = o.creatures;
+            this.upgrades = creatureFactory.creatures;
           }
         },
         buyGenerator(e) {
@@ -14053,8 +14252,8 @@ angular
           this.factoryStats = factory.factoryStats();
         },
         generatorPrice: (e) => factory.purchasePrice(e),
-        creaturePrice: (e) => o.purchasePrice(e),
-        creatureLevelPrice: (e) => o.levelPrice(e),
+        creaturePrice: (e) => creatureFactory.purchasePrice(e),
+        creatureLevelPrice: (e) => creatureFactory.levelPrice(e),
         creaturePercent(e) {
           return Math.min(
             Math.round(
@@ -14072,8 +14271,8 @@ angular
             100
           );
         },
-        buyCreature: (e) => o.startBuilding(e),
-        creatureTooExpensive: (e) => !o.canAffordCreature(e),
+        buyCreature: (e) => creatureFactory.startBuilding(e),
+        creatureTooExpensive: (e) => !creatureFactory.canAffordCreature(e),
         creatureButtonText(e) {
           return e.building
             ? "Building..."
@@ -14096,7 +14295,8 @@ angular
           return (
             !this.creatureTooExpensive(e) &&
             !e.building &&
-            o.creaturesBuildingCount() + this.model.creatureCount <
+            creatureFactory.creaturesBuildingCount() +
+              this.model.creatureCount <
               this.model.creatureLimit
           );
         },
@@ -14104,17 +14304,17 @@ angular
           return this.creatureLevelPrice(e) < this.model.persistentData.parts;
         },
         levelCreature(e) {
-          o.levelCreature(e);
+          creatureFactory.levelCreature(e);
         },
         autoBuild(e, t) {
           if (
             e.autobuild + t >= 0 &&
             e.autobuild + t <= this.model.creatureLimit
           ) {
-            o.creatureAutoBuildNumber(e, t);
+            creatureFactory.creatureAutoBuildNumber(e, t);
           }
         },
-        creatureStats: (e) => o.creatureStats(e),
+        creatureStats: (e) => creatureFactory.creatureStats(e),
         updateDelays() {
           this.delays = [];
           for (let e = 0; e < factory.generatorsApplied.length; e++) {
@@ -14202,17 +14402,17 @@ angular
 
       this.updateConstructionUpgrades = function () {
         if (this.sidePanels.construction == 1) {
-          this.upgrades = h.getAvailableConstructions();
+          this.upgrades = upgrades.getAvailableConstructions();
         }
       };
 
       this.startConstruction = function (e) {
-        h.startConstruction(e);
-        this.upgrades = h.getAvailableConstructions();
+        upgrades.startConstruction(e);
+        this.upgrades = upgrades.getAvailableConstructions();
       };
 
       this.playPauseConstruction = () => {
-        h.playPauseConstruction();
+        upgrades.playPauseConstruction();
       };
 
       this.cancelConstruction = function () {
@@ -14220,126 +14420,126 @@ angular
           "Are you sure you want to cancel construction? Used materials will not be refunded";
 
         this.confirmCallback = function () {
-          h.cancelConstruction();
-          this.upgrades = h.getAvailableConstructions();
+          upgrades.cancelConstruction();
+          this.upgrades = upgrades.getAvailableConstructions();
           this.confirmCallback = false;
         };
       };
 
       this.upgradeSubtitle = (e) => {
         switch (e.type) {
-          case h.types.energyRate: {
+          case upgrades.types.energyRate: {
             return `+${e.effect} energy per second`;
           }
-          case h.types.energyCap: {
+          case upgrades.types.energyCap: {
             return `+${e.effect} max energy`;
           }
-          case h.types.bloodCap: {
+          case upgrades.types.bloodCap: {
             return `+${formatWhole(e.effect)} max blood`;
           }
-          case h.types.bloodStoragePC: {
+          case upgrades.types.bloodStoragePC: {
             return `+${Math.round(100 * e.effect)}% max blood`;
           }
-          case h.types.bloodGainPC: {
+          case upgrades.types.bloodGainPC: {
             return `+${Math.round(100 * e.effect)}% blood income`;
           }
-          case h.types.brainsGainPC: {
+          case upgrades.types.brainsGainPC: {
             return `+${Math.round(100 * e.effect)}% brains income`;
           }
-          case h.types.bonesGainPC: {
+          case upgrades.types.bonesGainPC: {
             return `+${Math.round(100 * e.effect)}% bones income`;
           }
-          case h.types.partsGainPC: {
+          case upgrades.types.partsGainPC: {
             return `+${Math.round(100 * e.effect)}% parts income`;
           }
-          case h.types.brainsStoragePC: {
+          case upgrades.types.brainsStoragePC: {
             return `+${Math.round(100 * e.effect)}% max brains`;
           }
-          case h.types.energyCost: {
+          case upgrades.types.energyCost: {
             return `-${e.effect} zombie energy cost`;
           }
-          case h.types.brainsCap: {
+          case upgrades.types.brainsCap: {
             return `+${e.effect} max brains`;
           }
-          case h.types.damage: {
+          case upgrades.types.damage: {
             return `+${e.effect} zombie damage`;
           }
-          case h.types.speed: {
+          case upgrades.types.speed: {
             return `+${e.effect} zombie speed`;
           }
-          case h.types.health: {
+          case upgrades.types.health: {
             return `+${e.effect} zombie health`;
           }
-          case h.types.brainRecoverChance: {
+          case upgrades.types.brainRecoverChance: {
             return `+${Math.round(100 * e.effect)}% chance to recover brain`;
           }
-          case h.types.riseFromTheDeadChance: {
+          case upgrades.types.riseFromTheDeadChance: {
             return `+${Math.round(
               100 * e.effect
             )}% chance for corpse to become zombie`;
           }
-          case h.types.infectedBite: {
+          case upgrades.types.infectedBite: {
             return `+${Math.round(
               100 * e.effect
             )}% chance for zombies to infect their targets`;
           }
-          case h.types.infectedBlast: {
+          case upgrades.types.infectedBlast: {
             return `+${Math.round(
               100 * e.effect
             )}% chance for zombies to explode on death`;
           }
-          case h.types.boneCollectorCapacity: {
+          case upgrades.types.boneCollectorCapacity: {
             return `+${e.effect} bone collector capacity`;
           }
-          case h.types.zombieDmgPC: {
+          case upgrades.types.zombieDmgPC: {
             return `+${formatWhole(Math.round(100 * e.effect))}% zombie damage`;
           }
-          case h.types.zombieHealthPC: {
+          case upgrades.types.zombieHealthPC: {
             return `+${formatWhole(Math.round(100 * e.effect))}% zombie health`;
           }
-          case h.types.bonesRate: {
+          case upgrades.types.bonesRate: {
             return `+${e.effect} bones per second`;
           }
-          case h.types.brainsRate: {
+          case upgrades.types.brainsRate: {
             return `+${e.effect} brains per second`;
           }
-          case h.types.plagueDamage: {
+          case upgrades.types.plagueDamage: {
             return `+${formatWhole(e.effect)} plague damage`;
           }
-          case h.types.plagueTicks: {
+          case upgrades.types.plagueTicks: {
             return `+${formatWhole(e.effect)} plague ticks`;
           }
-          case h.types.spitDistance: {
+          case upgrades.types.spitDistance: {
             return `+${e.effect} spit distance`;
           }
-          case h.types.blastHealing: {
+          case upgrades.types.blastHealing: {
             return `+${Math.round(100 * e.effect)}% plague healing`;
           }
-          case h.types.plagueArmor: {
+          case upgrades.types.plagueArmor: {
             return `+${Math.round(100 * e.effect)}% damage reduction`;
           }
-          case h.types.monsterLimit: {
+          case upgrades.types.monsterLimit: {
             return `+${e.effect} creature limit`;
           }
-          case h.types.runicSyphon: {
+          case upgrades.types.runicSyphon: {
             return `+${Math.round(100 * e.effect)}% runic syphon`;
           }
-          case h.types.gigazombies: {
+          case upgrades.types.gigazombies: {
             return "Unlock more gigazombies";
           }
-          case h.types.bulletproof: {
+          case upgrades.types.bulletproof: {
             return `+${Math.round(100 * e.effect)}% earth golem bullet reflect`;
           }
-          case h.types.harpySpeed: {
+          case upgrades.types.harpySpeed: {
             return `+${e.effect} harpy speed`;
           }
-          case h.types.harpyBombs: {
+          case upgrades.types.harpyBombs: {
             return `+${e.effect} harpy bombs`;
           }
-          case h.types.tankBuster: {
+          case upgrades.types.tankBuster: {
             return "Anti tank harpies";
           }
-          case h.types.spikeDelay: {
+          case upgrades.types.spikeDelay: {
             return "-20% spike delay";
           }
         }
@@ -14349,40 +14549,41 @@ angular
       this.currentRank = function (e) {
         return this.sidePanels.factory
           ? factory.currentRank(e)
-          : h.currentRank(e);
+          : upgrades.currentRank(e);
       };
 
-      this.currentRankConstruction = (e) => h.currentRankConstruction(e);
+      this.currentRankConstruction = (e) => upgrades.currentRankConstruction(e);
 
       this.upgradeTooExpensive = function (e) {
         return this.sidePanels.factory
           ? !factory.canAffordGenerator(e)
-          : !h.canAffordUpgrade(e) || (e.cap != 0 && h.currentRank(e) >= e.cap);
+          : !upgrades.canAffordUpgrade(e) ||
+              (e.cap != 0 && upgrades.currentRank(e) >= e.cap);
       };
 
       this.requiredForUpgrade = function (e) {
         const t = this.upgradePrice(e);
         switch (e.costType) {
-          case h.costs.energy: {
+          case upgrades.costs.energy: {
             return `${formatWhole(t - this.model.energy)} energy required`;
           }
-          case h.costs.blood:
+          case upgrades.costs.blood:
           case factory.costs.blood: {
             return `${formatWhole(
               t - this.model.persistentData.blood
             )} blood required`;
           }
-          case h.costs.brains: {
+          case upgrades.costs.brains: {
             return `${formatWhole(
               t - this.model.persistentData.brains
             )} brains required`;
           }
-          case h.costs.bones: {
+          case upgrades.costs.bones: {
             return `${formatWhole(
               t - this.model.persistentData.bones
             )} bones required`;
           }
-          case h.costs.prestigePoints: {
+          case upgrades.costs.prestigePoints: {
             return `${formatWhole(
               t - this.model.persistentData.prestigePointsToSpend
             )} prestige points required`;
@@ -14404,9 +14605,9 @@ angular
             )} ${this.costTranslate(e.costType)})`;
           }
           {
-            const maxAffordableUpgrades = h.upgradeMaxAffordable(e);
+            const maxAffordableUpgrades = upgrades.upgradeMaxAffordable(e);
             return `Purchase ${maxAffordableUpgrades} (${formatWhole(
-              h.upgradeMaxPrice(e, maxAffordableUpgrades)
+              upgrades.upgradeMaxPrice(e, maxAffordableUpgrades)
             )} ${this.costTranslate(e.costType)})`;
           }
         }
@@ -14415,21 +14616,22 @@ angular
         )} ${this.costTranslate(e.costType)})`;
       };
 
-      this.costTranslate = (e) => (e == h.costs.prestigePoints ? "points" : e);
+      this.costTranslate = (e) =>
+        e == upgrades.costs.prestigePoints ? "points" : e;
 
       this.buyUpgrade = function (e) {
         if (this.keysPressed.shift) {
-          h.purchaseMaxUpgrades(e);
+          upgrades.purchaseMaxUpgrades(e);
         } else {
-          h.purchaseUpgrade(e);
+          upgrades.purchaseUpgrade(e);
         }
       };
 
       this.destroyUpgrade = (e) => {
-        h.removeUpgrade(e);
+        upgrades.removeUpgrade(e);
       };
 
-      this.upgradeStatInfo = (e) => h.displayStatValue(e);
+      this.upgradeStatInfo = (e) => upgrades.displayStatValue(e);
 
       this.startGame = function () {
         this.model.startGame();
@@ -14518,7 +14720,7 @@ angular
         };
       };
 
-      this.constructionLeadsTo = (e) => h.constructionLeadsTo(e);
+      this.constructionLeadsTo = (e) => upgrades.constructionLeadsTo(e);
 
       this.howToPlay = [
         "This started as Chalice's Mod, expanded by CirusDane (called Danemancer), for incremancer - We hope you enjoy the qol changes!",
@@ -14556,37 +14758,37 @@ angular
         if (this.infusionMax) {
           switch (t) {
             case "blood": {
-              h.infuseRune(e, t, this.model.persistentData.blood);
+              upgrades.infuseRune(e, t, this.model.persistentData.blood);
               break;
             }
             case "brains": {
-              h.infuseRune(e, t, this.model.persistentData.brains);
+              upgrades.infuseRune(e, t, this.model.persistentData.brains);
               break;
             }
             case "bones": {
-              h.infuseRune(e, t, this.model.persistentData.bones);
+              upgrades.infuseRune(e, t, this.model.persistentData.bones);
             }
           }
         } else {
-          h.infuseRune(e, t, this.infusionAmount);
+          upgrades.infuseRune(e, t, this.infusionAmount);
         }
       };
 
-      this.shatterPercent = (e) => h.shatterPercent(e);
+      this.shatterPercent = (e) => upgrades.shatterPercent(e);
 
-      this.shatterBloodCost = (e) => h.shatterBloodCost(e);
+      this.shatterBloodCost = (e) => upgrades.shatterBloodCost(e);
 
       this.shatterSatiate = function (e, t) {
-        h.infuseRune(e, "blood", this.shatterBloodCost(t));
+        upgrades.infuseRune(e, "blood", this.shatterBloodCost(t));
       };
 
-      this.canShatter = () => h.canShatter();
+      this.canShatter = () => upgrades.canShatter();
 
       this.doShatter = () => {
-        h.doShatter();
+        upgrades.doShatter();
       };
 
-      this.shatterEffect = () => 100 * h.shatterEffect();
+      this.shatterEffect = () => 100 * upgrades.shatterEffect();
 
       this.infuseButtonText = function () {
         return this.infusionMax ? "Max" : formatWhole(this.infusionAmount);
@@ -14696,7 +14898,7 @@ angular
         }
       };
 
-      this.skeletonTimer = () => i.skeletonTimer();
+      this.skeletonTimer = () => skeleton.skeletonTimer();
 
       this.skeletonMenu = {
         isShown: false,
@@ -14713,7 +14915,9 @@ angular
         show() {
           this.tab = "inventory";
 
-          this.upgrade = h.prestigeUpgrades.filter((e) => e.id == 115)[0];
+          this.upgrade = upgrades.prestigeUpgrades.filter(
+            (e) => e.id == 115
+          )[0];
 
           this.upgrades = Mt;
           this.isShown = !this.isShown;
@@ -14728,31 +14932,31 @@ angular
           Y.canType = this.isNewGearSetShown;
         },
         selectGearSet(index) {
-          i.persistent.gearSetEquipped = index;
+          skeleton.persistent.gearSetEquipped = index;
 
-          if (i.persistent.gearSetEquipped == -1) {
+          if (skeleton.persistent.gearSetEquipped == -1) {
             return;
           }
 
-          i.persistent.gearSets[i.persistent.gearSetEquipped].slots.forEach(
-            (t) => {
-              i.persistent.items.filter(
-                (e) => e.s == t.s && (e.q = t.id == e.id)
-              );
-            }
-          );
+          skeleton.persistent.gearSets[
+            skeleton.persistent.gearSetEquipped
+          ].slots.forEach((t) => {
+            skeleton.persistent.items.filter(
+              (e) => e.s == t.s && (e.q = t.id == e.id)
+            );
+          });
 
-          h.applyUpgrades();
+          upgrades.applyUpgrades();
           this.updateEquippedItems();
         },
         canCreateGearSets() {
-          return i.persistent.gearSets.length < this.maxGearSet;
+          return skeleton.persistent.gearSets.length < this.maxGearSet;
         },
         canDeleteGearSets: () =>
-          i.persistent.gearSets.length > 0 &&
-          i.persistent.gearSetEquipped != -1,
-        gearSets: () => i.persistent.gearSets,
-        gearSetEquipped: () => i.persistent.gearSetEquipped,
+          skeleton.persistent.gearSets.length > 0 &&
+          skeleton.persistent.gearSetEquipped != -1,
+        gearSets: () => skeleton.persistent.gearSets,
+        gearSetEquipped: () => skeleton.persistent.gearSetEquipped,
         createGearSet() {
           if (this.newGearSetName == null) {
             return;
@@ -14762,8 +14966,8 @@ angular
             return;
           }
           let newGearSet = { name, slots: [] };
-          const e = i.persistent.items.filter(
-            (e) => e.q && e.s == i.lootPositions.helmet.id
+          const e = skeleton.persistent.items.filter(
+            (e) => e.q && e.s == skeleton.lootPositions.helmet.id
           );
 
           if (e.length > 0) {
@@ -14771,98 +14975,101 @@ angular
           } else {
             newGearSet.slots.push([
               {
-                s: i.lootPositions.helmet.id,
+                s: skeleton.lootPositions.helmet.id,
                 id: -1,
               },
             ]);
           }
 
-          const s = i.persistent.items.filter(
-            (e) => e.q && e.s == i.lootPositions.sword.id
+          const s = skeleton.persistent.items.filter(
+            (e) => e.q && e.s == skeleton.lootPositions.sword.id
           );
 
           if (s.length > 0) {
             newGearSet.slots.push({ s: s[0].s, id: s[0].id });
           } else {
             newGearSet.slots.push({
-              s: i.lootPositions.sword.id,
+              s: skeleton.lootPositions.sword.id,
               id: -2,
             });
           }
 
-          const a = i.persistent.items.filter(
-            (e) => e.q && e.s == i.lootPositions.chest.id
+          const a = skeleton.persistent.items.filter(
+            (e) => e.q && e.s == skeleton.lootPositions.chest.id
           );
 
           if (a.length > 0) {
             newGearSet.slots.push({ s: a[0].s, id: a[0].id });
           } else {
             newGearSet.slots.push({
-              s: i.lootPositions.chest.id,
+              s: skeleton.lootPositions.chest.id,
               id: -3,
             });
           }
 
-          const r = i.persistent.items.filter(
-            (e) => e.q && e.s == i.lootPositions.shield.id
+          const r = skeleton.persistent.items.filter(
+            (e) => e.q && e.s == skeleton.lootPositions.shield.id
           );
 
           if (r.length > 0) {
             newGearSet.slots.push({ s: r[0].s, id: r[0].id });
           } else {
             newGearSet.slots.push({
-              s: i.lootPositions.shield.id,
+              s: skeleton.lootPositions.shield.id,
               id: -4,
             });
           }
 
-          const o = i.persistent.items.filter(
-            (e) => e.q && e.s == i.lootPositions.gloves.id
+          const o = skeleton.persistent.items.filter(
+            (e) => e.q && e.s == skeleton.lootPositions.gloves.id
           );
 
           if (o.length > 0) {
             newGearSet.slots.push({ s: o[0].s, id: o[0].id });
           } else {
             newGearSet.slots.push({
-              s: i.lootPositions.gloves.id,
+              s: skeleton.lootPositions.gloves.id,
               id: -5,
             });
           }
 
-          const h = i.persistent.items.filter(
-            (e) => e.q && e.s == i.lootPositions.legs.id
+          const h = skeleton.persistent.items.filter(
+            (e) => e.q && e.s == skeleton.lootPositions.legs.id
           );
 
           if (h.length > 0) {
             newGearSet.slots.push({ s: h[0].s, id: h[0].id });
           } else {
             newGearSet.slots.push({
-              s: i.lootPositions.legs.id,
+              s: skeleton.lootPositions.legs.id,
               id: -6,
             });
           }
 
-          const l = i.persistent.items.filter(
-            (e) => e.q && e.s == i.lootPositions.boots.id
+          const l = skeleton.persistent.items.filter(
+            (e) => e.q && e.s == skeleton.lootPositions.boots.id
           );
 
           if (l.length > 0) {
             newGearSet.slots.push({ s: l[0].s, id: l[0].id });
           } else {
             newGearSet.slots.push({
-              s: i.lootPositions.boots.id,
+              s: skeleton.lootPositions.boots.id,
               id: -7,
             });
           }
 
-          i.persistent.gearSets.push(newGearSet);
-          this.selectGearSet(i.persistent.gearSets.length - 1);
+          skeleton.persistent.gearSets.push(newGearSet);
+          this.selectGearSet(skeleton.persistent.gearSets.length - 1);
           this.showNewGearSet();
         },
         deleteGearSet() {
-          i.persistent.gearSets.splice(i.persistent.gearSetEquipped, 1);
+          skeleton.persistent.gearSets.splice(
+            skeleton.persistent.gearSetEquipped,
+            1
+          );
 
-          if (i.persistent.gearSets.length > 0) {
+          if (skeleton.persistent.gearSets.length > 0) {
             this.selectGearSet(0);
           } else {
             this.selectGearSet(-1);
@@ -14910,72 +15117,72 @@ angular
           this.itemsFilters.t = [];
         },
         acceptOffer() {
-          i.acceptOffer();
+          skeleton.acceptOffer();
           this.isShown = false;
         },
         anotherOffer: () =>
-          i.persistent.skeletons > 0 &&
+          skeleton.persistent.skeletons > 0 &&
           this.model.persistentData.trophies.length >=
-            (i.persistent.xpRate < 4
-              ? 20 * i.persistent.xpRate
-              : i.persistent.xpRate < 8
+            (skeleton.persistent.xpRate < 4
+              ? 20 * skeleton.persistent.xpRate
+              : skeleton.persistent.xpRate < 8
               ? 70
-              : i.persistent.xpRate < 16
+              : skeleton.persistent.xpRate < 16
               ? 110
-              : i.persistent.xpRate < 32
+              : skeleton.persistent.xpRate < 32
               ? 160
-              : i.persistent.xpRate < 64
+              : skeleton.persistent.xpRate < 64
               ? 220
-              : i.persistent.xpRate < 128
+              : skeleton.persistent.xpRate < 128
               ? 290
-              : i.persistent.xpRate < 256
+              : skeleton.persistent.xpRate < 256
               ? 370
-              : i.persistent.xpRate < 512
+              : skeleton.persistent.xpRate < 512
               ? 460
-              : i.persistent.xpRate < 1024
+              : skeleton.persistent.xpRate < 1024
               ? 560
-              : i.persistent.xpRate < 2048
+              : skeleton.persistent.xpRate < 2048
               ? 670
-              : i.persistent.xpRate < 4096
+              : skeleton.persistent.xpRate < 4096
               ? 790
               : 720 +
-                (Math.log2(i.persistent.xpRate) - 7) *
-                  (Math.log2(i.persistent.xpRate) - 7) *
+                (Math.log2(skeleton.persistent.xpRate) - 7) *
+                  (Math.log2(skeleton.persistent.xpRate) - 7) *
                   10),
         trophies: () =>
-          i.persistent.skeletons > 0
+          skeleton.persistent.skeletons > 0
             ? ` - ${this.model.persistentData.trophies.length} / ${
-                i.persistent.xpRate < 4
-                  ? 20 * i.persistent.xpRate
-                  : i.persistent.xpRate < 8
+                skeleton.persistent.xpRate < 4
+                  ? 20 * skeleton.persistent.xpRate
+                  : skeleton.persistent.xpRate < 8
                   ? 70
-                  : i.persistent.xpRate < 16
+                  : skeleton.persistent.xpRate < 16
                   ? 110
-                  : i.persistent.xpRate < 32
+                  : skeleton.persistent.xpRate < 32
                   ? 160
-                  : i.persistent.xpRate < 64
+                  : skeleton.persistent.xpRate < 64
                   ? 220
-                  : i.persistent.xpRate < 128
+                  : skeleton.persistent.xpRate < 128
                   ? 290
-                  : i.persistent.xpRate < 256
+                  : skeleton.persistent.xpRate < 256
                   ? 370
-                  : i.persistent.xpRate < 512
+                  : skeleton.persistent.xpRate < 512
                   ? 460
-                  : i.persistent.xpRate < 1024
+                  : skeleton.persistent.xpRate < 1024
                   ? 560
-                  : i.persistent.xpRate < 2048
+                  : skeleton.persistent.xpRate < 2048
                   ? 670
-                  : i.persistent.xpRate < 4096
+                  : skeleton.persistent.xpRate < 4096
                   ? 790
                   : 720 +
-                    (Math.log2(i.persistent.xpRate) - 7) *
-                      (Math.log2(i.persistent.xpRate) - 7) *
+                    (Math.log2(skeleton.persistent.xpRate) - 7) *
+                      (Math.log2(skeleton.persistent.xpRate) - 7) *
                       10
               } Trophies`
             : "",
-        talentPoints: () => i.talentPoints,
-        talentsAssigned: () => i.getUsedPoints(),
-        talentValue: (e) => `${i.talents[e.id]} / ${e.maxPoints}`,
+        talentPoints: () => skeleton.talentPoints,
+        talentsAssigned: () => skeleton.getUsedPoints(),
+        talentValue: (e) => `${skeleton.talents[e.id]} / ${e.maxPoints}`,
         talentSet(e, t) {
           e.set(t);
           kt();
@@ -14984,7 +15191,7 @@ angular
           e.reset();
           kt();
         },
-        canReset: () => i.persistent.talentReset,
+        canReset: () => skeleton.persistent.talentReset,
         talentsReset() {
           wt();
           kt();
@@ -14995,18 +15202,18 @@ angular
         },
         xpPercent: () =>
           Math.round(
-            100 * Math.min(1, this.skeleton().xp / i.xpForNextLevel())
+            100 * Math.min(1, this.skeleton().xp / skeleton.xpForNextLevel())
           ),
-        xpForNextLevel: () => i.xpForNextLevel(),
-        xpRate: () => 100 * i.persistent.xpRate,
+        xpForNextLevel: () => skeleton.xpForNextLevel(),
+        xpRate: () => 100 * skeleton.persistent.xpRate,
         prestigePointsPerKill: () =>
           1.00025 ** this.skeleton().level * this.skeleton().level,
-        isAlive: () => i.isAlive(),
-        timer: () => Math.ceil(i.skeletonTimer()),
+        isAlive: () => skeleton.isAlive(),
+        timer: () => Math.ceil(skeleton.skeletonTimer()),
         updateEquippedItems() {
           this.equipped = [];
-          const e = i.persistent.items.filter(
-            (e) => e.q && e.s == i.lootPositions.helmet.id
+          const e = skeleton.persistent.items.filter(
+            (e) => e.q && e.s == skeleton.lootPositions.helmet.id
           );
 
           if (e.length > 0) {
@@ -15015,7 +15222,7 @@ angular
             this.equipped.push([
               {
                 name: "Helmet Slot",
-                s: i.lootPositions.helmet.id,
+                s: skeleton.lootPositions.helmet.id,
                 id: -1,
               },
             ]);
@@ -15023,8 +15230,8 @@ angular
 
           const t = [];
 
-          const s = i.persistent.items.filter(
-            (e) => e.q && e.s == i.lootPositions.sword.id
+          const s = skeleton.persistent.items.filter(
+            (e) => e.q && e.s == skeleton.lootPositions.sword.id
           );
 
           if (s.length > 0) {
@@ -15032,13 +15239,13 @@ angular
           } else {
             t.push({
               name: "Sword Slot",
-              s: i.lootPositions.sword.id,
+              s: skeleton.lootPositions.sword.id,
               id: -2,
             });
           }
 
-          const a = i.persistent.items.filter(
-            (e) => e.q && e.s == i.lootPositions.chest.id
+          const a = skeleton.persistent.items.filter(
+            (e) => e.q && e.s == skeleton.lootPositions.chest.id
           );
 
           if (a.length > 0) {
@@ -15046,13 +15253,13 @@ angular
           } else {
             t.push({
               name: "Chest Slot",
-              s: i.lootPositions.chest.id,
+              s: skeleton.lootPositions.chest.id,
               id: -3,
             });
           }
 
-          const r = i.persistent.items.filter(
-            (e) => e.q && e.s == i.lootPositions.shield.id
+          const r = skeleton.persistent.items.filter(
+            (e) => e.q && e.s == skeleton.lootPositions.shield.id
           );
 
           if (r.length > 0) {
@@ -15060,7 +15267,7 @@ angular
           } else {
             t.push({
               name: "Shield Slot",
-              s: i.lootPositions.shield.id,
+              s: skeleton.lootPositions.shield.id,
               id: -4,
             });
           }
@@ -15068,8 +15275,8 @@ angular
           this.equipped.push(t);
           const n = [];
 
-          const o = i.persistent.items.filter(
-            (e) => e.q && e.s == i.lootPositions.gloves.id
+          const o = skeleton.persistent.items.filter(
+            (e) => e.q && e.s == skeleton.lootPositions.gloves.id
           );
 
           if (o.length > 0) {
@@ -15077,13 +15284,13 @@ angular
           } else {
             n.push({
               name: "Gloves Slot",
-              s: i.lootPositions.gloves.id,
+              s: skeleton.lootPositions.gloves.id,
               id: -5,
             });
           }
 
-          const h = i.persistent.items.filter(
-            (e) => e.q && e.s == i.lootPositions.legs.id
+          const h = skeleton.persistent.items.filter(
+            (e) => e.q && e.s == skeleton.lootPositions.legs.id
           );
 
           if (h.length > 0) {
@@ -15091,13 +15298,13 @@ angular
           } else {
             n.push({
               name: "Legs Slot",
-              s: i.lootPositions.legs.id,
+              s: skeleton.lootPositions.legs.id,
               id: -6,
             });
           }
 
-          const l = i.persistent.items.filter(
-            (e) => e.q && e.s == i.lootPositions.boots.id
+          const l = skeleton.persistent.items.filter(
+            (e) => e.q && e.s == skeleton.lootPositions.boots.id
           );
 
           if (l.length > 0) {
@@ -15105,7 +15312,7 @@ angular
           } else {
             n.push({
               name: "Boots Slot",
-              s: i.lootPositions.boots.id,
+              s: skeleton.lootPositions.boots.id,
               id: -7,
             });
           }
@@ -15121,32 +15328,32 @@ angular
           ]);
         },
         inventoryItems: () =>
-          i.persistent.items
+          skeleton.persistent.items
             .filter((e) => !e.q)
             .sort((e, t) => t.r * t.l - e.r * e.l),
-        itemName: (e) => e.name || i.getLootName(e),
+        itemName: (e) => e.name || skeleton.getLootName(e),
         itemSubName(e) {
           if (!e.name) {
             switch (e.r) {
-              case i.rarity.common: {
+              case skeleton.rarity.common: {
                 return `Common level ${e.l} ${this.itemType(e)}`;
               }
-              case i.rarity.rare: {
+              case skeleton.rarity.rare: {
                 return `Rare level ${e.l} ${this.itemType(e)}`;
               }
-              case i.rarity.epic: {
+              case skeleton.rarity.epic: {
                 return `Epic level ${e.l} ${this.itemType(e)}`;
               }
-              case i.rarity.legendary: {
+              case skeleton.rarity.legendary: {
                 return `Legendary level ${e.l} ${this.itemType(e)}`;
               }
-              case i.rarity.ancient: {
+              case skeleton.rarity.ancient: {
                 return `Ancient level ${e.l} ${this.itemType(e)}`;
               }
-              case i.rarity.divine: {
+              case skeleton.rarity.divine: {
                 return `Divine level ${e.l} ${this.itemType(e)}`;
               }
-              case i.rarity.chaos: {
+              case skeleton.rarity.chaos: {
                 return `Chaos level ${e.l} ${this.itemType(e)}`;
               }
             }
@@ -15155,39 +15362,39 @@ angular
             return "Click this to destroy all non-equipped items (legendary items will not be automatically destroyed). Or drag items here to destroy them.";
           }
         },
-        itemStats: (e) => i.getLootStats(e),
-        itemEffects: (e) => i.getSpecialEffects(e),
+        itemStats: (e) => skeleton.getLootStats(e),
+        itemEffects: (e) => skeleton.getSpecialEffects(e),
         itemEffectsNamesClass: (e) =>
-          i.getSpecialEffectsName(e).join(" ").toLowerCase(),
-        itemEffectsList: () => i.getSpecialEffectsList(),
+          skeleton.getSpecialEffectsName(e).join(" ").toLowerCase(),
+        itemEffectsList: () => skeleton.getSpecialEffectsList(),
         itemEffectsListClass: (e) => e.replace(" ", "-").toLowerCase(),
-        itemRarityList: () => i.getRarityList(),
-        itemRarityClass: (e) => i.getLootClass({ r: e }),
-        itemTypeList: () => i.getTypeList(),
+        itemRarityList: () => skeleton.getRarityList(),
+        itemRarityClass: (e) => skeleton.getLootClass({ r: e }),
+        itemTypeList: () => skeleton.getTypeList(),
         itemTypeClass(e) {
           return this.itemType({ s: e });
         },
         itemRarityName(r) {
           switch (r) {
-            case i.rarity.common: {
+            case skeleton.rarity.common: {
               return "Common";
             }
-            case i.rarity.rare: {
+            case skeleton.rarity.rare: {
               return "Rare";
             }
-            case i.rarity.epic: {
+            case skeleton.rarity.epic: {
               return "Epic";
             }
-            case i.rarity.legendary: {
+            case skeleton.rarity.legendary: {
               return "Legendary";
             }
-            case i.rarity.ancient: {
+            case skeleton.rarity.ancient: {
               return "Ancient";
             }
-            case i.rarity.divine: {
+            case skeleton.rarity.divine: {
               return "Divine";
             }
-            case i.rarity.chaos: {
+            case skeleton.rarity.chaos: {
               return "Chaos";
             }
           }
@@ -15197,34 +15404,34 @@ angular
             case -1: {
               return "trash";
             }
-            case i.lootPositions.helmet.id: {
+            case skeleton.lootPositions.helmet.id: {
               return "helmet";
             }
-            case i.lootPositions.chest.id: {
+            case skeleton.lootPositions.chest.id: {
               return "chest";
             }
-            case i.lootPositions.gloves.id: {
+            case skeleton.lootPositions.gloves.id: {
               return "gloves";
             }
-            case i.lootPositions.legs.id: {
+            case skeleton.lootPositions.legs.id: {
               return "legs";
             }
-            case i.lootPositions.boots.id: {
+            case skeleton.lootPositions.boots.id: {
               return "boots";
             }
-            case i.lootPositions.sword.id: {
+            case skeleton.lootPositions.sword.id: {
               return "sword";
             }
-            case i.lootPositions.shield.id: {
+            case skeleton.lootPositions.shield.id: {
               return "shield";
             }
           }
         },
-        itemClass: (e) => (e.name ? "empty" : i.getLootClass(e)),
+        itemClass: (e) => (e.name ? "empty" : skeleton.getLootClass(e)),
         itemById(e) {
           let t = null;
 
-          i.persistent.items.forEach((s) => {
+          skeleton.persistent.items.forEach((s) => {
             if (s.id == e) {
               t = s;
             }
@@ -15235,36 +15442,36 @@ angular
         itemDropped(e, t) {
           let s = null;
 
-          i.persistent.items.forEach((t) => {
+          skeleton.persistent.items.forEach((t) => {
             if (t.id == e) {
               s = t;
             }
           });
 
           if (-1 == t) {
-            i.destroyItem(s);
+            skeleton.destroyItem(s);
           } else {
             if (s.s == t) {
-              i.persistent.items.forEach((e) => {
+              skeleton.persistent.items.forEach((e) => {
                 if (e.s == t) {
                   e.q = false;
                 }
               }),
                 (s.q = true),
-                h.applyUpgrades();
+                upgrades.applyUpgrades();
             }
 
             this.updateEquippedItems();
           }
 
-          if (i.persistent.gearSetEquipped != -1 && -1 != t) {
-            i.persistent.gearSets[i.persistent.gearSetEquipped].slots.forEach(
-              (t) => {
-                if (t.s == s.s) {
-                  t.id = s.id;
-                }
+          if (skeleton.persistent.gearSetEquipped != -1 && -1 != t) {
+            skeleton.persistent.gearSets[
+              skeleton.persistent.gearSetEquipped
+            ].slots.forEach((t) => {
+              if (t.s == s.s) {
+                t.id = s.id;
               }
-            );
+            });
           }
         },
         equipItem(e) {
@@ -15273,41 +15480,41 @@ angular
             return;
           }
 
-          i.persistent.items.forEach((t) => {
+          skeleton.persistent.items.forEach((t) => {
             if (t.s == e.s) {
               t.q = false;
             }
           });
 
           e.q = true;
-          h.applyUpgrades();
+          upgrades.applyUpgrades();
           this.updateEquippedItems();
 
-          if (i.persistent.gearSetEquipped != -1) {
-            i.persistent.gearSets[i.persistent.gearSetEquipped].slots.forEach(
-              (t) => {
-                if (t.s == e.s) {
-                  t.id = e.id;
-                }
+          if (skeleton.persistent.gearSetEquipped != -1) {
+            skeleton.persistent.gearSets[
+              skeleton.persistent.gearSetEquipped
+            ].slots.forEach((t) => {
+              if (t.s == e.s) {
+                t.id = e.id;
               }
-            );
+            });
           }
         },
         trashAll() {
           this.confirmMessage = `Are you sure you want to destroy all non-equipped items? You will earn ${formatWhole(
-            i.xpTotal()
+            skeleton.xpTotal()
           )} xp`;
 
           this.confirmCallback = function () {
             this.confirmCallback = false;
-            i.destroyAllItems();
+            skeleton.destroyAllItems();
           };
         },
       };
 
       s.ready(function () {
         e.updatePromise = t(u, 200);
-        h.angularModel = this;
+        upgrades.angularModel = this;
         kt();
       });
     },
