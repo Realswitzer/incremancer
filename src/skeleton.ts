@@ -1,59 +1,59 @@
-Skeleton = {
-  map : ZmMap,
-  model : GameModel,
-  skeletons : [],
-  aliveSkeletons : [],
-  discardedSprites : [],
-  aliveHumans : [],
-  scaling : 1,
+const Skeleton = {
+  map: ZmMap,
+  model: GameModel,
+  skeletons: [],
+  aliveSkeletons: [],
+  discardedSprites: [],
+  aliveHumans: [],
+  scaling: 1,
   moveTargetDistance: 15,
-  attackDistance : 20,
-  attackSpeed : 3,
-  targetDistance : 100,
-  fadeSpeed : 0.1,
-  currId : 1,
-  scanTime : 3,
-  spawnTimer : 0,
-  respawnTime : 10,
-  moveSpeed : 40,
-  lastKillingBlow : 0,
-  randomSpells : [],
-  textures : {
-    set:false
+  attackDistance: 20,
+  attackSpeed: 3,
+  targetDistance: 100,
+  fadeSpeed: 0.1,
+  currId: 1,
+  scanTime: 3,
+  spawnTimer: 0,
+  respawnTime: 10,
+  moveSpeed: 40,
+  lastKillingBlow: 0,
+  randomSpells: [],
+  textures: {
+    set: false,
   },
-  directions : {
-    down:1,
-    up:2,
-    right:3,
-    left:4,
-    dead:5
+  directions: {
+    down: 1,
+    up: 2,
+    right: 3,
+    left: 4,
+    dead: 5,
   },
-  burnTickTimer : 5,
-  smokeTimer : 0.3,
-  fastDistance:fastDistance,
-  magnitude:magnitude,
-  damageZombie:Zombies.damageZombie,
-  searchClosestTarget:Zombies.searchClosestTarget,
-  updateBurns:Zombies.updateBurns,
-  updateZombieRegen:Zombies.updateZombieRegen,
-  causePlagueExplosion:Zombies.causePlagueExplosion,
-  inflictPlague:Zombies.inflictPlague,
-  healZombie:Zombies.healZombie,
+  burnTickTimer: 5,
+  smokeTimer: 0.3,
+  fastDistance: fastDistance,
+  magnitude: magnitude,
+  damageZombie: Zombies.damageZombie,
+  searchClosestTarget: Zombies.searchClosestTarget,
+  updateBurns: Zombies.updateBurns,
+  updateZombieRegen: Zombies.updateZombieRegen,
+  causePlagueExplosion: Zombies.causePlagueExplosion,
+  inflictPlague: Zombies.inflictPlague,
+  healZombie: Zombies.healZombie,
 
-  states : {
-    lookingForTarget:1,
-    movingToTarget:2,
-    attackingTarget:3
+  states: {
+    lookingForTarget: 1,
+    movingToTarget: 2,
+    attackingTarget: 3,
   },
 
-  storageName : "incremancerskele",
-  persistent : {
-    xpRate : 0,
-    skeletons : 0,
-    level : 1,
-    xp : 0,
-    items : [],
-    currItemId : 0
+  storageName: "incremancerskele",
+  persistent: {
+    xpRate: 0,
+    skeletons: 0,
+    level: 1,
+    xp: 0,
+    items: [],
+    currItemId: 0,
   },
 
   xpForNextLevel() {
@@ -67,19 +67,21 @@ Skeleton = {
         this.persistent.xp -= this.xpForNextLevel();
         this.persistent.level++;
         Upgrades.applyUpgrades();
-        GameModel.sendMessage("Skeleton Champion reached level " + this.persistent.level + "!");
+        GameModel.sendMessage(
+          "Skeleton Champion reached level " + this.persistent.level + "!"
+        );
         var skeletonElement = document.getElementById("skeleton");
         if (skeletonElement) {
           skeletonElement.classList.toggle("levelup");
-          setTimeout(function() {
+          setTimeout(function () {
             skeletonElement.classList.toggle("levelup");
           }, 3000);
-        };        
+        }
       }
     }
   },
 
-  isAlive : function() {
+  isAlive: function () {
     for (var i = 0; i < this.skeletons.length; i++) {
       if (!this.skeletons[i].dead) {
         return true;
@@ -91,7 +93,7 @@ Skeleton = {
   applyUpgrades() {
     if (this.persistent.skeletons > 0) {
       this.applyItemUpgrades();
-      var multiplier = 1 + (this.persistent.level / 100);
+      var multiplier = 1 + this.persistent.level / 100;
       GameModel.bloodPCMod *= multiplier;
       GameModel.brainsPCMod *= multiplier;
       GameModel.bonesPCMod *= multiplier;
@@ -103,7 +105,7 @@ Skeleton = {
 
   acceptOffer() {
     GameModel.persistentData.trophies = [];
-    
+
     if (this.persistent.skeletons < 1) {
       this.persistent.skeletons = 1;
       this.persistent.xpRate = 1;
@@ -123,16 +125,16 @@ Skeleton = {
       this.textures.up = [];
       this.textures.right = [];
       this.textures.dead = [];
-      for (var i=0; i < 3; i++) {
-        this.textures.down.push(PIXI.Texture.from('skeleton' + i + '.png'));
+      for (var i = 0; i < 3; i++) {
+        this.textures.down.push(PIXI.Texture.from("skeleton" + i + ".png"));
       }
-      for (var i=3; i < 6; i++) {
-        this.textures.up.push(PIXI.Texture.from('skeleton' + i + '.png'));
+      for (var i = 3; i < 6; i++) {
+        this.textures.up.push(PIXI.Texture.from("skeleton" + i + ".png"));
       }
-      for (var i=6; i < 9; i++) {
-        this.textures.right.push(PIXI.Texture.from('skeleton' + i + '.png'));
+      for (var i = 6; i < 9; i++) {
+        this.textures.right.push(PIXI.Texture.from("skeleton" + i + ".png"));
       }
-      this.textures.dead.push(PIXI.Texture.from('skeleton9.png'));
+      this.textures.dead.push(PIXI.Texture.from("skeleton9.png"));
       this.textures.set = true;
     }
 
@@ -142,7 +144,8 @@ Skeleton = {
       if (!this.skeletons[i].dead) {
         skeletons.push(this.skeletons[i]);
         this.skeletons[i].x = this.graveyard.sprite.x;
-        this.skeletons[i].zIndex = this.skeletons[i].y = this.graveyard.sprite.y + (this.graveyard.level > 2 ? 8 : 0);
+        this.skeletons[i].zIndex = this.skeletons[i].y =
+          this.graveyard.sprite.y + (this.graveyard.level > 2 ? 8 : 0);
         this.skeletons[i].target = false;
         this.skeletons[i].state = this.states.lookingForTarget;
       } else {
@@ -154,10 +157,8 @@ Skeleton = {
     this.aliveSkeletons = [];
 
     this.lootChance = 0.001;
-    if (GameModel.level < this.persistent.level)
-      this.lootChance *= 0.5;
-    if (GameModel.level > this.persistent.level * 2)
-      this.lootChance *= 1.5;
+    if (GameModel.level < this.persistent.level) this.lootChance *= 0.5;
+    if (GameModel.level > this.persistent.level * 2) this.lootChance *= 1.5;
   },
 
   spawnCreature() {
@@ -168,7 +169,7 @@ Skeleton = {
     } else {
       creature = new PIXI.AnimatedSprite(this.textures.down);
     }
-    creature.tint = 0xEEEEEE;
+    creature.tint = 0xeeeeee;
     creature.immuneToBurns = false;
     creature.bulletReflect = 0;
     creature.zombie = true;
@@ -181,22 +182,22 @@ Skeleton = {
     creature.lastKnownBuilding = false;
     creature.alpha = 1;
     creature.animationSpeed = 0.15;
-    creature.anchor = {x:8.5/16,y:1};
+    creature.anchor = { x: 8.5 / 16, y: 1 };
     creature.position = {
-      x:this.graveyard.sprite.x,
-      y:this.graveyard.sprite.y + (this.graveyard.level > 2 ? 8 : 0)
+      x: this.graveyard.sprite.x,
+      y: this.graveyard.sprite.y + (this.graveyard.level > 2 ? 8 : 0),
     };
     creature.target = false;
     creature.zIndex = creature.position.y;
     creature.visible = true;
-    creature.maxHealth = creature.health = (this.model.zombieHealth * 10);
+    creature.maxHealth = creature.health = this.model.zombieHealth * 10;
     creature.attackDamage = this.model.zombieDamage * 10;
     creature.regenTimer = 5;
     creature.state = this.states.lookingForTarget;
     creature.scaling = this.scaling;
     creature.scale = {
       x: creature.scaling,
-      y: creature.scaling
+      y: creature.scaling,
     };
     creature.abilityTime = Math.random() * 4;
     creature.attackTimer = 0;
@@ -228,7 +229,7 @@ Skeleton = {
 
     this.aliveSkeletons = [];
 
-    for (var i=0; i < this.skeletons.length; i++) {
+    for (var i = 0; i < this.skeletons.length; i++) {
       if (this.skeletons[i].visible) {
         this.updateCreature(this.skeletons[i], timeDiff);
         if (!this.skeletons[i].dead) {
@@ -248,13 +249,10 @@ Skeleton = {
     this.lastKillingBlow -= timeDiff;
   },
 
-  
-
   updateCreature(creature, timeDiff) {
     if (creature.dead) {
-      if (!creature.visible)
-        return;
-      
+      if (!creature.visible) return;
+
       creature.alpha -= this.fadeSpeed * timeDiff;
       if (creature.alpha < 0) {
         creature.visible = false;
@@ -262,19 +260,19 @@ Skeleton = {
       }
       return;
     }
-    
+
     creature.attackTimer -= timeDiff;
     creature.scanTime -= timeDiff;
     creature.abilityTime -= timeDiff;
-    
+
     if (this.model.runeEffects.healthRegen > 0) {
       this.updateZombieRegen(creature, timeDiff);
     }
-    
+
     if (creature.burning && !creature.immuneToBurns) {
       this.updateBurns(creature, timeDiff);
     }
-    
+
     if (creature.abilityTime < 0) {
       creature.abilityTime = 4;
       // do abilities
@@ -284,10 +282,8 @@ Skeleton = {
       creature.state = this.states.lookingForTarget;
     }
 
-    switch(creature.state) {
-
+    switch (creature.state) {
       case this.states.lookingForTarget:
-
         this.searchClosestTarget(creature);
         if (creature.target) {
           creature.state = this.states.movingToTarget;
@@ -295,15 +291,22 @@ Skeleton = {
         break;
 
       case this.states.movingToTarget:
-
-        var distanceToHumanTarget = this.fastDistance(creature.position.x, creature.position.y, creature.target.x, creature.target.y);
+        var distanceToHumanTarget = this.fastDistance(
+          creature.position.x,
+          creature.position.y,
+          creature.target.x,
+          creature.target.y
+        );
 
         if (distanceToHumanTarget < this.attackDistance) {
           creature.state = this.states.attackingTarget;
           break;
         }
 
-        if (distanceToHumanTarget > this.attackDistance * 3 && creature.scanTime < 0) {
+        if (
+          distanceToHumanTarget > this.attackDistance * 3 &&
+          creature.scanTime < 0
+        ) {
           this.searchClosestTarget(creature);
         }
         this.updateCreatureSpeed(creature, timeDiff);
@@ -311,7 +314,12 @@ Skeleton = {
         break;
 
       case this.states.attackingTarget:
-        var distanceToTarget = this.fastDistance(creature.position.x, creature.position.y, creature.target.x, creature.target.y);
+        var distanceToTarget = this.fastDistance(
+          creature.position.x,
+          creature.position.y,
+          creature.target.x,
+          creature.target.y
+        );
         if (distanceToTarget < this.attackDistance) {
           if (creature.attackTimer < 0 && !creature.target.dead) {
             Humans.damageHuman(creature.target, this.calculateDamage(creature));
@@ -320,11 +328,12 @@ Skeleton = {
               this.lastKillingBlow = 20;
               PrestigePoints.newPart(creature.target.x, creature.target.y);
             }
-            creature.attackTimer = this.attackSpeed * this.model.runeEffects.attackSpeed;
+            creature.attackTimer =
+              this.attackSpeed * this.model.runeEffects.attackSpeed;
             if (creature.burning) {
-              creature.attackTimer *= (1 / this.model.burningSpeedMod);
+              creature.attackTimer *= 1 / this.model.burningSpeedMod;
             }
-            if (this.randomSpells.length > 0)  {
+            if (this.randomSpells.length > 0) {
               for (var i = 0; i < this.randomSpells.length; i++) {
                 if (Math.random() < 0.07) {
                   Spells.castSpellNoMana(this.randomSpells[i]);
@@ -344,13 +353,13 @@ Skeleton = {
 
   incinerate() {
     var creature;
-    for (var i=0; i < this.skeletons.length; i++) {
+    for (var i = 0; i < this.skeletons.length; i++) {
       if (this.skeletons[i].visible) {
-        creature=this.skeletons[i];
+        creature = this.skeletons[i];
       }
     }
     if (creature)
-      for (var i=0; i < this.aliveHumans.length; i++) {
+      for (var i = 0; i < this.aliveHumans.length; i++) {
         if (Math.abs(this.aliveHumans[i].x - creature.x) < 200) {
           if (Math.abs(this.aliveHumans[i].y - creature.y) < 200) {
             Humans.burnHuman(this.aliveHumans[i], creature.attackDamage);
@@ -358,10 +367,9 @@ Skeleton = {
         }
       }
   },
-  
 
   getCreatureDirection(creature) {
-    if(Math.abs(creature.xSpeed) > Math.abs(creature.ySpeed)) {
+    if (Math.abs(creature.xSpeed) > Math.abs(creature.ySpeed)) {
       //left right
       if (creature.xSpeed < 0) {
         return this.directions.left;
@@ -379,7 +387,7 @@ Skeleton = {
   changeTextureDirection(creature) {
     var direction = this.getCreatureDirection(creature);
     if (direction !== creature.currentDirection) {
-      switch(direction) {
+      switch (direction) {
         case this.directions.up:
           creature.textures = creature.textureSet.up;
           creature.scale.x = creature.scaling;
@@ -411,14 +419,17 @@ Skeleton = {
     if (!creature.targetTimer || !creature.targetVector) {
       creature.targetTimer = 0;
     }
-    creature.targetTimer-=timeDiff;
+    creature.targetTimer -= timeDiff;
     if (creature.targetTimer <= 0) {
-      creature.targetVector = this.map.howDoIGetToMyTarget(creature, creature.target);
+      creature.targetVector = this.map.howDoIGetToMyTarget(
+        creature,
+        creature.target
+      );
       creature.targetTimer = 0.2;
     }
 
     var speedMod = creature.speedMultiplier * creature.maxSpeed;
-    
+
     creature.xSpeed = creature.targetVector.x * speedMod;
     creature.ySpeed = creature.targetVector.y * speedMod;
 
@@ -430,42 +441,82 @@ Skeleton = {
 
   calculateDamage(creature) {
     var damage = creature.attackDamage;
-    if (this.model.runeEffects.critChance > 0 && Math.random() < this.model.runeEffects.critChance) {
+    if (
+      this.model.runeEffects.critChance > 0 &&
+      Math.random() < this.model.runeEffects.critChance
+    ) {
       damage *= this.model.runeEffects.critDamage;
     }
     return damage;
   },
 
-  lootPositions : {
-    helmet : {id:1,name:"Helmet"},
-    chest : {id:2,name:"Chest"},
-    legs : {id:3,name:"Legs"},
-    gloves : {id:4,name:"Gloves"},
-    boots : {id:5,name:"Boots"},
-    sword : {id:6,name:"Sword"},
-    shield : {id:7,name:"Shield"}
+  lootPositions: {
+    helmet: { id: 1, name: "Helmet" },
+    chest: { id: 2, name: "Chest" },
+    legs: { id: 3, name: "Legs" },
+    gloves: { id: 4, name: "Gloves" },
+    boots: { id: 5, name: "Boots" },
+    sword: { id: 6, name: "Sword" },
+    shield: { id: 7, name: "Shield" },
   },
 
-  rarity : {
-    common : 1,
-    rare : 2,
-    epic : 3,
-    legendary : 4
+  rarity: {
+    common: 1,
+    rare: 2,
+    epic: 3,
+    legendary: 4,
   },
 
-  prefixes : {
-    commonQuality : ["Wooden", "Sturdy", "Rigid", "Iron", "Rusty", "Flimsy", "Battered", "Damaged", "Used", "Stained", "Training"],
-    rareQuality : ["Steel", "Shiny", "Polished", "Forged", "Plated", "Bronze", "Reinforced", "Veteran's", "Reliable"],
-    epicQuality : ["Antique", "Ancient", "Famous", "Bejeweled", "Notorious", "Historic", "Mythical", "Extraordinary"],
-    legendaryQuality : ["Monstrous", "Diabolical", "Withering", "Terrible", "Demoniacal"]
+  prefixes: {
+    commonQuality: [
+      "Wooden",
+      "Sturdy",
+      "Rigid",
+      "Iron",
+      "Rusty",
+      "Flimsy",
+      "Battered",
+      "Damaged",
+      "Used",
+      "Stained",
+      "Training",
+    ],
+    rareQuality: [
+      "Steel",
+      "Shiny",
+      "Polished",
+      "Forged",
+      "Plated",
+      "Bronze",
+      "Reinforced",
+      "Veteran's",
+      "Reliable",
+    ],
+    epicQuality: [
+      "Antique",
+      "Ancient",
+      "Famous",
+      "Bejeweled",
+      "Notorious",
+      "Historic",
+      "Mythical",
+      "Extraordinary",
+    ],
+    legendaryQuality: [
+      "Monstrous",
+      "Diabolical",
+      "Withering",
+      "Terrible",
+      "Demoniacal",
+    ],
   },
 
-  stats : {
-    respawnTime : {id:1, scaling:1},
-    speed : {id:2, scaling:1},
-    zombieHealth : {id:3, scaling:24},
-    zombieDamage : {id:4, scaling:3},
-    zombieSpeed : {id:5, scaling:1}
+  stats: {
+    respawnTime: { id: 1, scaling: 1 },
+    speed: { id: 2, scaling: 1 },
+    zombieHealth: { id: 3, scaling: 24 },
+    zombieDamage: { id: 4, scaling: 3 },
+    zombieSpeed: { id: 5, scaling: 1 },
   },
 
   applyItemUpgrades() {
@@ -473,31 +524,35 @@ Skeleton = {
     this.respawnTime = 10;
     this.randomSpells = [];
     var that = this;
-    this.persistent.items.filter(i => i.q).forEach(function(item){
-      item.e.forEach(function(effect){
-        switch (effect) {
-          case that.stats.respawnTime.id:
-            that.respawnTime--;
-            break;
-          case that.stats.speed.id:
-            that.moveSpeed++;
-            break;
-          case that.stats.zombieHealth.id:
-            GameModel.zombieHealth += item.l * that.stats.zombieHealth.scaling;
-            break;
-          case that.stats.zombieDamage.id:
-            GameModel.zombieDamage += item.l * that.stats.zombieDamage.scaling;
-            break;
-          case that.stats.zombieSpeed.id:
-            GameModel.zombieSpeed++;
-            break;
-        }
-      });
-      if (item.se)
-        item.se.forEach(function(specialEffect){
-          that.randomSpells.push(specialEffect);
+    this.persistent.items
+      .filter((i) => i.q)
+      .forEach(function (item) {
+        item.e.forEach(function (effect) {
+          switch (effect) {
+            case that.stats.respawnTime.id:
+              that.respawnTime--;
+              break;
+            case that.stats.speed.id:
+              that.moveSpeed++;
+              break;
+            case that.stats.zombieHealth.id:
+              GameModel.zombieHealth +=
+                item.l * that.stats.zombieHealth.scaling;
+              break;
+            case that.stats.zombieDamage.id:
+              GameModel.zombieDamage +=
+                item.l * that.stats.zombieDamage.scaling;
+              break;
+            case that.stats.zombieSpeed.id:
+              GameModel.zombieSpeed++;
+              break;
+          }
         });
-    });
+        if (item.se)
+          item.se.forEach(function (specialEffect) {
+            that.randomSpells.push(specialEffect);
+          });
+      });
   },
 
   getLootName(loot) {
@@ -568,27 +623,40 @@ Skeleton = {
             stats.push("+1 movement speed");
             break;
           case this.stats.zombieHealth.id:
-            stats.push("+" + formatWhole(this.stats.zombieHealth.scaling * loot.l) + " zombie health");
+            stats.push(
+              "+" +
+                formatWhole(this.stats.zombieHealth.scaling * loot.l) +
+                " zombie health"
+            );
             break;
           case this.stats.zombieDamage.id:
-            stats.push("+" + formatWhole(this.stats.zombieDamage.scaling * loot.l) + " zombie damage");
+            stats.push(
+              "+" +
+                formatWhole(this.stats.zombieDamage.scaling * loot.l) +
+                " zombie damage"
+            );
             break;
           case this.stats.zombieSpeed.id:
             stats.push("+1 zombie speed");
             break;
         }
       }
-      
+
     return stats;
   },
 
   getSpecialEffects(loot) {
     var stats = [];
     if (loot.se)
-    for (var i = 0; i < loot.se.length; i++) {
-      var spell = Spells.spells.filter(sp => sp.id == loot.se[i])[0];
-      stats.push(spell.itemText || "Has a chance to cast " + spell.name + " when attacking, this does not cost energy or trigger a cooldown");
-    }
+      for (var i = 0; i < loot.se.length; i++) {
+        var spell = Spells.spells.filter((sp) => sp.id == loot.se[i])[0];
+        stats.push(
+          spell.itemText ||
+            "Has a chance to cast " +
+              spell.name +
+              " when attacking, this does not cost energy or trigger a cooldown"
+        );
+      }
     return stats;
   },
 
@@ -620,19 +688,31 @@ Skeleton = {
     var prefixIndex = 0;
     switch (rarity) {
       case this.rarity.common:
-        prefixIndex = Math.floor(Math.random() * this.prefixes.commonQuality.length);
+        prefixIndex = Math.floor(
+          Math.random() * this.prefixes.commonQuality.length
+        );
         break;
       case this.rarity.rare:
-        prefixIndex = Math.floor(Math.random() * this.prefixes.rareQuality.length);
+        prefixIndex = Math.floor(
+          Math.random() * this.prefixes.rareQuality.length
+        );
         break;
       case this.rarity.epic:
-        prefixIndex = Math.floor(Math.random() * this.prefixes.epicQuality.length);
+        prefixIndex = Math.floor(
+          Math.random() * this.prefixes.epicQuality.length
+        );
         break;
       case this.rarity.legendary:
-        prefixIndex = Math.floor(Math.random() * this.prefixes.legendaryQuality.length);
+        prefixIndex = Math.floor(
+          Math.random() * this.prefixes.legendaryQuality.length
+        );
         break;
     }
-    var effects = [(Math.random() > 0.5 ? this.stats.zombieHealth.id : this.stats.zombieDamage.id)];
+    var effects = [
+      Math.random() > 0.5
+        ? this.stats.zombieHealth.id
+        : this.stats.zombieDamage.id,
+    ];
     for (var i = 0; i < rarity - 1; i++) {
       var effect = Math.ceil(Math.random() * 5);
       while (effects.includes(effect)) {
@@ -641,34 +721,37 @@ Skeleton = {
       effects.push(effect);
     }
     return {
-      id : this.persistent.currItemId++,
-      l : level,
-      s : position,
-      r : rarity,
-      p : prefixIndex,
-      e : effects,
-      se : specialEffects,
-      q : false
-    }
+      id: this.persistent.currItemId++,
+      l: level,
+      s: position,
+      r: rarity,
+      p: prefixIndex,
+      e: effects,
+      se: specialEffects,
+      q: false,
+    };
   },
 
   destroyItem(item) {
     this.addXp(item.l * item.r * 10);
-    for( var i = 0; i < this.persistent.items.length; i++){
-      if ( this.persistent.items[i].id === item.id) { 
+    for (var i = 0; i < this.persistent.items.length; i++) {
+      if (this.persistent.items[i].id === item.id) {
         this.persistent.items.splice(i, 1);
       }
     }
   },
   destroyAllItems() {
     this.addXp(this.xpForItems());
-    this.persistent.items = this.persistent.items.filter(i => i.q);    
+    this.persistent.items = this.persistent.items.filter((i) => i.q);
   },
   xpForItems() {
     var xp = 0;
-    this.persistent.items.filter(i => !i.q).forEach(function(item){
-      xp += item.l * item.r * 10;
-    });
+    this.persistent.items
+      .filter((i) => !i.q)
+      .forEach(function (item) {
+        xp += item.l * item.r * 10;
+      });
     return xp;
-  }
+  },
 };
+export { Skeleton };
