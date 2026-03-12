@@ -1,5 +1,21 @@
-const Spells = {
-  spells: [
+export interface Spell {
+  id: number;
+  name: string;
+  tooltip: string;
+  icon: string;
+  cooldown: number;
+  duration: number;
+  energyCost: number;
+  start: () => void;
+  end: () => void;
+  onCooldown: boolean;
+  active: boolean;
+  cooldownLeft: number;
+  timer: number;
+}
+
+export class Spells {
+  static spells: Spell[] = [
     {
       id: 1,
       name: "Time Warp",
@@ -110,30 +126,30 @@ const Spells = {
         Humans.pandemic = false;
       },
     },
-  ],
-  lockAllSpells() {
+  ];
+  static lockAllSpells() {
     for (var i = 0; i < this.spells.length; i++) {
       this.spells[i].unlocked = false;
     }
-  },
-  unlockSpell(spellId) {
+  }
+  static unlockSpell(spellId) {
     for (var i = 0; i < this.spells.length; i++) {
       if (spellId == this.spells[i].id) {
         this.spells[i].unlocked = true;
       }
     }
-  },
-  getSpell(spellId) {
+  }
+  static getSpell(spellId) {
     for (var i = 0; i < this.spells.length; i++) {
       if (spellId == this.spells[i].id) {
         return this.spells[i];
       }
     }
-  },
-  getUnlockedSpells() {
+  }
+  static getUnlockedSpells() {
     return this.spells.filter((spell) => spell.unlocked);
-  },
-  castSpell(spell) {
+  }
+  static castSpell(spell) {
     if (spell.onCooldown || spell.active || !spell.unlocked) return false;
 
     if (spell.energyCost > GameModel.energy) return false;
@@ -145,8 +161,8 @@ const Spells = {
     spell.timer = spell.duration;
     spell.start();
     GameModel.sendMessage(spell.name);
-  },
-  castSpellNoMana(spellId) {
+  }
+  static castSpellNoMana(spellId) {
     var spellList = this.spells.filter((sp) => sp.id == spellId);
     if (spellList.length > 0) {
       var spell = spellList[0];
@@ -157,8 +173,8 @@ const Spells = {
       spell.start();
       GameModel.sendMessage(spell.name);
     }
-  },
-  updateSpells(timeDiff) {
+  }
+  static updateSpells(timeDiff) {
     for (var i = 0; i < this.spells.length; i++) {
       var spell = this.spells[i];
 
@@ -177,8 +193,8 @@ const Spells = {
         }
       }
     }
-  },
-};
+  }
+}
 
 for (var i = 0; i < Spells.spells.length; i++) {
   Spells.spells[i].onCooldown = false;

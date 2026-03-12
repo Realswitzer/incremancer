@@ -1,0 +1,6 @@
+{
+  "$schema": "vscode://schemas/settings/user",
+  "editor.formatOnSave": true,
+  "editor.cursorSmoothCaretAnimation": "on",
+  "editor.defaultFormatter": "esbenp.prettier-vscode"
+}

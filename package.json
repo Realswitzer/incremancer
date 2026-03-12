@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "esbuild src/deobf.ts --bundle --outfile=dist/reconstructed_bundle.js --format=esm"
+    "build": "pnpx esbuild src/deobf.ts --bundle --outfile=dist/reconstructed_bundle.js --format=esm",
+    "fmt": "pnpx prettier --write \"src/**/*.ts\""
   },
   "keywords": [],
   "author": "",

@@ -1,12 +1,14 @@
 import angular from "angular";
+import { CreatureFactory } from "./creaturefactory";
 import { GameModel } from "./gamemodel";
+import { PartFactory } from "./partfactory";
 import { Skeleton } from "./skeleton";
 import { Spells } from "./spells";
-import { KeysPressed } from "./zombiemancer";
-import { format2Places, formatWhole } from "./utilsfunctions";
+import { Trophies } from "./trophies";
 import { Upgrades } from "./upgrades";
-import { PartFactory } from "./partfactory";
-import * as CreatureFactory from "./creaturefactory";
+import { format2Places, formatWhole } from "./utilsfunctions";
+import { KeysPressed } from "./zombiemancer";
+
 angular
   .module("zombieApp", [])
   .filter("decimal", function () {
@@ -19,7 +21,7 @@ angular
     "$compileProvider",
     function ($compileProvider) {
       $compileProvider.aHrefSanitizationWhitelist(
-        /^\s*(https?|ftp|mailto|javascript|data|blob):/
+        /^\s*(https?|ftp|mailto|javascript|data|blob):/,
       );
     },
   ])
@@ -92,14 +94,14 @@ angular
           case "prestige":
             zm.upgrades = Upgrades.prestigeUpgrades.filter(
               (upgrade) =>
-                upgrade.cap == 0 || zm.currentRank(upgrade) < upgrade.cap
+                upgrade.cap == 0 || zm.currentRank(upgrade) < upgrade.cap,
             );
             zm.upgrades.push.apply(
               zm.upgrades,
               Upgrades.prestigeUpgrades.filter(
                 (upgrade) =>
-                  upgrade.cap !== 0 && zm.currentRank(upgrade) >= upgrade.cap
-              )
+                  upgrade.cap !== 0 && zm.currentRank(upgrade) >= upgrade.cap,
+              ),
             );
             zm.sidePanels.prestige = true;
             break;
@@ -127,12 +129,12 @@ angular
             break;
           case "collected":
             zm.trophies = Trophies.getTrophyList().filter(
-              (trophy) => trophy.owned
+              (trophy) => trophy.owned,
             );
             break;
           case "uncollected":
             zm.trophies = Trophies.getTrophyList().filter(
-              (trophy) => !trophy.owned
+              (trophy) => !trophy.owned,
             );
             break;
           case "totals":
@@ -161,7 +163,7 @@ angular
       zm.resetGame = function () {
         if (
           confirm(
-            "Are you sure you want to reset everything? If you have a cloud save it will also be deleted. Make sure you export your save game first."
+            "Are you sure you want to reset everything? If you have a cloud save it will also be deleted. Make sure you export your save game first.",
           )
         ) {
           zm.model.resetData();
@@ -236,9 +238,9 @@ angular
           return Math.min(
             Math.round(
               (zm.model.persistentData.parts / this.creaturePrice(creature)) *
-                100
+                100,
             ),
-            100
+            100,
           );
         },
         creatureLevelPercent(creature) {
@@ -246,9 +248,9 @@ angular
             Math.round(
               (zm.model.persistentData.parts /
                 this.creatureLevelPrice(creature)) *
-                100
+                100,
             ),
-            100
+            100,
           );
         },
         buyCreature(creature) {
@@ -264,7 +266,7 @@ angular
           if (this.creatureTooExpensive(creature)) {
             return (
               formatWhole(
-                this.creaturePrice(creature) - zm.model.persistentData.parts
+                this.creaturePrice(creature) - zm.model.persistentData.parts,
               ) + " parts required"
             );
           } else {
@@ -285,7 +287,7 @@ angular
           }
           return (
             formatWhole(
-              this.creatureLevelPrice(creature) - zm.model.persistentData.parts
+              this.creatureLevelPrice(creature) - zm.model.persistentData.parts,
             ) + " parts required"
           );
         },
@@ -387,7 +389,7 @@ angular
 
       zm.addToHomeScreen = function () {
         if (zm.model.deferredPrompt) {
-          deferredPrompt.prompt();
+          GameModel.deferredPrompt.prompt();
         }
       };
 
@@ -397,7 +399,7 @@ angular
             zm.model.persistentData.currentConstruction.time -
             zm.model.persistentData.currentConstruction.timeRemaining;
           return Math.round(
-            (time / zm.model.persistentData.currentConstruction.time) * 100
+            (time / zm.model.persistentData.currentConstruction.time) * 100,
           );
         }
         return 0;
@@ -409,7 +411,7 @@ angular
       };
 
       zm.startConstruction = function (upgrade) {
-        Upgrades.startConstruction(upgrade, zm);
+        Upgrades.startConstruction(upgrade /*, zm*/);
         zm.upgrades = Upgrades.getAvailableConstructions();
       };
 
@@ -420,7 +422,7 @@ angular
       zm.cancelConstruction = function () {
         if (
           confirm(
-            "Are you sure you want to cancel construction? Used materials will not be refunded"
+            "Are you sure you want to cancel construction? Used materials will not be refunded",
           )
         ) {
           Upgrades.cancelConstruction();
@@ -578,7 +580,7 @@ angular
           case Upgrades.costs.prestigePoints:
             return (
               formatWhole(
-                cost - zm.model.persistentData.prestigePointsToSpend
+                cost - zm.model.persistentData.prestigePointsToSpend,
               ) + " prestige points required"
             );
           case PartFactory.costs.parts:
@@ -626,7 +628,7 @@ angular
         );
       };
 
-      (zm.costTranslate = function (costType) {
+      ((zm.costTranslate = function (costType) {
         if (costType == Upgrades.costs.prestigePoints) {
           return "points";
         }
@@ -638,7 +640,7 @@ angular
           } else {
             Upgrades.purchaseUpgrade(upgrade);
           }
-        });
+        }));
 
       zm.upgradeStatInfo = function (upgrade) {
         return Upgrades.displayStatValue(upgrade);
@@ -789,21 +791,21 @@ angular
       zm.energyPercent = function () {
         return Math.min(
           Math.round((zm.model.energy / zm.model.energyMax) * 100),
-          100
+          100,
         );
       };
       zm.bloodPercent = function () {
         return Math.min(
           Math.round((zm.model.persistentData.blood / zm.model.bloodMax) * 100),
-          100
+          100,
         );
       };
       zm.brainsPercent = function () {
         return Math.min(
           Math.round(
-            (zm.model.persistentData.brains / zm.model.brainsMax) * 100
+            (zm.model.persistentData.brains / zm.model.brainsMax) * 100,
           ),
-          100
+          100,
         );
       };
 
@@ -844,37 +846,37 @@ angular
             return Math.round(
               Math.min(
                 1,
-                zm.model.persistentData.blood / zm.upgradePrice(upgrade)
-              ) * 100
+                zm.model.persistentData.blood / zm.upgradePrice(upgrade),
+              ) * 100,
             );
           case "brains":
             return Math.round(
               Math.min(
                 1,
-                zm.model.persistentData.brains / zm.upgradePrice(upgrade)
-              ) * 100
+                zm.model.persistentData.brains / zm.upgradePrice(upgrade),
+              ) * 100,
             );
           case "bones":
             return Math.round(
               Math.min(
                 1,
-                zm.model.persistentData.bones / zm.upgradePrice(upgrade)
-              ) * 100
+                zm.model.persistentData.bones / zm.upgradePrice(upgrade),
+              ) * 100,
             );
           case "parts":
             return Math.round(
               Math.min(
                 1,
-                zm.model.persistentData.parts / zm.upgradePrice(upgrade)
-              ) * 100
+                zm.model.persistentData.parts / zm.upgradePrice(upgrade),
+              ) * 100,
             );
           case "prestigePoints":
             return Math.round(
               Math.min(
                 1,
                 zm.model.persistentData.prestigePointsToSpend /
-                  zm.upgradePrice(upgrade)
-              ) * 100
+                  zm.upgradePrice(upgrade),
+              ) * 100,
             );
         }
       };
@@ -894,7 +896,7 @@ angular
             setTimeout(function () {
               var elements = document.getElementsByClassName("item legendary");
               for (var i = 0; i < elements.length; i++) {
-                elements[i].style.animationDelay =
+                (elements[i] as HTMLElement).style.animationDelay =
                   (Math.random() * 4).toFixed(2) + "s";
               }
             }, 100);
@@ -913,7 +915,7 @@ angular
         },
         xpPercent() {
           return Math.round(
-            Math.min(1, zm.skeleton().xp / Skeleton.xpForNextLevel()) * 100
+            Math.min(1, zm.skeleton().xp / Skeleton.xpForNextLevel()) * 100,
           );
         },
         xpForNextLevel() {
@@ -931,7 +933,7 @@ angular
         updateEquippedItems() {
           this.equipped = [];
           var helmetItems = Skeleton.persistent.items.filter(
-            (i) => i.q && i.s == Skeleton.lootPositions.helmet.id
+            (i) => i.q && i.s == Skeleton.lootPositions.helmet.id,
           );
           if (helmetItems.length > 0) {
             this.equipped.push([helmetItems[0]]);
@@ -946,7 +948,7 @@ angular
           }
           var row2 = [];
           var swordItems = Skeleton.persistent.items.filter(
-            (i) => i.q && i.s == Skeleton.lootPositions.sword.id
+            (i) => i.q && i.s == Skeleton.lootPositions.sword.id,
           );
           if (swordItems.length > 0) {
             row2.push(swordItems[0]);
@@ -958,7 +960,7 @@ angular
             });
           }
           var chestItems = Skeleton.persistent.items.filter(
-            (i) => i.q && i.s == Skeleton.lootPositions.chest.id
+            (i) => i.q && i.s == Skeleton.lootPositions.chest.id,
           );
           if (chestItems.length > 0) {
             row2.push(chestItems[0]);
@@ -970,7 +972,7 @@ angular
             });
           }
           var shieldItems = Skeleton.persistent.items.filter(
-            (i) => i.q && i.s == Skeleton.lootPositions.shield.id
+            (i) => i.q && i.s == Skeleton.lootPositions.shield.id,
           );
           if (shieldItems.length > 0) {
             row2.push(shieldItems[0]);
@@ -984,7 +986,7 @@ angular
           this.equipped.push(row2);
           var row3 = [];
           var gloveItems = Skeleton.persistent.items.filter(
-            (i) => i.q && i.s == Skeleton.lootPositions.gloves.id
+            (i) => i.q && i.s == Skeleton.lootPositions.gloves.id,
           );
           if (gloveItems.length > 0) {
             row3.push(gloveItems[0]);
@@ -996,7 +998,7 @@ angular
             });
           }
           var legItems = Skeleton.persistent.items.filter(
-            (i) => i.q && i.s == Skeleton.lootPositions.legs.id
+            (i) => i.q && i.s == Skeleton.lootPositions.legs.id,
           );
           if (legItems.length > 0) {
             row3.push(legItems[0]);
@@ -1008,7 +1010,7 @@ angular
             });
           }
           var bootItems = Skeleton.persistent.items.filter(
-            (i) => i.q && i.s == Skeleton.lootPositions.boots.id
+            (i) => i.q && i.s == Skeleton.lootPositions.boots.id,
           );
           if (bootItems.length > 0) {
             row3.push(bootItems[0]);
@@ -1084,7 +1086,7 @@ angular
           return itemById;
         },
         itemDropped(itemId, target) {
-          var draggedItem = false;
+          var draggedItem: null | Item = false;
           Skeleton.persistent.items.forEach(function (item) {
             if (item.id == itemId) draggedItem = item;
           });
@@ -1119,7 +1121,7 @@ angular
             confirm(
               "Are you sure you want to destroy all non-equipped items? You will earn " +
                 formatWhole(Skeleton.xpForItems()) +
-                " xp"
+                " xp",
             )
           ) {
             Skeleton.destroyAllItems();
@@ -1216,7 +1218,7 @@ angular
               e.dataTransfer.setDragImage(
                 el[0],
                 rect.width / 2,
-                rect.height / 2
+                rect.height / 2,
               );
               $rootScope.$emit("item-drag-start", itemId);
               setTimeout(function () {
