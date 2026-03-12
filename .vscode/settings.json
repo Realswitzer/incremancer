@@ -1,0 +1,5 @@
+{
+    "$schema": "vscode://schemas/settings/workspace",
+    "editor.formatOnSave": true,
+    "editor.cursorSmoothCaretAnimation": "on"
+}

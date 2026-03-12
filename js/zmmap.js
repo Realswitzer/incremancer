@@ -1,16 +1,15 @@
 ZmMap = {
-
-  buildings : [],
-  buildingsByPopularity : [],
-  buildingTextures : false,
-  roadSprite : false,
-  roadTexture : false,
-  entranceWidth : 16,
-  entranceDepth : 16,
-  cornerDistance : 16,
+  buildings: [],
+  buildingsByPopularity: [],
+  buildingTextures: false,
+  roadSprite: false,
+  roadTexture: false,
+  entranceWidth: 16,
+  entranceDepth: 16,
+  cornerDistance: 16,
   minBuildings: 3,
-  wallWidth : 4,
-  graveyardCollision : false,
+  wallWidth: 4,
+  graveyardCollision: false,
 
   getRandomBuilding() {
     return getRandomElementFromArray(this.buildingsByPopularity, Math.random());
@@ -18,23 +17,32 @@ ZmMap = {
 
   roomNoOverlap(position1, position2) {
     var buffer = 50;
-    if (position1.x > position2.x + position2.width + buffer || position1.x + position1.width + buffer < position2.x)
+    if (
+      position1.x > position2.x + position2.width + buffer ||
+      position1.x + position1.width + buffer < position2.x
+    )
       return true;
-    if (position1.y > position2.y + position2.height + buffer || position1.y + position1.height + buffer < position2.y)
+    if (
+      position1.y > position2.y + position2.height + buffer ||
+      position1.y + position1.height + buffer < position2.y
+    )
       return true;
   },
 
   isValidPosition(position) {
+    if (!this.roomNoOverlap(position, this.graveYardPosition)) return false;
 
-    if (!this.roomNoOverlap(position, this.graveYardPosition))
-      return false;
-
-    for (var i=0; i < this.buildings.length; i++) {
-      if (!this.roomNoOverlap(position, this.buildings[i]))
-        return false;
+    for (var i = 0; i < this.buildings.length; i++) {
+      if (!this.roomNoOverlap(position, this.buildings[i])) return false;
     }
 
-    if (GameModel.level % 5 == 0 && !GameModel.isBossStage(GameModel.level) && position.y < this.roadSprite.y + (this.roadSprite.height / 2) && position.y + position.height > this.roadSprite.y - (this.roadSprite.height / 2)) {
+    if (
+      GameModel.level % 5 == 0 &&
+      !GameModel.isBossStage(GameModel.level) &&
+      position.y < this.roadSprite.y + this.roadSprite.height / 2 &&
+      position.y + position.height >
+        this.roadSprite.y - this.roadSprite.height / 2
+    ) {
       return false;
     }
 
@@ -42,7 +50,6 @@ ZmMap = {
   },
 
   makeHorizontalWall(walls, texture, hasEntrance, x, y, width) {
-
     if (hasEntrance) {
       var wall1 = new PIXI.TilingSprite(texture);
       wall1.x = x;
@@ -52,9 +59,9 @@ ZmMap = {
       walls.push(wall1);
 
       var wall2 = new PIXI.TilingSprite(texture);
-      wall2.x = x + (width / 2) + this.entranceWidth;
+      wall2.x = x + width / 2 + this.entranceWidth;
       wall2.y = y;
-      wall2.width = (width / 2) - this.entranceWidth;
+      wall2.width = width / 2 - this.entranceWidth;
       wall2.height = 4;
       walls.push(wall2);
     } else {
@@ -68,7 +75,6 @@ ZmMap = {
   },
 
   makeVerticalWall(walls, texture, hasEntrance, x, y, height) {
-
     if (hasEntrance) {
       var wall1 = new PIXI.TilingSprite(texture);
       wall1.x = x;
@@ -79,9 +85,9 @@ ZmMap = {
 
       var wall2 = new PIXI.TilingSprite(texture);
       wall2.x = x;
-      wall2.y = y + (height / 2) + this.entranceWidth;;
+      wall2.y = y + height / 2 + this.entranceWidth;
       wall2.width = 4;
-      wall2.height = (height / 2) - this.entranceWidth;
+      wall2.height = height / 2 - this.entranceWidth;
       walls.push(wall2);
     } else {
       var wall = new PIXI.TilingSprite(texture);
@@ -96,7 +102,11 @@ ZmMap = {
   addBuilding(poi) {
     poi.container = new PIXI.Container();
     poi.floorSprite = new PIXI.TilingSprite(PIXI.Texture.WHITE);
-    poi.floorSprite.tint = rgbToHex(10 + Math.round(Math.random() * 50), 10 + Math.round(Math.random() * 50), 10 + Math.round(Math.random() * 50));
+    poi.floorSprite.tint = rgbToHex(
+      10 + Math.round(Math.random() * 50),
+      10 + Math.round(Math.random() * 50),
+      10 + Math.round(Math.random() * 50),
+    );
     poi.floorSprite.alpha = 0.2;
     // poi.floorSprite.x = poi.x;
     // poi.floorSprite.y = poi.y;
@@ -111,69 +121,74 @@ ZmMap = {
       {
         x: poi.x + poi.width / 2,
         y: poi.y,
-        north : true,
-        inside : {
+        north: true,
+        inside: {
           x: poi.x + poi.width / 2,
           y: poi.y + this.entranceDepth,
-          entrance:true
+          entrance: true,
         },
-        outside : {
+        outside: {
           x: poi.x + poi.width / 2,
           y: poi.y - this.entranceDepth,
-          entrance:true
-        }
+          entrance: true,
+        },
       },
       {
         x: poi.x + poi.width / 2,
         y: poi.y + poi.height,
-        south : true,
-        inside : {
+        south: true,
+        inside: {
           x: poi.x + poi.width / 2,
           y: poi.y + poi.height - this.entranceDepth,
-          entrance:true
+          entrance: true,
         },
-        outside : {
+        outside: {
           x: poi.x + poi.width / 2,
           y: poi.y + poi.height + this.entranceDepth,
-          entrance:true
-        }
+          entrance: true,
+        },
       },
       {
         x: poi.x,
         y: poi.y + poi.height / 2,
-        west : true,
-        inside : {
+        west: true,
+        inside: {
           x: poi.x + this.entranceDepth,
           y: poi.y + poi.height / 2,
-          entrance:true
+          entrance: true,
         },
-        outside : {
+        outside: {
           x: poi.x - this.entranceDepth,
           y: poi.y + poi.height / 2,
-          entrance:true
-        }
+          entrance: true,
+        },
       },
       {
         x: poi.x + poi.width,
         y: poi.y + poi.height / 2,
-        east : true,
-        inside : {
+        east: true,
+        inside: {
           x: poi.x + poi.width - this.entranceDepth,
           y: poi.y + poi.height / 2,
-          entrance:true
+          entrance: true,
         },
-        outside : {
+        outside: {
           x: poi.x + poi.width + this.entranceDepth,
           y: poi.y + poi.height / 2,
-          entrance:true
-        }
-      }
+          entrance: true,
+        },
+      },
     ];
     var closestEntrance;
-    var center = {x:gameFieldSize.x / 2, y:gameFieldSize.y / 2};
+    var center = { x: gameFieldSize.x / 2, y: gameFieldSize.y / 2 };
     var closestDistance = 2000;
-    for (var i=0; i < possibleEntrances.length; i++) {
-      var distance = fastDistance(possibleEntrances[i].x, possibleEntrances[i].y, center.x, center.y);
+    for (var i = 0; i < possibleEntrances.length; i++) {
+      var distance = fastDistance(
+        possibleEntrances[i].x,
+        possibleEntrances[i].y,
+        center.x,
+        center.y,
+      );
       if (distance < closestDistance) {
         closestDistance = distance;
         closestEntrance = possibleEntrances[i];
@@ -183,27 +198,58 @@ ZmMap = {
 
     if (GameModel.level % 5 == 0) {
       if (poi.y < gameFieldSize.y / 2) {
-        poi.entrance = possibleEntrances.filter(e => e.south)[0];
+        poi.entrance = possibleEntrances.filter((e) => e.south)[0];
       } else {
-        poi.entrance = possibleEntrances.filter(e => e.north)[0];
+        poi.entrance = possibleEntrances.filter((e) => e.north)[0];
       }
     }
 
     poi.walls = [];
-    var wallTexture = getRandomElementFromArray(this.buildingTextures.walls, Math.random());
+    var wallTexture = getRandomElementFromArray(
+      this.buildingTextures.walls,
+      Math.random(),
+    );
 
-    this.makeHorizontalWall(poi.walls, wallTexture, poi.entrance.north, -4, -4, poi.width + 8);
-    this.makeHorizontalWall(poi.walls, wallTexture, poi.entrance.south, -4, poi.height, poi.width + 8);
-    this.makeVerticalWall(poi.walls, wallTexture, poi.entrance.west, -4, -4, poi.height + 8);
-    this.makeVerticalWall(poi.walls, wallTexture, poi.entrance.east, poi.width, -4, poi.height + 8);
+    this.makeHorizontalWall(
+      poi.walls,
+      wallTexture,
+      poi.entrance.north,
+      -4,
+      -4,
+      poi.width + 8,
+    );
+    this.makeHorizontalWall(
+      poi.walls,
+      wallTexture,
+      poi.entrance.south,
+      -4,
+      poi.height,
+      poi.width + 8,
+    );
+    this.makeVerticalWall(
+      poi.walls,
+      wallTexture,
+      poi.entrance.west,
+      -4,
+      -4,
+      poi.height + 8,
+    );
+    this.makeVerticalWall(
+      poi.walls,
+      wallTexture,
+      poi.entrance.east,
+      poi.width,
+      -4,
+      poi.height + 8,
+    );
 
-    for (var i=0; i < poi.walls.length; i++) {
+    for (var i = 0; i < poi.walls.length; i++) {
       poi.container.addChild(poi.walls[i]);
     }
     poi.container.cacheAsBitmap = true;
     backgroundContainer.addChild(poi.container);
 
-    for (var i=0; i < poi.walls.length; i++) {
+    for (var i = 0; i < poi.walls.length; i++) {
       poi.walls[i].collisionX = poi.x + poi.walls[i].x;
       poi.walls[i].collisionY = poi.y + poi.walls[i].y;
       poi.walls[i].collisionWidth = poi.walls[i].width;
@@ -213,66 +259,77 @@ ZmMap = {
 
   addCorners(building) {
     building.corners = [];
-    building.corners.push({ // top left
-      x:building.x - this.cornerDistance,
-      y:building.y - this.cornerDistance
+    building.corners.push({
+      // top left
+      x: building.x - this.cornerDistance,
+      y: building.y - this.cornerDistance,
     });
-    building.corners.push({ // top right
-      x:building.x + building.width + this.cornerDistance,
-      y:building.y - this.cornerDistance
+    building.corners.push({
+      // top right
+      x: building.x + building.width + this.cornerDistance,
+      y: building.y - this.cornerDistance,
     });
-    building.corners.push({ // bottom left
-      x:building.x - this.cornerDistance,
-      y:building.y + building.height + this.cornerDistance
+    building.corners.push({
+      // bottom left
+      x: building.x - this.cornerDistance,
+      y: building.y + building.height + this.cornerDistance,
     });
-    building.corners.push({ // bottom right
-      x:building.x + building.width + this.cornerDistance,
-      y:building.y + building.height + this.cornerDistance
+    building.corners.push({
+      // bottom right
+      x: building.x + building.width + this.cornerDistance,
+      y: building.y + building.height + this.cornerDistance,
     });
   },
 
   setGraveyardPosition() {
     if (GameModel.level % 5 == 0 && !GameModel.isBossStage(GameModel.level)) {
       this.graveYardPosition = {
-        x:(Math.random() * gameFieldSize.x * 0.8) - 50 + (gameFieldSize.x * 0.1),
-        y:(Math.random() > 0.5 ? gameFieldSize.y * 0.25 : gameFieldSize.y * 0.75) - 50,
-        width: 100, height: 100
+        x: Math.random() * gameFieldSize.x * 0.8 - 50 + gameFieldSize.x * 0.1,
+        y:
+          (Math.random() > 0.5
+            ? gameFieldSize.y * 0.25
+            : gameFieldSize.y * 0.75) - 50,
+        width: 100,
+        height: 100,
       };
     } else {
       this.graveYardPosition = {
-        x:gameFieldSize.x / 2 - 50,
-        y:gameFieldSize.y / 2 - 50,
-        width: 100, height: 100
+        x: gameFieldSize.x / 2 - 50,
+        y: gameFieldSize.y / 2 - 50,
+        width: 100,
+        height: 100,
       };
     }
-    this.graveYardLocation = {x:this.graveYardPosition.x + 50, y:this.graveYardPosition.y + 50};
+    this.graveYardLocation = {
+      x: this.graveYardPosition.x + 50,
+      y: this.graveYardPosition.y + 50,
+    };
   },
 
   populatePois() {
-    
     this.setGraveyardPosition();
 
     if (!this.buildingTextures) {
       var floors = [];
       var walls = [];
-      
+
       for (var i = 0; i < 2; i++) {
-        walls.push(PIXI.Texture.from('floor' + (i + 1) + '.png'));
+        walls.push(PIXI.Texture.from("floor" + (i + 1) + ".png"));
       }
       for (var i = 0; i < 2; i++) {
-        walls.push(PIXI.Texture.from('wall' + (i + 1) + '.png'));
+        walls.push(PIXI.Texture.from("wall" + (i + 1) + ".png"));
       }
       this.buildingTextures = {
-        floors:floors,
-        walls:walls
-      }
-      this.roadSprite = new PIXI.TilingSprite(PIXI.Texture.from('road.png'));
+        floors: floors,
+        walls: walls,
+      };
+      this.roadSprite = new PIXI.TilingSprite(PIXI.Texture.from("road.png"));
       this.roadSprite.width = gameFieldSize.x;
-      this.roadSprite.tileScale = {x:3,y:3};
+      this.roadSprite.tileScale = { x: 3, y: 3 };
       this.roadSprite.height = 96;
       backgroundContainer.addChild(this.roadSprite);
       this.roadSprite.visible = false;
-      this.roadSprite.anchor = {x:0.5, y:0.5};
+      this.roadSprite.anchor = { x: 0.5, y: 0.5 };
     }
 
     if (this.buildings.length > 0) {
@@ -280,7 +337,7 @@ ZmMap = {
         backgroundContainer.removeChild(this.buildings[i].container);
         this.buildings[i].container.destroy();
         // backgroundContainer.removeChild(this.buildings[i].floorSprite);
-        for (var j=0; j < this.buildings[i].walls.length; j++) {
+        for (var j = 0; j < this.buildings[i].walls.length; j++) {
           // backgroundContainer.removeChild(this.buildings[i].walls[j]);
         }
       }
@@ -306,9 +363,11 @@ ZmMap = {
       this.roadSprite.y = gameFieldSize.y / 2;
     }
 
-    while(spaceToCreate > 0 || minBuildings > 0) {
+    while (spaceToCreate > 0 || minBuildings > 0) {
       minBuildings--;
-      var personSize = Math.round(minRoomSize + (Math.random() * (maxRoomSize - minRoomSize)));
+      var personSize = Math.round(
+        minRoomSize + Math.random() * (maxRoomSize - minRoomSize),
+      );
       var roomSize = Math.sqrt(personSize * areaPerPerson);
       spaceToCreate -= personSize;
       var foundPosition = false;
@@ -316,31 +375,51 @@ ZmMap = {
 
       var counter = 1000;
       var spaceFromEdges = 10;
-      while(!foundPosition && counter > 0) {
+      while (!foundPosition && counter > 0) {
         counter--;
         if (GameModel.level % 5 == 0) {
           if (Math.random() > 0.7) {
             testPosition = {
-              x: spaceFromEdges + (Math.random() * (gameFieldSize.x - (2 * spaceFromEdges + roomSize))), 
-              y: spaceFromEdges + (Math.random() * (gameFieldSize.y - (2 * spaceFromEdges + roomSize))),
-              width : roomSize,
-              height: roomSize
+              x:
+                spaceFromEdges +
+                Math.random() *
+                  (gameFieldSize.x - (2 * spaceFromEdges + roomSize)),
+              y:
+                spaceFromEdges +
+                Math.random() *
+                  (gameFieldSize.y - (2 * spaceFromEdges + roomSize)),
+              width: roomSize,
+              height: roomSize,
             };
           } else {
             testPosition = {
-              x: spaceFromEdges + (Math.random() * (gameFieldSize.x - (2 * spaceFromEdges + roomSize))), 
-              y: Math.random() > 0.5 ? gameFieldSize.y / 2 + (this.roadSprite.height / 2) + 8 : gameFieldSize.y / 2 - (this.roadSprite.height / 2) - 8 - roomSize,
-              width : roomSize,
-              height: roomSize
+              x:
+                spaceFromEdges +
+                Math.random() *
+                  (gameFieldSize.x - (2 * spaceFromEdges + roomSize)),
+              y:
+                Math.random() > 0.5
+                  ? gameFieldSize.y / 2 + this.roadSprite.height / 2 + 8
+                  : gameFieldSize.y / 2 -
+                    this.roadSprite.height / 2 -
+                    8 -
+                    roomSize,
+              width: roomSize,
+              height: roomSize,
             };
           }
-          
         } else {
           testPosition = {
-            x: spaceFromEdges + (Math.random() * (gameFieldSize.x - (2 * spaceFromEdges + roomSize))), 
-            y: spaceFromEdges + (Math.random() * (gameFieldSize.y - (2 * spaceFromEdges + roomSize))),
-            width : roomSize,
-            height: roomSize
+            x:
+              spaceFromEdges +
+              Math.random() *
+                (gameFieldSize.x - (2 * spaceFromEdges + roomSize)),
+            y:
+              spaceFromEdges +
+              Math.random() *
+                (gameFieldSize.y - (2 * spaceFromEdges + roomSize)),
+            width: roomSize,
+            height: roomSize,
           };
         }
         foundPosition = this.isValidPosition(testPosition);
@@ -348,15 +427,15 @@ ZmMap = {
 
       if (foundPosition) {
         var poi = {
-          id : buildingId++,
+          id: buildingId++,
           x: testPosition.x,
           y: testPosition.y,
-          width : roomSize,
-          height : roomSize
+          width: roomSize,
+          height: roomSize,
         };
         this.addBuilding(poi);
         var popularity = Math.max(Math.round(roomSize / 10), 1);
-        for (var j=0; j<popularity; j++) {
+        for (var j = 0; j < popularity; j++) {
           this.buildingsByPopularity.push(poi);
         }
         this.buildings.push(poi);
@@ -377,58 +456,94 @@ ZmMap = {
       if (Math.random() > 0.5) {
         return {
           x: Math.random() * gameFieldSize.x,
-          y: (gameFieldSize.y / 2) + (yMod * y25) + (Math.random() * yMod * y25)
-        }
+          y: gameFieldSize.y / 2 + yMod * y25 + Math.random() * yMod * y25,
+        };
       }
       return {
-        x: (gameFieldSize.x / 2) + (xMod * x25) + (Math.random() * xMod * x25), 
+        x: gameFieldSize.x / 2 + xMod * x25 + Math.random() * xMod * x25,
         y: Math.random() * gameFieldSize.y,
-      }
+      };
     }
     var wallBuffer = 5;
-    return {x:building.x + wallBuffer + (Math.random() * (building.width - wallBuffer * 2)), y: building.y + wallBuffer + (Math.random() * (building.height - wallBuffer * 2))};
+    return {
+      x:
+        building.x +
+        wallBuffer +
+        Math.random() * (building.width - wallBuffer * 2),
+      y:
+        building.y +
+        wallBuffer +
+        Math.random() * (building.height - wallBuffer * 2),
+    };
   },
 
   isInsidePoi(x, y, poi, wall = 0) {
-    return x > poi.x - wall && x < poi.x + poi.width + wall && y > poi.y - wall && y < poi.y + poi.height + wall;
+    return (
+      x > poi.x - wall &&
+      x < poi.x + poi.width + wall &&
+      y > poi.y - wall &&
+      y < poi.y + poi.height + wall
+    );
   },
 
-  wallCollisionBuffer : 3,
+  wallCollisionBuffer: 3,
 
   checkWall(wall, start, end, collision) {
-    if (start.y > wall.collisionY && start.y < wall.collisionY + wall.collisionHeight) {
-      if (start.x < wall.collisionX - this.wallCollisionBuffer && end.x > wall.collisionX - this.wallCollisionBuffer) {
+    if (
+      start.y > wall.collisionY &&
+      start.y < wall.collisionY + wall.collisionHeight
+    ) {
+      if (
+        start.x < wall.collisionX - this.wallCollisionBuffer &&
+        end.x > wall.collisionX - this.wallCollisionBuffer
+      ) {
         collision.x = true;
         collision.validX = wall.collisionX - this.wallCollisionBuffer - 1;
       }
-      if (start.x > wall.collisionX + wall.collisionWidth + this.wallCollisionBuffer && end.x < wall.collisionX + wall.collisionWidth + this.wallCollisionBuffer) {
+      if (
+        start.x >
+          wall.collisionX + wall.collisionWidth + this.wallCollisionBuffer &&
+        end.x < wall.collisionX + wall.collisionWidth + this.wallCollisionBuffer
+      ) {
         collision.x = true;
-        collision.validX = wall.collisionX + wall.collisionWidth + this.wallCollisionBuffer + 1;
+        collision.validX =
+          wall.collisionX + wall.collisionWidth + this.wallCollisionBuffer + 1;
       }
     }
 
-    if (start.x > wall.collisionX && start.x < wall.collisionX + wall.collisionWidth) {
-      if (start.y < wall.collisionY - this.wallCollisionBuffer && end.y > wall.collisionY - this.wallCollisionBuffer) {
+    if (
+      start.x > wall.collisionX &&
+      start.x < wall.collisionX + wall.collisionWidth
+    ) {
+      if (
+        start.y < wall.collisionY - this.wallCollisionBuffer &&
+        end.y > wall.collisionY - this.wallCollisionBuffer
+      ) {
         collision.y = true;
         collision.validY = wall.collisionY - this.wallCollisionBuffer - 1;
-      } 
-      if (start.y > wall.collisionY + wall.collisionHeight + this.wallCollisionBuffer && end.y < wall.collisionY + wall.collisionHeight + this.wallCollisionBuffer) {
+      }
+      if (
+        start.y >
+          wall.collisionY + wall.collisionHeight + this.wallCollisionBuffer &&
+        end.y <
+          wall.collisionY + wall.collisionHeight + this.wallCollisionBuffer
+      ) {
         collision.y = true;
-        collision.validY = wall.collisionY + wall.collisionHeight + this.wallCollisionBuffer + 1;
+        collision.validY =
+          wall.collisionY + wall.collisionHeight + this.wallCollisionBuffer + 1;
       }
     }
   },
 
   checkGraveyard(start, end) {
     var collision = {
-      x:false, 
-      y:false
+      x: false,
+      y: false,
     };
     if (this.graveyardCollision) {
       this.checkWall(this.graveyardCollision, start, end, collision);
     }
-    if (collision.x || collision.y)
-      return collision;
+    if (collision.x || collision.y) return collision;
 
     return false;
   },
@@ -441,49 +556,48 @@ ZmMap = {
     }
 
     var collision = {
-      x:false, 
-      y:false
+      x: false,
+      y: false,
     };
 
     for (var i = 0; i < closeBuilding.walls.length; i++) {
       this.checkWall(closeBuilding.walls[i], start, end, collision);
     }
-    
 
     return collision;
   },
 
-  fastDistance : fastDistance,
+  fastDistance: fastDistance,
 
-  pathFindStepSize : 5,
+  pathFindStepSize: 5,
 
   pathStepCalc(start, end) {
     var xVector = end.x - start.x;
     var yVector = end.y - start.y;
     var ax = Math.abs(xVector);
     var ay = Math.abs(yVector);
-    if (Math.max(ax, ay) == 0)
-      return;
+    if (Math.max(ax, ay) == 0) return;
     var ratio = 1 / Math.max(ax, ay);
     ratio = ratio * (1.29289 - (ax + ay) * ratio * 0.29289);
-    
+
     return {
       x: xVector * ratio * this.pathFindStepSize,
-      y: yVector * ratio * this.pathFindStepSize
+      y: yVector * ratio * this.pathFindStepSize,
     };
   },
 
   isBuildingClose(position, building) {
-    return position.x > building.x - this.cornerDistance && 
-            position.x < building.x + building.width + this.cornerDistance && 
-            position.y > building.y - this.cornerDistance && 
-            position.y < building.y + building.height + this.cornerDistance;
+    return (
+      position.x > building.x - this.cornerDistance &&
+      position.x < building.x + building.width + this.cornerDistance &&
+      position.y > building.y - this.cornerDistance &&
+      position.y < building.y + building.height + this.cornerDistance
+    );
   },
 
   findBuilding(position) {
-
     if (position.lastKnownBuilding) {
-      if(this.isBuildingClose(position, position.lastKnownBuilding)) {
+      if (this.isBuildingClose(position, position.lastKnownBuilding)) {
         return position.lastKnownBuilding;
       }
     }
@@ -494,14 +608,13 @@ ZmMap = {
       if (this.isBuildingClose(position, buildingsToCheck[i])) {
         position.lastKnownBuilding = buildingsToCheck[i];
         return position.lastKnownBuilding;
-      } 
+      }
     }
     position.lastKnownBuilding = false;
     return false;
   },
 
   normalizeVector(vector) {
-
     if (vector.x == 0 && vector.y == 0) {
       return vector;
     }
@@ -513,19 +626,18 @@ ZmMap = {
   },
 
   modifyVectorForCollision(vector, building, position) {
-
     // no building = no collision
     if (!building && !this.graveyardCollision) {
       return this.normalizeVector(vector);
     }
 
     // check 5 distance from position
-    var collision = {x:false, y:false};
+    var collision = { x: false, y: false };
     var collisionDistance = 1;
 
     var end = {
-      x:position.x + (vector.x > 0 ? collisionDistance : -collisionDistance),
-      y:position.y + (vector.y > 0 ? collisionDistance : -collisionDistance)
+      x: position.x + (vector.x > 0 ? collisionDistance : -collisionDistance),
+      y: position.y + (vector.y > 0 ? collisionDistance : -collisionDistance),
     };
 
     // check all the walls
@@ -549,23 +661,18 @@ ZmMap = {
   },
 
   willVectorHitBuilding(start, end, building) {
-
     var dx = end.x - start.x;
     var dy = end.y - start.y;
 
-    if (dx < 0 && start.x < building.x - 4)
-      return false;
-    if (dx > 0 && start.x > building.x + building.width + 4)
-      return false;
-    if (dy < 0 && start.y < building.y - 4)
-      return false;
-    if(dy > 0 && start.y > building.y + building.width + 4)
-      return false;
+    if (dx < 0 && start.x < building.x - 4) return false;
+    if (dx > 0 && start.x > building.x + building.width + 4) return false;
+    if (dy < 0 && start.y < building.y - 4) return false;
+    if (dy > 0 && start.y > building.y + building.width + 4) return false;
 
     var step = this.pathStepCalc(start, end);
     var stepsToTake = 10;
     var hasHit = false;
-    var testPosition = {x:start.x, y:start.y};
+    var testPosition = { x: start.x, y: start.y };
     while (!hasHit && stepsToTake > 0) {
       stepsToTake--;
       testPosition.x += step.x;
@@ -581,7 +688,12 @@ ZmMap = {
     var closestCorner = false;
     var closestDistance = 10000;
     for (var i = 0; i < corners.length; i++) {
-      var distance = this.fastDistance(position.x, position.y, corners[i].x, corners[i].y);
+      var distance = this.fastDistance(
+        position.x,
+        position.y,
+        corners[i].x,
+        corners[i].y,
+      );
       if (distance < closestDistance) {
         closestDistance = distance;
         closestCorner = corners[i];
@@ -593,7 +705,10 @@ ZmMap = {
   findAdjacentCorners(corner, building) {
     var corners = [];
     for (var i = 0; i < building.corners.length; i++) {
-      if (building.corners[i].x == corner.x || building.corners[i].y == corner.y) {
+      if (
+        building.corners[i].x == corner.x ||
+        building.corners[i].y == corner.y
+      ) {
         corners.push(building.corners[i]);
       }
     }
@@ -601,12 +716,11 @@ ZmMap = {
   },
 
   navigateAroundBuilding(position, target, building, distanceToTarget) {
-
     // if no building return vector
     var vector = {
       x: target.x - position.x,
       y: target.y - position.y,
-      distance: distanceToTarget
+      distance: distanceToTarget,
     };
     if (!building) {
       return this.normalizeVector(vector);
@@ -631,91 +745,144 @@ ZmMap = {
     }
 
     // if still hit building then go to my closest adjacent corner
-    corner = this.findNearestCorner(position, this.findAdjacentCorners(corner, building));
+    corner = this.findNearestCorner(
+      position,
+      this.findAdjacentCorners(corner, building),
+    );
     vector.x = corner.x - position.x;
     vector.y = corner.y - position.y;
     return this.modifyVectorForCollision(vector, building, position);
   },
 
   howDoIGetToMyTarget(currentPosition, targetPosition) {
-
-    var distanceToTarget = this.fastDistance(currentPosition.x, currentPosition.y, targetPosition.x, targetPosition.y);
+    var distanceToTarget = this.fastDistance(
+      currentPosition.x,
+      currentPosition.y,
+      targetPosition.x,
+      targetPosition.y,
+    );
     var closeBuilding = this.findBuilding(currentPosition);
     var insideBuilding = false;
-    
-    if (closeBuilding) {
 
-      insideBuilding = this.isInsidePoi(currentPosition.x, currentPosition.y, closeBuilding, 0);
+    if (closeBuilding) {
+      insideBuilding = this.isInsidePoi(
+        currentPosition.x,
+        currentPosition.y,
+        closeBuilding,
+        0,
+      );
 
       if (insideBuilding) {
-        if (this.isInsidePoi(targetPosition.x, targetPosition.y, closeBuilding, 0)) {
+        if (
+          this.isInsidePoi(targetPosition.x, targetPosition.y, closeBuilding, 0)
+        ) {
           // target in same building as me, just return direction
-          return this.modifyVectorForCollision({
-            x: targetPosition.x - currentPosition.x,
-            y: targetPosition.y - currentPosition.y,
-            distance: distanceToTarget
-          }, closeBuilding, currentPosition);
+          return this.modifyVectorForCollision(
+            {
+              x: targetPosition.x - currentPosition.x,
+              y: targetPosition.y - currentPosition.y,
+              distance: distanceToTarget,
+            },
+            closeBuilding,
+            currentPosition,
+          );
         } else {
           // I need to go outside
-          return this.modifyVectorForCollision({
-            x: closeBuilding.entrance.outside.x - currentPosition.x,
-            y: closeBuilding.entrance.outside.y - currentPosition.y,
-            distance: distanceToTarget
-          }, closeBuilding, currentPosition);
+          return this.modifyVectorForCollision(
+            {
+              x: closeBuilding.entrance.outside.x - currentPosition.x,
+              y: closeBuilding.entrance.outside.y - currentPosition.y,
+              distance: distanceToTarget,
+            },
+            closeBuilding,
+            currentPosition,
+          );
         }
       }
     }
 
     var targetCloseBuilding = this.findBuilding(targetPosition);
-    
+
     if (targetCloseBuilding) {
-      insideBuilding = this.isInsidePoi(targetPosition.x, targetPosition.y, targetCloseBuilding, 0);
+      insideBuilding = this.isInsidePoi(
+        targetPosition.x,
+        targetPosition.y,
+        targetCloseBuilding,
+        0,
+      );
 
       if (insideBuilding) {
         // I need to go inside
-        var distanceToEntrance = this.fastDistance(currentPosition.x, currentPosition.y, targetCloseBuilding.entrance.outside.x, targetCloseBuilding.entrance.outside.y);
+        var distanceToEntrance = this.fastDistance(
+          currentPosition.x,
+          currentPosition.y,
+          targetCloseBuilding.entrance.outside.x,
+          targetCloseBuilding.entrance.outside.y,
+        );
         if (distanceToEntrance < 30) {
-          return this.modifyVectorForCollision({
-            x: targetCloseBuilding.entrance.inside.x - currentPosition.x,
-            y: targetCloseBuilding.entrance.inside.y - currentPosition.y,
-            distance: distanceToTarget
-          }, closeBuilding, currentPosition);
+          return this.modifyVectorForCollision(
+            {
+              x: targetCloseBuilding.entrance.inside.x - currentPosition.x,
+              y: targetCloseBuilding.entrance.inside.y - currentPosition.y,
+              distance: distanceToTarget,
+            },
+            closeBuilding,
+            currentPosition,
+          );
         }
         // navigate to entrance
-        return this.navigateAroundBuilding(currentPosition, targetCloseBuilding.entrance.outside, closeBuilding, distanceToTarget);
+        return this.navigateAroundBuilding(
+          currentPosition,
+          targetCloseBuilding.entrance.outside,
+          closeBuilding,
+          distanceToTarget,
+        );
       }
     }
 
-
     if (distanceToTarget < 20) {
       // no need to navigate this close, just return direction
-      return this.modifyVectorForCollision({
-        x: targetPosition.x - currentPosition.x,
-        y: targetPosition.y - currentPosition.y,
-        distance: distanceToTarget
-      }, closeBuilding, currentPosition);
+      return this.modifyVectorForCollision(
+        {
+          x: targetPosition.x - currentPosition.x,
+          y: targetPosition.y - currentPosition.y,
+          distance: distanceToTarget,
+        },
+        closeBuilding,
+        currentPosition,
+      );
     }
 
     // navigate to target
-    return this.navigateAroundBuilding(currentPosition, targetPosition, closeBuilding, distanceToTarget);
+    return this.navigateAroundBuilding(
+      currentPosition,
+      targetPosition,
+      closeBuilding,
+      distanceToTarget,
+    );
   },
 
-  treeSprites : [],
-  treeTextures : [],
-  armyTextures : [],
+  treeSprites: [],
+  treeTextures: [],
+  armyTextures: [],
 
   isValidTreePosition(position) {
-    if (!this.isValidPosition(position))
-      return false;
-    for (var i=0; i < this.treeSprites.length; i++) {
-      if (this.fastDistance(position.x, position.y, this.treeSprites[i].x, this.treeSprites[i].y) < 25)
+    if (!this.isValidPosition(position)) return false;
+    for (var i = 0; i < this.treeSprites.length; i++) {
+      if (
+        this.fastDistance(
+          position.x,
+          position.y,
+          this.treeSprites[i].x,
+          this.treeSprites[i].y,
+        ) < 25
+      )
         return false;
     }
     return true;
   },
-  
-  populateTrees() {
 
+  populateTrees() {
     if (this.treeSprites.length > 0) {
       for (var i = 0; i < this.treeSprites.length; i++) {
         characterContainer.removeChild(this.treeSprites[i]);
@@ -724,11 +891,11 @@ ZmMap = {
     }
 
     if (this.treeTextures.length == 0) {
-      for (var i=0; i < 6; i++) {
-        this.treeTextures.push(PIXI.Texture.from('tree' + i + '.png'));
+      for (var i = 0; i < 6; i++) {
+        this.treeTextures.push(PIXI.Texture.from("tree" + i + ".png"));
       }
-      this.armyTextures.push(PIXI.Texture.from('hedgehog.png'));
-      this.armyTextures.push(PIXI.Texture.from('sandbags.png'));
+      this.armyTextures.push(PIXI.Texture.from("hedgehog.png"));
+      this.armyTextures.push(PIXI.Texture.from("sandbags.png"));
     }
 
     var treesToCreate = Math.round(gameFieldSize.x / 50);
@@ -736,20 +903,24 @@ ZmMap = {
       treesToCreate = Math.round(treesToCreate * 1.5);
     }
 
-    while(treesToCreate > 0) {
+    while (treesToCreate > 0) {
       var foundPosition = false;
       var testPosition;
       var counter = 1000;
       var spaceFromEdges = 8;
       var roomSize = 2;
 
-      while(!foundPosition && counter > 0) {
+      while (!foundPosition && counter > 0) {
         counter--;
         testPosition = {
-          x: spaceFromEdges + (Math.random() * (gameFieldSize.x - (2 * spaceFromEdges))), 
-          y: spaceFromEdges + (Math.random() * (gameFieldSize.y - (2 * spaceFromEdges))),
-          width : roomSize,
-          height: roomSize
+          x:
+            spaceFromEdges +
+            Math.random() * (gameFieldSize.x - 2 * spaceFromEdges),
+          y:
+            spaceFromEdges +
+            Math.random() * (gameFieldSize.y - 2 * spaceFromEdges),
+          width: roomSize,
+          height: roomSize,
         };
         foundPosition = this.isValidTreePosition(testPosition);
       }
@@ -757,23 +928,39 @@ ZmMap = {
       if (foundPosition) {
         var alivePercent = 0.4 + Math.random() * 0.6;
         if (GameModel.constructions.graveyard) {
-          alivePercent = Math.min((this.fastDistance(testPosition.x, testPosition.y, this.graveYardLocation.x, this.graveYardLocation.y) - 90) / 400, 1);
+          alivePercent = Math.min(
+            (this.fastDistance(
+              testPosition.x,
+              testPosition.y,
+              this.graveYardLocation.x,
+              this.graveYardLocation.y,
+            ) -
+              90) /
+              400,
+            1,
+          );
         }
-        var texture = this.treeTextures[(this.treeTextures.length - 1) - Math.round((this.treeTextures.length - 1) * alivePercent)];
+        var texture =
+          this.treeTextures[
+            this.treeTextures.length -
+              1 -
+              Math.round((this.treeTextures.length - 1) * alivePercent)
+          ];
         if (GameModel.isBossStage(GameModel.level) && Math.random() > 0.7) {
           texture = getRandomElementFromArray(this.armyTextures, Math.random());
         }
         var treeSprite = new PIXI.Sprite(texture);
-        treeSprite.anchor = {x:0.5, y:1};
+        treeSprite.anchor = { x: 0.5, y: 1 };
         treeSprite.x = testPosition.x;
         treeSprite.y = testPosition.y;
         treeSprite.zIndex = treeSprite.y;
         treeSprite.scale.x = treeSprite.scale.y = 2;
-        treeSprite.scale.x = Math.random() > 0.5 ? treeSprite.scale.x : -1 * treeSprite.scale.x;
+        treeSprite.scale.x =
+          Math.random() > 0.5 ? treeSprite.scale.x : -1 * treeSprite.scale.x;
         this.treeSprites.push(treeSprite);
         characterContainer.addChild(treeSprite);
       }
       treesToCreate--;
     }
-  }
+  },
 };
