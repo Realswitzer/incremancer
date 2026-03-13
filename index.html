@@ -9,39 +9,31 @@
     <meta name="theme-color" content="#104510" />
     <meta charset="utf-8" />
     <link rel="manifest" href="/manifest.json" />
-    <script src="/src/legacy/lz-string.min.js"></script>
-    <script src="/src/legacy/pixi-legacy.min.js"></script>
-    <script src="/src/legacy/angular.min.js"></script>
+    <script src="/legacy/lz-string.min.js"></script>
+    <script src="/legacy/pixi-legacy.min.js"></script>
+    <script src="/legacy/angular.min.js"></script>
 
-    <script src="/src/legacy/utilsfunctions.js"></script>
-    <script src="/src/legacy/zombiemancer.js"></script>
-    <script src="/src/legacy/spells.js"></script>
-    <script src="/src/legacy/zmmap.js"></script>
-    <script src="/src/legacy/partfactory.js"></script>
-    <script src="/src/legacy/creaturefactory.js"></script>
-    <script src="/src/legacy/gamemodel.js"></script>
-    <script src="/src/legacy/upgrades.js"></script>
-    <script src="/src/legacy/trophies.js"></script>
-    <script src="/src/legacy/humans.js"></script>
-    <script src="/src/legacy/zombies.js"></script>
-    <script src="/src/legacy/skeleton.js"></script>
-    <script src="/src/legacy/creatures.js"></script>
-    <script src="/src/legacy/graveyard.js"></script>
-    <script src="/src/legacy/bloodparts.js"></script>
-    <script src="/src/legacy/angularzombie.js"></script>
-    <link
-      rel="stylesheet"
-      type="text/css"
-      href="/src/assets/zombiemancer.css"
-    />
-    <link
-      rel="shortcut icon"
-      href="/src/assets/favicon.ico"
-      type="image/x-icon"
-    />
+    <script src="/legacy/utilsfunctions.js"></script>
+    <script src="/legacy/zombiemancer.js"></script>
+    <script src="/legacy/spells.js"></script>
+    <script src="/legacy/zmmap.js"></script>
+    <script src="/legacy/partfactory.js"></script>
+    <script src="/legacy/creaturefactory.js"></script>
+    <script src="/legacy/gamemodel.js"></script>
+    <script src="/legacy/upgrades.js"></script>
+    <script src="/legacy/trophies.js"></script>
+    <script src="/legacy/humans.js"></script>
+    <script src="/legacy/zombies.js"></script>
+    <script src="/legacy/skeleton.js"></script>
+    <script src="/legacy/creatures.js"></script>
+    <script src="/legacy/graveyard.js"></script>
+    <script src="/legacy/bloodparts.js"></script>
+    <script src="/legacy/angularzombie.js"></script>
+    <link rel="stylesheet" type="text/css" href="/assets/zombiemancer.css" />
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
   </head>
 
-  <body id="app" ng-controller="ZombieController as zm">
+  <body ng-app="zombieApp" ng-controller="ZombieController as zm">
     <div class="message" ng-if="zm.message">
       <p>{{zm.message}}</p>
     </div>
@@ -292,14 +284,5 @@
       </p>
       <button ng-click="zm.startGame();">Start Level {{zm.model.level}}</button>
     </div>
-
-    <script>
-      window.addEventListener("load", () => {
-        setTimeout(() => {
-          console.warn("executnigmg FUCK");
-          angular.bootstrap(document.getElementById("app"), ["zombieApp"]);
-        }, 0);
-      });
-    </script>
   </body>
 </html>
