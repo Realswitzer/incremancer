@@ -1,0 +1,20 @@
+import "./legacy/lz-string.min.js";
+import "./legacy/pixi-legacy.min.js";
+import "./legacy/angular.min.js";
+
+import "./legacy/utilsfunctions.js";
+import "./legacy/zombiemancer.js";
+import "./legacy/spells.js";
+import "./legacy/zmmap.js";
+import "./legacy/partfactory.js";
+import "./legacy/creaturefactory.js";
+import "./legacy/gamemodel.js";
+import "./legacy/upgrades.js";
+import "./legacy/trophies.js";
+import "./legacy/humans.js";
+import "./legacy/zombies.js";
+import "./legacy/skeleton.js";
+import "./legacy/creatures.js";
+import "./legacy/graveyard.js";
+import "./legacy/bloodparts.js";
+import "./legacy/angularzombie.js";

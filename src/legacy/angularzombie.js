@@ -617,7 +617,7 @@ angular
         );
       };
 
-      (zm.costTranslate = function (costType) {
+      ((zm.costTranslate = function (costType) {
         if (costType == Upgrades.costs.prestigePoints) {
           return "points";
         }
@@ -629,7 +629,7 @@ angular
           } else {
             Upgrades.purchaseUpgrade(upgrade);
           }
-        });
+        }));
 
       zm.upgradeStatInfo = function (upgrade) {
         return Upgrades.displayStatValue(upgrade);

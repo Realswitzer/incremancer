@@ -1,28 +1,19 @@
 {
-  "name": "incremancer",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "name": "incremancer-port",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
   "scripts": {
-    "build": "pnpx esbuild src/deobf.ts --bundle --outfile=dist/reconstructed_bundle.js --format=esm",
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
     "fmt": "pnpx prettier@3.3.3 --write \"src/**/*.ts\""
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "angular": "1.7.8",
-    "lz-string": "^1.5.0",
-    "pixi.js": "6.5.10",
-    "pixi.js-legacy": "5.3.8"
-  },
   "devDependencies": {
-    "@eslint/js": "^9.39.2",
     "esbuild": "^0.27.2",
-    "eslint": "^9.39.2",
     "globals": "^17.0.0",
-    "jiti": "^2.6.1",
-    "typescript-eslint": "^8.53.0",
-    "vite": "^7.3.1"
+    "prettier": "^3.8.1",
+    "typescript": "~5.9.3",
+    "vite": "^8.0.0"
   }
 }
