@@ -37,7 +37,7 @@ incremancer-port started as an idea of recreating Incremancer in such a way that
 
 ## Forks
 
-Officially, this is a fork and port-in-progress of CirusDane/incremancer@0820c5993fd38dbd95577e22a5e2695f517e4d18 starting on the latest official version with source code, jamesmgittins/incremancer@0b921f429dc928529e43ed634049936c1e277087. This is detached from the forks due to being independent enough, and approaches modding differently. As I port commits, any extra contributors will be credited to the best of my ability.
+Officially, this is a fork and port-in-progress of [CirusDane/incremancer@0820c59](https://github.com/CirusDane/incremancer/commit/0820c5993fd38dbd95577e22a5e2695f517e4d18) starting on the latest official version with source code, [incremancer@0b921f4](https://github.com/jamesmgittins/incremancer/commit/0b921f429dc928529e43ed634049936c1e277087). This is detached from the forks due to being independent enough, and approaches modding differently. As I port commits, any extra contributors will be credited to the best of my ability.
 
 ```
 .
