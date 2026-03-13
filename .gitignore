@@ -22,3 +22,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Stackblitz uses an unreasonably outdated version of pnpm
+# This is to prevent accidental commits that modify pnpm-lock or pnpm-workspace
+pnpm-lock.yaml
+pnpm-workspace.yaml
