@@ -1,4 +1,5 @@
-ZmMap = {
+import { getRandomElementFromArray } from "./utilsfunctions";
+const ZmMap = {
   buildings: [],
   buildingsByPopularity: [],
   buildingTextures: false,
@@ -12,7 +13,7 @@ ZmMap = {
   graveyardCollision: false,
 
   getRandomBuilding() {
-    return getRandomElementFromArray(this.buildingsByPopularity, Math.random());
+    return getRandomElementFromArray(this.buildingsByPopularity);
   },
 
   roomNoOverlap(position1, position2) {
@@ -205,10 +206,7 @@ ZmMap = {
     }
 
     poi.walls = [];
-    var wallTexture = getRandomElementFromArray(
-      this.buildingTextures.walls,
-      Math.random()
-    );
+    var wallTexture = getRandomElementFromArray(this.buildingTextures.walls);
 
     this.makeHorizontalWall(
       poi.walls,
@@ -947,7 +945,7 @@ ZmMap = {
               Math.round((this.treeTextures.length - 1) * alivePercent)
           ];
         if (GameModel.isBossStage(GameModel.level) && Math.random() > 0.7) {
-          texture = getRandomElementFromArray(this.armyTextures, Math.random());
+          texture = getRandomElementFromArray(this.armyTextures);
         }
         var treeSprite = new PIXI.Sprite(texture);
         treeSprite.anchor = { x: 0.5, y: 1 };
@@ -964,3 +962,4 @@ ZmMap = {
     }
   },
 };
+export default ZmMap;

@@ -680,7 +680,7 @@ Skeleton = {
         rarity = this.rarity.epic;
         if (Math.random() < 0.1) {
           rarity = this.rarity.legendary;
-          var spell = getRandomElementFromArray(Spells.spells, Math.random());
+          var spell = getRandomElementFromArray(Spells.spells);
           specialEffects.push(spell.id);
         }
       }

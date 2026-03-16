@@ -16,5 +16,5 @@ import "./game/zombies.ts";
 import "./game/skeleton.ts";
 import "./game/creatures.ts";
 import "./game/graveyard.ts";
-import "./game/bloodparts.ts";
+import "./game/particles.ts";
 import "./game/angularzombie.ts";

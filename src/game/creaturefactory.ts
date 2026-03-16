@@ -1,4 +1,4 @@
-CreatureFactory = {
+const CreatureFactory = {
   spawnedSavedCreatures: false,
 
   types: {
@@ -244,3 +244,4 @@ CreatureFactory.creatures = [
     "A calming golem that restores health to nearby units"
   ),
 ];
+export default CreatureFactory;

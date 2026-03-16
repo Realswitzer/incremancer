@@ -1,4 +1,4 @@
-Humans = {
+const Humans = {
   map: ZmMap,
   maxWalkSpeed: 15,
   maxRunSpeed: 35,
@@ -56,7 +56,7 @@ Humans = {
       Blood.newSplatter(human.x, human.y);
       human.speedMod = Math.max(
         Math.min(1, human.health / human.maxHealth),
-        0.25,
+        0.25
       );
     } else {
       Fragments.newPart(human.x, human.y - 18, 0x7b650e);
@@ -219,7 +219,7 @@ Humans = {
         var animated = [];
         for (var j = 0; j < 3; j++) {
           animated.push(
-            PIXI.Texture.from("human" + (i + 1) + "_" + (j + 1) + ".png"),
+            PIXI.Texture.from("human" + (i + 1) + "_" + (j + 1) + ".png")
           );
         }
         this.textures.push({
@@ -231,7 +231,7 @@ Humans = {
     if (this.doctorTextures.length == 0) {
       for (var i = 0; i < 3; i++) {
         this.doctorTextures.push(
-          PIXI.Texture.from("doctor" + (i + 1) + ".png"),
+          PIXI.Texture.from("doctor" + (i + 1) + ".png")
         );
       }
       this.doctorDeadTexture = [PIXI.Texture.from("doctor4.png")];
@@ -515,7 +515,7 @@ Humans = {
             human,
             this.aliveHumans[i],
             GameModel.zombieDamage / 2,
-            true,
+            true
           );
         }
       }
@@ -532,7 +532,7 @@ Humans = {
         human.health = human.maxHealth;
         human.speedMod = Math.max(
           Math.min(1, human.health / human.maxHealth),
-          0.25,
+          0.25
         );
       }
       Exclamations.newHealing(human);
@@ -552,7 +552,7 @@ Humans = {
                 human.x,
                 human.y,
                 this.aliveHumans[i].x,
-                this.aliveHumans[i].y,
+                this.aliveHumans[i].y
               ) < healRadius
             ) {
               this.healHuman(this.aliveHumans[i]);
@@ -608,7 +608,7 @@ Humans = {
             human.position.x,
             human.position.y,
             human.target.x,
-            human.target.y,
+            human.target.y
           ) < this.moveTargetDistance
         ) {
           human.target = false;
@@ -624,7 +624,7 @@ Humans = {
             human.position.x,
             human.position.y,
             human.target.x,
-            human.target.y,
+            human.target.y
           ) < this.moveTargetDistance
         ) {
           Smoke.newDroneCloud(human.x, human.y);
@@ -645,14 +645,14 @@ Humans = {
             human.position.x,
             human.position.y,
             human.target.x,
-            human.target.y,
+            human.target.y
           );
           if (distanceToTarget < this.attackDistance) {
             if (human.attackTimer < 0) {
               Zombies.damageZombie(
                 human.zombieTarget,
                 this.attackDamage,
-                human,
+                human
               );
               this.inflictBurn(human, human.zombieTarget);
               human.attackTimer = this.attackSpeed;
@@ -727,7 +727,7 @@ Police = {
   getMaxPolice() {
     var maxPolice = Math.min(
       Math.round(this.policePerLevel * GameModel.level),
-      100,
+      100
     );
 
     if (GameModel.level < 3) return 0;
@@ -893,7 +893,7 @@ Police = {
         police.position.x,
         police.position.y,
         police.zombieTarget.x,
-        police.zombieTarget.y,
+        police.zombieTarget.y
       );
 
       if (distanceToTarget > this.shootDistance) {
@@ -946,7 +946,7 @@ Police = {
           police.x,
           police.y,
           this.police[i].x,
-          this.police[i].y,
+          this.police[i].y
         );
         if (distance < closestDistance) {
           closestPolice = this.police[i];
@@ -1001,7 +1001,7 @@ Police = {
             police.position.x,
             police.position.y,
             police.target.x,
-            police.target.y,
+            police.target.y
           ) < this.moveTargetDistance
         ) {
           police.target = false;
@@ -1030,7 +1030,7 @@ Police = {
             Zombies.damageZombie(
               police.zombieTarget,
               this.attackDamage,
-              police,
+              police
             );
             police.attackTimer = this.attackSpeed;
           }
@@ -1089,7 +1089,7 @@ Police = {
             dog.position.x,
             dog.position.y,
             dog.target.x,
-            dog.target.y,
+            dog.target.y
           ) < this.moveTargetDistance
         ) {
           dog.followTimer = Math.random() * 3;
@@ -1109,7 +1109,7 @@ Police = {
               dog.position.x,
               dog.position.y,
               dog.zombieTarget.x,
-              dog.zombieTarget.y,
+              dog.zombieTarget.y
             ) < this.moveTargetDistance
           ) {
             dog.scale.x =
@@ -1142,7 +1142,7 @@ Police = {
             dog.position.x,
             dog.position.y,
             dog.target.x,
-            dog.target.y,
+            dog.target.y
           ) < this.moveTargetDistance
         ) {
           dog.target = {
@@ -1194,7 +1194,7 @@ Army = {
   getMaxArmy() {
     var maxArmy = Math.min(
       Math.round(this.armyPerLevel * GameModel.level),
-      100,
+      100
     );
 
     if (GameModel.level < 11) return 0;
@@ -1226,7 +1226,7 @@ Army = {
         var animated = [];
         for (var j = 0; j < 3; j++) {
           animated.push(
-            PIXI.Texture.from("army" + (i + 1) + "_" + (j + 1) + ".png"),
+            PIXI.Texture.from("army" + (i + 1) + "_" + (j + 1) + ".png")
           );
         }
         this.textures.push({
@@ -1345,7 +1345,7 @@ Army = {
         armyman.position.x,
         armyman.position.y,
         armyman.zombieTarget.x,
-        armyman.zombieTarget.y,
+        armyman.zombieTarget.y
       );
 
       if (distanceToTarget > this.shootDistance && !armyman.rocketlauncher) {
@@ -1436,7 +1436,7 @@ Army = {
             armyman.position.x,
             armyman.position.y,
             armyman.target.x,
-            armyman.target.y,
+            armyman.target.y
           ) < this.moveTargetDistance
         ) {
           armyman.target = false;
@@ -1463,7 +1463,7 @@ Army = {
             Zombies.damageZombie(
               armyman.zombieTarget,
               this.attackDamage,
-              armyman,
+              armyman
             );
             armyman.attackTimer = this.attackSpeed;
           }
@@ -1505,7 +1505,7 @@ Army = {
                     ? this.attackDamage / 2
                     : this.attackDamage,
                 false,
-                armyman.rocketlauncher,
+                armyman.rocketlauncher
               );
               armyman.shotsLeft--;
             }
@@ -1569,7 +1569,7 @@ Army = {
       this.droneStrike.target.x + (Math.random() - 1) * variance,
       this.droneStrike.target.y + (Math.random() - 1) * variance,
       aliveZombies,
-      this.attackDamage * 3,
+      this.attackDamage * 3
     );
     this.droneStrike.timer = 0.3;
     this.droneStrike.bombsLeft--;
@@ -1625,11 +1625,11 @@ Army = {
         this.droneStrike.laser.lineStyle(1, 0xff0000);
         this.droneStrike.laser.moveTo(
           this.droneStrike.caller.x,
-          this.droneStrike.caller.y - 10,
+          this.droneStrike.caller.y - 10
         );
         this.droneStrike.laser.lineTo(
           this.droneStrike.target.x,
-          this.droneStrike.target.y - 10,
+          this.droneStrike.target.y - 10
         );
       }
 
@@ -1823,7 +1823,7 @@ Tanks = {
             tank.position.x,
             tank.position.y,
             tank.target.x,
-            tank.target.y,
+            tank.target.y
           ) < this.moveTargetDistance
         ) {
           tank.target = false;
@@ -1848,7 +1848,7 @@ Tanks = {
               tank.zombieTarget,
               this.attackDamage,
               false,
-              true,
+              true
             );
           }
         } else {
@@ -1896,7 +1896,7 @@ Tanks = {
         tank.position.x,
         tank.position.y,
         tank.zombieTarget.x,
-        tank.zombieTarget.y,
+        tank.zombieTarget.y
       );
 
       if (distanceToTarget > this.shootDistance) {
@@ -1923,3 +1923,4 @@ Tanks = {
     tank.state = state;
   },
 };
+export default Humans;

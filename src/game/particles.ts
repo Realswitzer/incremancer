@@ -1,4 +1,4 @@
-Particles = {
+const Particles = {
   initialize() {
     Blood.initialize();
     Bullets.initialize();
@@ -19,7 +19,7 @@ Particles = {
   },
 };
 
-PrestigePoints = {
+export const PrestigePoints = {
   maxParts: 5,
   partCounter: 0,
   container: null,
@@ -110,7 +110,7 @@ PrestigePoints = {
   },
 };
 
-Blood = {
+export const Blood = {
   maxParts: 1000,
   partCounter: 0,
   partsPerSplatter: 6,
@@ -231,7 +231,7 @@ Blood = {
   },
 };
 
-Bones = {
+export const Bones = {
   maxParts: 100,
   partsPerSplatter: 3,
   container: null,
@@ -349,7 +349,7 @@ Bones = {
   },
 };
 
-Exclamations = {
+export const Exclamations = {
   sprites: [],
   discardedSprites: [],
   maxSprites: 10,
@@ -455,7 +455,7 @@ Exclamations = {
   },
 };
 
-Bullets = {
+export const Bullets = {
   maxParts: 20,
   speed: 150,
   hitbox: 12,
@@ -540,7 +540,7 @@ Bullets = {
             sprite.damage,
             false,
             false,
-            false,
+            false
           );
         } else {
           if (sprite.rocket) {
@@ -551,7 +551,7 @@ Bullets = {
               sprite.target.x,
               sprite.target.y,
               false,
-              sprite.damage,
+              sprite.damage
             );
           } else {
             if (sprite.target.zombie) {
@@ -584,7 +584,7 @@ Bullets = {
     damage,
     plague = false,
     rocket = false,
-    fireball = false,
+    fireball = false
   ) {
     var sprite;
     if (this.discardedSprites.length > 0) {
@@ -632,7 +632,7 @@ Bullets = {
   },
 };
 
-Blasts = {
+export const Blasts = {
   maxParts: 50,
   partCounter: 0,
   sprites: [],
@@ -713,7 +713,7 @@ Blasts = {
   },
 };
 
-Smoke = {
+export const Smoke = {
   maxParts: 1000,
   partCounter: 0,
   container: false,
@@ -733,7 +733,7 @@ Smoke = {
       0,
       size / 2 + 2,
       size / 2 + 2,
-      size / 2,
+      size / 2
     );
     radgrad.addColorStop(0, "rgba(255,255,255,0.05)");
     radgrad.addColorStop(0.5, "rgba(255,255,255,0.1)");
@@ -840,7 +840,7 @@ Smoke = {
   },
 };
 
-Fragments = {
+export const Fragments = {
   maxParts: 200,
   partCounter: 0,
   partsPerSplatter: 15,
@@ -945,3 +945,4 @@ Fragments = {
     }
   },
 };
+export default Particles;

@@ -10,7 +10,7 @@ var grass;
 var canvasSize = { x: 800, y: 600 };
 var gameFieldSize = { x: 600, y: 600 };
 
-function onDragStart(event) {
+export function onDragStart(event: DragEvent): void {
   this.data = event.data;
   this.dragging = true;
   this.dragOffset = this.data.getLocalPosition(this);
@@ -21,7 +21,7 @@ function onDragStart(event) {
   lastDiff = false;
 }
 
-function onDragEnd() {
+export function onDragEnd(): void {
   this.dragging = false;
   this.data = null;
   lastDiff = false;
@@ -30,10 +30,10 @@ function onDragEnd() {
 var lastDiff = false;
 var lastPinchZoom = 0;
 
-function pinchZoom(event) {
+export function pinchZoom(event: DragEvent) {
   var curDiff = Math.abs(
     event.data.originalEvent.touches[0].clientX -
-      event.data.originalEvent.touches[1].clientX,
+      event.data.originalEvent.touches[1].clientX
   );
   if (lastDiff) {
     if (lastPinchZoom + 50 < Date.now() && Math.abs(curDiff - lastDiff) > 10) {
@@ -50,7 +50,7 @@ function pinchZoom(event) {
   }
 }
 
-function onDragMove(event) {
+export function onDragMove(event: DragEvent) {
   if (Zombies.zombieCursor) {
     Zombies.zombieCursor.position = event.data.getLocalPosition(this.parent);
   }
@@ -73,7 +73,7 @@ function onDragMove(event) {
   }
 }
 
-function preventGameContainerLeavingBounds(gc) {
+export function preventGameContainerLeavingBounds(gc) {
   var gcWidth = gameFieldSize.x * gc.scale.x;
   var gcHeight = gameFieldSize.y * gc.scale.y;
   if (gc.x > canvasSize.x * 0.5) gc.x = canvasSize.x * 0.5;
@@ -83,7 +83,7 @@ function preventGameContainerLeavingBounds(gc) {
     gc.y = canvasSize.y * 0.5 - gcHeight;
 }
 
-function onClickTap(event) {
+export function onClickTap(event) {
   if (
     !this.hasMoved &&
     GameModel.currentState == GameModel.states.playingLevel
@@ -91,28 +91,27 @@ function onClickTap(event) {
     if (KeysPressed.shift) {
       Zombies.spawnAllZombies(
         event.data.getLocalPosition(this).x,
-        event.data.getLocalPosition(this).y,
+        event.data.getLocalPosition(this).y
       );
     } else {
       Zombies.spawnZombie(
         event.data.getLocalPosition(this).x,
-        event.data.getLocalPosition(this).y,
+        event.data.getLocalPosition(this).y
       );
     }
   }
   this.hasMoved = false;
 }
 
-function zoom(change, coords) {
+export function zoom(
+  change,
+  coords = { x: canvasSize.x * 0.5, y: canvasSize.y * 0.5 }
+): void {
   if (lastPinchZoom + 50 > Date.now()) {
     return;
   }
   lastPinchZoom = Date.now();
   var gc = gameContainer;
-
-  if (!coords) {
-    coords = { x: canvasSize.x * 0.5, y: canvasSize.y * 0.5 };
-  }
 
   var gcWidth = gameFieldSize.x * gc.scale.x;
   var gcHeight = gameFieldSize.y * gc.scale.y;
@@ -153,7 +152,7 @@ function zoom(change, coords) {
   preventGameContainerLeavingBounds(gc);
 }
 
-function onWheel(event) {
+export function onWheel(event) {
   event.preventDefault();
   var coords = {
     x: event.clientX * (canvasSize.x / document.body.clientWidth),
@@ -164,7 +163,7 @@ function onWheel(event) {
   else zoom(-1, coords);
 }
 
-function setupContainers(app) {
+export function setupContainers(app) {
   gameContainer = new PIXI.Container();
   backgroundContainer = new PIXI.Container();
   backgroundSpriteContainer = new PIXI.Container();
@@ -196,7 +195,7 @@ function setupContainers(app) {
   };
 }
 
-function centerGameContainer(resetZoom = false) {
+export function centerGameContainer(resetZoom = false) {
   if (resetZoom) {
     gameContainer.scale.x = canvasSize.defaultScale;
     gameContainer.scale.y = canvasSize.defaultScale;
@@ -211,7 +210,7 @@ function centerGameContainer(resetZoom = false) {
     (canvasSize.y - gameFieldSize.y * gameContainer.scale.y) / 2;
 }
 
-function scrollGameContainer(timeDiff) {
+export function scrollGameContainer(timeDiff) {
   var keys = KeysPressed;
   var moved = false;
   var gc = gameContainer;
@@ -266,7 +265,7 @@ var debug = false;
 var frames = 0;
 var timeSinceLastFrameCount = 1;
 
-function update(timeDiff) {
+export function update(timeDiff) {
   if (GameModel.persistentData.showfps) {
     frames++;
     timeSinceLastFrameCount -= timeDiff;
@@ -289,7 +288,7 @@ function update(timeDiff) {
   Particles.update(timeDiff);
 }
 
-function setGameFieldSizeForLevel() {
+export function setGameFieldSizeForLevel() {
   var size = Math.min(500 + GameModel.level * 50, 1500);
   var shift = (Math.random() * size) / 3;
 
@@ -306,11 +305,11 @@ function setGameFieldSizeForLevel() {
     0,
     0,
     gameFieldSize.x,
-    gameFieldSize.y,
+    gameFieldSize.y
   );
 }
 
-function startGame() {
+export function startGame() {
   PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
 
   const app = new PIXI.Application({
@@ -368,7 +367,7 @@ function startGame() {
     });
 }
 
-function setSizes() {
+export function setSizes() {
   var x = document.body.clientWidth;
   var y = document.body.clientHeight;
   canvasSize = {
@@ -416,7 +415,7 @@ window.onload = function () {
         GameModel.hidden = false;
       }
     },
-    false,
+    false
   );
 };
 

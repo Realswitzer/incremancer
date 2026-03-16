@@ -1,4 +1,4 @@
-GameModel = {
+const GameModel = {
   storageName: "ZombieData",
   hidden: false,
   energy: 0,
@@ -279,7 +279,7 @@ GameModel = {
             if (window.kongregate) {
               window.kongregate.stats.submit(
                 "level",
-                this.persistentData.allTimeHighestLevel,
+                this.persistentData.allTimeHighestLevel
               );
             }
           }
@@ -529,7 +529,7 @@ GameModel = {
       this.persistentData.generators = [];
       this.persistentData.bonesTotal = 0;
       this.persistentData.upgrades = this.persistentData.upgrades.filter(
-        (upgrade) => upgrade.costType == Upgrades.costs.prestigePoints,
+        (upgrade) => upgrade.costType == Upgrades.costs.prestigePoints
       );
       this.persistentData.constructions = [];
       this.persistentData.boneCollectors = 0;
@@ -577,11 +577,11 @@ GameModel = {
     try {
       localStorage.setItem(
         this.storageName,
-        JSON.stringify(this.persistentData),
+        JSON.stringify(this.persistentData)
       );
       localStorage.setItem(
         Skeleton.storageName,
-        JSON.stringify(Skeleton.persistent),
+        JSON.stringify(Skeleton.persistent)
       );
     } catch (e) {
       console.log(e);
@@ -591,12 +591,12 @@ GameModel = {
     try {
       if (localStorage.getItem(this.storageName) !== null) {
         this.persistentData = JSON.parse(
-          localStorage.getItem(this.storageName),
+          localStorage.getItem(this.storageName)
         );
         this.level = this.persistentData.levelUnlocked;
         if (localStorage.getItem(Skeleton.storageName) !== null) {
           Skeleton.persistent = JSON.parse(
-            localStorage.getItem(Skeleton.storageName),
+            localStorage.getItem(Skeleton.storageName)
           );
         }
         this.updatePersistentData();
@@ -682,7 +682,7 @@ GameModel = {
     this.app.renderer.plugins.interaction.resolution = resolution;
     this.app.renderer.resize(
       document.body.clientWidth,
-      document.body.clientHeight,
+      document.body.clientHeight
     );
   },
 
@@ -691,10 +691,10 @@ GameModel = {
     this.blob = new Blob(
       [
         LZString.compressToEncodedURIComponent(
-          JSON.stringify(this.persistentData),
+          JSON.stringify(this.persistentData)
         ),
       ],
-      { type: "octet/stream" },
+      { type: "octet/stream" }
     );
     delete this.persistentData.skeleton;
     this.encodedContent = window.URL.createObjectURL(this.blob);
@@ -710,7 +710,7 @@ GameModel = {
       var reader = new FileReader();
       reader.onload = function (event) {
         var savegame = JSON.parse(
-          LZString.decompressFromEncodedURIComponent(event.target.result),
+          LZString.decompressFromEncodedURIComponent(event.target.result)
         );
         if (savegame.dateOfSave) {
           if (savegame.skeleton) {
@@ -825,7 +825,7 @@ GameModel = {
           },
           function (err) {
             console.log(err);
-          },
+          }
         );
       } catch (e) {
         console.error(e);
@@ -845,7 +845,7 @@ GameModel = {
           save: remove
             ? false
             : LZString.compressToEncodedURIComponent(
-                JSON.stringify(this.persistentData),
+                JSON.stringify(this.persistentData)
               ),
           trophies: remove
             ? false
@@ -853,7 +853,7 @@ GameModel = {
           skeleton: remove
             ? false
             : LZString.compressToEncodedURIComponent(
-                JSON.stringify(Skeleton.persistent),
+                JSON.stringify(Skeleton.persistent)
               ),
         },
       };
@@ -872,7 +872,7 @@ GameModel = {
           },
           function (err) {
             console.log(err);
-          },
+          }
         );
       } catch (e) {
         console.log(e);
@@ -901,8 +901,8 @@ GameModel = {
             if (result.data.Data.save) {
               var savegame = JSON.parse(
                 LZString.decompressFromEncodedURIComponent(
-                  result.data.Data.save.Value,
-                ),
+                  result.data.Data.save.Value
+                )
               );
               // playfab save is older so overwrite
               if (
@@ -915,15 +915,15 @@ GameModel = {
                 if (result.data.Data.trophies) {
                   model.persistentData.trophies = JSON.parse(
                     LZString.decompressFromEncodedURIComponent(
-                      result.data.Data.trophies.Value,
-                    ),
+                      result.data.Data.trophies.Value
+                    )
                   );
                 }
                 if (result.data.Data.skeleton) {
                   Skeleton.persistent = JSON.parse(
                     LZString.decompressFromEncodedURIComponent(
-                      result.data.Data.skeleton.Value,
-                    ),
+                      result.data.Data.skeleton.Value
+                    )
                   );
                 }
                 model.level = model.persistentData.levelUnlocked;
@@ -936,7 +936,7 @@ GameModel = {
           },
           function (err) {
             console.log(err);
-          },
+          }
         );
       } catch (e) {
         console.log(e);
@@ -948,3 +948,4 @@ GameModel = {
     return this.lastPlayFabSave + 15000 < Date.now();
   },
 };
+export default GameModel;
