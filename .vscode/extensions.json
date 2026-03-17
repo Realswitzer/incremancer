@@ -1,8 +1,8 @@
 {
-    "recommendations": [
-      "esbenp.prettier-vscode",
-      "vivaxy.vscode-conventional-commits",
-      "yzhang.markdown-all-in-one"
-    ]
-  }
-  
+  "recommendations": [
+    "esbenp.prettier-vscode",
+    "svelte.svelte-vscode",
+    "vivaxy.vscode-conventional-commits",
+    "yzhang.markdown-all-in-one"
+  ]
+}
