@@ -249,10 +249,6 @@ const GameModel = {
         this.lastSave = updateTime;
       }
 
-      if (this.lastPlayFabSave + 1200000 < updateTime) {
-        this.saveToPlayFab();
-      }
-
       if (this.getHumanCount() <= 0) {
         if (this.endLevelTimer < 0) {
           if (
@@ -276,12 +272,6 @@ const GameModel = {
             this.level > this.persistentData.allTimeHighestLevel
           ) {
             this.persistentData.allTimeHighestLevel = this.level;
-            if (window.kongregate) {
-              window.kongregate.stats.submit(
-                "level",
-                this.persistentData.allTimeHighestLevel
-              );
-            }
           }
           this.startTimer = 3;
         } else {
@@ -481,7 +471,6 @@ const GameModel = {
   },
 
   lastSave: 0,
-  lastPlayFabSave: Date.now() - 15000,
 
   persistentData: {
     saveCreated: Date.now(),
@@ -626,7 +615,6 @@ const GameModel = {
     try {
       localStorage.removeItem(this.storageName);
       localStorage.removeItem(Skeleton.storageName);
-      this.saveToPlayFab(true);
     } catch (e) {
       console.log(e);
     }
@@ -719,7 +707,6 @@ const GameModel = {
           }
           GameModel.persistentData = savegame;
           GameModel.updatePersistentData();
-          GameModel.saveToPlayFab();
           GameModel.level = GameModel.persistentData.levelUnlocked;
           CreatureFactory.spawnedSavedCreatures = false;
           GameModel.setupLevel();
@@ -796,156 +783,6 @@ const GameModel = {
       locked: this.levelLocked(level),
       trophy: Trophies.doesLevelHaveTrophy(level),
     };
-  },
-
-  loginInUsingPlayFab() {
-    if (window.kongregate) {
-      try {
-        // Setting up playfab title ID
-        PlayFab.settings.titleId = this.titleId;
-
-        // forming request
-        var request = {
-          TitleId: PlayFab.settings.titleId,
-          AuthTicket: window.kongregate.services.getGameAuthToken(),
-          KongregateId: window.kongregate.services.getUserId(),
-          CreateAccount: true,
-        };
-
-        var model = this;
-
-        // Invoke LoginWithKongregate API call and visualize both results (success or failue)
-        PlayFabClientSDK.LoginWithKongregate(
-          request,
-          function (result) {
-            if (result && result.data && result.data.PlayFabId) {
-              model.playFabId = result.data.PlayFabId;
-              model.loadFromPlayFab();
-            }
-          },
-          function (err) {
-            console.log(err);
-          }
-        );
-      } catch (e) {
-        console.error(e);
-      }
-    }
-  },
-
-  saveToPlayFab(remove = false) {
-    this.lastPlayFabSave = Date.now();
-    if (this.playFabId) {
-      var trophies = this.persistentData.trophies;
-      delete this.persistentData.trophies;
-      var request = {
-        TitleId: this.titleId,
-        PlayFabId: this.playFabId,
-        Data: {
-          save: remove
-            ? false
-            : LZString.compressToEncodedURIComponent(
-                JSON.stringify(this.persistentData)
-              ),
-          trophies: remove
-            ? false
-            : LZString.compressToEncodedURIComponent(JSON.stringify(trophies)),
-          skeleton: remove
-            ? false
-            : LZString.compressToEncodedURIComponent(
-                JSON.stringify(Skeleton.persistent)
-              ),
-        },
-      };
-      this.persistentData.trophies = trophies;
-      try {
-        PlayFab.ClientApi.UpdateUserData(
-          request,
-          function (result) {
-            if (remove) {
-              GameModel.resetToBaseStats();
-              GameModel.setupLevel();
-              window.location.reload();
-            } else {
-              GameModel.messageQueue.push("Game Saved to Cloud");
-            }
-          },
-          function (err) {
-            console.log(err);
-          }
-        );
-      } catch (e) {
-        console.log(e);
-      }
-    } else {
-      if (remove) {
-        this.resetToBaseStats();
-        this.setupLevel();
-        window.location.reload();
-      }
-    }
-  },
-
-  loadFromPlayFab(force = false) {
-    if (this.playFabId) {
-      var request = {
-        TitleId: this.titleId,
-        PlayFabId: this.playFabId,
-        Keys: ["save", "trophies", "skeleton"],
-      };
-      try {
-        var model = this;
-        PlayFab.ClientApi.GetUserData(
-          request,
-          function (result) {
-            if (result.data.Data.save) {
-              var savegame = JSON.parse(
-                LZString.decompressFromEncodedURIComponent(
-                  result.data.Data.save.Value
-                )
-              );
-              // playfab save is older so overwrite
-              if (
-                force ||
-                savegame.saveCreated < model.persistentData.saveCreated ||
-                (savegame.saveCreated == model.persistentData.saveCreated &&
-                  savegame.dateOfSave > model.persistentData.dateOfSave)
-              ) {
-                model.persistentData = savegame;
-                if (result.data.Data.trophies) {
-                  model.persistentData.trophies = JSON.parse(
-                    LZString.decompressFromEncodedURIComponent(
-                      result.data.Data.trophies.Value
-                    )
-                  );
-                }
-                if (result.data.Data.skeleton) {
-                  Skeleton.persistent = JSON.parse(
-                    LZString.decompressFromEncodedURIComponent(
-                      result.data.Data.skeleton.Value
-                    )
-                  );
-                }
-                model.level = model.persistentData.levelUnlocked;
-                model.updatePersistentData();
-                model.calcOfflineProgress();
-                model.setupLevel();
-                GameModel.messageQueue.push("Game Loaded from Cloud");
-              }
-            }
-          },
-          function (err) {
-            console.log(err);
-          }
-        );
-      } catch (e) {
-        console.log(e);
-      }
-    }
-  },
-
-  allowPlayFabAction() {
-    return this.lastPlayFabSave + 15000 < Date.now();
   },
 };
 export default GameModel;

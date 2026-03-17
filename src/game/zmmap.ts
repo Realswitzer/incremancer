@@ -1,4 +1,5 @@
 import { getRandomElementFromArray } from "./utilsfunctions";
+
 const ZmMap = {
   buildings: [],
   buildingsByPopularity: [],

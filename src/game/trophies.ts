@@ -1,173 +1,125 @@
-Trophies = {
-  trophyStats: [
-    {
-      type: Upgrades.types.health,
-      value: 50,
-    },
-    {
-      type: Upgrades.types.damage,
-      value: 7,
-    },
-    {
-      type: Upgrades.types.energyCap,
-      value: 10,
-    },
-    {
-      type: Upgrades.types.energyRate,
-      value: 0.5,
-    },
-    {
-      type: Upgrades.types.boneCollectorCapacity,
-      value: 15,
-    },
-    {
-      type: Upgrades.types.plagueDamage,
-      value: 50,
-    },
-    {
-      type: Upgrades.types.bloodCap,
-      value: 5000,
-    },
-    {
-      type: Upgrades.types.brainsRate,
-      value: 2,
-    },
-    {
-      type: Upgrades.types.zombieHealthPC,
-      value: 0.02,
-      percentage: true,
-    },
-    {
-      type: Upgrades.types.bonesRate,
-      value: 2,
-    },
-    {
-      type: Upgrades.types.zombieDmgPC,
-      value: 0.02,
-      percentage: true,
-    },
-  ],
-  isPercentage(type) {
-    for (var i = 0; i < this.trophyStats.length; i++) {
-      if (this.trophyStats[i].type == type) {
-        return this.trophyStats[i].percentage == true;
-      }
-    }
-  },
-  doesLevelHaveTrophy(level) {
-    if (GameModel.persistentData.vipEscaped) {
-      if (GameModel.persistentData.vipEscaped.includes(level)) {
-        return false;
-      }
-    }
-    if (GameModel.persistentData.trophies) {
-      if (GameModel.persistentData.trophies.includes(level)) {
-        return false;
-      }
-    }
-    return level % 5 == 0;
-  },
-  createTrophy(level, owned, escaped) {
-    var trophyId = Math.round(level / 5) - 1;
-    var multiplier = Math.floor(trophyId / this.trophyStats.length);
-    var trophy =
-      this.trophyStats[trophyId - multiplier * this.trophyStats.length];
+import { gameModel } from "./gameModel";
+import { default as upgrades } from "./upgrades";
+
+export interface TrophyStat {
+  type: string;
+  value: number;
+  percentage?: boolean;
+}
+
+export class Trophies {
+  trophyStats: TrophyStat[] = [
+    { type: upgrades.types.health, value: 50 },
+    { type: upgrades.types.damage, value: 7 },
+    { type: upgrades.types.energyCap, value: 10 },
+    { type: upgrades.types.energyRate, value: 0.5 },
+    { type: upgrades.types.boneCollectorCapacity, value: 15 },
+    { type: upgrades.types.plagueDamage, value: 50 },
+    { type: upgrades.types.bloodCap, value: 5000 },
+    { type: upgrades.types.brainsRate, value: 2 },
+    { type: upgrades.types.zombieHealthPC, value: 0.02, percentage: true },
+    { type: upgrades.types.bonesRate, value: 2 },
+    { type: upgrades.types.zombieDmgPC, value: 0.02, percentage: true },
+  ];
+
+  isPercentage(type: string): boolean {
+    const stat = this.trophyStats.find((s) => s.type === type);
+    return stat?.percentage === true;
+  }
+
+  doesLevelHaveTrophy(level: number): boolean {
+    const data = gameModel.persistentData;
+
+    if (data.vipEscaped?.includes(level)) return false;
+    if (data.trophies?.includes(level)) return false;
+
+    return level % 5 === 0;
+  }
+
+  createTrophy(level: number, owned: boolean, escaped?: boolean) {
+    const trophyId = Math.round(level / 5) - 1;
+    const multiplier = Math.floor(trophyId / this.trophyStats.length);
+    const trophy = this.trophyStats[trophyId % this.trophyStats.length];
+
     return {
-      level: level,
+      level,
       type: trophy.type,
       effect: trophy.value * (multiplier + 1),
       rank: 1,
-      owned: owned,
-      escaped: escaped,
+      owned,
+      escaped,
     };
-  },
-  trophyAquired(level) {
-    if (!GameModel.persistentData.trophies) {
-      GameModel.persistentData.trophies = [];
-    }
-    if (!GameModel.persistentData.trophies.includes(level)) {
-      GameModel.persistentData.trophies.push(level);
-      GameModel.persistentData.trophies.sort();
-      GameModel.saveData();
-      Upgrades.applyUpgrades();
-      if (window.kongregate) {
-        window.kongregate.stats.submit(
-          "trophies",
-          GameModel.persistentData.trophies.length,
-        );
-      }
-      GameModel.sendMessage("The VIP has been killed! - New Trophy Aquired");
+  }
+
+  trophyAquired(level: number) {
+    const data = gameModel.persistentData;
+
+    if (!data.trophies) data.trophies = [];
+
+    if (!data.trophies.includes(level)) {
+      data.trophies.push(level);
+      data.trophies.sort();
+      gameModel.saveData();
+      upgrades.applyUpgrades();
+
+      gameModel.sendMessage("The VIP has been killed! - New Trophy Acquired");
     } else {
-      GameModel.sendMessage("The VIP has been killed!");
+      gameModel.sendMessage("The VIP has been killed!");
     }
-  },
+  }
+
   getTrophyList() {
-    if (!GameModel.persistentData.trophies) {
-      GameModel.persistentData.trophies = [];
-    }
-    if (!GameModel.persistentData.vipEscaped) {
-      GameModel.persistentData.vipEscaped = [];
-    }
-    var trophies = [];
-    var maxTrophyToCreate = GameModel.persistentData.allTimeHighestLevel + 5;
-    for (var i = 0; i < GameModel.persistentData.trophies.length; i++) {
-      if (GameModel.persistentData.trophies[i] > maxTrophyToCreate) {
-        maxTrophyToCreate = GameModel.persistentData.trophies[i];
-      }
+    const data = gameModel.persistentData;
+
+    if (!data.trophies) data.trophies = [];
+    if (!data.vipEscaped) data.vipEscaped = [];
+
+    let max = data.allTimeHighestLevel + 5;
+
+    for (const t of data.trophies) {
+      if (t > max) max = t;
     }
 
-    for (var i = 5; i <= maxTrophyToCreate; i += 5) {
+    const trophies = [];
+    for (let i = 5; i <= max; i += 5) {
       trophies.push(
         this.createTrophy(
           i,
-          GameModel.persistentData.trophies.includes(i),
-          GameModel.persistentData.vipEscaped.includes(i),
-        ),
+          data.trophies.includes(i),
+          data.vipEscaped.includes(i)
+        )
       );
     }
+
     return trophies;
-  },
+  }
+
   getTrophyTotals() {
-    var trophiesCollected = this.getTrophyList().filter(
-      (trophy) => trophy.owned,
-    );
-    var trophies = [];
-    for (var i = 0; i < trophiesCollected.length; i++) {
-      if (
-        trophies.filter((trophy) => trophy.type == trophiesCollected[i].type)
-          .length == 0
-      ) {
-        trophies.push(trophiesCollected[i]);
+    const collected = this.getTrophyList().filter((t) => t.owned);
+    const totals: any[] = [];
+
+    for (const t of collected) {
+      const existing = totals.find((x) => x.type === t.type);
+
+      if (!existing) {
+        totals.push({ ...t });
       } else {
-        if (this.isPercentage(trophiesCollected[i].type)) {
-          trophies.filter(
-            (trophy) => trophy.type == trophiesCollected[i].type,
-          )[0].effect =
-            (trophies.filter(
-              (trophy) => trophy.type == trophiesCollected[i].type,
-            )[0].effect +
-              1) *
-              (1 + trophiesCollected[i].effect) -
-            1;
+        if (this.isPercentage(t.type)) {
+          existing.effect = (existing.effect + 1) * (1 + t.effect) - 1;
         } else {
-          trophies.filter(
-            (trophy) => trophy.type == trophiesCollected[i].type,
-          )[0].effect += trophiesCollected[i].effect;
+          existing.effect += t.effect;
         }
       }
     }
-    return trophies;
-  },
+
+    return totals;
+  }
+
   getAquiredTrophyList() {
-    if (!GameModel.persistentData.trophies) {
-      GameModel.persistentData.trophies = [];
-    }
-    var trophies = [];
-    for (var i = 0; i < GameModel.persistentData.trophies.length; i++) {
-      trophies.push(
-        this.createTrophy(GameModel.persistentData.trophies[i], true),
-      );
-    }
-    return trophies;
-  },
-};
+    const data = gameModel.persistentData;
+
+    if (!data.trophies) data.trophies = [];
+
+    return data.trophies.map((level) => this.createTrophy(level, true));
+  }
+}

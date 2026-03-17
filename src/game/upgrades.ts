@@ -2125,4 +2125,5 @@ Upgrades.upgrades = [
   ),
 ];
 
+export const Upgrades;
 export default Upgrades;

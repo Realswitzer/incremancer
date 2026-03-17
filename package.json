@@ -11,10 +11,15 @@
   },
   "devDependencies": {
     "esbuild": "^0.27.2",
+    "eslint": "^10.0.3",
     "globals": "^17.0.0",
     "prettier": "^3.8.1",
     "typescript": "~5.9.3",
-    "vite": "^8.0.0",
-    "eslint": "^10.0.3"
+    "vite": "^8.0.0"
+  },
+  "dependencies": {
+    "angular": "1.7.8",
+    "lz-string": "^1.5.0",
+    "pixi.js-legacy": "5.3.8"
   }
 }

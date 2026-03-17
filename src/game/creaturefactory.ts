@@ -1,3 +1,22 @@
+export class Creature {
+  time = 3;
+  building = false;
+  timeLeft = 10;
+  autobuild = 0;
+  level = 1;
+
+  constructor(
+    public id: number,
+    public type: string,
+    public name: string,
+    public baseHealth: number,
+    public baseDamage: number,
+    public speed: number,
+    public baseCost: number,
+    public description: string
+  ) {}
+}
+
 const CreatureFactory = {
   spawnedSavedCreatures: false,
 
@@ -6,12 +25,12 @@ const CreatureFactory = {
     airGolem: 2,
     fireGolem: 3,
     waterGolem: 4,
-  },
+  } as const,
 
   creatureScaling: 1.75,
   creatureCostScaling: 2,
 
-  update(timeDiff) {
+  update(timeDiff): void {
     var creatureCount = Creatures.creatureCount;
     for (var i = 0; i < this.creatures.length; i++) {
       if (this.creatures[i].building) {
@@ -34,19 +53,19 @@ const CreatureFactory = {
     }
   },
 
-  purchasePrice(creature) {
+  purchasePrice(creature: Creature): number {
     return (
       creature.baseCost * Math.pow(this.creatureCostScaling, creature.level - 1)
     );
   },
 
-  levelPrice(creature) {
+  levelPrice(creature: Creature): number {
     return (
       creature.baseCost * Math.pow(this.creatureCostScaling, creature.level) * 5
     );
   },
 
-  levelCreature(creature) {
+  levelCreature(creature: Creature): void {
     if (this.levelPrice(creature) < GameModel.persistentData.parts) {
       GameModel.persistentData.parts -= this.levelPrice(creature);
       creature.level++;
@@ -54,11 +73,11 @@ const CreatureFactory = {
     }
   },
 
-  canAffordCreature(creature) {
+  canAffordCreature(creature: Creature): number {
     return this.purchasePrice(creature) < GameModel.persistentData.parts;
   },
 
-  creaturesBuildingCount() {
+  creaturesBuildingCount(): number {
     var count = 0;
     for (var i = 0; i < CreatureFactory.creatures.length; i++) {
       if (CreatureFactory.creatures[i].building) {
@@ -68,7 +87,7 @@ const CreatureFactory = {
     return count;
   },
 
-  startBuilding(creature) {
+  startBuilding(creature: Creature): void {
     if (creature.building) {
       return;
     }
@@ -176,30 +195,7 @@ const CreatureFactory = {
     };
   },
 
-  Creature: function (
-    id,
-    type,
-    name,
-    baseHealth,
-    baseDamage,
-    speed,
-    baseCost,
-    description
-  ) {
-    this.id = id;
-    this.type = type;
-    this.name = name;
-    this.baseHealth = baseHealth;
-    this.baseDamage = baseDamage;
-    this.speed = speed;
-    this.baseCost = baseCost;
-    this.description = description;
-    this.time = 3;
-    this.building = false;
-    this.timeLeft = 10;
-    this.autobuild = 0;
-    this.level = 1;
-  },
+  Creature = Creature,
 };
 
 CreatureFactory.creatures = [

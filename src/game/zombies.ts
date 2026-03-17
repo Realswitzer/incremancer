@@ -1,4 +1,6 @@
+import * as PIXI from "pixi.js-legacy";
 import { getRandomElementFromArray } from "./utilsfunctions";
+
 const Zombies = {
   map: ZmMap,
   model: GameModel,
@@ -34,7 +36,7 @@ const Zombies = {
     attackingTarget: 3,
   },
 
-  populate() {
+  populate(): void {
     this.graveyard = Graveyard;
     this.model.zombieCount = 0;
     if (this.textures.length == 0) {
@@ -91,7 +93,7 @@ const Zombies = {
     }
   },
 
-  createZombie(x, y, isDog = false) {
+  createZombie(x: number, y: number, isDog: boolean = false): void {
     var textureId = Math.floor(Math.random() * this.textures.length);
     var zombie;
     if (this.discardedZombies.length > 0) {
