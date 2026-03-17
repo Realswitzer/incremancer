@@ -1,56 +1,164 @@
-<div class="shop" ng-if="sidePanels.construction">
-  <div class="shop-title">
-    <h2>Unholy Construction</h2>
-    <button on:click={closeSidePanels();}>Close</button>
-  </div>
-  <div class="tabs">
-    <button on:click={filterConstruction('available');} class="{currentConstructionFilter == 'available' ? 'active' : ''}">Available</button>
-    <button on:click={filterConstruction('completed');} class="{currentConstructionFilter == 'completed' ? 'active' : ''}">Completed</button>
-    <button ng-if="model.autoconstructionUnlocked" on:click={model.autoconstruction = !model.autoconstruction} class="{model.autoconstruction ? 'active' : ''}">{model.autoconstruction ? 'Auto On' : 'Auto Off'}</button>
-  </div>
-  <div class="upgrade current-construction" ng-if="model.persistentData.currentConstruction">
-    <h4>Building - {model.persistentData.currentConstruction.name}</h4>
-    <p>Consuming 
-      <span ng-if="model.persistentData.currentConstruction.costPerTick.energy" class="energy">{model.persistentData.currentConstruction.costPerTick.energy|decimal} energy</span> 
-      <span ng-if="model.persistentData.currentConstruction.costPerTick.blood" class="blood">{model.persistentData.currentConstruction.costPerTick.blood|decimal} blood</span>
-      <span ng-if="model.persistentData.currentConstruction.costPerTick.brains" class="brains">{model.persistentData.currentConstruction.costPerTick.brains|decimal} brains</span>
-      <span ng-if="model.persistentData.currentConstruction.costPerTick.bones" class="bones">{model.persistentData.currentConstruction.costPerTick.bones|decimal} bones</span>
-      <span ng-if="model.persistentData.currentConstruction.costPerTick.parts" class="parts">{model.persistentData.currentConstruction.costPerTick.parts|decimal} parts</span>
-      each second
-    </p>
-    <div class="progress {model.persistentData.currentConstruction.state == 'building' ? 'active' : 'stopped'}">
-      <div ng-style="{'width':constructionPercent() + '%'}"></div>
-      <span>{constructionPercent()}%</span>
-    </div>
-    <p ng-if="!model.persistentData.currentConstruction.shortfall"><strong>Time Remaining: {model.persistentData.currentConstruction.timeRemaining}</strong></p>
-    <p ng-if="model.persistentData.currentConstruction.shortfall">
-      <strong>Production stopped, need more
-      <span ng-if="model.persistentData.currentConstruction.shortfall.energy" class="energy">energy</span>
-      <span ng-if="model.persistentData.currentConstruction.shortfall.blood" class="blood">blood</span>
-      <span ng-if="model.persistentData.currentConstruction.shortfall.brains" class="brains">brains</span>
-      <span ng-if="model.persistentData.currentConstruction.shortfall.bones" class="bones">bones</span>
-      <span ng-if="model.persistentData.currentConstruction.shortfall.parts" class="parts">parts</span>
-      </strong>
-    </p>
-    <button on:click={playPauseConstruction();}>{model.persistentData.currentConstruction.state == 'paused' ? 'Resume' : 'Pause'}</button>
-    <button on:click={cancelConstruction();}>Cancel</button>
-  </div>
-  <div class="upgrades">
-    <div ng-repeat="upgrade in upgrades" class="upgrade">
-      <h4>{upgrade.name}</h4>
-      <p>{upgrade.description}</p>
-      <label ng-if="currentRankConstruction(upgrade) < upgrade.cap">Time to build: {upgrade.time} seconds</label>
-      <div ng-if="currentRankConstruction(upgrade) < upgrade.cap">
-        <label>Total Cost: </label>
-        <label ng-if="upgrade.costs.energy" class="energy">{upgrade.costs.energy|whole} energy ({upgrade.costs.energy/upgrade.time|whole} per sec)</label>
-        <label ng-if="upgrade.costs.blood" class="blood">{upgrade.costs.blood|whole} blood ({upgrade.costs.blood/upgrade.time|whole} per sec)</label>
-        <label ng-if="upgrade.costs.brains" class="brains">{upgrade.costs.brains|whole} brains ({upgrade.costs.brains/upgrade.time|whole} per sec)</label>
-        <label ng-if="upgrade.costs.bones" class="bones">{upgrade.costs.bones|whole} bones ({upgrade.costs.bones/upgrade.time|whole} per sec)</label>
-        <label ng-if="upgrade.costs.parts" class="parts">{upgrade.costs.parts|whole} parts ({upgrade.costs.parts/upgrade.time|whole} per sec)</label>
-      </div>
-      <label ng-if="constructionLeadsTo(upgrade)">Required for: {constructionLeadsTo(upgrade)}</label>
-      <p ng-if="currentRankConstruction(upgrade) < upgrade.cap">Current Rank: {currentRankConstruction(upgrade)} / {upgrade.cap}</p>
-      <button on:click={startConstruction(upgrade)} ng-disabled="model.persistentData.currentConstruction} ng-if="currentRankConstruction(upgrade) < upgrade.cap">Begin Construction</button>
-    </div>
-  </div>
-</div>
+<script lang="ts">
+	import { default as model } from '../game/gamemodel';
+</script>
+
+{#if sidePanels.construction}
+	<div class="shop">
+		<div class="shop-title">
+			<h2>Unholy Construction</h2>
+			<button on:click={closeSidePanels()}>Close</button>
+		</div>
+		<div class="tabs">
+			<button
+				on:click={filterConstruction('available')}
+				class:active={currentConstructionFilter === 'available'}>Available</button
+			>
+			<button
+				on:click={filterConstruction('completed')}
+				class:active={currentConstructionFilter === 'completed'}>Completed</button
+			>
+			{#if model.autoconstructionUnlocked}
+				<button
+					on:click={(model.autoconstruction = !model.autoconstruction)}
+					class:active={model.autoconstruction}
+					>{model.autoconstruction ? 'Auto On' : 'Auto Off'}</button
+				>
+			{/if}
+		</div>
+		{#if model.persistentData.currentConstruction}
+			<div class="upgrade current-construction">
+				<h4>Building - {model.persistentData.currentConstruction.name}</h4>
+				<p>
+					Consuming
+					{#if model.persistentData.currentConstruction.costPerTick.energy}
+						<span class="energy"
+							>{model.persistentData.currentConstruction.costPerTick.energy | decimal} energy</span
+						>
+					{/if}
+					{#if model.persistentData.currentConstruction.costPerTick.blood}
+						<span class="blood"
+							>{model.persistentData.currentConstruction.costPerTick.blood | decimal} blood</span
+						>
+					{/if}
+					{#if model.persistentData.currentConstruction.costPerTick.brains}
+						<span class="brains"
+							>{model.persistentData.currentConstruction.costPerTick.brains | decimal} brains</span
+						>
+					{/if}
+					{#if model.persistentData.currentConstruction.costPerTick.bones}
+						<span class="bones"
+							>{model.persistentData.currentConstruction.costPerTick.bones | decimal} bones</span
+						>
+					{/if}
+					{#if model.persistentData.currentConstruction.costPerTick.parts}
+						<span class="parts"
+							>{model.persistentData.currentConstruction.costPerTick.parts | decimal} parts</span
+						>{/if}
+					each second
+				</p>
+				<div
+					class="progress {model.persistentData.currentConstruction.state == 'building'
+						? 'active'
+						: 'stopped'}"
+				>
+					<div
+						style:width={() => {
+							constructionPercent() + '%';
+						}}
+					></div>
+					<span>{constructionPercent()}%</span>
+				</div>
+				{#if !model.persistentData.currentConstruction.shortfall}
+					<p>
+						<strong>Time Remaining: {model.persistentData.currentConstruction.timeRemaining}</strong
+						>
+					</p>
+				{/if}
+				{#if model.persistentData.currentConstruction.shortfall}
+					<p>
+						<strong
+							>Production stopped, need more
+							{#if model.persistentData.currentConstruction.shortfall.energy}<span class="energy"
+									>energy</span
+								>{/if}
+							{#if model.persistentData.currentConstruction.shortfall.blood}
+								<span class="blood">blood</span>
+							{/if}
+							{#if model.persistentData.currentConstruction.shortfall.brains}
+								<span class="brains">brains</span>
+							{/if}
+							{#if model.persistentData.currentConstruction.shortfall.bones}
+								<span class="bones">bones</span>
+							{/if}
+							{#if model.persistentData.currentConstruction.shortfall.parts}
+								<span class="parts">parts</span>
+							{/if}
+						</strong>
+					</p>
+				{/if}
+				<button on:click={playPauseConstruction()}
+					>{model.persistentData.currentConstruction.state == 'paused' ? 'Resume' : 'Pause'}</button
+				>
+				<button on:click={cancelConstruction()}>Cancel</button>
+			</div>
+		{/if}
+		<div class="upgrades">
+			{#each upgrades as upgrade}
+				<div class="upgrade">
+					<h4>{upgrade.name}</h4>
+					<p>{upgrade.description}</p>
+					{#if currentRankConstruction(upgrade) < upgrade.cap}
+						<label>Time to build: {upgrade.time} seconds</label>
+					{/if}
+					{#if currentRankConstruction(upgrade) < upgrade.cap}
+						<div>
+							<label>Total Cost: </label>
+							<label
+								ng-if="upgrade.costs.energy"
+								class="energy"
+								>{upgrade.costs.energy | whole} energy ({(upgrade.costs.energy / upgrade.time) |
+									whole} per sec)</label
+							>
+							<label
+								ng-if="upgrade.costs.blood"
+								class="blood"
+								>{upgrade.costs.blood | whole} blood ({(upgrade.costs.blood / upgrade.time) | whole} per
+								sec)</label
+							>
+							<label
+								ng-if="upgrade.costs.brains"
+								class="brains"
+								>{upgrade.costs.brains | whole} brains ({(upgrade.costs.brains / upgrade.time) |
+									whole} per sec)</label
+							>
+							<label
+								ng-if="upgrade.costs.bones"
+								class="bones"
+								>{upgrade.costs.bones | whole} bones ({(upgrade.costs.bones / upgrade.time) | whole} per
+								sec)</label
+							>
+							<label
+								ng-if="upgrade.costs.parts"
+								class="parts"
+								>{upgrade.costs.parts | whole} parts ({(upgrade.costs.parts / upgrade.time) | whole} per
+								sec)</label
+							>
+						</div>
+					{/if}
+					<label ng-if="constructionLeadsTo(upgrade)"
+						>Required for: {constructionLeadsTo(upgrade)}</label
+					>
+					<p ng-if="currentRankConstruction(upgrade) < upgrade.cap">
+						Current Rank: {currentRankConstruction(upgrade)} / {upgrade.cap}
+					</p>
+					{#if currentRankConstruction(upgrade) < upgrade.cap}
+						<button
+							on:click={startConstruction(upgrade)}
+							disabled={model.persistentData.currentConstruction}>Begin Construction</button
+						>
+					{/if}
+				</div>
+			{/each}
+		</div>
+	</div>
+{/if}
