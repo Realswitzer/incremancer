@@ -59,10 +59,7 @@
     />
   </head>
 
-  <body
-    ng-app="zombieApp"
-    ng-controller="ZombieController as zm"
-  >
+  <body>
     {#if message}
       <div class="message">
         <p>{message}</p>
@@ -71,17 +68,19 @@
     <div class="stats {model.persistentData.zoomButtons ? 'zoom' : ''}">
       <label>Level: {model.level}</label>
       <button
-        ng-click="showStats = !showStats"
-        class={showStats ? 'active' : ''}
+        on:click={(showStats = !showStats)}
+        class:active={showStats}
       >
         Stats
       </button>
       <label>Humans: {model.getHumanCount()}</label>
       <label>Zombies: {model.zombieCount}</label>
-      <label ng-if="model.constructions.monsterFactory"
-        >Creatures: {model.creatureCount} / {model.creatureLimit}</label
-      >
-      <label ng-if="model.persistentData.showfps">FPS: {model.frameRate}</label>
+      {#if model.constructions.monsterFactory}
+        <label>Creatures: {model.creatureCount} / {model.creatureLimit}</label>
+      {/if}
+      {#if model.persistentData.showfps}
+        <label>FPS: {model.frameRate}</label>
+      {/if}
     </div>
 
     <div class="resources">
@@ -94,9 +93,7 @@
         ></span></label
       >
       <label class="blood"
-        >Blood:<span class="value"
-          >{model.persistentData.blood | whole} / {model.bloodMax | whole}</span
-        ><span
+        >Blood:<span class="value">{model.persistentData.blood | whole} / {model.bloodMax | whole}</span><span
           class="percent"
           style:width={() => {
             bloodPercent() + '%';
@@ -104,145 +101,144 @@
         ></span></label
       >
       <label class="brains"
-        >Brains:<span class="value"
-          >{model.persistentData.brains | whole} / {model.brainsMax | whole}</span
-        ><span
+        >Brains:<span class="value">{model.persistentData.brains | whole} / {model.brainsMax | whole}</span><span
           class="percent"
           style:width={() => {
             brainsPercent() + '%';
           }}
         ></span></label
       >
-      <label
-        class="bones"
-        ng-if="model.constructions.graveyard || model.persistentData.bones > 0"
-        >Bones:<span class="value">{model.persistentData.bones | whole}</span></label
-      >
-      <label
-        class="parts"
-        ng-if="model.constructions.factory || model.persistentData.parts > 0"
-        >Parts:<span class="value">{model.persistentData.parts | whole}</span></label
-      >
+      {#if model.constructions.graveyard || model.persistentData.bones > 0}
+        <label class="bones">Bones:<span class="value">{model.persistentData.bones | whole}</span></label>
+      {/if}
+      {#if model.constructions.factory || model.persistentData.parts > 0}
+        <label class="parts">Parts:<span class="value">{model.persistentData.parts | whole}</span></label>
+      {/if}
       <div class="spells">
-        <button
-          ng-repeat="spell in spells.getUnlockedSpells()"
-          ng-click="spells.castSpell(spell)"
-          class="spell {spell.active ? 'active' : spell.onCooldown ? 'cooldown' : ''}"
-          ng-disabled="spell.onCooldown || spell.energyCost > model.energy"
-        >
-          <span class="icon">{spell.name}</span>
-          <span
-            class="timer"
-            ng-if="spell.active || spell.onCooldown"
-            >{spell.active ? spell.timer : spell.cooldownLeft | whole}</span
+        {#each spells.getUnlockedSpells() as spell}
+          <button
+            on:click={spells.castSpell(spell)}
+            class="spell {spell.active ? 'active' : spell.onCooldown ? 'cooldown' : ''}"
+            disabled={spell.onCooldown || spell.energyCost > model.energy}
           >
-          <span
-            class="tooltip"
-            ng-if="!spell.active && !spell.onCooldown">{spell.tooltip}</span
-          >
-        </button>
-        <div
-          class="skeleton"
-          ng-if="model.persistentData.allTimeHighestLevel >= 50"
-          ng-click="skeletonMenu.show()"
-        >
+            <span class="icon">{spell.name}</span>
+            {#if spell.active || spell.onCooldown}
+              <span class="timer">{spell.active ? spell.timer : spell.cooldownLeft | whole}</span>
+            {/if}
+            {#if !spell.active && !spell.onCooldown}
+              <span class="tooltip">{spell.tooltip}</span>
+            {/if}
+          </button>
+        {/each}
+        {#if model.persistentData.allTimeHighestLevel >= 50}
           <div
-            class="bg"
-            id="skeleton"
-          ></div>
-          <div class="xp">
-            <span
-              style:height={() => {
-                skeletonMenu.xpPercent() + '%';
-              }}
-            ></span>
-          </div>
-          <div
-            class="lvl"
-            ng-if="skeleton().skeletons > 0 && skeletonMenu.isAlive()"
+            class="skeleton"
+            on:click={skeletonMenu.show()}
           >
-            lvl {skeleton().level}
+            <div
+              class="bg"
+              id="skeleton"
+            ></div>
+            <div class="xp">
+              <span
+                style:height={() => {
+                  skeletonMenu.xpPercent() + '%';
+                }}
+              ></span>
+            </div>
+            {#if skeleton().skeletons > 0 && skeletonMenu.isAlive()}
+              <div class="lvl">
+                lvl {skeleton().level}
+              </div>
+            {/if}
+            {#if skeleton().skeletons > 0 && !skeletonMenu.isAlive()}
+              <div class="lvl dead">
+                DEAD: {skeletonMenu.timer()}
+              </div>
+            {/if}
           </div>
-          <div
-            class="lvl dead"
-            ng-if="skeleton().skeletons > 0 && !skeletonMenu.isAlive()"
-          >
-            DEAD: {skeletonMenu.timer()}
-          </div>
-        </div>
+        {/if}
       </div>
     </div>
 
-    <div class="buttons {sidePanels.open ? 'open' : ''}">
+    <div
+      class="buttons"
+      class:open={sidePanels.open}
+    >
       <button
-        ng-click="openSidePanel('shop');"
-        class={sidePanels.shop ? 'active' : ''}
+        on:click={OpenSidePanel('shop')}
+        class:active={sidePanels.shop}
       >
         Shop
       </button>
+      {#if model.construction}
+        <button
+          on:click={openSidePanel('construction')}
+          class:active={sidePanels.construction}
+        >
+          {#if model.persistentData.currentConstruction}
+            <span class="tag">{constructionPercent()}%</span>
+          {/if}Construction
+        </button>
+      {/if}
+      {#if model.constructions.graveyard}
+        <button
+          on:click={openSidePanel('graveyard')}
+          class:active={sidePanels.graveyard}
+        >
+          Graveyard
+        </button>
+      {/if}
+      {#if model.constructions.factory}
+        <button
+          on:click={openSidePanel('factory')}
+          class:active={sidePanels.factory}
+        >
+          Factory
+        </button>
+      {/if}
+      {#if model.constructions.runesmith}
+        <button
+          on:click={openSidePanel('runesmith')}
+          class:active={sidePanels.runesmith}
+          class:shatter={canShatter()}
+        >
+          Runesmith
+        </button>
+      {/if}
+      {#if isShowPrestige()}
+        <button
+          on:click={openSidePanel('prestige')}
+          class:active={sidePanels.prestige}
+          id="prestige-button"
+        >
+          <div id="prestige-bg"></div>
+          Prestige
+        </button>
+      {/if}
       <button
-        ng-click="openSidePanel('construction');"
-        ng-if="model.construction"
-        class={sidePanels.construction ? 'active' : ''}
-      >
-        <span
-          ng-if="model.persistentData.currentConstruction"
-          class="tag">{constructionPercent()}%</span
-        >Construction
-      </button>
-      <button
-        ng-click="openSidePanel('graveyard');"
-        ng-if="model.constructions.graveyard"
-        class={sidePanels.graveyard ? 'active' : ''}
-      >
-        Graveyard
-      </button>
-      <button
-        ng-click="openSidePanel('factory');"
-        ng-if="model.constructions.factory"
-        class={sidePanels.factory ? 'active' : ''}
-      >
-        Factory
-      </button>
-      <button
-        ng-click="openSidePanel('runesmith');"
-        ng-if="model.constructions.runesmith"
-        class="{sidePanels.runesmith ? 'active' : ''}{canShatter() ? 'shatter' : ''}"
-      >
-        Runesmith
-      </button>
-      <button
-        ng-click="openSidePanel('prestige');"
-        ng-if="isShowPrestige()"
-        class={sidePanels.prestige ? 'active' : ''}
-        id="prestige-button"
-      >
-        <div id="prestige-bg"></div>
-        Prestige
-      </button>
-      <button
-        ng-click="openSidePanel('options');"
-        class={sidePanels.options ? 'active' : ''}
+        on:click={openSidePanel('options')}
+        class:active={sidePanels.options}
       >
         Options
       </button>
-      <button
-        ng-click="levelSelect.show()"
-        class={levelSelect.shown ? 'active' : ''}
-        ng-if="levelSelect.showButton()"
-      >
-        Level Select
-      </button>
+      {#if levelSelect.showButton()}
+        <button
+          on:click={levelSelect.show()}
+          class:active={levelSelect.shown}
+        >
+          Level Select
+        </button>
+      {/if}
     </div>
 
-    <div
-      class="zoom-buttons"
-      ng-if="model.persistentData.zoomButtons"
-    >
-      <button ng-click="zoom(-1);">-</button>
-      <button ng-click="resetZoom();">Reset</button>
-      <button ng-click="zoom(+1);">+</button>
-    </div>
+    {#if model.persistentData.zoomButtons}
+      <div class="zoom-buttons">
+        <button on:click={zoom(-1)}>-</button>
+        <button on:click={resetZoom()}>Reset</button>
+        <button on:click={zoom(+1)}>+</button>
+      </div>
+    {/if}
 
     <shop-menu></shop-menu>
     <construction-menu></construction-menu>
@@ -255,55 +251,54 @@
     <level-select></level-select>
     <level-stats></level-stats>
 
-    <div
-      class="start-game"
-      ng-if="model.currentState == model.states.startGame"
-    >
-      <h2>Incremancer</h2>
-      <h4>Take control of a horde of zombies to ravage small towns</h4>
-      <ul>
-        <li ng-repeat="text in howToPlay">{text}</li>
-      </ul>
-      <h2
-        ng-if="model.offlineMessage"
-        style="margin: 1em"
-      >
-        {model.offlineMessage}
-      </h2>
-      <button ng-click="startGame();">Start Level {model.level}</button>
-    </div>
+    {#if model.currentState === model.states.startGame}
+      <div class="start-game">
+        <h2>Incremancer</h2>
+        <h4>Take control of a horde of zombies to ravage small towns</h4>
+        <ul>
+          {#each howToPlay as text}
+            <li>{text}</li>
+          {/each}
+        </ul>
+        {#if model.offlineMessage}
+          <h2 style="margin: 1em">
+            {model.offlineMessage}
+          </h2>
+        {/if}
+        <button on:click={startGame()}>Start Level {model.level}</button>
+      </div>
+    {/if}
 
-    <div
-      class="end-level"
-      ng-if="model.currentState == model.states.failed"
-    >
-      <h2>Level {model.level} Failed</h2>
-      <h4>You have been defeated</h4>
-      <button ng-click="model.startLevel(model.level - 1);">
-        Go back to Level {model.level - 1}
-      </button>
-      <button ng-click="model.startLevel(model.level);">
-        Retry Level {model.level}
-      </button>
-    </div>
+    {#if model.currentState === model.states.failed}
+      <div class="end-level">
+        <h2>Level {model.level} Failed</h2>
+        <h4>You have been defeated</h4>
+        <button on:click={model.startLevel(model.level - 1)}>
+          Go back to Level {model.level - 1}
+        </button>
+        <button on:click={model.startLevel(model.level)}>
+          Retry Level {model.level}
+        </button>
+      </div>
+    {/if}
 
-    <div
-      class="end-level"
-      ng-if="model.currentState == model.states.levelCompleted"
-    >
-      <h2>Level {model.level} Complete</h2>
-      <h4>All the humans are either dead or undead!</h4>
-      <h4 ng-if="model.prestigePointsEarned > 0">
-        You have earned {model.prestigePointsEarned} prestige points
-      </h4>
-      <h4
-        ng-if="model.endLevelBones"
-        style="margin: 1em"
-      >
-        Your bone collectors have gathered the remaining {model.endLevelBones} bones from the town
-      </h4>
-      <button ng-click="nextLevel();">Start Level {model.level + 1}</button>
-    </div>
+    {#if model.currentState === model.states.levelCompleted}
+      <div class="end-level">
+        <h2>Level {model.level} Complete</h2>
+        <h4>All the humans are either dead or undead!</h4>
+        {#if model.prestigePointsEarned > 0}
+          <h4>
+            You have earned {model.prestigePointsEarned} prestige points
+          </h4>
+        {/if}
+        {#if model.endLevelBones}
+          <h4 style="margin: 1em">
+            Your bone collectors have gathered the remaining {model.endLevelBones} bones from the town
+          </h4>
+        {/if}
+        <button on:click={nextLevel()}>Start Level {model.level + 1}</button>
+      </div>
+    {/if}
 
     {#if model.currentState === model.states.prestiged}
       <div class="start-game">

@@ -45,8 +45,7 @@ const Graveyard = {
   drawHealthBar(): void {
     if (GameModel.isBossStage(GameModel.level)) {
       GameModel.sendMessage('Defend the Graveyard!');
-      this.graveyardHealth = this.graveyardMaxHealth =
-        GameModel.zombieHealth * 100 * GameModel.graveyardHealthMod;
+      this.graveyardHealth = this.graveyardMaxHealth = GameModel.zombieHealth * 100 * GameModel.graveyardHealthMod;
       if (!this.healthBar) {
         this.healthBar = {
           container: new PIXI.Container(),
@@ -85,10 +84,7 @@ const Graveyard = {
   },
 
   updateHealthBar() {
-    var percentage = Math.max(
-      Math.round((this.graveyardHealth / this.graveyardMaxHealth) * 100),
-      0
-    );
+    var percentage = Math.max(Math.round((this.graveyardHealth / this.graveyardMaxHealth) * 100), 0);
     if (percentage != this.healthBar.percentage) {
       this.healthBar.foreground.clear();
       if (percentage > 0) {
@@ -193,11 +189,7 @@ const Graveyard = {
       postSprite.anchor = { x: 0.5, y: 1 };
       postSprite.scale.x = Math.random() > 0.5 ? 1 : -1;
       var positionWobble = -5 + Math.random() * 10;
-      postSprite.position = RotateVector2d(
-        0,
-        this.fenceRadius + positionWobble,
-        radiansPerFencePost * i
-      );
+      postSprite.position = RotateVector2d(0, this.fenceRadius + positionWobble, radiansPerFencePost * i);
     }
     this.fence.cacheAsBitmap = true;
 
@@ -215,10 +207,7 @@ const Graveyard = {
       this.updateHealthBar();
     }
 
-    if (
-      !GameModel.constructions.graveyard ||
-      GameModel.currentState != GameModel.states.playingLevel
-    ) {
+    if (!GameModel.constructions.graveyard || GameModel.currentState != GameModel.states.playingLevel) {
       this.sprite.visible = false;
       return;
     }
@@ -278,10 +267,7 @@ const Graveyard = {
         for (var i = 0; i < aliveHumans.length; i++) {
           if (Math.abs(aliveHumans[i].x - this.sprite.x) < this.fenceRadius) {
             if (Math.abs(aliveHumans[i].y - this.sprite.y) < this.fenceRadius) {
-              if (
-                fastDistance(this.sprite.x, this.sprite.y, aliveHumans[i].x, aliveHumans[i].y) <
-                this.fenceRadius
-              ) {
+              if (fastDistance(this.sprite.x, this.sprite.y, aliveHumans[i].x, aliveHumans[i].y) < this.fenceRadius) {
                 Zombies.inflictPlague(aliveHumans[i]);
                 Humans.damageHuman(aliveHumans[i], GameModel.zombieDamage);
                 Blood.newPlagueSplatter(aliveHumans[i].x, aliveHumans[i].y);
@@ -430,12 +416,7 @@ export const BoneCollectors = {
         var distanceToNearest = 2000;
         for (var i = 0; i < this.bones.uncollected.length; i++) {
           if (!this.bones.uncollected[i].collected && !this.bones.uncollected[i].collector) {
-            var distance = fastDistance(
-              x,
-              y,
-              this.bones.uncollected[i].x,
-              this.bones.uncollected[i].y
-            );
+            var distance = fastDistance(x, y, this.bones.uncollected[i].x, this.bones.uncollected[i].y);
             if (distance < distanceToNearest) {
               distanceToNearest = distance;
               nearestBone = this.bones.uncollected[i];
@@ -461,29 +442,18 @@ export const BoneCollectors = {
   },
 
   updateBoneCollector(boneCollector, timeDiff): void {
-    if (
-      boneCollector.target &&
-      !(boneCollector.target.graveyard && boneCollector.state == this.states.collecting)
-    )
+    if (boneCollector.target && !(boneCollector.target.graveyard && boneCollector.state == this.states.collecting))
       this.updateSpeed(boneCollector, timeDiff);
 
     switch (boneCollector.state) {
       case this.states.collecting:
-        if (
-          !boneCollector.target ||
-          boneCollector.target.collected ||
-          !boneCollector.target.visible
-        ) {
+        if (!boneCollector.target || boneCollector.target.collected || !boneCollector.target.visible) {
           this.findNearestBone(boneCollector);
         }
         if (boneCollector.target && !boneCollector.target.collected) {
           if (
-            fastDistance(
-              boneCollector.position.x,
-              boneCollector.position.y,
-              boneCollector.target.x,
-              boneCollector.target.y
-            ) < this.collectDistance
+            fastDistance(boneCollector.position.x, boneCollector.position.y, boneCollector.target.x, boneCollector.target.y) <
+            this.collectDistance
           ) {
             boneCollector.bones++;
             boneCollector.target.collected = true;
@@ -502,12 +472,8 @@ export const BoneCollectors = {
           boneCollector.target = Graveyard.sprite;
         }
         if (
-          fastDistance(
-            boneCollector.position.x,
-            boneCollector.position.y,
-            boneCollector.target.x,
-            boneCollector.target.y
-          ) < this.collectDistance
+          fastDistance(boneCollector.position.x, boneCollector.position.y, boneCollector.target.x, boneCollector.target.y) <
+          this.collectDistance
         ) {
           boneCollector.target = false;
           GameModel.addBones(boneCollector.bones);
@@ -647,21 +613,13 @@ export const Harpies = {
     switch (harpy.state) {
       case this.states.bombing:
         if (!harpy.target || harpy.target.graveyard || harpy.target.dead) {
-          if (
-            this.model.tankBuster &&
-            this.model.isBossStage(this.model.level) &&
-            Tanks.aliveTanks.length > 0
-          ) {
+          if (this.model.tankBuster && this.model.isBossStage(this.model.level) && Tanks.aliveTanks.length > 0) {
             harpy.target = getRandomElementFromArray(Tanks.aliveTanks);
             harpy.bomb.fire = true;
           } else {
             for (var i = 0; i < 8; i++) {
               harpy.target = getRandomElementFromArray(Humans.aliveHumans);
-              if (
-                !harpy.target ||
-                fastDistance(harpy.x, harpy.y, harpy.target.x, harpy.target.y - this.bombHeight) <
-                  500
-              ) {
+              if (!harpy.target || fastDistance(harpy.x, harpy.y, harpy.target.x, harpy.target.y - this.bombHeight) < 500) {
                 break;
               }
             }

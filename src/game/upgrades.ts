@@ -57,11 +57,7 @@ const Upgrades = {
   },
 
   hasRequirement(upgrade) {
-    if (
-      upgrade.requires &&
-      GameModel.persistentData.constructions.filter((built) => built.id == upgrade.requires)
-        .length == 0
-    ) {
+    if (upgrade.requires && GameModel.persistentData.constructions.filter((built) => built.id == upgrade.requires).length == 0) {
       return false;
     }
     return true;
@@ -75,14 +71,10 @@ const Upgrades = {
       case this.costs.parts:
         return this.upgrades.filter(
           (upgrade) =>
-            upgrade.costType == type &&
-            (upgrade.cap == 0 || this.currentRank(upgrade) < upgrade.cap) &&
-            this.hasRequirement(upgrade)
+            upgrade.costType == type && (upgrade.cap == 0 || this.currentRank(upgrade) < upgrade.cap) && this.hasRequirement(upgrade)
         );
       case 'completed':
-        return this.upgrades.filter(
-          (upgrade) => upgrade.cap > 0 && this.currentRank(upgrade) >= upgrade.cap
-        );
+        return this.upgrades.filter((upgrade) => upgrade.cap > 0 && this.currentRank(upgrade) >= upgrade.cap);
     }
   },
 
@@ -90,13 +82,9 @@ const Upgrades = {
     GameModel.resetToBaseStats();
     Spells.lockAllSpells();
     for (var i = 0; i < GameModel.persistentData.upgrades.length; i++) {
-      var upgrade = Upgrades.upgrades.filter(
-        (up) => up.id == GameModel.persistentData.upgrades[i].id
-      )[0];
+      var upgrade = Upgrades.upgrades.filter((up) => up.id == GameModel.persistentData.upgrades[i].id)[0];
       if (!upgrade) {
-        upgrade = Upgrades.prestigeUpgrades.filter(
-          (up) => up.id == GameModel.persistentData.upgrades[i].id
-        )[0];
+        upgrade = Upgrades.prestigeUpgrades.filter((up) => up.id == GameModel.persistentData.upgrades[i].id)[0];
       }
       if (upgrade) {
         this.applyUpgrade(upgrade, GameModel.persistentData.upgrades[i].rank);
@@ -358,29 +346,15 @@ const Upgrades = {
       case this.types.brainRecoverChance:
         return Math.round(GameModel.brainRecoverChance * 100) + '% chance to recover brain';
       case this.types.riseFromTheDeadChance:
-        return (
-          Math.round(GameModel.riseFromTheDeadChance * 100) +
-          '% chance for human corpses to turn into zombies'
-        );
+        return Math.round(GameModel.riseFromTheDeadChance * 100) + '% chance for human corpses to turn into zombies';
       case this.types.infectedBite:
-        return (
-          Math.round(GameModel.infectedBiteChance * 100) +
-          '% chance for zombies to infect their targets'
-        );
+        return Math.round(GameModel.infectedBiteChance * 100) + '% chance for zombies to infect their targets';
       case this.types.infectedBlast:
-        return (
-          Math.round(GameModel.infectedBlastChance * 100) +
-          '% chance for zombies to explode on death'
-        );
+        return Math.round(GameModel.infectedBlastChance * 100) + '% chance for zombies to explode on death';
       case this.types.bulletproof:
-        return (
-          Math.round(GameModel.bulletproofChance * 100) +
-          '% chance for earth golems to reflect bullets'
-        );
+        return Math.round(GameModel.bulletproofChance * 100) + '% chance for earth golems to reflect bullets';
       case this.types.construction:
-        return GameModel.construction > 0
-          ? 'You have unlocked Unholy Construction'
-          : 'You have yet to unlock Unholy Construction';
+        return GameModel.construction > 0 ? 'You have unlocked Unholy Construction' : 'You have yet to unlock Unholy Construction';
       case this.types.boneCollectorCapacity:
         return 'Bone collector capacity: ' + formatWhole(GameModel.boneCollectorCapacity);
       case this.types.bonesGainPC:
@@ -413,9 +387,7 @@ const Upgrades = {
           ' bones'
         );
       case this.types.unlockSpell:
-        return this.currentRank(upgrade) > 0
-          ? 'You have learned this spell'
-          : 'You have yet to learn this spell';
+        return this.currentRank(upgrade) > 0 ? 'You have learned this spell' : 'You have yet to learn this spell';
       case this.types.energyCost:
         return 'Zombie Cost: ' + GameModel.zombieCost + ' energy';
       case this.types.burningSpeedPC:
@@ -425,17 +397,13 @@ const Upgrades = {
       case this.types.spitDistance:
         return 'Zombie spit distance: ' + GameModel.spitDistance;
       case this.types.plagueArmor:
-        return (
-          'Infected damage reduction: ' + Math.round(100 - GameModel.plagueDmgReduction * 100) + '%'
-        );
+        return 'Infected damage reduction: ' + Math.round(100 - GameModel.plagueDmgReduction * 100) + '%';
       case this.types.monsterLimit:
         return 'Creature limit: ' + GameModel.creatureLimit;
       case this.types.runicSyphon:
         return 'Syphon amount: ' + Math.round(GameModel.runicSyphon.percentage * 100) + '%';
       case this.types.autoconstruction:
-        return this.currentRank(upgrade) > 0
-          ? 'You have unlocked automatic construction'
-          : 'You have yet to unlock automatic construction';
+        return this.currentRank(upgrade) > 0 ? 'You have unlocked automatic construction' : 'You have yet to unlock automatic construction';
       case this.types.autoshop:
         return this.currentRank(upgrade) > 0
           ? 'You have unlocked automatic shop purchases'
@@ -449,9 +417,7 @@ const Upgrades = {
       case this.types.harpyBombs:
         return 'Harpy bombs: ' + formatWhole(GameModel.harpyBombs);
       case this.types.tankBuster:
-        return this.currentRank(upgrade) > 0
-          ? 'You have unlocked tank buster'
-          : 'You have yet to unlock tank buster';
+        return this.currentRank(upgrade) > 0 ? 'You have unlocked tank buster' : 'You have yet to unlock tank buster';
     }
   },
 
@@ -485,44 +451,19 @@ const Upgrades = {
     var maxAffordable = 0;
     switch (upgrade.costType) {
       case this.costs.blood:
-        maxAffordable = getMaxUpgrades(
-          upgrade.basePrice,
-          upgrade.multiplier,
-          currentRank,
-          GameModel.persistentData.blood
-        );
+        maxAffordable = getMaxUpgrades(upgrade.basePrice, upgrade.multiplier, currentRank, GameModel.persistentData.blood);
         break;
       case this.costs.brains:
-        maxAffordable = getMaxUpgrades(
-          upgrade.basePrice,
-          upgrade.multiplier,
-          currentRank,
-          GameModel.persistentData.brains
-        );
+        maxAffordable = getMaxUpgrades(upgrade.basePrice, upgrade.multiplier, currentRank, GameModel.persistentData.brains);
         break;
       case this.costs.bones:
-        maxAffordable = getMaxUpgrades(
-          upgrade.basePrice,
-          upgrade.multiplier,
-          currentRank,
-          GameModel.persistentData.bones
-        );
+        maxAffordable = getMaxUpgrades(upgrade.basePrice, upgrade.multiplier, currentRank, GameModel.persistentData.bones);
         break;
       case this.costs.parts:
-        maxAffordable = getMaxUpgrades(
-          upgrade.basePrice,
-          upgrade.multiplier,
-          currentRank,
-          GameModel.persistentData.parts
-        );
+        maxAffordable = getMaxUpgrades(upgrade.basePrice, upgrade.multiplier, currentRank, GameModel.persistentData.parts);
         break;
       case this.costs.prestigePoints:
-        maxAffordable = getMaxUpgrades(
-          upgrade.basePrice,
-          upgrade.multiplier,
-          currentRank,
-          GameModel.persistentData.prestigePointsToSpend
-        );
+        maxAffordable = getMaxUpgrades(upgrade.basePrice, upgrade.multiplier, currentRank, GameModel.persistentData.prestigePointsToSpend);
         break;
     }
     if (upgrade.cap != 0) {
@@ -532,12 +473,7 @@ const Upgrades = {
   },
 
   upgradeMaxPrice(upgrade, number) {
-    return getCostForUpgrades(
-      upgrade.basePrice,
-      upgrade.multiplier,
-      this.currentRank(upgrade),
-      number
-    );
+    return getCostForUpgrades(upgrade.basePrice, upgrade.multiplier, this.currentRank(upgrade), number);
   },
 
   canAffordUpgrade(upgrade) {
@@ -681,9 +617,7 @@ const Upgrades = {
   },
 
   completeConstruction() {
-    var upgrade = Upgrades.constructionUpgrades.filter(
-      (upgrade) => upgrade.id == GameModel.persistentData.currentConstruction.id
-    )[0];
+    var upgrade = Upgrades.constructionUpgrades.filter((upgrade) => upgrade.id == GameModel.persistentData.currentConstruction.id)[0];
     var ownedUpgrade;
     for (var i = 0; i < GameModel.persistentData.constructions.length; i++) {
       if (upgrade.id == GameModel.persistentData.constructions[i].id) {
@@ -790,16 +724,11 @@ const Upgrades = {
       GameModel.energy >= (upgrade.costs.energy || 0);
 
     var costPerTick = {};
-    if (upgrade.costs.energy)
-      costPerTick.energy = upgrade.costs.energy / (fastMode ? 5 : upgrade.time);
-    if (upgrade.costs.blood)
-      costPerTick.blood = upgrade.costs.blood / (fastMode ? 5 : upgrade.time);
-    if (upgrade.costs.brains)
-      costPerTick.brains = upgrade.costs.brains / (fastMode ? 5 : upgrade.time);
-    if (upgrade.costs.bones)
-      costPerTick.bones = upgrade.costs.bones / (fastMode ? 5 : upgrade.time);
-    if (upgrade.costs.parts)
-      costPerTick.parts = upgrade.costs.parts / (fastMode ? 5 : upgrade.time);
+    if (upgrade.costs.energy) costPerTick.energy = upgrade.costs.energy / (fastMode ? 5 : upgrade.time);
+    if (upgrade.costs.blood) costPerTick.blood = upgrade.costs.blood / (fastMode ? 5 : upgrade.time);
+    if (upgrade.costs.brains) costPerTick.brains = upgrade.costs.brains / (fastMode ? 5 : upgrade.time);
+    if (upgrade.costs.bones) costPerTick.bones = upgrade.costs.bones / (fastMode ? 5 : upgrade.time);
+    if (upgrade.costs.parts) costPerTick.parts = upgrade.costs.parts / (fastMode ? 5 : upgrade.time);
 
     GameModel.persistentData.currentConstruction = {
       state: this.constructionStates.building,
@@ -826,19 +755,11 @@ const Upgrades = {
   },
 
   constructionAvailable(construction) {
-    if (
-      GameModel.persistentData.currentConstruction &&
-      GameModel.persistentData.currentConstruction.id == construction.id
-    )
-      return false;
+    if (GameModel.persistentData.currentConstruction && GameModel.persistentData.currentConstruction.id == construction.id) return false;
 
     if (this.currentRankConstruction(construction) >= construction.cap) return false;
 
-    if (
-      construction.requires &&
-      GameModel.persistentData.constructions.filter((built) => built.id == construction.requires)
-        .length == 0
-    )
+    if (construction.requires && GameModel.persistentData.constructions.filter((built) => built.id == construction.requires).length == 0)
       return false;
 
     return true;
@@ -849,15 +770,11 @@ const Upgrades = {
   },
 
   getAvailableConstructions() {
-    return this.constructionUpgrades.filter((construction) =>
-      this.constructionAvailable(construction)
-    );
+    return this.constructionUpgrades.filter((construction) => this.constructionAvailable(construction));
   },
 
   getCompletedConstructions() {
-    return this.constructionUpgrades.filter((construction) =>
-      this.constructionComplete(construction)
-    );
+    return this.constructionUpgrades.filter((construction) => this.constructionComplete(construction));
   },
 
   upgradeIdCheck() {
@@ -956,10 +873,7 @@ const Upgrades = {
   },
 
   shatterBloodCost(rune) {
-    return Math.max(
-      0,
-      100000000 * Math.pow(1.5, GameModel.persistentData.runeshatter) - rune.blood
-    );
+    return Math.max(0, 100000000 * Math.pow(1.5, GameModel.persistentData.runeshatter) - rune.blood);
   },
 
   shatterEffect() {
@@ -967,11 +881,7 @@ const Upgrades = {
   },
 
   canShatter() {
-    return (
-      this.shatterPercent(GameModel.persistentData.runes.life) +
-        this.shatterPercent(GameModel.persistentData.runes.death) ==
-      200
-    );
+    return this.shatterPercent(GameModel.persistentData.runes.life) + this.shatterPercent(GameModel.persistentData.runes.death) == 200;
   },
 
   doShatter() {
@@ -989,10 +899,7 @@ const Upgrades = {
   },
 
   infuseRune(runeType, costType, amount) {
-    var rune =
-      runeType == 'life'
-        ? GameModel.persistentData.runes.life
-        : GameModel.persistentData.runes.death;
+    var rune = runeType == 'life' ? GameModel.persistentData.runes.life : GameModel.persistentData.runes.death;
     switch (costType) {
       case 'blood':
         if (GameModel.persistentData.blood >= amount) {
@@ -1032,8 +939,7 @@ const Upgrades = {
       var calculation = this.runeCalculations[i];
       var infusionAmount = GameModel.persistentData.runes[calculation.rune][calculation.cost];
       if (infusionAmount > 0) {
-        var result =
-          (Math.log(infusionAmount) / Math.log(calculation.logBase) + calculation.adjustment) / 100;
+        var result = (Math.log(infusionAmount) / Math.log(calculation.logBase) + calculation.adjustment) / 100;
         if (result > 0) {
           if (calculation.cap && result > calculation.cap) {
             result = calculation.cap;
@@ -1070,19 +976,7 @@ const Upgrades = {
     harpy: 'harpy'
   },
 
-  Upgrade: function (
-    id,
-    name,
-    type,
-    costType,
-    basePrice,
-    multiplier,
-    effect,
-    cap,
-    description,
-    purchaseMessage,
-    requires
-  ) {
+  Upgrade: function (id, name, type, costType, basePrice, multiplier, effect, cap, description, purchaseMessage, requires) {
     this.id = id;
     this.name = name;
     this.type = type;
@@ -1097,19 +991,7 @@ const Upgrades = {
     this.requires = requires;
   },
 
-  Construction: function (
-    id,
-    name,
-    type,
-    costs,
-    time,
-    multiplier,
-    effect,
-    cap,
-    requires,
-    description,
-    completeMessage
-  ) {
+  Construction: function (id, name, type, costs, time, multiplier, effect, cap, requires, description, completeMessage) {
     this.id = id;
     this.name = name;
     this.type = type;

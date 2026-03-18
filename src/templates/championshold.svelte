@@ -12,10 +12,7 @@
       <div class="ranges">
         <p>The Skeleton Champion respects your strength and is willing to join you.</p>
         <p>
-          <em
-            >Give me those trophies of yours as tribute and I will fight for you to scour the humans
-            from this world!</em
-          >
+          <em>Give me those trophies of yours as tribute and I will fight for you to scour the humans from this world!</em>
         </p>
         <button on:click={skeletonMenu.acceptOffer()}>Accept the offer</button>
         <button on:click={skeletonMenu.show()}>Reject the offer</button>
@@ -37,9 +34,7 @@
               <div class="row">
                 {#each itemRow as item, i (item.id)}
                   <div
-                    class="item {skeletonMenu.itemClass(item)} {skeletonMenu.itemType(
-                      item
-                    )} droppable"
+                    class="item {skeletonMenu.itemClass(item)} {skeletonMenu.itemType(item)} droppable"
                     onmousemove={moveToolTip(event, this)}
                     droppable-target="true"
                     dropType={item.s}
@@ -59,8 +54,7 @@
                         {#each skeletonMenu.itemEffects(item) as stat}
                           <span class="effect">{stat}</span>
                         {/each}
-                        <span class="xp">Can be destroyed for {whole(item.l * item.r * 10)} xp</span
-                        >
+                        <span class="xp">Can be destroyed for {whole(item.l * item.r * 10)} xp</span>
                       {/if}
                     </div>
                     {#if item.l}
@@ -77,10 +71,9 @@
             {#each skeletonMenu.inventoryItems() as item, i (item.id)}
               <div
                 class="item {skeletonMenu.itemClass(item)} {skeletonMenu.itemType(item)}"
-                onmousemove={moveToolTip(event, this)}
-                draggable-item="true"
-                drag-object="item"
-                on:click={skeletonMenu.equipItem(item)}
+                use:draggable={item.id}
+                on:mousemove={(e) => moveToolTip(e, e.currentTarget)}
+                on:click={() => skeletonMenu.equipItem(item)}
               >
                 <div class="icon"></div>
                 {#if item.l}
@@ -104,14 +97,12 @@
           </div>
         </div>
         <p>
-          Level: {skeleton().level} - {whole(skeleton().xp)} / {skeletonMenu.xpForNextLevel() |
-            whole} xp ({skeletonMenu.xpRate()}% xp rate)<br />Earn xp by killing humans while the
-          Champion is alive, higher level humans reward more xp
+          Level: {skeleton().level} - {whole(skeleton().xp)} / {whole(skeletonMenu.xpForNextLevel())} xp ({skeletonMenu.xpRate()}% xp rate)<br
+          />Earn xp by killing humans while the Champion is alive, higher level humans reward more xp
         </p>
         <p>
-          Increases zombie health and damage by {skeleton().level}%, all resource generation by {skeleton()
-            .level}%,<br />and receive {skeleton().level} prestige points when the Skeleton Champion
-          lands a killing blow. (20 second cooldown)
+          Increases zombie health and damage by {skeleton().level}%, all resource generation by {skeleton().level}%,<br />and receive {skeleton()
+            .level} prestige points when the Skeleton Champion lands a killing blow. (20 second cooldown)
         </p>
       </div>
     {/if}

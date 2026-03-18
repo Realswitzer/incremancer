@@ -1,10 +1,7 @@
 {#if levelSelect.shown}
   <div class="level-select scroll">
     <label>Level Select</label>
-    <p>
-      You can go directly to any level previously completed, but only after the preceding boss level
-      has been beaten.
-    </p>
+    <p>You can go directly to any level previously completed, but only after the preceding boss level has been beaten.</p>
     <div class="ranges">
       {#each levelSelect.levelRanges as range}
         <button
@@ -31,19 +28,14 @@
     </div>
     <div class="clear start">
       {#if levelSelect.level.completed}
-        <label
-          >Level {levelSelect.level.level} already completed. No prestige points will be rewarded.</label
-        >
+        <label>Level {levelSelect.level.level} already completed. No prestige points will be rewarded.</label>
       {:else}
-        <label
-          >Level {levelSelect.level.level} has yet to be completed. {levelSelect.level.level} prestige
-          points are available.</label
-        >
+        <label>Level {levelSelect.level.level} has yet to be completed. {levelSelect.level.level} prestige points are available.</label>
       {/if}
       {#if levelSelect.level.bossStage}
         <label
-          >Warning: Level {levelSelect.level.level} is a boss level. On boss levels your graveyard can
-          be attacked. The health of your graveyard is increased by upgrading your zombie health.</label
+          >Warning: Level {levelSelect.level.level} is a boss level. On boss levels your graveyard can be attacked. The health of your graveyard
+          is increased by upgrading your zombie health.</label
         >
       {/if}
       {#if levelSelect.level.trophy}

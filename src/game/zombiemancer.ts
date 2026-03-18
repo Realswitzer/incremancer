@@ -1,11 +1,6 @@
 var canvas;
 var renderer;
-var gameContainer,
-  backgroundContainer,
-  backgroundSpriteContainer,
-  characterContainer,
-  uiContainer,
-  foregroundContainer;
+var gameContainer, backgroundContainer, backgroundSpriteContainer, characterContainer, uiContainer, foregroundContainer;
 var grass;
 var canvasSize = { x: 800, y: 600 };
 var gameFieldSize = { x: 600, y: 600 };
@@ -31,9 +26,7 @@ var lastDiff = false;
 var lastPinchZoom = 0;
 
 export function pinchZoom(event: DragEvent) {
-  var curDiff = Math.abs(
-    event.data.originalEvent.touches[0].clientX - event.data.originalEvent.touches[1].clientX
-  );
+  var curDiff = Math.abs(event.data.originalEvent.touches[0].clientX - event.data.originalEvent.touches[1].clientX);
   if (lastDiff) {
     if (lastPinchZoom + 50 < Date.now() && Math.abs(curDiff - lastDiff) > 10) {
       if (curDiff > lastDiff) {
@@ -78,10 +71,7 @@ export function preventGameContainerLeavingBounds(gc) {
 export function onClickTap(event) {
   if (!this.hasMoved && GameModel.currentState == GameModel.states.playingLevel) {
     if (KeysPressed.shift) {
-      Zombies.spawnAllZombies(
-        event.data.getLocalPosition(this).x,
-        event.data.getLocalPosition(this).y
-      );
+      Zombies.spawnAllZombies(event.data.getLocalPosition(this).x, event.data.getLocalPosition(this).y);
     } else {
       Zombies.spawnZombie(event.data.getLocalPosition(this).x, event.data.getLocalPosition(this).y);
     }
@@ -114,16 +104,14 @@ export function zoom(change, coords = { x: canvasSize.x * 0.5, y: canvasSize.y *
       gc.scale.x = gc.scale.y = gc.scale.x * 1.1;
       if (Zombies.zombieCursor && Zombies.zombieCursor.scale)
         // .scale is undefined sometimes, don't know why yet
-        Zombies.zombieCursor.scale.x = Zombies.zombieCursor.scale.y =
-          Zombies.zombieCursor.scale.x * 1.1;
+        Zombies.zombieCursor.scale.x = Zombies.zombieCursor.scale.y = Zombies.zombieCursor.scale.x * 1.1;
     }
   } else {
     if (Math.max(gcWidth, gcHeight) > Math.min(canvasSize.y, canvasSize.x) * 0.8) {
       gc.scale.x = gc.scale.y = gc.scale.x * 0.9;
       if (Zombies.zombieCursor && Zombies.zombieCursor.scale)
         // .scale is undefined sometimes, don't know why yet
-        Zombies.zombieCursor.scale.x = Zombies.zombieCursor.scale.y =
-          Zombies.zombieCursor.scale.x * 0.9;
+        Zombies.zombieCursor.scale.x = Zombies.zombieCursor.scale.y = Zombies.zombieCursor.scale.x * 0.9;
     }
   }
 
@@ -180,8 +168,7 @@ export function centerGameContainer(resetZoom = false) {
     gameContainer.scale.x = canvasSize.defaultScale;
     gameContainer.scale.y = canvasSize.defaultScale;
     if (Zombies.zombieCursor)
-      Zombies.zombieCursor.scale.x = Zombies.zombieCursor.scale.y =
-        Zombies.zombieCursorScale * canvasSize.defaultScale;
+      Zombies.zombieCursor.scale.x = Zombies.zombieCursor.scale.y = Zombies.zombieCursorScale * canvasSize.defaultScale;
   }
 
   gameContainer.x = (canvasSize.x - gameFieldSize.x * gameContainer.scale.x) / 2;

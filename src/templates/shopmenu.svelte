@@ -73,9 +73,7 @@
           {/if}
           <p hidden={!upgrade.selected}>{upgrade.description}</p>
           <p hidden={!upgrade.selected}>
-            Current Rank: {currentRank(upgrade)}{upgrade.cap !== 0 ? ' / ' + upgrade.cap : ''} - {upgradeStatInfo(
-              upgrade
-            )}
+            Current Rank: {currentRank(upgrade)}{upgrade.cap !== 0 ? ' / ' + upgrade.cap : ''} - {upgradeStatInfo(upgrade)}
           </p>
         </div>
       {/each}

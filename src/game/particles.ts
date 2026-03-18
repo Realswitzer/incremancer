@@ -525,11 +525,7 @@ export const Bullets = {
         Humans.burnHuman(sprite.target, sprite.damage);
         Humans.damageHuman(sprite.target, sprite.damage);
       } else {
-        if (
-          !sprite.rocket &&
-          sprite.target.bulletReflect &&
-          Math.random() < sprite.target.bulletReflect
-        ) {
+        if (!sprite.rocket && sprite.target.bulletReflect && Math.random() < sprite.target.bulletReflect) {
           this.newBullet(sprite.target, sprite.source, sprite.damage, false, false, false);
         } else {
           if (sprite.rocket) {
@@ -704,14 +700,7 @@ export const Smoke = {
     var blastCtx = blast.getContext('2d');
     blastCtx.shadowBlur = 5;
     blastCtx.shadowColor = 'white';
-    var radgrad = blastCtx.createRadialGradient(
-      size / 2 + 2,
-      size / 2 + 2,
-      0,
-      size / 2 + 2,
-      size / 2 + 2,
-      size / 2
-    );
+    var radgrad = blastCtx.createRadialGradient(size / 2 + 2, size / 2 + 2, 0, size / 2 + 2, size / 2 + 2, size / 2);
     radgrad.addColorStop(0, 'rgba(255,255,255,0.05)');
     radgrad.addColorStop(0.5, 'rgba(255,255,255,0.1)');
     radgrad.addColorStop(1, 'rgba(255,255,255,0)');

@@ -53,21 +53,14 @@ export function getMaxUpgrades(basePrice, exponent, numberOwned, resourcesOwned)
   if (exponent == 1) {
     return Math.floor(resourcesOwned / basePrice);
   }
-  return Math.floor(
-    Math.log(
-      (resourcesOwned * (exponent - 1)) / (basePrice * Math.pow(exponent, numberOwned)) + 1
-    ) / Math.log(exponent)
-  );
+  return Math.floor(Math.log((resourcesOwned * (exponent - 1)) / (basePrice * Math.pow(exponent, numberOwned)) + 1) / Math.log(exponent));
 }
 
 export function getCostForUpgrades(basePrice, exponent, numberOwned, numberToBuy) {
   if (exponent == 1) {
     return basePrice * numberToBuy;
   }
-  return (
-    basePrice *
-    ((Math.pow(exponent, numberOwned) * (Math.pow(exponent, numberToBuy) - 1)) / (exponent - 1))
-  );
+  return basePrice * ((Math.pow(exponent, numberOwned) * (Math.pow(exponent, numberToBuy) - 1)) / (exponent - 1));
 }
 
 export function moveToolTip(event, element) {

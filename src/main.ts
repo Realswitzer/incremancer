@@ -1,20 +1,7 @@
-import './game/legacy/lz-string.min.js';
-import './game/legacy/pixi-legacy.min.js';
-import './game/legacy/angular.min.js';
+import index from './index.svelte';
 
-import './game/utilsfunctions.ts';
-import './game/zombiemancer.ts';
-import './game/spells.ts';
-import './game/zmmap.ts';
-import './game/partfactory.ts';
-import './game/creaturefactory.ts';
-import './game/gamemodel.ts';
-import './game/upgrades.ts';
-import './game/trophies.ts';
-import './game/humans.ts';
-import './game/zombies.ts';
-import './game/skeleton.ts';
-import './game/creatures.ts';
-import './game/graveyard.ts';
-import './game/particles.ts';
-import './game/angularzombie.ts';
+const app = new index({
+  target: document.getElementsByTagName('html')
+});
+
+export default app;

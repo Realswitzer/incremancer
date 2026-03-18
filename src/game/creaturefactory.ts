@@ -106,8 +106,7 @@ const CreatureFactory = {
 
   updateAutoBuild() {
     for (var i = 0; i < this.creatures.length; i++) {
-      this.creatures[i].autobuild =
-        GameModel.persistentData.creatureAutobuild[this.creatures[i].id] || 0;
+      this.creatures[i].autobuild = GameModel.persistentData.creatureAutobuild[this.creatures[i].id] || 0;
     }
   },
 
@@ -118,14 +117,8 @@ const CreatureFactory = {
   },
 
   spawnCreature(creature) {
-    var health =
-      creature.baseHealth *
-      Math.pow(this.creatureScaling, creature.level - 1) *
-      GameModel.golemHealthPCMod;
-    var damage =
-      creature.baseDamage *
-      Math.pow(this.creatureScaling, creature.level - 1) *
-      GameModel.golemDamagePCMod;
+    var health = creature.baseHealth * Math.pow(this.creatureScaling, creature.level - 1) * GameModel.golemHealthPCMod;
+    var damage = creature.baseDamage * Math.pow(this.creatureScaling, creature.level - 1) * GameModel.golemDamagePCMod;
     Creatures.spawnCreature(health, damage, creature.speed, creature.type, creature.level);
   },
 
@@ -149,26 +142,14 @@ const CreatureFactory = {
     return {
       thisLevel: {
         level: creature.level,
-        health:
-          creature.baseHealth *
-          Math.pow(this.creatureScaling, creature.level - 1) *
-          GameModel.golemHealthPCMod,
-        damage:
-          creature.baseDamage *
-          Math.pow(this.creatureScaling, creature.level - 1) *
-          GameModel.golemDamagePCMod,
+        health: creature.baseHealth * Math.pow(this.creatureScaling, creature.level - 1) * GameModel.golemHealthPCMod,
+        damage: creature.baseDamage * Math.pow(this.creatureScaling, creature.level - 1) * GameModel.golemDamagePCMod,
         cost: creature.baseCost * Math.pow(this.creatureCostScaling, creature.level - 1)
       },
       nextLevel: {
         level: creature.level + 1,
-        health:
-          creature.baseHealth *
-          Math.pow(this.creatureScaling, creature.level) *
-          GameModel.golemHealthPCMod,
-        damage:
-          creature.baseDamage *
-          Math.pow(this.creatureScaling, creature.level) *
-          GameModel.golemDamagePCMod,
+        health: creature.baseHealth * Math.pow(this.creatureScaling, creature.level) * GameModel.golemHealthPCMod,
+        damage: creature.baseDamage * Math.pow(this.creatureScaling, creature.level) * GameModel.golemDamagePCMod,
         cost: creature.baseCost * Math.pow(this.creatureCostScaling, creature.level)
       }
     };

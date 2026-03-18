@@ -142,8 +142,7 @@ Skeleton = {
       if (!this.skeletons[i].dead) {
         skeletons.push(this.skeletons[i]);
         this.skeletons[i].x = this.graveyard.sprite.x;
-        this.skeletons[i].zIndex = this.skeletons[i].y =
-          this.graveyard.sprite.y + (this.graveyard.level > 2 ? 8 : 0);
+        this.skeletons[i].zIndex = this.skeletons[i].y = this.graveyard.sprite.y + (this.graveyard.level > 2 ? 8 : 0);
         this.skeletons[i].target = false;
         this.skeletons[i].state = this.states.lookingForTarget;
       } else {
@@ -289,12 +288,7 @@ Skeleton = {
         break;
 
       case this.states.movingToTarget:
-        var distanceToHumanTarget = this.fastDistance(
-          creature.position.x,
-          creature.position.y,
-          creature.target.x,
-          creature.target.y
-        );
+        var distanceToHumanTarget = this.fastDistance(creature.position.x, creature.position.y, creature.target.x, creature.target.y);
 
         if (distanceToHumanTarget < this.attackDistance) {
           creature.state = this.states.attackingTarget;
@@ -309,12 +303,7 @@ Skeleton = {
         break;
 
       case this.states.attackingTarget:
-        var distanceToTarget = this.fastDistance(
-          creature.position.x,
-          creature.position.y,
-          creature.target.x,
-          creature.target.y
-        );
+        var distanceToTarget = this.fastDistance(creature.position.x, creature.position.y, creature.target.x, creature.target.y);
         if (distanceToTarget < this.attackDistance) {
           if (creature.attackTimer < 0 && !creature.target.dead) {
             Humans.damageHuman(creature.target, this.calculateDamage(creature));
@@ -432,10 +421,7 @@ Skeleton = {
 
   calculateDamage(creature) {
     var damage = creature.attackDamage;
-    if (
-      this.model.runeEffects.critChance > 0 &&
-      Math.random() < this.model.runeEffects.critChance
-    ) {
+    if (this.model.runeEffects.critChance > 0 && Math.random() < this.model.runeEffects.critChance) {
       damage *= this.model.runeEffects.critDamage;
     }
     return damage;
@@ -459,40 +445,9 @@ Skeleton = {
   },
 
   prefixes: {
-    commonQuality: [
-      'Wooden',
-      'Sturdy',
-      'Rigid',
-      'Iron',
-      'Rusty',
-      'Flimsy',
-      'Battered',
-      'Damaged',
-      'Used',
-      'Stained',
-      'Training'
-    ],
-    rareQuality: [
-      'Steel',
-      'Shiny',
-      'Polished',
-      'Forged',
-      'Plated',
-      'Bronze',
-      'Reinforced',
-      "Veteran's",
-      'Reliable'
-    ],
-    epicQuality: [
-      'Antique',
-      'Ancient',
-      'Famous',
-      'Bejeweled',
-      'Notorious',
-      'Historic',
-      'Mythical',
-      'Extraordinary'
-    ],
+    commonQuality: ['Wooden', 'Sturdy', 'Rigid', 'Iron', 'Rusty', 'Flimsy', 'Battered', 'Damaged', 'Used', 'Stained', 'Training'],
+    rareQuality: ['Steel', 'Shiny', 'Polished', 'Forged', 'Plated', 'Bronze', 'Reinforced', "Veteran's", 'Reliable'],
+    epicQuality: ['Antique', 'Ancient', 'Famous', 'Bejeweled', 'Notorious', 'Historic', 'Mythical', 'Extraordinary'],
     legendaryQuality: ['Monstrous', 'Diabolical', 'Withering', 'Terrible', 'Demoniacal']
   },
 
@@ -606,14 +561,10 @@ Skeleton = {
             stats.push('+1 movement speed');
             break;
           case this.stats.zombieHealth.id:
-            stats.push(
-              '+' + formatWhole(this.stats.zombieHealth.scaling * loot.l) + ' zombie health'
-            );
+            stats.push('+' + formatWhole(this.stats.zombieHealth.scaling * loot.l) + ' zombie health');
             break;
           case this.stats.zombieDamage.id:
-            stats.push(
-              '+' + formatWhole(this.stats.zombieDamage.scaling * loot.l) + ' zombie damage'
-            );
+            stats.push('+' + formatWhole(this.stats.zombieDamage.scaling * loot.l) + ' zombie damage');
             break;
           case this.stats.zombieSpeed.id:
             stats.push('+1 zombie speed');
@@ -630,10 +581,7 @@ Skeleton = {
       for (var i = 0; i < loot.se.length; i++) {
         var spell = Spells.spells.filter((sp) => sp.id == loot.se[i])[0];
         stats.push(
-          spell.itemText ||
-            'Has a chance to cast ' +
-              spell.name +
-              ' when attacking, this does not cost energy or trigger a cooldown'
+          spell.itemText || 'Has a chance to cast ' + spell.name + ' when attacking, this does not cost energy or trigger a cooldown'
         );
       }
     return stats;

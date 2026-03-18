@@ -74,8 +74,7 @@ Creatures = {
         if (!this.creatures[i].dead) {
           creatures.push(this.creatures[i]);
           this.creatures[i].x = this.graveyard.sprite.x;
-          this.creatures[i].zIndex = this.creatures[i].y =
-            this.graveyard.sprite.y + (this.graveyard.level > 2 ? 8 : 0);
+          this.creatures[i].zIndex = this.creatures[i].y = this.graveyard.sprite.y + (this.graveyard.level > 2 ? 8 : 0);
           this.creatures[i].target = false;
           this.creatures[i].state = this.states.lookingForTarget;
         } else {
@@ -252,12 +251,7 @@ Creatures = {
         break;
 
       case this.states.movingToTarget:
-        var distanceToHumanTarget = this.fastDistance(
-          creature.position.x,
-          creature.position.y,
-          creature.target.x,
-          creature.target.y
-        );
+        var distanceToHumanTarget = this.fastDistance(creature.position.x, creature.position.y, creature.target.x, creature.target.y);
 
         if (distanceToHumanTarget < this.attackDistance) {
           creature.state = this.states.attackingTarget;
@@ -272,12 +266,7 @@ Creatures = {
         break;
 
       case this.states.attackingTarget:
-        var distanceToTarget = this.fastDistance(
-          creature.position.x,
-          creature.position.y,
-          creature.target.x,
-          creature.target.y
-        );
+        var distanceToTarget = this.fastDistance(creature.position.x, creature.position.y, creature.target.x, creature.target.y);
         if (distanceToTarget < this.attackDistance) {
           creature.scale.x = creature.target.x > creature.x ? creature.scaling : -creature.scaling;
           if (creature.attackTimer < 0) {
@@ -370,10 +359,7 @@ Creatures = {
 
   calculateDamage(creature) {
     var damage = creature.attackDamage;
-    if (
-      this.model.runeEffects.critChance > 0 &&
-      Math.random() < this.model.runeEffects.critChance
-    ) {
+    if (this.model.runeEffects.critChance > 0 && Math.random() < this.model.runeEffects.critChance) {
       damage *= this.model.runeEffects.critDamage;
     }
     return damage;
@@ -419,14 +405,7 @@ Creatures = {
         if (Math.abs(this.aliveHumans[i].x - creature.x) < this.targetDistance) {
           if (Math.abs(this.aliveHumans[i].y - creature.y) < this.targetDistance) {
             fireBalls--;
-            Bullets.newBullet(
-              creature,
-              this.aliveHumans[i],
-              creature.attackDamage / 2,
-              false,
-              false,
-              true
-            );
+            Bullets.newBullet(creature, this.aliveHumans[i], creature.attackDamage / 2, false, false, true);
           }
         }
       }

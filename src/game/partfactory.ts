@@ -56,20 +56,10 @@ PartFactory = {
     var maxAffordable = 0;
     switch (upgrade.costType) {
       case this.costs.blood:
-        maxAffordable = getMaxUpgrades(
-          upgrade.basePrice,
-          upgrade.multi,
-          currentRank,
-          GameModel.persistentData.blood
-        );
+        maxAffordable = getMaxUpgrades(upgrade.basePrice, upgrade.multi, currentRank, GameModel.persistentData.blood);
         break;
       case this.costs.parts:
-        maxAffordable = getMaxUpgrades(
-          upgrade.basePrice,
-          upgrade.multi,
-          currentRank,
-          GameModel.persistentData.parts
-        );
+        maxAffordable = getMaxUpgrades(upgrade.basePrice, upgrade.multi, currentRank, GameModel.persistentData.parts);
         break;
     }
     if (upgrade.cap != 0) {
@@ -135,8 +125,7 @@ PartFactory = {
       if (this.generatorsApplied[i].id == generator.id) {
         owned = true;
         this.generatorsApplied[i].rank = rank;
-        this.generatorsApplied[i].total =
-          this.generatorsApplied[i].produces * this.generatorsApplied[i].rank;
+        this.generatorsApplied[i].total = this.generatorsApplied[i].produces * this.generatorsApplied[i].rank;
       }
     }
     if (!owned) {

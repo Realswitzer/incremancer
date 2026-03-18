@@ -1,8 +1,3 @@
-<script lang="ts">
-  import { default as model } from '../game/gamemodel';
-  import { decimal, whole } from '../game/utilsfunctions';
-</script>
-
 {#if sidePanels.construction}
   <div class="shop">
     <div class="shop-title">
@@ -21,8 +16,7 @@
       {#if model.autoconstructionUnlocked}
         <button
           on:click={(model.autoconstruction = !model.autoconstruction)}
-          class:active={model.autoconstruction}
-          >{model.autoconstruction ? 'Auto On' : 'Auto Off'}</button
+          class:active={model.autoconstruction}>{model.autoconstruction ? 'Auto On' : 'Auto Off'}</button
         >
       {/if}
     </div>
@@ -32,36 +26,22 @@
         <p>
           Consuming
           {#if model.persistentData.currentConstruction.costPerTick.energy}
-            <span class="energy"
-              >{decimal(model.persistentData.currentConstruction.costPerTick.energy)} energy</span
-            >
+            <span class="energy">{decimal(model.persistentData.currentConstruction.costPerTick.energy)} energy</span>
           {/if}
           {#if model.persistentData.currentConstruction.costPerTick.blood}
-            <span class="blood"
-              >{decimal(model.persistentData.currentConstruction.costPerTick.blood)} blood</span
-            >
+            <span class="blood">{decimal(model.persistentData.currentConstruction.costPerTick.blood)} blood</span>
           {/if}
           {#if model.persistentData.currentConstruction.costPerTick.brains}
-            <span class="brains"
-              >{decimal(model.persistentData.currentConstruction.costPerTick.brains)} brains</span
-            >
+            <span class="brains">{decimal(model.persistentData.currentConstruction.costPerTick.brains)} brains</span>
           {/if}
           {#if model.persistentData.currentConstruction.costPerTick.bones}
-            <span class="bones"
-              >{decimal(model.persistentData.currentConstruction.costPerTick.bones)} bones</span
-            >
+            <span class="bones">{decimal(model.persistentData.currentConstruction.costPerTick.bones)} bones</span>
           {/if}
           {#if model.persistentData.currentConstruction.costPerTick.parts}
-            <span class="parts"
-              >{decimal(model.persistentData.currentConstruction.costPerTick.parts)} parts</span
-            >{/if}
+            <span class="parts">{decimal(model.persistentData.currentConstruction.costPerTick.parts)} parts</span>{/if}
           each second
         </p>
-        <div
-          class="progress {model.persistentData.currentConstruction.state == 'building'
-            ? 'active'
-            : 'stopped'}"
-        >
+        <div class="progress {model.persistentData.currentConstruction.state == 'building' ? 'active' : 'stopped'}">
           <div
             style:width={() => {
               constructionPercent() + '%';
@@ -71,17 +51,14 @@
         </div>
         {#if !model.persistentData.currentConstruction.shortfall}
           <p>
-            <strong>Time Remaining: {model.persistentData.currentConstruction.timeRemaining}</strong
-            >
+            <strong>Time Remaining: {model.persistentData.currentConstruction.timeRemaining}</strong>
           </p>
         {/if}
         {#if model.persistentData.currentConstruction.shortfall}
           <p>
             <strong
               >Production stopped, need more
-              {#if model.persistentData.currentConstruction.shortfall.energy}<span class="energy"
-                  >energy</span
-                >{/if}
+              {#if model.persistentData.currentConstruction.shortfall.energy}<span class="energy">energy</span>{/if}
               {#if model.persistentData.currentConstruction.shortfall.blood}
                 <span class="blood">blood</span>
               {/if}
@@ -97,8 +74,7 @@
             </strong>
           </p>
         {/if}
-        <button on:click={playPauseConstruction()}
-          >{model.persistentData.currentConstruction.state == 'paused' ? 'Resume' : 'Pause'}</button
+        <button on:click={playPauseConstruction()}>{model.persistentData.currentConstruction.state == 'paused' ? 'Resume' : 'Pause'}</button
         >
         <button on:click={cancelConstruction()}>Cancel</button>
       </div>
@@ -114,45 +90,30 @@
           {#if currentRankConstruction(upgrade) < upgrade.cap}
             <div>
               <label>Total Cost: </label>
-              <label
-                ng-if="upgrade.costs.energy"
-                class="energy"
-                >{whole(upgrade.costs.energy)} energy ({(upgrade.costs.energy / upgrade.time) |
-                  whole} per sec)</label
-              >
-              <label
-                ng-if="upgrade.costs.blood"
-                class="blood"
-                >{whole(upgrade.costs.blood)} blood ({whole(upgrade.costs.blood / upgrade.time)} per
-                sec)</label
-              >
-              <label
-                ng-if="upgrade.costs.brains"
-                class="brains"
-                >{whole(upgrade.costs.brains)} brains ({whole(upgrade.costs.brains / upgrade.time)} per
-                sec)</label
-              >
-              <label
-                ng-if="upgrade.costs.bones"
-                class="bones"
-                >{whole(upgrade.costs.bones)} bones ({whole(upgrade.costs.bones / upgrade.time)} per
-                sec)</label
-              >
-              <label
-                ng-if="upgrade.costs.parts"
-                class="parts"
-                >{whole(upgrade.costs.parts)} parts ({whole(upgrade.costs.parts / upgrade.time)} per
-                sec)</label
-              >
+              {#if upgrade.costs.energy}
+                <label class="energy">{whole(upgrade.costs.energy)} energy ({whole(upgrade.costs.energy / upgrade.time)} per sec)</label>
+              {/if}
+              {#if upgrade.costs.blood}
+                <label class="blood">{whole(upgrade.costs.blood)} blood ({whole(upgrade.costs.blood / upgrade.time)} per sec)</label>
+              {/if}
+              {#if upgrade.costs.brains}
+                <label class="brains">{whole(upgrade.costs.brains)} brains ({whole(upgrade.costs.brains / upgrade.time)} per sec)</label>
+              {/if}
+              {#if upgrade.costs.bones}
+                <label class="bones">{whole(upgrade.costs.bones)} bones ({whole(upgrade.costs.bones / upgrade.time)} per sec)</label>
+              {/if}
+              {#if upgrade.costs.parts}
+                <label class="parts">{whole(upgrade.costs.parts)} parts ({whole(upgrade.costs.parts / upgrade.time)} per sec)</label>
+              {/if}
             </div>
           {/if}
-          <label ng-if="constructionLeadsTo(upgrade)"
-            >Required for: {constructionLeadsTo(upgrade)}</label
-          >
-          <p ng-if="currentRankConstruction(upgrade) < upgrade.cap">
-            Current Rank: {currentRankConstruction(upgrade)} / {upgrade.cap}
-          </p>
+          {#if constructionLeadsTo(upgrade)}
+            <label>Required for: {constructionLeadsTo(upgrade)}</label>
+          {/if}
           {#if currentRankConstruction(upgrade) < upgrade.cap}
+            <p>
+              Current Rank: {currentRankConstruction(upgrade)} / {upgrade.cap}
+            </p>
             <button
               on:click={startConstruction(upgrade)}
               disabled={model.persistentData.currentConstruction}>Begin Construction</button

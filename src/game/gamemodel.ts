@@ -209,10 +209,7 @@ const GameModel = {
   },
 
   getEnergyRate() {
-    return (
-      this.energySpellMultiplier * this.energyRate -
-      (this.persistentData.boneCollectors + this.persistentData.harpies)
-    );
+    return this.energySpellMultiplier * this.energyRate - (this.persistentData.boneCollectors + this.persistentData.harpies);
   },
 
   toggleGigazombies() {
@@ -261,10 +258,7 @@ const GameModel = {
             this.persistentData.levelsCompleted.push(this.level);
           }
           this.persistentData.levelUnlocked = this.level + 1;
-          if (
-            !this.persistentData.allTimeHighestLevel ||
-            this.level > this.persistentData.allTimeHighestLevel
-          ) {
+          if (!this.persistentData.allTimeHighestLevel || this.level > this.persistentData.allTimeHighestLevel) {
             this.persistentData.allTimeHighestLevel = this.level;
           }
           this.startTimer = 3;
@@ -508,9 +502,7 @@ const GameModel = {
       this.persistentData.parts = 0;
       this.persistentData.generators = [];
       this.persistentData.bonesTotal = 0;
-      this.persistentData.upgrades = this.persistentData.upgrades.filter(
-        (upgrade) => upgrade.costType == Upgrades.costs.prestigePoints
-      );
+      this.persistentData.upgrades = this.persistentData.upgrades.filter((upgrade) => upgrade.costType == Upgrades.costs.prestigePoints);
       this.persistentData.constructions = [];
       this.persistentData.boneCollectors = 0;
       this.persistentData.currentConstruction = false;
@@ -583,8 +575,7 @@ const GameModel = {
       var timeDiff = (Date.now() - this.persistentData.dateOfSave) / 1000;
       var partsCreated = PartFactory.updateLongTime(timeDiff);
       if (partsCreated > 0) {
-        this.offlineMessage =
-          'Your factory has generated ' + formatWhole(partsCreated) + ' parts while you were away';
+        this.offlineMessage = 'Your factory has generated ' + formatWhole(partsCreated) + ' parts while you were away';
         this.persistentData.parts += partsCreated;
       }
     }
@@ -642,8 +633,7 @@ const GameModel = {
 
     this.app.renderer.resolution = resolution;
 
-    if (this.app.renderer.rootRenderTarget)
-      this.app.renderer.rootRenderTarget.resolution = resolution;
+    if (this.app.renderer.rootRenderTarget) this.app.renderer.rootRenderTarget.resolution = resolution;
 
     this.app.renderer.plugins.interaction.resolution = resolution;
     this.app.renderer.resize(document.body.clientWidth, document.body.clientHeight);
@@ -651,10 +641,7 @@ const GameModel = {
 
   downloadSaveGame() {
     this.persistentData.skeleton = Skeleton.persistent;
-    this.blob = new Blob(
-      [LZString.compressToEncodedURIComponent(JSON.stringify(this.persistentData))],
-      { type: 'octet/stream' }
-    );
+    this.blob = new Blob([LZString.compressToEncodedURIComponent(JSON.stringify(this.persistentData))], { type: 'octet/stream' });
     delete this.persistentData.skeleton;
     this.encodedContent = window.URL.createObjectURL(this.blob);
     var datestamp = new Date().toISOString().replace(/:|T|Z|\./g, '');
@@ -688,12 +675,7 @@ const GameModel = {
   },
 
   toggleFullscreen() {
-    if (
-      document.fullscreenElement ||
-      document.webkitFullscreenElement ||
-      document.mozFullScreenElement ||
-      document.msFullscreenElement
-    ) {
+    if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement) {
       if (document.exitFullscreen) {
         document.exitFullscreen();
       } else if (document.webkitExitFullscreen) {

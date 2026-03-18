@@ -48,8 +48,7 @@ Spells = {
     {
       id: 4,
       name: 'Earth Freeze',
-      tooltip:
-        'Freeze all humans in place preventing them from moving for 15 seconds, cost 75 energy',
+      tooltip: 'Freeze all humans in place preventing them from moving for 15 seconds, cost 75 energy',
       icon: '',
       cooldown: 60,
       duration: 15,
@@ -64,8 +63,7 @@ Spells = {
     {
       id: 5,
       name: 'Gigazombies',
-      tooltip:
-        'For 5 seconds any zombies spawned will be giants with 10x health and attack damage, cost 100 energy',
+      tooltip: 'For 5 seconds any zombies spawned will be giants with 10x health and attack damage, cost 100 energy',
       icon: '',
       cooldown: 360,
       duration: 5,
@@ -81,8 +79,7 @@ Spells = {
       id: 6,
       name: 'Incinerate',
       tooltip: 'Burns humans near the skeleton champion',
-      itemText:
-        'Has a chance to cast Incinerate when attacking, burning all humans within a large radius of the Skeleon',
+      itemText: 'Has a chance to cast Incinerate when attacking, burning all humans within a large radius of the Skeleon',
       icon: '',
       cooldown: 1,
       duration: 10,
@@ -96,8 +93,7 @@ Spells = {
       id: 7,
       name: 'Pandemic',
       tooltip: 'Causes plague to spread',
-      itemText:
-        'Has a chance to cast Pandemic when attacking, causing infected humans to spread the plague to each other for 20 seconds',
+      itemText: 'Has a chance to cast Pandemic when attacking, causing infected humans to spread the plague to each other for 20 seconds',
       icon: '',
       cooldown: 10,
       duration: 20,
