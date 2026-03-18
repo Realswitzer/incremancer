@@ -1,548 +1,476 @@
 // just extracting the thing
 export class Controller {
-    model = GameModel;
-    skeleton = function () {
-      return Skeleton.persistent;
-    };
-    spells = Spells;
-    keysPressed = KeysPressed;
+  controller = this;
 
-    messageTimer = 4;
-    message = false;
-    lastUpdate = 0;
-    sidePanels = {};
-    upgrades = [];
+  model = GameModel;
+  skeleton() {
+    return Skeleton.persistent;
+  }
+  spells = Spells;
+  keysPressed = KeysPressed;
+
+  messageTimer = 4;
+  message = false;
+  lastUpdate = 0;
+  sidePanels = {};
+  upgrades = [];
+  currentShopFilter = 'blood';
+  currentConstructionFilter = 'available';
+  graveyardTab = 'minions';
+  trophyTab = 'all';
+  factoryTab = 'parts';
+  factoryStats = {};
+
+  closeSidePanels = function () {
     currentShopFilter = 'blood';
     currentConstructionFilter = 'available';
     graveyardTab = 'minions';
-    trophyTab = 'all';
     factoryTab = 'parts';
-    factoryStats = {};
+    sidePanels.options = false;
+    sidePanels.graveyard = false;
+    sidePanels.runesmith = false;
+    sidePanels.prestige = false;
+    sidePanels.construction = false;
+    sidePanels.shop = false;
+    sidePanels.open = false;
+    sidePanels.factory = false;
+    levelSelect.shown = false;
+  };
 
-    closeSidePanels = function () {
-      currentShopFilter = 'blood';
-      currentConstructionFilter = 'available';
-      graveyardTab = 'minions';
-      factoryTab = 'parts';
-      sidePanels.options = false;
-      sidePanels.graveyard = false;
-      sidePanels.runesmith = false;
-      sidePanels.prestige = false;
-      sidePanels.construction = false;
-      sidePanels.shop = false;
-      sidePanels.open = false;
-      sidePanels.factory = false;
-      levelSelect.shown = false;
-    };
-
-    openSidePanel = function (type) {
-      closeSidePanels();
-      switch (type) {
-        case 'shop':
-          filterShop(currentShopFilter);
-          sidePanels.shop = true;
-          break;
-        case 'construction':
-          filterConstruction(currentConstructionFilter);
-          sidePanels.construction = true;
-          break;
-        case 'graveyard':
-          sidePanels.graveyard = true;
-          graveyardTab = 'minions';
-          trophyTab = 'all';
-          break;
-        case 'runesmith':
-          sidePanels.runesmith = true;
-          break;
-        case 'factory':
-          sidePanels.factory = true;
-          upgrades = PartFactory.generators;
-          factoryStats = PartFactory.factoryStats();
-          factory.updateDelays();
-          break;
-        case 'prestige':
-          upgrades = Upgrades.prestigeUpgrades.filter(
-            (upgrade) => upgrade.cap == 0 || currentRank(upgrade) < upgrade.cap
-          );
-          upgrades.push.apply(
-            upgrades,
-            Upgrades.prestigeUpgrades.filter(
-              (upgrade) => upgrade.cap !== 0 && currentRank(upgrade) >= upgrade.cap
-            )
-          );
-          sidePanels.prestige = true;
-          break;
-        case 'options':
-          sidePanels.options = true;
-          model.downloadSaveGame();
-          break;
-      }
-      sidePanels.open = true;
-    };
-
-    graveyardTabSelect = function (tab) {
-      graveyardTab = tab;
-      if (tab == 'trophies') {
-        trophies = Trophies.getTrophyList();
+  openSidePanel = function (type) {
+    closeSidePanels();
+    switch (type) {
+      case 'shop':
+        filterShop(currentShopFilter);
+        sidePanels.shop = true;
+        break;
+      case 'construction':
+        filterConstruction(currentConstructionFilter);
+        sidePanels.construction = true;
+        break;
+      case 'graveyard':
+        sidePanels.graveyard = true;
+        graveyardTab = 'minions';
         trophyTab = 'all';
-      }
-    };
-
-    trophyTabSelect = function (tab) {
-      trophyTab = tab;
-      switch (tab) {
-        case 'all':
-          trophies = Trophies.getTrophyList();
-          break;
-        case 'collected':
-          trophies = Trophies.getTrophyList().filter((trophy) => trophy.owned);
-          break;
-        case 'uncollected':
-          trophies = Trophies.getTrophyList().filter((trophy) => !trophy.owned);
-          break;
-        case 'totals':
-          trophies = Trophies.getTrophyTotals();
-          break;
-      }
-    };
-
-    filterShop = function (type) {
-      currentShopFilter = type;
-      upgrades = Upgrades.getUpgrades(type);
-    };
-
-    filterConstruction = function (type) {
-      currentConstructionFilter = type;
-      switch (type) {
-        case 'available':
-          upgrades = Upgrades.getAvailableConstructions();
-          break;
-        case 'completed':
-          upgrades = Upgrades.getCompletedConstructions();
-          break;
-      }
-    };
-
-    resetGame = function () {
-      if (
-        confirm(
-          'Are you sure you want to reset everything? If you have a cloud save it will also be deleted. Make sure you export your save game first.'
-        )
-      ) {
-        model.resetData();
-      }
-    };
-
-    addBoneCollector = function () {
-      if (model.getEnergyRate() >= 1) model.persistentData.boneCollectors++;
-    };
-
-    subtractBoneCollector = function () {
-      if (model.persistentData.boneCollectors > 0) model.persistentData.boneCollectors--;
-    };
-
-    setHarpies = function (number) {
-      if (
-        (number >= 0 && number < model.persistentData.harpies) ||
-        (model.getEnergyRate() >= 1 && number > 0)
-      ) {
-        model.persistentData.harpies = number;
-      }
-    };
-
-    setGraveyardZombies = function (number) {
-      if (number <= maxGraveyardZombies() && number >= 0)
-        model.persistentData.graveyardZombies = number;
-    };
-
-    maxGraveyardZombies = function () {
-      return Math.floor(model.energyMax / model.zombieCost);
-    };
-
-    upgradePrice = function (upgrade) {
-      if (sidePanels.factory) {
-        return PartFactory.purchasePrice(upgrade);
-      }
-      return Upgrades.upgradePrice(upgrade);
-    };
-
-    // ---- Factory Functions ---- //
-    factory = {
-      delays: [],
-      changeFactoryTab(tab) {
-        factoryTab = tab;
-        if (tab == 'parts') {
-          upgrades = PartFactory.generators;
-          this.updateDelays();
-        } else {
-          upgrades = CreatureFactory.creatures;
-        }
-      },
-      buyGenerator(generator) {
-        if (keysPressed.shift) {
-          PartFactory.purchaseMaxGenerators(generator);
-        } else {
-          PartFactory.purchaseGenerator(generator);
-        }
+        break;
+      case 'runesmith':
+        sidePanels.runesmith = true;
+        break;
+      case 'factory':
+        sidePanels.factory = true;
+        upgrades = PartFactory.generators;
         factoryStats = PartFactory.factoryStats();
-      },
-      generatorPrice(upgrade) {
-        return PartFactory.purchasePrice(upgrade);
-      },
-      creaturePrice(creature) {
-        return CreatureFactory.purchasePrice(creature);
-      },
-      creatureLevelPrice(creature) {
-        return CreatureFactory.levelPrice(creature);
-      },
-      creaturePercent(creature) {
-        return Math.min(
-          Math.round((model.persistentData.parts / this.creaturePrice(creature)) * 100),
-          100
+        factory.updateDelays();
+        break;
+      case 'prestige':
+        upgrades = Upgrades.prestigeUpgrades.filter((upgrade) => upgrade.cap == 0 || currentRank(upgrade) < upgrade.cap);
+        upgrades.push.apply(
+          upgrades,
+          Upgrades.prestigeUpgrades.filter((upgrade) => upgrade.cap !== 0 && currentRank(upgrade) >= upgrade.cap)
         );
-      },
-      creatureLevelPercent(creature) {
-        return Math.min(
-          Math.round((model.persistentData.parts / this.creatureLevelPrice(creature)) * 100),
-          100
-        );
-      },
-      buyCreature(creature) {
-        return CreatureFactory.startBuilding(creature);
-      },
-      creatureTooExpensive(creature) {
-        return !CreatureFactory.canAffordCreature(creature);
-      },
-      creatureButtonText(creature) {
-        if (creature.building) {
-          return 'Building...';
-        }
-        if (this.creatureTooExpensive(creature)) {
-          return (
-            formatWhole(this.creaturePrice(creature) - model.persistentData.parts) +
-            ' parts required'
-          );
-        } else {
-          return 'Build (' + formatWhole(this.creaturePrice(creature)) + ' parts)';
-        }
-      },
-      creatureLevelButtonText(creature) {
-        if (this.canLevelCreature(creature)) {
-          return (
-            'Upgrade Level ' +
-            (creature.level + 1) +
-            ' (' +
-            formatWhole(this.creatureLevelPrice(creature)) +
-            ' parts)'
-          );
-        }
-        return (
-          formatWhole(this.creatureLevelPrice(creature) - model.persistentData.parts) +
-          ' parts required'
-        );
-      },
-      canBuildCreature(creature) {
-        if (this.creatureTooExpensive(creature)) return false;
-        if (creature.building) return false;
-        return (
-          CreatureFactory.creaturesBuildingCount() + model.creatureCount <
-          model.creatureLimit
-        );
-      },
-      canLevelCreature(creature) {
-        return this.creatureLevelPrice(creature) < model.persistentData.parts;
-      },
-      levelCreature(creature) {
-        CreatureFactory.levelCreature(creature);
-      },
-      autoBuild(creature, number) {
-        if (
-          creature.autobuild + number >= 0 &&
-          creature.autobuild + number <= model.creatureLimit
-        ) {
-          CreatureFactory.creatureAutoBuildNumber(creature, number);
-        }
-      },
-      creatureStats(creature) {
-        return CreatureFactory.creatureStats(creature);
-      },
-      updateDelays() {
-        this.delays = [];
-        for (var i = 0; i < PartFactory.generatorsApplied.length; i++) {
-          this.delays[PartFactory.generatorsApplied[i].id] = (
-            -1 *
-            (PartFactory.generatorsApplied[i].time - PartFactory.generatorsApplied[i].timeLeft)
-          ).toFixed(2);
-        }
+        sidePanels.prestige = true;
+        break;
+      case 'options':
+        sidePanels.options = true;
+        model.downloadSaveGame();
+        break;
+    }
+    sidePanels.open = true;
+  };
+
+  graveyardTabSelect = function (tab) {
+    graveyardTab = tab;
+    if (tab == 'trophies') {
+      trophies = Trophies.getTrophyList();
+      trophyTab = 'all';
+    }
+  };
+
+  trophyTabSelect = function (tab) {
+    trophyTab = tab;
+    switch (tab) {
+      case 'all':
+        trophies = Trophies.getTrophyList();
+        break;
+      case 'collected':
+        trophies = Trophies.getTrophyList().filter((trophy) => trophy.owned);
+        break;
+      case 'uncollected':
+        trophies = Trophies.getTrophyList().filter((trophy) => !trophy.owned);
+        break;
+      case 'totals':
+        trophies = Trophies.getTrophyTotals();
+        break;
+    }
+  };
+
+  filterShop = function (type) {
+    currentShopFilter = type;
+    upgrades = Upgrades.getUpgrades(type);
+  };
+
+  filterConstruction = function (type) {
+    currentConstructionFilter = type;
+    switch (type) {
+      case 'available':
+        upgrades = Upgrades.getAvailableConstructions();
+        break;
+      case 'completed':
+        upgrades = Upgrades.getCompletedConstructions();
+        break;
+    }
+  };
+
+  resetGame = function () {
+    if (
+      confirm(
+        'Are you sure you want to reset everything? If you have a cloud save it will also be deleted. Make sure you export your save game first.'
+      )
+    ) {
+      model.resetData();
+    }
+  };
+
+  addBoneCollector = function () {
+    if (model.getEnergyRate() >= 1) model.persistentData.boneCollectors++;
+  };
+
+  subtractBoneCollector = function () {
+    if (model.persistentData.boneCollectors > 0) model.persistentData.boneCollectors--;
+  };
+
+  setHarpies = function (number) {
+    if ((number >= 0 && number < model.persistentData.harpies) || (model.getEnergyRate() >= 1 && number > 0)) {
+      model.persistentData.harpies = number;
+    }
+  };
+
+  setGraveyardZombies = function (number) {
+    if (number <= maxGraveyardZombies() && number >= 0) model.persistentData.graveyardZombies = number;
+  };
+
+  maxGraveyardZombies = function () {
+    return Math.floor(model.energyMax / model.zombieCost);
+  };
+
+  upgradePrice = function (upgrade) {
+    if (sidePanels.factory) {
+      return PartFactory.purchasePrice(upgrade);
+    }
+    return Upgrades.upgradePrice(upgrade);
+  };
+
+  // ---- Factory Functions ---- //
+  factory = {
+    delays: [],
+    changeFactoryTab(tab) {
+      factoryTab = tab;
+      if (tab == 'parts') {
+        upgrades = PartFactory.generators;
+        this.updateDelays();
+      } else {
+        upgrades = CreatureFactory.creatures;
       }
-    };
-    // ---- Factory Functions ---- //
+    },
+    buyGenerator(generator) {
+      if (keysPressed.shift) {
+        PartFactory.purchaseMaxGenerators(generator);
+      } else {
+        PartFactory.purchaseGenerator(generator);
+      }
+      factoryStats = PartFactory.factoryStats();
+    },
+    generatorPrice(upgrade) {
+      return PartFactory.purchasePrice(upgrade);
+    },
+    creaturePrice(creature) {
+      return CreatureFactory.purchasePrice(creature);
+    },
+    creatureLevelPrice(creature) {
+      return CreatureFactory.levelPrice(creature);
+    },
+    creaturePercent(creature) {
+      return Math.min(Math.round((model.persistentData.parts / this.creaturePrice(creature)) * 100), 100);
+    },
+    creatureLevelPercent(creature) {
+      return Math.min(Math.round((model.persistentData.parts / this.creatureLevelPrice(creature)) * 100), 100);
+    },
+    buyCreature(creature) {
+      return CreatureFactory.startBuilding(creature);
+    },
+    creatureTooExpensive(creature) {
+      return !CreatureFactory.canAffordCreature(creature);
+    },
+    creatureButtonText(creature) {
+      if (creature.building) {
+        return 'Building...';
+      }
+      if (this.creatureTooExpensive(creature)) {
+        return formatWhole(this.creaturePrice(creature) - model.persistentData.parts) + ' parts required';
+      } else {
+        return 'Build (' + formatWhole(this.creaturePrice(creature)) + ' parts)';
+      }
+    },
+    creatureLevelButtonText(creature) {
+      if (this.canLevelCreature(creature)) {
+        return 'Upgrade Level ' + (creature.level + 1) + ' (' + formatWhole(this.creatureLevelPrice(creature)) + ' parts)';
+      }
+      return formatWhole(this.creatureLevelPrice(creature) - model.persistentData.parts) + ' parts required';
+    },
+    canBuildCreature(creature) {
+      if (this.creatureTooExpensive(creature)) return false;
+      if (creature.building) return false;
+      return CreatureFactory.creaturesBuildingCount() + model.creatureCount < model.creatureLimit;
+    },
+    canLevelCreature(creature) {
+      return this.creatureLevelPrice(creature) < model.persistentData.parts;
+    },
+    levelCreature(creature) {
+      CreatureFactory.levelCreature(creature);
+    },
+    autoBuild(creature, number) {
+      if (creature.autobuild + number >= 0 && creature.autobuild + number <= model.creatureLimit) {
+        CreatureFactory.creatureAutoBuildNumber(creature, number);
+      }
+    },
+    creatureStats(creature) {
+      return CreatureFactory.creatureStats(creature);
+    },
+    updateDelays() {
+      this.delays = [];
+      for (var i = 0; i < PartFactory.generatorsApplied.length; i++) {
+        this.delays[PartFactory.generatorsApplied[i].id] = (
+          -1 *
+          (PartFactory.generatorsApplied[i].time - PartFactory.generatorsApplied[i].timeLeft)
+        ).toFixed(2);
+      }
+    }
+  };
+  // ---- Factory Functions ---- //
 
-    // ---- Level Select Functions ---- //
-    levelSelect = {
-      shown: false,
-      levelsPerPage: 50,
-      levels: [],
-      levelRanges: [],
-      start: 1,
-      showButton() {
-        return model.persistentData.allTimeHighestLevel > 1;
-      },
-      show() {
-        if (!this.shown) {
-          closeSidePanels();
-          this.shown = true;
-          this.level = model.levelInfo(model.level);
-          this.start =
-            Math.floor((this.level.level - 1) / this.levelsPerPage) * this.levelsPerPage + 1;
-          this.populate();
-        } else {
-          this.shown = false;
-        }
-      },
-      populate() {
-        this.levels = [];
-        this.levelRanges = [];
-        if (this.start > this.levelsPerPage) {
-          this.levelRanges.push(this.start - this.levelsPerPage);
-        }
-        this.levelRanges.push(this.start);
-        if (this.start + this.levelsPerPage <= model.persistentData.allTimeHighestLevel + 1) {
-          this.levelRanges.push(this.start + this.levelsPerPage);
-        }
-
-        for (var i = this.start; i < this.start + this.levelsPerPage; i++) {
-          this.levels.push(model.levelInfo(i));
-        }
-      },
-      selectRange(range) {
-        this.start = range;
+  // ---- Level Select Functions ---- //
+  levelSelect = {
+    shown: false,
+    levelsPerPage: 50,
+    levels: [],
+    levelRanges: [],
+    start: 1,
+    showButton() {
+      return model.persistentData.allTimeHighestLevel > 1;
+    },
+    show() {
+      if (!this.shown) {
+        closeSidePanels();
+        this.shown = true;
+        this.level = model.levelInfo(model.level);
+        this.start = Math.floor((this.level.level - 1) / this.levelsPerPage) * this.levelsPerPage + 1;
         this.populate();
-      },
-      select(level) {
-        this.level = level;
-      },
-      startLevel() {
-        model.startLevel(this.level.level);
+      } else {
         this.shown = false;
       }
-    };
-    // ---- Level Select Functions ---- //
-
-    addToHomeScreen = function () {
-      if (model.deferredPrompt) {
-        deferredPrompt.prompt();
+    },
+    populate() {
+      this.levels = [];
+      this.levelRanges = [];
+      if (this.start > this.levelsPerPage) {
+        this.levelRanges.push(this.start - this.levelsPerPage);
       }
-    };
-
-    constructionPercent = function () {
-      if (model.persistentData.currentConstruction) {
-        var time =
-          model.persistentData.currentConstruction.time -
-          model.persistentData.currentConstruction.timeRemaining;
-        return Math.round((time / model.persistentData.currentConstruction.time) * 100);
+      this.levelRanges.push(this.start);
+      if (this.start + this.levelsPerPage <= model.persistentData.allTimeHighestLevel + 1) {
+        this.levelRanges.push(this.start + this.levelsPerPage);
       }
-      return 0;
-    };
 
-    updateConstructionUpgrades = function () {
-      if (sidePanels.construction == true) upgrades = Upgrades.getAvailableConstructions();
-    };
+      for (var i = this.start; i < this.start + this.levelsPerPage; i++) {
+        this.levels.push(model.levelInfo(i));
+      }
+    },
+    selectRange(range) {
+      this.start = range;
+      this.populate();
+    },
+    select(level) {
+      this.level = level;
+    },
+    startLevel() {
+      model.startLevel(this.level.level);
+      this.shown = false;
+    }
+  };
+  // ---- Level Select Functions ---- //
 
-    startConstruction = function (upgrade) {
-      Upgrades.startConstruction(upgrade, zm);
+  addToHomeScreen = function () {
+    if (model.deferredPrompt) {
+      deferredPrompt.prompt();
+    }
+  };
+
+  constructionPercent = function () {
+    if (model.persistentData.currentConstruction) {
+      var time = model.persistentData.currentConstruction.time - model.persistentData.currentConstruction.timeRemaining;
+      return Math.round((time / model.persistentData.currentConstruction.time) * 100);
+    }
+    return 0;
+  };
+
+  updateConstructionUpgrades = function () {
+    if (sidePanels.construction == true) upgrades = Upgrades.getAvailableConstructions();
+  };
+
+  startConstruction = function (upgrade) {
+    Upgrades.startConstruction(upgrade, zm);
+    upgrades = Upgrades.getAvailableConstructions();
+  };
+
+  playPauseConstruction = function () {
+    Upgrades.playPauseConstruction();
+  };
+
+  cancelConstruction = function () {
+    if (confirm('Are you sure you want to cancel construction? Used materials will not be refunded')) {
+      Upgrades.cancelConstruction();
       upgrades = Upgrades.getAvailableConstructions();
-    };
+    }
+  };
 
-    playPauseConstruction = function () {
-      Upgrades.playPauseConstruction();
-    };
+  upgradeSubtitle = function (upgrade) {
+    switch (upgrade.type) {
+      case Upgrades.types.energyRate:
+        return '+' + upgrade.effect + ' energy per second';
+      case Upgrades.types.energyCap:
+        return '+' + upgrade.effect + ' max energy';
+      case Upgrades.types.bloodCap:
+        return '+' + formatWhole(upgrade.effect) + ' max blood';
+      case Upgrades.types.bloodStoragePC:
+        return '+' + Math.round(upgrade.effect * 100) + '% max blood';
+      case Upgrades.types.bloodGainPC:
+        return '+' + Math.round(upgrade.effect * 100) + '% blood income';
+      case Upgrades.types.brainsGainPC:
+        return '+' + Math.round(upgrade.effect * 100) + '% brains income';
+      case Upgrades.types.bonesGainPC:
+        return '+' + Math.round(upgrade.effect * 100) + '% bones income';
+      case Upgrades.types.partsGainPC:
+        return '+' + Math.round(upgrade.effect * 100) + '% parts income';
+      case Upgrades.types.brainsStoragePC:
+        return '+' + Math.round(upgrade.effect * 100) + '% max brains';
+      case Upgrades.types.energyCost:
+        return '-' + upgrade.effect + ' zombie energy cost';
+      case Upgrades.types.brainsCap:
+        return '+' + upgrade.effect + ' max brains';
+      case Upgrades.types.damage:
+        return '+' + upgrade.effect + ' zombie damage';
+      case Upgrades.types.speed:
+        return '+' + upgrade.effect + ' zombie speed';
+      case Upgrades.types.health:
+        return '+' + upgrade.effect + ' zombie health';
+      case Upgrades.types.brainRecoverChance:
+        return '+' + Math.round(upgrade.effect * 100) + '% chance to recover brain';
+      case Upgrades.types.riseFromTheDeadChance:
+        return '+' + Math.round(upgrade.effect * 100) + '% chance for corpse to become zombie';
+      case Upgrades.types.infectedBite:
+        return '+' + Math.round(upgrade.effect * 100) + '% chance for zombies to infect their targets';
+      case Upgrades.types.infectedBlast:
+        return '+' + Math.round(upgrade.effect * 100) + '% chance for zombies to explode on death';
+      case Upgrades.types.boneCollectorCapacity:
+        return '+' + upgrade.effect + ' bone collector capacity';
+      case Upgrades.types.zombieDmgPC:
+        return '+' + formatWhole(Math.round(upgrade.effect * 100)) + '% zombie damage';
+      case Upgrades.types.zombieHealthPC:
+        return '+' + formatWhole(Math.round(upgrade.effect * 100)) + '% zombie health';
+      case Upgrades.types.bonesRate:
+        return '+' + upgrade.effect + ' bones per second';
+      case Upgrades.types.brainsRate:
+        return '+' + upgrade.effect + ' brains per second';
+      case Upgrades.types.plagueDamage:
+        return '+' + formatWhole(upgrade.effect) + ' plague damage';
+      case Upgrades.types.spitDistance:
+        return '+' + upgrade.effect + ' spit distance';
+      case Upgrades.types.blastHealing:
+        return '+' + Math.round(upgrade.effect * 100) + '% plague healing';
+      case Upgrades.types.plagueArmor:
+        return '+' + Math.round(upgrade.effect * 100) + '% damage reduction';
+      case Upgrades.types.monsterLimit:
+        return '+' + upgrade.effect + ' creature limit';
+      case Upgrades.types.runicSyphon:
+        return '+' + Math.round(upgrade.effect * 100) + '% runic syphon';
+      case Upgrades.types.gigazombies:
+        return 'Unlock more gigazombies';
+      case Upgrades.types.bulletproof:
+        return '+' + Math.round(upgrade.effect * 100) + '% earth golem bullet reflect';
+      case Upgrades.types.harpySpeed:
+        return '+' + upgrade.effect + ' harpy speed';
+      case Upgrades.types.harpyBombs:
+        return '+' + upgrade.effect + ' harpy bombs';
+      case Upgrades.types.tankBuster:
+        return 'Anti tank harpies';
+    }
+    return '';
+  };
 
-    cancelConstruction = function () {
-      if (
-        confirm(
-          'Are you sure you want to cancel construction? Used materials will not be refunded'
-        )
-      ) {
-        Upgrades.cancelConstruction();
-        upgrades = Upgrades.getAvailableConstructions();
-      }
-    };
+  currentRank = function (upgrade) {
+    if (sidePanels.factory) {
+      return PartFactory.currentRank(upgrade);
+    }
+    return Upgrades.currentRank(upgrade);
+  };
 
-    upgradeSubtitle = function (upgrade) {
-      switch (upgrade.type) {
-        case Upgrades.types.energyRate:
-          return '+' + upgrade.effect + ' energy per second';
-        case Upgrades.types.energyCap:
-          return '+' + upgrade.effect + ' max energy';
-        case Upgrades.types.bloodCap:
-          return '+' + formatWhole(upgrade.effect) + ' max blood';
-        case Upgrades.types.bloodStoragePC:
-          return '+' + Math.round(upgrade.effect * 100) + '% max blood';
-        case Upgrades.types.bloodGainPC:
-          return '+' + Math.round(upgrade.effect * 100) + '% blood income';
-        case Upgrades.types.brainsGainPC:
-          return '+' + Math.round(upgrade.effect * 100) + '% brains income';
-        case Upgrades.types.bonesGainPC:
-          return '+' + Math.round(upgrade.effect * 100) + '% bones income';
-        case Upgrades.types.partsGainPC:
-          return '+' + Math.round(upgrade.effect * 100) + '% parts income';
-        case Upgrades.types.brainsStoragePC:
-          return '+' + Math.round(upgrade.effect * 100) + '% max brains';
-        case Upgrades.types.energyCost:
-          return '-' + upgrade.effect + ' zombie energy cost';
-        case Upgrades.types.brainsCap:
-          return '+' + upgrade.effect + ' max brains';
-        case Upgrades.types.damage:
-          return '+' + upgrade.effect + ' zombie damage';
-        case Upgrades.types.speed:
-          return '+' + upgrade.effect + ' zombie speed';
-        case Upgrades.types.health:
-          return '+' + upgrade.effect + ' zombie health';
-        case Upgrades.types.brainRecoverChance:
-          return '+' + Math.round(upgrade.effect * 100) + '% chance to recover brain';
-        case Upgrades.types.riseFromTheDeadChance:
-          return '+' + Math.round(upgrade.effect * 100) + '% chance for corpse to become zombie';
-        case Upgrades.types.infectedBite:
-          return (
-            '+' +
-            Math.round(upgrade.effect * 100) +
-            '% chance for zombies to infect their targets'
-          );
-        case Upgrades.types.infectedBlast:
-          return (
-            '+' + Math.round(upgrade.effect * 100) + '% chance for zombies to explode on death'
-          );
-        case Upgrades.types.boneCollectorCapacity:
-          return '+' + upgrade.effect + ' bone collector capacity';
-        case Upgrades.types.zombieDmgPC:
-          return '+' + formatWhole(Math.round(upgrade.effect * 100)) + '% zombie damage';
-        case Upgrades.types.zombieHealthPC:
-          return '+' + formatWhole(Math.round(upgrade.effect * 100)) + '% zombie health';
-        case Upgrades.types.bonesRate:
-          return '+' + upgrade.effect + ' bones per second';
-        case Upgrades.types.brainsRate:
-          return '+' + upgrade.effect + ' brains per second';
-        case Upgrades.types.plagueDamage:
-          return '+' + formatWhole(upgrade.effect) + ' plague damage';
-        case Upgrades.types.spitDistance:
-          return '+' + upgrade.effect + ' spit distance';
-        case Upgrades.types.blastHealing:
-          return '+' + Math.round(upgrade.effect * 100) + '% plague healing';
-        case Upgrades.types.plagueArmor:
-          return '+' + Math.round(upgrade.effect * 100) + '% damage reduction';
-        case Upgrades.types.monsterLimit:
-          return '+' + upgrade.effect + ' creature limit';
-        case Upgrades.types.runicSyphon:
-          return '+' + Math.round(upgrade.effect * 100) + '% runic syphon';
-        case Upgrades.types.gigazombies:
-          return 'Unlock more gigazombies';
-        case Upgrades.types.bulletproof:
-          return '+' + Math.round(upgrade.effect * 100) + '% earth golem bullet reflect';
-        case Upgrades.types.harpySpeed:
-          return '+' + upgrade.effect + ' harpy speed';
-        case Upgrades.types.harpyBombs:
-          return '+' + upgrade.effect + ' harpy bombs';
-        case Upgrades.types.tankBuster:
-          return 'Anti tank harpies';
-      }
-      return '';
-    };
+  currentRankConstruction = function (upgrade) {
+    return Upgrades.currentRankConstruction(upgrade);
+  };
 
-    currentRank = function (upgrade) {
+  upgradeTooExpensive = function (upgrade) {
+    if (sidePanels.factory) {
+      return !PartFactory.canAffordGenerator(upgrade);
+    }
+    return !Upgrades.canAffordUpgrade(upgrade) || (upgrade.cap != 0 && Upgrades.currentRank(upgrade) >= upgrade.cap);
+  };
+
+  requiredForUpgrade = function (upgrade) {
+    var cost = upgradePrice(upgrade);
+
+    switch (upgrade.costType) {
+      case Upgrades.costs.energy:
+        return formatWhole(cost - model.energy) + ' energy required';
+      case Upgrades.costs.blood:
+      case PartFactory.costs.blood:
+        return formatWhole(cost - model.persistentData.blood) + ' blood required';
+      case Upgrades.costs.brains:
+        return formatWhole(cost - model.persistentData.brains) + ' brains required';
+      case Upgrades.costs.bones:
+        return formatWhole(cost - model.persistentData.bones) + ' bones required';
+      case Upgrades.costs.prestigePoints:
+        return formatWhole(cost - model.persistentData.prestigePointsToSpend) + ' prestige points required';
+      case PartFactory.costs.parts:
+        return formatWhole(cost - model.persistentData.parts) + ' parts required';
+    }
+  };
+
+  purchaseText = function (upgrade) {
+    if (keysPressed.shift) {
       if (sidePanels.factory) {
-        return PartFactory.currentRank(upgrade);
+        var amount = PartFactory.upgradeMaxAffordable(upgrade);
+        var price = PartFactory.upgradeMaxPrice(upgrade, amount);
+        return 'Purchase ' + amount + ' (' + formatWhole(price) + ' ' + costTranslate(upgrade.costType) + ')';
+      } else {
+        var amount = Upgrades.upgradeMaxAffordable(upgrade);
+        var price = Upgrades.upgradeMaxPrice(upgrade, amount);
+        return 'Purchase ' + amount + ' (' + formatWhole(price) + ' ' + costTranslate(upgrade.costType) + ')';
       }
-      return Upgrades.currentRank(upgrade);
-    };
+    }
+    return 'Purchase (' + formatWhole(upgradePrice(upgrade)) + ' ' + costTranslate(upgrade.costType) + ')';
+  };
 
-    currentRankConstruction = function (upgrade) {
-      return Upgrades.currentRankConstruction(upgrade);
-    };
-
-    upgradeTooExpensive = function (upgrade) {
-      if (sidePanels.factory) {
-        return !PartFactory.canAffordGenerator(upgrade);
-      }
-      return (
-        !Upgrades.canAffordUpgrade(upgrade) ||
-        (upgrade.cap != 0 && Upgrades.currentRank(upgrade) >= upgrade.cap)
-      );
-    };
-
-    requiredForUpgrade = function (upgrade) {
-      var cost = upgradePrice(upgrade);
-
-      switch (upgrade.costType) {
-        case Upgrades.costs.energy:
-          return formatWhole(cost - model.energy) + ' energy required';
-        case Upgrades.costs.blood:
-        case PartFactory.costs.blood:
-          return formatWhole(cost - model.persistentData.blood) + ' blood required';
-        case Upgrades.costs.brains:
-          return formatWhole(cost - model.persistentData.brains) + ' brains required';
-        case Upgrades.costs.bones:
-          return formatWhole(cost - model.persistentData.bones) + ' bones required';
-        case Upgrades.costs.prestigePoints:
-          return (
-            formatWhole(cost - model.persistentData.prestigePointsToSpend) +
-            ' prestige points required'
-          );
-        case PartFactory.costs.parts:
-          return formatWhole(cost - model.persistentData.parts) + ' parts required';
-      }
-    };
-
-    purchaseText = function (upgrade) {
+  costTranslate = function (costType) {
+    if (costType == Upgrades.costs.prestigePoints) {
+      return 'points';
+    }
+    return costType;
+    buyUpgrade = function (upgrade) {
       if (keysPressed.shift) {
-        if (sidePanels.factory) {
-          var amount = PartFactory.upgradeMaxAffordable(upgrade);
-          var price = PartFactory.upgradeMaxPrice(upgrade, amount);
-          return (
-            'Purchase ' +
-            amount +
-            ' (' +
-            formatWhole(price) +
-            ' ' +
-            costTranslate(upgrade.costType) +
-            ')'
-          );
-        } else {
-          var amount = Upgrades.upgradeMaxAffordable(upgrade);
-          var price = Upgrades.upgradeMaxPrice(upgrade, amount);
-          return (
-            'Purchase ' +
-            amount +
-            ' (' +
-            formatWhole(price) +
-            ' ' +
-            costTranslate(upgrade.costType) +
-            ')'
-          );
-        }
+        Upgrades.purchaseMaxUpgrades(upgrade);
+      } else {
+        Upgrades.purchaseUpgrade(upgrade);
       }
-      return (
-        'Purchase (' +
-        formatWhole(upgradePrice(upgrade)) +
-        ' ' +
-        costTranslate(upgrade.costType) +
-        ')'
-      );
     };
-
-    ((costTranslate = function (costType) {
-      if (costType == Upgrades.costs.prestigePoints) {
-        return 'points';
-      }
-      return costType;
-    }),
-      (buyUpgrade = function (upgrade) {
-        if (keysPressed.shift) {
-          Upgrades.purchaseMaxUpgrades(upgrade);
-        } else {
-          Upgrades.purchaseUpgrade(upgrade);
-        }
-      }));
 
     upgradeStatInfo = function (upgrade) {
       return Upgrades.displayStatValue(upgrade);
@@ -695,10 +623,7 @@ export class Controller {
       return Math.min(Math.round((model.persistentData.blood / model.bloodMax) * 100), 100);
     };
     brainsPercent = function () {
-      return Math.min(
-        Math.round((model.persistentData.brains / model.brainsMax) * 100),
-        100
-      );
+      return Math.min(Math.round((model.persistentData.brains / model.brainsMax) * 100), 100);
     };
 
     costAboveCap = function (upgrade, price) {
@@ -734,28 +659,15 @@ export class Controller {
     upgradePercent = function (upgrade) {
       switch (upgrade.costType) {
         case 'blood':
-          return Math.round(
-            Math.min(1, model.persistentData.blood / upgradePrice(upgrade)) * 100
-          );
+          return Math.round(Math.min(1, model.persistentData.blood / upgradePrice(upgrade)) * 100);
         case 'brains':
-          return Math.round(
-            Math.min(1, model.persistentData.brains / upgradePrice(upgrade)) * 100
-          );
+          return Math.round(Math.min(1, model.persistentData.brains / upgradePrice(upgrade)) * 100);
         case 'bones':
-          return Math.round(
-            Math.min(1, model.persistentData.bones / upgradePrice(upgrade)) * 100
-          );
+          return Math.round(Math.min(1, model.persistentData.bones / upgradePrice(upgrade)) * 100);
         case 'parts':
-          return Math.round(
-            Math.min(1, model.persistentData.parts / upgradePrice(upgrade)) * 100
-          );
+          return Math.round(Math.min(1, model.persistentData.parts / upgradePrice(upgrade)) * 100);
         case 'prestigePoints':
-          return Math.round(
-            Math.min(
-              1,
-              model.persistentData.prestigePointsToSpend / upgradePrice(upgrade)
-            ) * 100
-          );
+          return Math.round(Math.min(1, model.persistentData.prestigePointsToSpend / upgradePrice(upgrade)) * 100);
       }
     };
 
@@ -784,10 +696,7 @@ export class Controller {
         this.isShown = false;
       },
       anotherOffer() {
-        return (
-          Skeleton.persistent.skeletons > 0 &&
-          GameModel.persistentData.trophies.length >= Skeleton.persistent.xpRate * 20
-        );
+        return Skeleton.persistent.skeletons > 0 && GameModel.persistentData.trophies.length >= Skeleton.persistent.xpRate * 20;
       },
       xpPercent() {
         return Math.round(Math.min(1, skeleton().xp / Skeleton.xpForNextLevel()) * 100);
@@ -806,9 +715,7 @@ export class Controller {
       },
       updateEquippedItems() {
         this.equipped = [];
-        var helmetItems = Skeleton.persistent.items.filter(
-          (i) => i.q && i.s == Skeleton.lootPositions.helmet.id
-        );
+        var helmetItems = Skeleton.persistent.items.filter((i) => i.q && i.s == Skeleton.lootPositions.helmet.id);
         if (helmetItems.length > 0) {
           this.equipped.push([helmetItems[0]]);
         } else {
@@ -821,9 +728,7 @@ export class Controller {
           ]);
         }
         var row2 = [];
-        var swordItems = Skeleton.persistent.items.filter(
-          (i) => i.q && i.s == Skeleton.lootPositions.sword.id
-        );
+        var swordItems = Skeleton.persistent.items.filter((i) => i.q && i.s == Skeleton.lootPositions.sword.id);
         if (swordItems.length > 0) {
           row2.push(swordItems[0]);
         } else {
@@ -833,9 +738,7 @@ export class Controller {
             id: -2
           });
         }
-        var chestItems = Skeleton.persistent.items.filter(
-          (i) => i.q && i.s == Skeleton.lootPositions.chest.id
-        );
+        var chestItems = Skeleton.persistent.items.filter((i) => i.q && i.s == Skeleton.lootPositions.chest.id);
         if (chestItems.length > 0) {
           row2.push(chestItems[0]);
         } else {
@@ -845,9 +748,7 @@ export class Controller {
             id: -3
           });
         }
-        var shieldItems = Skeleton.persistent.items.filter(
-          (i) => i.q && i.s == Skeleton.lootPositions.shield.id
-        );
+        var shieldItems = Skeleton.persistent.items.filter((i) => i.q && i.s == Skeleton.lootPositions.shield.id);
         if (shieldItems.length > 0) {
           row2.push(shieldItems[0]);
         } else {
@@ -859,9 +760,7 @@ export class Controller {
         }
         this.equipped.push(row2);
         var row3 = [];
-        var gloveItems = Skeleton.persistent.items.filter(
-          (i) => i.q && i.s == Skeleton.lootPositions.gloves.id
-        );
+        var gloveItems = Skeleton.persistent.items.filter((i) => i.q && i.s == Skeleton.lootPositions.gloves.id);
         if (gloveItems.length > 0) {
           row3.push(gloveItems[0]);
         } else {
@@ -871,9 +770,7 @@ export class Controller {
             id: -5
           });
         }
-        var legItems = Skeleton.persistent.items.filter(
-          (i) => i.q && i.s == Skeleton.lootPositions.legs.id
-        );
+        var legItems = Skeleton.persistent.items.filter((i) => i.q && i.s == Skeleton.lootPositions.legs.id);
         if (legItems.length > 0) {
           row3.push(legItems[0]);
         } else {
@@ -883,9 +780,7 @@ export class Controller {
             id: -6
           });
         }
-        var bootItems = Skeleton.persistent.items.filter(
-          (i) => i.q && i.s == Skeleton.lootPositions.boots.id
-        );
+        var bootItems = Skeleton.persistent.items.filter((i) => i.q && i.s == Skeleton.lootPositions.boots.id);
         if (bootItems.length > 0) {
           row3.push(bootItems[0]);
         } else {
@@ -899,9 +794,7 @@ export class Controller {
         this.equipped.push([{ name: 'Destroy Items', s: -1, id: -8 }]);
       },
       inventoryItems() {
-        return Skeleton.persistent.items
-          .filter((i) => !i.q)
-          .sort((a, b) => b.r * b.l - a.r * a.l);
+        return Skeleton.persistent.items.filter((i) => !i.q).sort((a, b) => b.r * b.l - a.r * a.l);
       },
       itemName(item) {
         return item.name || Skeleton.getLootName(item);
@@ -992,11 +885,7 @@ export class Controller {
       },
       trashAll() {
         if (
-          confirm(
-            'Are you sure you want to destroy all non-equipped items? You will earn ' +
-              formatWhole(Skeleton.xpForItems()) +
-              ' xp'
-          )
+          confirm('Are you sure you want to destroy all non-equipped items? You will earn ' + formatWhole(Skeleton.xpForItems()) + ' xp')
         ) {
           Skeleton.destroyAllItems();
         }
@@ -1018,6 +907,7 @@ export class Controller {
 
     $document.ready(function () {
       $scope.updatePromise = $interval(update, 200);
-      Upgrades.angularModel = zm;
+      Upgrades.angularModel = Controller;
     });
+  };
 }

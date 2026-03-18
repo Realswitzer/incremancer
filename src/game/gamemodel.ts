@@ -1,87 +1,87 @@
-const GameModel = {
-  storageName: 'ZombieData',
-  hidden: false,
-  energy: 0,
-  energyMax: 10,
-  energyRate: 1,
-  brainsRate: 0,
-  bonesRate: 0,
-  energySpellMultiplier: 1,
-  zombieCost: 10,
-  bonesPCMod: 1,
-  partsPCMod: 1,
-  bloodMax: 1000,
-  bloodPCMod: 1,
-  bloodStorePCMod: 1,
-  brainsMax: 50,
-  brainsPCMod: 1,
-  brainsStorePCMod: 1,
-  zombieHealth: 100,
-  zombieHealthPCMod: 1,
-  zombieDamage: 10,
-  zombieDamagePCMod: 1,
-  zombieSpeed: 10,
-  zombieCages: 0,
-  zombiesInCages: 0,
-  golemDamagePCMod: 1,
-  golemHealthPCMod: 1,
-  plagueDamageMod: 0,
-  graveyardHealthMod: 1,
-  burningSpeedMod: 1,
-  startingResources: 0,
-  brainRecoverChance: 0,
-  riseFromTheDeadChance: 0,
-  infectedBiteChance: 0,
-  infectedBlastChance: 0,
-  constructions: {},
-  construction: 0,
-  boneCollectorCapacity: 10,
-  frameRate: 0,
-  humanCount: 50,
-  zombieCount: 0,
-  creatureCount: 0,
-  creatureLimit: 1,
-  harpySpeed: 75,
-  tankBuster: false,
-  harpyBombs: 1,
-  runicSyphon: {
-    percentage: 0,
-    blood: 0,
-    bones: 0,
-    brains: 0
-  },
-  gigazombies: false,
-  endLevelTimer: 3,
-  endLevelDelay: 3,
-  messageQueue: [],
-  runeEffects: {
-    attackSpeed: 1,
-    critChance: 0,
-    critDamage: 0,
-    damageReduction: 1,
-    healthRegen: 0,
-    damageReflection: 0
-  },
-  autoUpgrades: false,
-  autoconstruction: false,
-  autoconstructionUnlocked: false,
-  levelResourcesAdded: false,
-  bulletproofChance: 0,
-  gameSpeed: 1,
+export class GameModel {
+  storageName = 'ZombieData';
+  hidden = false;
+  energy = 0;
+  energyMax = 10;
+  energyRate = 1;
+  brainsRate = 0;
+  bonesRate = 0;
+  energySpellMultiplier = 1;
+  zombieCost = 10;
+  bonesPCMod = 1;
+  partsPCMod = 1;
+  bloodMax = 1000;
+  bloodPCMod = 1;
+  bloodStorePCMod = 1;
+  brainsMax = 50;
+  brainsPCMod = 1;
+  brainsStorePCMod = 1;
+  zombieHealth = 100;
+  zombieHealthPCMod = 1;
+  zombieDamage = 10;
+  zombieDamagePCMod = 1;
+  zombieSpeed = 10;
+  zombieCages = 0;
+  zombiesInCages = 0;
+  golemDamagePCMod = 1;
+  golemHealthPCMod = 1;
+  plagueDamageMod = 0;
+  graveyardHealthMod = 1;
+  burningSpeedMod = 1;
+  startingResources = 0;
+  brainRecoverChance = 0;
+  riseFromTheDeadChance = 0;
+  infectedBiteChance = 0;
+  infectedBlastChance = 0;
+  constructions = {};
+  construction = 0;
+  boneCollectorCapacity = 10;
+  frameRate = 0;
+  humanCount = 50;
+  zombieCount = 0;
+  creatureCount = 0;
+  creatureLimit = 1;
+  harpySpeed = 75;
+  tankBuster = false;
+  harpyBombs = 1;
+  runicSyphon = {
+    percentage = 0,
+    blood = 0,
+    bones = 0,
+    brains = 0
+  };
+  gigazombies = false;
+  endLevelTimer = 3;
+  endLevelDelay = 3;
+  messageQueue = [];
+  runeEffects = {
+    attackSpeed = 1,
+    critChance = 0,
+    critDamage = 0,
+    damageReduction = 1,
+    healthRegen = 0,
+    damageReflection = 0
+  };
+  autoUpgrades = false;
+  autoconstruction = false;
+  autoconstructionUnlocked = false;
+  levelResourcesAdded = false;
+  bulletproofChance = 0;
+  gameSpeed = 1;
 
-  level: 1,
+  level = 1;
 
-  currentState: 'startGame',
+  currentState = 'startGame';
 
-  states: {
+  states = {
     playingLevel: 'playingLevel',
     levelCompleted: 'levelCompleted',
     startGame: 'startGame',
     prestiged: 'prestiged',
     failed: 'failed'
-  },
+  };
 
-  baseStats: {
+  baseStats = {
     energyRate: 1,
     brainsRate: 0,
     bonesRate: 0,
@@ -96,12 +96,12 @@ const GameModel = {
     graveyard: 0,
     construction: 0,
     boneCollectorCapacity: 10
-  },
+  };
 
-  zoom: zoom,
-  centerGameContainer: centerGameContainer,
+  zoom = zoom;
+  centerGameContainer = centerGameContainer;
 
-  resetToBaseStats() {
+  resetToBaseStats(): void {
     this.energyRate = this.baseStats.energyRate;
     this.brainsRate = this.baseStats.brainsRate;
     this.bonesRate = this.baseStats.bonesRate;
@@ -147,14 +147,14 @@ const GameModel = {
     this.harpySpeed = 75;
     this.tankBuster = false;
     this.harpyBombs = 1;
-  },
+  }
 
-  addEnergy(value) {
+  addEnergy(value: number): void {
     this.energy += value;
     if (this.energy > this.energyMax) this.energy = this.energyMax;
-  },
+  }
 
-  addBlood(value) {
+  addBlood(value: number): void {
     if (isNaN(this.persistentData.blood)) {
       this.persistentData.blood = 0;
     }
@@ -170,9 +170,9 @@ const GameModel = {
     if (this.runicSyphon.percentage > 0) {
       this.runicSyphon.blood += value * this.bloodPCMod * this.runicSyphon.percentage;
     }
-  },
+  }
 
-  addBrains(value) {
+  addBrains(value: number): void {
     if (isNaN(this.persistentData.brains)) {
       this.persistentData.brains = 0;
     }
@@ -189,9 +189,9 @@ const GameModel = {
     if (this.runicSyphon.percentage > 0) {
       this.runicSyphon.brains += value * this.brainsPCMod * this.runicSyphon.percentage;
     }
-  },
+  }
 
-  addBones(value) {
+  addBones(value: number): void {
     if (isNaN(this.persistentData.bones)) {
       this.persistentData.bones = 0;
     }
@@ -202,22 +202,22 @@ const GameModel = {
     if (this.runicSyphon.percentage > 0) {
       this.runicSyphon.bones += value * this.bonesPCMod * this.runicSyphon.percentage;
     }
-  },
+  }
 
-  getHumanCount() {
+  getHumanCount(): number {
     return this.humanCount;
-  },
+  }
 
-  getEnergyRate() {
+  getEnergyRate(): number {
     return this.energySpellMultiplier * this.energyRate - (this.persistentData.boneCollectors + this.persistentData.harpies);
-  },
+  }
 
-  toggleGigazombies() {
+  toggleGigazombies(): void {
     this.persistentData.gigazombiesOn = !this.persistentData.gigazombiesOn;
     Upgrades.applyUpgrades();
-  },
+  }
 
-  update(timeDiff, updateTime) {
+  update(timeDiff: number, updateTime: number): void {
     // spell update before gamespeed modifier
     Spells.updateSpells(timeDiff);
 
@@ -283,24 +283,24 @@ const GameModel = {
       }
     }
     this.updateStats();
-  },
+  }
 
-  calculateEndLevelBones() {
+  calculateEndLevelBones(): void {
     this.endLevelBones = 0;
     if (this.persistentData.boneCollectors > 0 && Bones.uncollected) {
       this.endLevelBones = Bones.uncollected.length;
       this.addBones(this.endLevelBones);
     }
-  },
+  }
 
-  calculateEndLevelZombieCages() {
+  calculateEndLevelZombieCages(): void {
     if (this.zombieCages > 0) {
       this.zombiesInCages += this.zombieCount;
       if (this.zombiesInCages > this.zombieCages) this.zombiesInCages = this.zombieCages;
     }
-  },
+  }
 
-  autoRemoveCollectorsHarpies() {
+  autoRemoveCollectorsHarpies(): void {
     if (this.getEnergyRate() < 0) {
       var energyRate = this.getEnergyRate();
       if (this.persistentData.harpies > 0) {
@@ -313,44 +313,44 @@ const GameModel = {
         this.persistentData.boneCollectors--;
       }
     }
-  },
+  }
 
-  releaseCagedZombies() {
+  releaseCagedZombies(): void {
     if (this.currentState == this.states.playingLevel) {
       for (var i = 0; i < this.zombiesInCages; i++) {
         Zombies.createZombie(Graveyard.sprite.x, Graveyard.sprite.y);
       }
       this.zombiesInCages = 0;
     }
-  },
+  }
 
-  sacrificeCagedZombies() {
+  sacrificeCagedZombies(): void {
     this.addBlood(this.cagedZombieSacrificeValue().blood);
     this.addBrains(this.cagedZombieSacrificeValue().brains);
     this.addBones(this.cagedZombieSacrificeValue().bones);
     this.zombiesInCages = 0;
-  },
+  }
 
-  cagedZombieSacrificeValue() {
+  cagedZombieSacrificeValue(): { blood: number; brains: number; bones: number } {
     return {
       blood: this.zombiesInCages * this.zombieHealth * 0.5,
       brains: this.zombiesInCages,
       bones: this.zombiesInCages * 3
     };
-  },
+  }
 
-  startLevel(level) {
+  startLevel(level: number): void {
     this.level = level;
     this.startGame();
-  },
+  }
 
-  startGame() {
+  startGame(): void {
     this.currentState = this.states.playingLevel;
     this.setupLevel();
     this.updatePlayingLevel();
-  },
+  }
 
-  nextLevel() {
+  nextLevel(): void {
     this.level++;
     this.currentState = this.states.playingLevel;
     this.setupLevel();
@@ -358,9 +358,9 @@ const GameModel = {
     if (this.persistentData.autoRelease) {
       this.releaseCagedZombies();
     }
-  },
+  }
 
-  setupLevel() {
+  setupLevel(): void {
     this.endLevelTimer = this.endLevelDelay;
     setGameFieldSizeForLevel();
     Particles.initialize();
@@ -375,9 +375,9 @@ const GameModel = {
     Skeleton.populate();
     this.addStartLevelResources();
     this.populateStats();
-  },
+  }
 
-  populateStats() {
+  populateStats(): void {
     this.stats = {
       skeleton: {
         show: Skeleton.persistent.skeletons > 0,
@@ -408,9 +408,9 @@ const GameModel = {
         speed: Army.maxRunSpeed
       }
     };
-  },
+  }
 
-  updateStats() {
+  updateStats(): void {
     if (this.stats) {
       this.stats.zombie.health = this.zombieHealth;
       this.stats.zombie.damage = this.zombieDamage;
@@ -420,21 +420,21 @@ const GameModel = {
       this.stats.skeleton.damage = this.zombieDamage * 10;
       this.stats.skeleton.speed = Skeleton.moveSpeed;
     }
-  },
+  }
 
-  vipEscaped() {
+  vipEscaped(): void {
     if (!this.persistentData.vipEscaped) {
       this.persistentData.vipEscaped = [];
     }
     this.persistentData.vipEscaped.push(this.level);
     this.saveData();
-  },
+  }
 
-  updatePlayingLevel() {
+  updatePlayingLevel(): void {
     this.saveData();
-  },
+  }
 
-  addStartLevelResources() {
+  addStartLevelResources(): void {
     this.energy = this.energyMax;
 
     if (!this.levelResourcesAdded) {
@@ -449,15 +449,15 @@ const GameModel = {
 
       this.levelResourcesAdded = true;
     }
-  },
+  }
 
-  onReady() {
+  onReady(): void {
     Upgrades.upgradeIdCheck();
-  },
+  }
 
-  lastSave: 0,
+  lastSave = 0;
 
-  persistentData: {
+  persistentData = {
     saveCreated: Date.now(),
     autoStart: false,
     levelUnlocked: 1,
@@ -483,17 +483,17 @@ const GameModel = {
     creatureAutobuild: [],
     savedCreatures: [],
     levelsCompleted: []
-  },
+  };
 
-  addPrestigePoints(points) {
+  addPrestigePoints(points: number): void {
     if (typeof this.persistentData.prestigePointsEarned == 'undefined') {
       this.persistentData.prestigePointsEarned = 0;
       this.persistentData.prestigePointsToSpend = 0;
     }
     this.persistentData.prestigePointsEarned += points;
-  },
+  }
 
-  prestige() {
+  prestige(): void {
     if (this.persistentData.prestigePointsEarned > 0) {
       this.persistentData.levelUnlocked = 1;
       this.persistentData.blood = 0;
@@ -541,9 +541,9 @@ const GameModel = {
         Upgrades.upgrades[i].auto = false;
       }
     }
-  },
+  }
 
-  saveData() {
+  saveData(): void {
     this.persistentData.dateOfSave = Date.now();
     try {
       localStorage.setItem(this.storageName, JSON.stringify(this.persistentData));
@@ -551,8 +551,8 @@ const GameModel = {
     } catch (e) {
       console.log(e);
     }
-  },
-  loadData() {
+  }
+  loadData(): void {
     try {
       if (localStorage.getItem(this.storageName) !== null) {
         this.persistentData = JSON.parse(localStorage.getItem(this.storageName));
@@ -566,8 +566,8 @@ const GameModel = {
     } catch (e) {
       console.log(e);
     }
-  },
-  calcOfflineProgress() {
+  }
+  calcOfflineProgress(): void {
     Upgrades.applyUpgrades();
     Upgrades.updateRuneEffects();
     PartFactory.applyGenerators();
@@ -579,16 +579,16 @@ const GameModel = {
         this.persistentData.parts += partsCreated;
       }
     }
-  },
-  resetData() {
+  }
+  resetData(): void {
     try {
       localStorage.removeItem(this.storageName);
       localStorage.removeItem(Skeleton.storageName);
     } catch (e) {
       console.log(e);
     }
-  },
-  updatePersistentData() {
+  }
+  updatePersistentData(): void {
     if (!this.persistentData.constructions) {
       this.persistentData.constructions = [];
     }
@@ -620,15 +620,15 @@ const GameModel = {
       this.persistentData.runeshatter = 0;
     }
     CreatureFactory.updateAutoBuild();
-  },
+  }
 
-  sendMessage(message) {
+  sendMessage(message: string): void {
     if (!this.messageQueue.includes(message)) {
       this.messageQueue.push(message);
     }
-  },
+  }
 
-  setResolution(resolution) {
+  setResolution(resolution: number): void {
     if (!this.app) return;
 
     this.app.renderer.resolution = resolution;
@@ -637,18 +637,18 @@ const GameModel = {
 
     this.app.renderer.plugins.interaction.resolution = resolution;
     this.app.renderer.resize(document.body.clientWidth, document.body.clientHeight);
-  },
+  }
 
-  downloadSaveGame() {
+  downloadSaveGame(): void {
     this.persistentData.skeleton = Skeleton.persistent;
     this.blob = new Blob([LZString.compressToEncodedURIComponent(JSON.stringify(this.persistentData))], { type: 'octet/stream' });
     delete this.persistentData.skeleton;
     this.encodedContent = window.URL.createObjectURL(this.blob);
     var datestamp = new Date().toISOString().replace(/:|T|Z|\./g, '');
     this.savefilename = 'incremancer-' + datestamp + '.sav';
-  },
+  }
 
-  importFile() {
+  importFile(): void {
     var files = document.getElementById('import-file').files;
 
     if (files && files.length == 1) {
@@ -672,9 +672,9 @@ const GameModel = {
       };
       reader.readAsText(file);
     }
-  },
+  }
 
-  toggleFullscreen() {
+  toggleFullscreen(): void {
     if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement) {
       if (document.exitFullscreen) {
         document.exitFullscreen();
@@ -697,33 +697,33 @@ const GameModel = {
         i.msRequestFullscreen();
       }
     }
-  },
+  }
 
-  prestigePointsForLevel(level) {
+  prestigePointsForLevel(level: number): void {
     if (this.persistentData.levelsCompleted.includes(level)) {
       return 0;
     } else {
       return level;
     }
-  },
+  }
 
-  bossCompleted(level) {
+  bossCompleted(level: number): boolean {
     var bossLevel = Math.floor((level - 1) / 50) * 50;
 
     if (bossLevel < 50) return true;
 
     return this.persistentData.levelsCompleted.includes(bossLevel);
-  },
+  }
 
-  levelLocked(level) {
+  levelLocked(level: number): boolean {
     return level > this.persistentData.allTimeHighestLevel + 1 || !this.bossCompleted(level);
-  },
+  }
 
-  isBossStage(level) {
+  isBossStage(level: number): boolean {
     return level > 0 && level % 50 == 0;
-  },
+  }
 
-  levelInfo(level) {
+  levelInfo(level: number): { level: number; bossStage: boolean; completed: boolean; locked: boolean; trophy: boolean } {
     return {
       level: level,
       bossStage: this.isBossStage(level),
@@ -732,5 +732,5 @@ const GameModel = {
       trophy: Trophies.doesLevelHaveTrophy(level)
     };
   }
-};
+}
 export default GameModel;

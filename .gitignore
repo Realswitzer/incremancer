@@ -27,3 +27,4 @@ dist-ssr
 # This is to prevent accidental commits that modify pnpm-lock or pnpm-workspace
 pnpm-lock.yaml
 pnpm-workspace.yaml
+*.d.ts
