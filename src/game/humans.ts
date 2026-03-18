@@ -38,13 +38,12 @@ const Humans = {
     walking: 2,
     attacking: 3,
     fleeing: 4,
-    escaping: 5,
+    escaping: 5
   },
 
   randomSecondsToStand() {
     return (
-      this.minSecondsTostand +
-      Math.random() * (this.maxSecondsToStand - this.minSecondsTostand)
+      this.minSecondsTostand + Math.random() * (this.maxSecondsToStand - this.minSecondsTostand)
     );
   },
 
@@ -54,10 +53,7 @@ const Humans = {
     human.timeToScan = 0;
     if (!human.tank) {
       Blood.newSplatter(human.x, human.y);
-      human.speedMod = Math.max(
-        Math.min(1, human.health / human.maxHealth),
-        0.25
-      );
+      human.speedMod = Math.max(Math.min(1, human.health / human.maxHealth), 0.25);
     } else {
       Fragments.newPart(human.x, human.y - 18, 0x7b650e);
     }
@@ -84,7 +80,7 @@ const Humans = {
     if (!Army.assaultStarted) {
       if (Math.random() > 0.9 && GameModel.isBossStage(GameModel.level)) {
         Army.assaultStarted = true;
-        GameModel.sendMessage("The assault has begun!");
+        GameModel.sendMessage('The assault has begun!');
       }
     }
   },
@@ -106,15 +102,11 @@ const Humans = {
   },
 
   assignRandomTarget(human) {
-    if (
-      Math.random() > this.chanceToStayInCurrentBuilding ||
-      human.timeFleeing > 0
-    ) {
+    if (Math.random() > this.chanceToStayInCurrentBuilding || human.timeFleeing > 0) {
       human.currentPoi = this.map.getRandomBuilding();
     }
     human.target = this.map.randomPositionInBuilding(human.currentPoi);
-    human.maxSpeed =
-      human.timeFleeing > 0 ? this.maxRunSpeed : this.maxWalkSpeed;
+    human.maxSpeed = human.timeFleeing > 0 ? this.maxRunSpeed : this.maxWalkSpeed;
     human.xSpeed = 0;
     human.ySpeed = 0;
   },
@@ -191,13 +183,13 @@ const Humans = {
 
   setupVipText(human) {
     if (!this.vipText) {
-      this.vipText = new PIXI.Text("VIP", {
-        fontFamily: "sans-serif",
+      this.vipText = new PIXI.Text('VIP', {
+        fontFamily: 'sans-serif',
         fontSize: 64,
-        fill: "#FC0",
-        stroke: "#000",
+        fill: '#FC0',
+        stroke: '#000',
         strokeThickness: 5,
-        align: "center",
+        align: 'center'
       });
       this.vipText.anchor = { x: 0.5, y: 1 };
       this.vipText.scale.x = 0.25;
@@ -218,23 +210,19 @@ const Humans = {
       for (var i = 0; i < 6; i++) {
         var animated = [];
         for (var j = 0; j < 3; j++) {
-          animated.push(
-            PIXI.Texture.from("human" + (i + 1) + "_" + (j + 1) + ".png")
-          );
+          animated.push(PIXI.Texture.from('human' + (i + 1) + '_' + (j + 1) + '.png'));
         }
         this.textures.push({
           animated: animated,
-          dead: [PIXI.Texture.from("human" + (i + 1) + "_dead.png")],
+          dead: [PIXI.Texture.from('human' + (i + 1) + '_dead.png')]
         });
       }
     }
     if (this.doctorTextures.length == 0) {
       for (var i = 0; i < 3; i++) {
-        this.doctorTextures.push(
-          PIXI.Texture.from("doctor" + (i + 1) + ".png")
-        );
+        this.doctorTextures.push(PIXI.Texture.from('doctor' + (i + 1) + '.png'));
       }
-      this.doctorDeadTexture = [PIXI.Texture.from("doctor4.png")];
+      this.doctorDeadTexture = [PIXI.Texture.from('doctor4.png')];
     }
 
     if (this.humans.length > 0) {
@@ -327,7 +315,7 @@ const Humans = {
       human.attackTimer = this.attackSpeed;
       human.scale = {
         x: Math.random() > 0.5 ? this.scaling : -1 * this.scaling,
-        y: this.scaling,
+        y: this.scaling
       };
       this.humans.push(human);
       characterContainer.addChild(human);
@@ -450,7 +438,7 @@ const Humans = {
         human.maxSpeed = this.maxRunSpeed;
         human.target = this.escapeTarget;
         Exclamations.newExclamation(human);
-        GameModel.sendMessage("The VIP is escaping!");
+        GameModel.sendMessage('The VIP is escaping!');
         break;
       case this.states.attacking:
         human.play();
@@ -511,12 +499,7 @@ const Humans = {
         Math.abs(this.aliveHumans[i].y - human.y) < 30
       ) {
         if (Math.random() < 0.3) {
-          Bullets.newBullet(
-            human,
-            this.aliveHumans[i],
-            GameModel.zombieDamage / 2,
-            true
-          );
+          Bullets.newBullet(human, this.aliveHumans[i], GameModel.zombieDamage / 2, true);
         }
       }
     }
@@ -530,10 +513,7 @@ const Humans = {
       human.health += this.attackDamage * 2;
       if (human.health > human.maxHealth) {
         human.health = human.maxHealth;
-        human.speedMod = Math.max(
-          Math.min(1, human.health / human.maxHealth),
-          0.25
-        );
+        human.speedMod = Math.max(Math.min(1, human.health / human.maxHealth), 0.25);
       }
       Exclamations.newHealing(human);
     }
@@ -548,12 +528,8 @@ const Humans = {
         if (Math.abs(this.aliveHumans[i].x - human.x) < healRadius) {
           if (Math.abs(this.aliveHumans[i].y - human.y) < healRadius) {
             if (
-              this.fastDistance(
-                human.x,
-                human.y,
-                this.aliveHumans[i].x,
-                this.aliveHumans[i].y
-              ) < healRadius
+              this.fastDistance(human.x, human.y, this.aliveHumans[i].x, this.aliveHumans[i].y) <
+              healRadius
             ) {
               this.healHuman(this.aliveHumans[i]);
             }
@@ -574,16 +550,12 @@ const Humans = {
     if (human.doctor) this.doHeal(human, timeDiff);
     if (human.burning) this.updateBurns(human, timeDiff);
 
-    if (
-      (!human.zombieTarget || human.zombieTarget.dead) &&
-      human.timeToScan < 0
-    ) {
+    if ((!human.zombieTarget || human.zombieTarget.dead) && human.timeToScan < 0) {
       var count = Humans.scanForZombies(human, aliveZombies);
 
       if (count > 0) {
         if (human.vip) {
-          if (human.state !== this.states.escaping)
-            this.changeState(human, this.states.escaping);
+          if (human.state !== this.states.escaping) this.changeState(human, this.states.escaping);
         } else if (Math.random() < count * this.fleeChancePerZombie) {
           this.changeState(human, this.states.fleeing);
         } else {
@@ -604,12 +576,8 @@ const Humans = {
       case this.states.walking:
       case this.states.fleeing:
         if (
-          this.fastDistance(
-            human.position.x,
-            human.position.y,
-            human.target.x,
-            human.target.y
-          ) < this.moveTargetDistance
+          this.fastDistance(human.position.x, human.position.y, human.target.x, human.target.y) <
+          this.moveTargetDistance
         ) {
           human.target = false;
           human.zombieTarget = false;
@@ -620,19 +588,15 @@ const Humans = {
         break;
       case this.states.escaping:
         if (
-          this.fastDistance(
-            human.position.x,
-            human.position.y,
-            human.target.x,
-            human.target.y
-          ) < this.moveTargetDistance
+          this.fastDistance(human.position.x, human.position.y, human.target.x, human.target.y) <
+          this.moveTargetDistance
         ) {
           Smoke.newDroneCloud(human.x, human.y);
           human.dead = true;
           human.zombieTarget = false;
           human.visible = false;
           this.vipText.visible = false;
-          GameModel.sendMessage("The VIP has escaped!");
+          GameModel.sendMessage('The VIP has escaped!');
           GameModel.vipEscaped();
         } else {
           Humans.updateHumanSpeed(human, timeDiff);
@@ -649,11 +613,7 @@ const Humans = {
           );
           if (distanceToTarget < this.attackDistance) {
             if (human.attackTimer < 0) {
-              Zombies.damageZombie(
-                human.zombieTarget,
-                this.attackDamage,
-                human
-              );
+              Zombies.damageZombie(human.zombieTarget, this.attackDamage, human);
               this.inflictBurn(human, human.zombieTarget);
               human.attackTimer = this.attackSpeed;
             }
@@ -681,7 +641,7 @@ const Humans = {
       }
     }
     return zombieSpottedCount;
-  },
+  }
 };
 
 Police = {
@@ -711,13 +671,13 @@ Police = {
     attacking: 2,
     walking: 3,
     running: 4,
-    standing: 5,
+    standing: 5
   },
 
   dogStates: {
     following: 1,
     attacking: 2,
-    hunting: 3,
+    hunting: 3
   },
 
   isExtraPolice() {
@@ -725,10 +685,7 @@ Police = {
   },
 
   getMaxPolice() {
-    var maxPolice = Math.min(
-      Math.round(this.policePerLevel * GameModel.level),
-      100
-    );
+    var maxPolice = Math.min(Math.round(this.policePerLevel * GameModel.level), 100);
 
     if (GameModel.level < 3) return 0;
 
@@ -750,13 +707,13 @@ Police = {
   populate() {
     if (this.walkTexture.length == 0) {
       for (var i = 0; i < 3; i++) {
-        this.walkTexture.push(PIXI.Texture.from("cop" + (i + 1) + ".png"));
+        this.walkTexture.push(PIXI.Texture.from('cop' + (i + 1) + '.png'));
       }
-      this.deadTexture = [PIXI.Texture.from("cop4.png")];
+      this.deadTexture = [PIXI.Texture.from('cop4.png')];
       for (var i = 0; i < 2; i++) {
-        this.dogTexture.push(PIXI.Texture.from("dog" + (i + 1) + ".png"));
+        this.dogTexture.push(PIXI.Texture.from('dog' + (i + 1) + '.png'));
       }
-      this.deadDogTexture = [PIXI.Texture.from("dogdead.png")];
+      this.deadDogTexture = [PIXI.Texture.from('dogdead.png')];
     }
 
     if (this.police.length > 0) {
@@ -811,7 +768,7 @@ Police = {
       police.attackTimer = this.attackSpeed;
       police.scale = {
         x: Math.random() > 0.5 ? this.scaling : -1 * this.scaling,
-        y: this.scaling,
+        y: this.scaling
       };
       this.police.push(police);
       characterContainer.addChild(police);
@@ -822,7 +779,7 @@ Police = {
     }
 
     if (this.isExtraPolice()) {
-      GameModel.sendMessage("Warning: High Police Activity!");
+      GameModel.sendMessage('Warning: High Police Activity!');
     }
   },
 
@@ -864,7 +821,7 @@ Police = {
     dog.attackTimer = this.attackSpeed;
     dog.scale = {
       x: Math.random() > 0.5 ? this.dogScaling : -1 * this.dogScaling,
-      y: this.dogScaling,
+      y: this.dogScaling
     };
     this.police.push(dog);
     characterContainer.addChild(dog);
@@ -942,12 +899,7 @@ Police = {
         !this.police[i].isDog &&
         (!this.police[i].zombieTarget || this.police[i].zombieTarget.dead)
       ) {
-        var distance = fastDistance(
-          police.x,
-          police.y,
-          this.police[i].x,
-          this.police[i].y
-        );
+        var distance = fastDistance(police.x, police.y, this.police[i].x, this.police[i].y);
         if (distance < closestDistance) {
           closestPolice = this.police[i];
           closestDistance = distance;
@@ -974,10 +926,7 @@ Police = {
     if (police.infected) Humans.updatePlague(police, timeDiff);
     if (police.burning) Humans.updateBurns(police, timeDiff);
 
-    if (
-      (!police.zombieTarget || police.zombieTarget.dead) &&
-      police.timeToScan < 0
-    ) {
+    if ((!police.zombieTarget || police.zombieTarget.dead) && police.timeToScan < 0) {
       Humans.scanForZombies(police, aliveZombies);
       if (police.zombieTarget && !police.zombieTarget.dead) {
         if (police.radioTime < 0) this.radioForBackup(police);
@@ -997,12 +946,8 @@ Police = {
         break;
       case this.states.walking:
         if (
-          fastDistance(
-            police.position.x,
-            police.position.y,
-            police.target.x,
-            police.target.y
-          ) < this.moveTargetDistance
+          fastDistance(police.position.x, police.position.y, police.target.x, police.target.y) <
+          this.moveTargetDistance
         ) {
           police.target = false;
           police.zombieTarget = false;
@@ -1024,14 +969,9 @@ Police = {
         break;
       case this.states.attacking:
         if (police.zombieTarget && !police.zombieTarget.dead) {
-          police.scale.x =
-            police.zombieTarget.x > police.x ? this.scaling : -this.scaling;
+          police.scale.x = police.zombieTarget.x > police.x ? this.scaling : -this.scaling;
           if (police.attackTimer < 0) {
-            Zombies.damageZombie(
-              police.zombieTarget,
-              this.attackDamage,
-              police
-            );
+            Zombies.damageZombie(police.zombieTarget, this.attackDamage, police);
             police.attackTimer = this.attackSpeed;
           }
         } else {
@@ -1041,8 +981,7 @@ Police = {
         break;
       case this.states.shooting:
         if (police.zombieTarget && !police.zombieTarget.dead) {
-          police.scale.x =
-            police.zombieTarget.x > police.x ? this.scaling : -this.scaling;
+          police.scale.x = police.zombieTarget.x > police.x ? this.scaling : -this.scaling;
           if (police.attackTimer < 0) {
             Bullets.newBullet(police, police.zombieTarget, this.attackDamage);
             police.attackTimer = this.attackSpeed;
@@ -1057,8 +996,7 @@ Police = {
   updateDogSpeed(dog, timeDiff) {
     // dog.speedMod = 1;
     Humans.updateHumanSpeed(dog, timeDiff);
-    if (Math.abs(dog.xSpeed) > 1)
-      dog.scale.x = dog.xSpeed > 0 ? this.dogScaling : -this.dogScaling;
+    if (Math.abs(dog.xSpeed) > 1) dog.scale.x = dog.xSpeed > 0 ? this.dogScaling : -this.dogScaling;
   },
   updatePoliceDog(dog, timeDiff, aliveZombies) {
     if (dog.dead) return Humans.updateDeadHumanFading(dog, timeDiff);
@@ -1085,12 +1023,8 @@ Police = {
         }
         dog.target = dog.owner;
         if (
-          fastDistance(
-            dog.position.x,
-            dog.position.y,
-            dog.target.x,
-            dog.target.y
-          ) < this.moveTargetDistance
+          fastDistance(dog.position.x, dog.position.y, dog.target.x, dog.target.y) <
+          this.moveTargetDistance
         ) {
           dog.followTimer = Math.random() * 3;
           dog.gotoAndStop(0);
@@ -1105,15 +1039,10 @@ Police = {
       case this.dogStates.attacking:
         if (dog.zombieTarget && !dog.zombieTarget.dead) {
           if (
-            fastDistance(
-              dog.position.x,
-              dog.position.y,
-              dog.zombieTarget.x,
-              dog.zombieTarget.y
-            ) < this.moveTargetDistance
+            fastDistance(dog.position.x, dog.position.y, dog.zombieTarget.x, dog.zombieTarget.y) <
+            this.moveTargetDistance
           ) {
-            dog.scale.x =
-              dog.target.x > dog.x ? this.dogScaling : -this.dogScaling;
+            dog.scale.x = dog.target.x > dog.x ? this.dogScaling : -this.dogScaling;
             if (dog.attackTimer < 0) {
               Zombies.damageZombie(dog.target, this.attackDamage, dog);
               dog.target.dogStun = 1;
@@ -1127,10 +1056,7 @@ Police = {
           dog.state = this.dogStates.following;
         }
       case this.dogStates.hunting:
-        if (
-          (!dog.zombieTarget || dog.zombieTarget.dead) &&
-          dog.timeToScan < 0
-        ) {
+        if ((!dog.zombieTarget || dog.zombieTarget.dead) && dog.timeToScan < 0) {
           Humans.scanForZombies(dog, aliveZombies);
           if (dog.zombieTarget) {
             dog.state = this.dogStates.attacking;
@@ -1138,16 +1064,12 @@ Police = {
         }
 
         if (
-          fastDistance(
-            dog.position.x,
-            dog.position.y,
-            dog.target.x,
-            dog.target.y
-          ) < this.moveTargetDistance
+          fastDistance(dog.position.x, dog.position.y, dog.target.x, dog.target.y) <
+          this.moveTargetDistance
         ) {
           dog.target = {
             x: Math.random() * gameFieldSize.x,
-            y: Math.random() * gameFieldSize.y,
+            y: Math.random() * gameFieldSize.y
           };
           dog.maxSpeed = this.maxRunSpeed;
         } else {
@@ -1155,7 +1077,7 @@ Police = {
         }
         break;
     }
-  },
+  }
 };
 
 Army = {
@@ -1184,7 +1106,7 @@ Army = {
     attacking: 2,
     walking: 3,
     running: 4,
-    standing: 5,
+    standing: 5
   },
 
   isExtraArmy() {
@@ -1192,10 +1114,7 @@ Army = {
   },
 
   getMaxArmy() {
-    var maxArmy = Math.min(
-      Math.round(this.armyPerLevel * GameModel.level),
-      100
-    );
+    var maxArmy = Math.min(Math.round(this.armyPerLevel * GameModel.level), 100);
 
     if (GameModel.level < 11) return 0;
 
@@ -1225,13 +1144,11 @@ Army = {
       for (var i = 0; i < 3; i++) {
         var animated = [];
         for (var j = 0; j < 3; j++) {
-          animated.push(
-            PIXI.Texture.from("army" + (i + 1) + "_" + (j + 1) + ".png")
-          );
+          animated.push(PIXI.Texture.from('army' + (i + 1) + '_' + (j + 1) + '.png'));
         }
         this.textures.push({
           animated: animated,
-          dead: [PIXI.Texture.from("army" + (i + 1) + "_dead.png")],
+          dead: [PIXI.Texture.from('army' + (i + 1) + '_dead.png')]
         });
       }
     }
@@ -1307,14 +1224,14 @@ Army = {
       armyman.attackingGraveyard = false;
       armyman.scale = {
         x: Math.random() > 0.5 ? this.scaling : -1 * this.scaling,
-        y: this.scaling,
+        y: this.scaling
       };
       this.armymen.push(armyman);
       characterContainer.addChild(armyman);
     }
 
     if (this.isExtraArmy()) {
-      GameModel.sendMessage("Warning: High Military Activity!");
+      GameModel.sendMessage('Warning: High Military Activity!');
     }
   },
 
@@ -1353,10 +1270,7 @@ Army = {
         return;
       }
 
-      if (
-        distanceToTarget > this.shootDistance * 1.2 &&
-        armyman.rocketlauncher
-      ) {
+      if (distanceToTarget > this.shootDistance * 1.2 && armyman.rocketlauncher) {
         this.changeState(armyman, this.states.running);
         return;
       }
@@ -1401,19 +1315,12 @@ Army = {
     if (armyman.infected) Humans.updatePlague(armyman, timeDiff);
     if (armyman.burning) Humans.updateBurns(armyman, timeDiff);
 
-    if (
-      (!armyman.zombieTarget || armyman.zombieTarget.dead) &&
-      armyman.timeToScan < 0
-    ) {
+    if ((!armyman.zombieTarget || armyman.zombieTarget.dead) && armyman.timeToScan < 0) {
       var zombies = Humans.scanForZombies(armyman, aliveZombies);
       if (zombies > 3 && this.droneActive && this.droneStrikeTimer < 0) {
         this.callDroneStrike(armyman, aliveZombies);
       }
-      if (
-        this.assaultStarted &&
-        armyman.rocketlauncher &&
-        Math.random() > 0.98
-      ) {
+      if (this.assaultStarted && armyman.rocketlauncher && Math.random() > 0.98) {
         armyman.zombieTarget = Graveyard.target;
         armyman.attackingGraveyard = true;
       }
@@ -1432,12 +1339,8 @@ Army = {
         break;
       case this.states.walking:
         if (
-          fastDistance(
-            armyman.position.x,
-            armyman.position.y,
-            armyman.target.x,
-            armyman.target.y
-          ) < this.moveTargetDistance
+          fastDistance(armyman.position.x, armyman.position.y, armyman.target.x, armyman.target.y) <
+          this.moveTargetDistance
         ) {
           armyman.target = false;
           armyman.zombieTarget = false;
@@ -1457,14 +1360,9 @@ Army = {
         break;
       case this.states.attacking:
         if (armyman.zombieTarget && !armyman.zombieTarget.dead) {
-          armyman.scale.x =
-            armyman.zombieTarget.x > armyman.x ? this.scaling : -this.scaling;
+          armyman.scale.x = armyman.zombieTarget.x > armyman.x ? this.scaling : -this.scaling;
           if (armyman.attackTimer < 0) {
-            Zombies.damageZombie(
-              armyman.zombieTarget,
-              this.attackDamage,
-              armyman
-            );
+            Zombies.damageZombie(armyman.zombieTarget, this.attackDamage, armyman);
             armyman.attackTimer = this.attackSpeed;
           }
         } else {
@@ -1474,8 +1372,7 @@ Army = {
         break;
       case this.states.shooting:
         if (armyman.zombieTarget && !armyman.zombieTarget.dead) {
-          armyman.scale.x =
-            armyman.zombieTarget.x > armyman.x ? this.scaling : -this.scaling;
+          armyman.scale.x = armyman.zombieTarget.x > armyman.x ? this.scaling : -this.scaling;
           if (armyman.attackTimer < 0) {
             armyman.shotsLeft = this.shotsPerBurst;
             if (armyman.minigun) {
@@ -1558,7 +1455,7 @@ Army = {
         caller: armyman,
         target: armyman.zombieTarget,
         timer: 3,
-        bombsLeft: 3,
+        bombsLeft: 3
       };
     }
   },
@@ -1601,13 +1498,13 @@ Army = {
 
       if (!this.droneStrike.startedBombing) {
         if (!this.droneStrike.text) {
-          this.droneStrike.text = new PIXI.Text("3", {
-            fontFamily: "sans-serif",
+          this.droneStrike.text = new PIXI.Text('3', {
+            fontFamily: 'sans-serif',
             fontSize: 40,
-            fill: "#F00",
-            stroke: "#000",
+            fill: '#F00',
+            stroke: '#000',
             strokeThickness: 0,
-            align: "center",
+            align: 'center'
           });
           this.droneStrike.text.anchor = { x: 0.5, y: 1 };
           this.droneStrike.text.scale.x = 0.5;
@@ -1623,14 +1520,8 @@ Army = {
 
         this.droneStrike.laser.clear();
         this.droneStrike.laser.lineStyle(1, 0xff0000);
-        this.droneStrike.laser.moveTo(
-          this.droneStrike.caller.x,
-          this.droneStrike.caller.y - 10
-        );
-        this.droneStrike.laser.lineTo(
-          this.droneStrike.target.x,
-          this.droneStrike.target.y - 10
-        );
+        this.droneStrike.laser.moveTo(this.droneStrike.caller.x, this.droneStrike.caller.y - 10);
+        this.droneStrike.laser.lineTo(this.droneStrike.target.x, this.droneStrike.target.y - 10);
       }
 
       if (
@@ -1658,7 +1549,7 @@ Army = {
         }
       }
     }
-  },
+  }
 };
 
 Tanks = {
@@ -1677,12 +1568,12 @@ Tanks = {
   states: {
     shooting: 1,
     attacking: 2,
-    patrolling: 3,
+    patrolling: 3
   },
 
   directions: {
     horizontal: 1,
-    vertical: 2,
+    vertical: 2
   },
 
   getMaxTanks() {
@@ -1705,15 +1596,15 @@ Tanks = {
       this.textures = {
         vertical: [],
         horizontal: [],
-        turret: [],
+        turret: []
       };
       for (var i = 0; i < 2; i++) {
-        this.textures.horizontal.push(PIXI.Texture.from("tank" + i + ".png"));
+        this.textures.horizontal.push(PIXI.Texture.from('tank' + i + '.png'));
       }
       for (var i = 2; i < 4; i++) {
-        this.textures.vertical.push(PIXI.Texture.from("tank" + i + ".png"));
+        this.textures.vertical.push(PIXI.Texture.from('tank' + i + '.png'));
       }
-      this.textures.turret = PIXI.Texture.from("tank4.png");
+      this.textures.turret = PIXI.Texture.from('tank4.png');
     }
 
     if (this.tanks.length > 0) {
@@ -1819,12 +1710,8 @@ Tanks = {
         }
 
         if (
-          fastDistance(
-            tank.position.x,
-            tank.position.y,
-            tank.target.x,
-            tank.target.y
-          ) < this.moveTargetDistance
+          fastDistance(tank.position.x, tank.position.y, tank.target.x, tank.target.y) <
+          this.moveTargetDistance
         ) {
           tank.target = false;
           tank.zombieTarget = false;
@@ -1843,13 +1730,7 @@ Tanks = {
         if (tank.zombieTarget && !tank.zombieTarget.dead) {
           if (tank.attackTimer < 0) {
             tank.attackTimer = this.attackSpeed;
-            Bullets.newBullet(
-              tank,
-              tank.zombieTarget,
-              this.attackDamage,
-              false,
-              true
-            );
+            Bullets.newBullet(tank, tank.zombieTarget, this.attackDamage, false, true);
           }
         } else {
           this.changeState(tank, this.states.patrolling);
@@ -1879,8 +1760,7 @@ Tanks = {
     }
     if (tank.zombieTarget) {
       var targetAngle =
-        Math.atan2(tank.zombieTarget.x - tank.x, tank.y - tank.zombieTarget.y) +
-        Math.PI / 2;
+        Math.atan2(tank.zombieTarget.x - tank.x, tank.y - tank.zombieTarget.y) + Math.PI / 2;
       if (tank.turretSprite.rotation > targetAngle) {
         tank.turretSprite.rotation -= timeDiff * 2;
       } else {
@@ -1921,6 +1801,6 @@ Tanks = {
         break;
     }
     tank.state = state;
-  },
+  }
 };
 export default Humans;

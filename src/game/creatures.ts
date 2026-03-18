@@ -16,14 +16,14 @@ Creatures = {
   scanTime: 3,
   creatureTypes: CreatureFactory.types,
   golemTextures: {
-    set: false,
+    set: false
   },
   directions: {
     down: 1,
     up: 2,
     right: 3,
     left: 4,
-    dead: 5,
+    dead: 5
   },
   burnTickTimer: 5,
   smokeTimer: 0.3,
@@ -38,9 +38,9 @@ Creatures = {
   healZombie: Zombies.healZombie,
 
   states: {
-    lookingForTarget: "lookingForTarget",
-    movingToTarget: "movingToTarget",
-    attackingTarget: "attackingTarget",
+    lookingForTarget: 'lookingForTarget',
+    movingToTarget: 'movingToTarget',
+    attackingTarget: 'attackingTarget'
   },
 
   populate() {
@@ -52,15 +52,15 @@ Creatures = {
       this.golemTextures.right = [];
       this.golemTextures.dead = [];
       for (var i = 0; i < 3; i++) {
-        this.golemTextures.down.push(PIXI.Texture.from("golem" + i + ".png"));
+        this.golemTextures.down.push(PIXI.Texture.from('golem' + i + '.png'));
       }
       for (var i = 3; i < 6; i++) {
-        this.golemTextures.up.push(PIXI.Texture.from("golem" + i + ".png"));
+        this.golemTextures.up.push(PIXI.Texture.from('golem' + i + '.png'));
       }
       for (var i = 6; i < 9; i++) {
-        this.golemTextures.right.push(PIXI.Texture.from("golem" + i + ".png"));
+        this.golemTextures.right.push(PIXI.Texture.from('golem' + i + '.png'));
       }
-      this.golemTextures.dead.push(PIXI.Texture.from("golem9.png"));
+      this.golemTextures.dead.push(PIXI.Texture.from('golem9.png'));
       this.golemTextures.set = true;
     }
 
@@ -136,7 +136,7 @@ Creatures = {
     creature.anchor = { x: 8.5 / 16, y: 1 };
     creature.position = {
       x: this.graveyard.sprite.x,
-      y: this.graveyard.sprite.y + (this.graveyard.level > 2 ? 8 : 0),
+      y: this.graveyard.sprite.y + (this.graveyard.level > 2 ? 8 : 0)
     };
     creature.target = false;
     creature.zIndex = creature.position.y;
@@ -148,7 +148,7 @@ Creatures = {
     creature.scaling = this.scaling;
     creature.scale = {
       x: creature.scaling,
-      y: creature.scaling,
+      y: creature.scaling
     };
     creature.abilityTime = Math.random() * 4;
     creature.attackTimer = 0;
@@ -192,7 +192,7 @@ Creatures = {
           this.creatureCount[this.creatures[i].creatureType]++;
           this.model.persistentData.savedCreatures.push({
             t: this.creatures[i].creatureType,
-            l: this.creatures[i].level,
+            l: this.creatures[i].level
           });
         }
       }
@@ -256,7 +256,7 @@ Creatures = {
           creature.position.x,
           creature.position.y,
           creature.target.x,
-          creature.target.y,
+          creature.target.y
         );
 
         if (distanceToHumanTarget < this.attackDistance) {
@@ -264,10 +264,7 @@ Creatures = {
           break;
         }
 
-        if (
-          distanceToHumanTarget > this.attackDistance * 3 &&
-          creature.scanTime < 0
-        ) {
+        if (distanceToHumanTarget > this.attackDistance * 3 && creature.scanTime < 0) {
           this.searchClosestTarget(creature);
         }
         this.updateCreatureSpeed(creature, timeDiff);
@@ -279,20 +276,16 @@ Creatures = {
           creature.position.x,
           creature.position.y,
           creature.target.x,
-          creature.target.y,
+          creature.target.y
         );
         if (distanceToTarget < this.attackDistance) {
-          creature.scale.x =
-            creature.target.x > creature.x
-              ? creature.scaling
-              : -creature.scaling;
+          creature.scale.x = creature.target.x > creature.x ? creature.scaling : -creature.scaling;
           if (creature.attackTimer < 0) {
             Humans.damageHuman(creature.target, this.calculateDamage(creature));
             if (creature.creatureType == this.creatureTypes.fireGolem) {
               Humans.burnHuman(creature.target, creature.attackDamage / 2);
             }
-            creature.attackTimer =
-              this.attackSpeed * this.model.runeEffects.attackSpeed;
+            creature.attackTimer = this.attackSpeed * this.model.runeEffects.attackSpeed;
             if (creature.burning) {
               creature.attackTimer *= 1 / this.model.burningSpeedMod;
             }
@@ -360,10 +353,7 @@ Creatures = {
     }
     creature.targetTimer -= timeDiff;
     if (creature.targetTimer <= 0) {
-      creature.targetVector = this.map.howDoIGetToMyTarget(
-        creature,
-        creature.target,
-      );
+      creature.targetVector = this.map.howDoIGetToMyTarget(creature, creature.target);
       creature.targetTimer = 0.2;
     }
 
@@ -392,9 +382,7 @@ Creatures = {
   golemTaunt(creature) {
     for (var i = 0; i < this.aliveHumans.length; i++) {
       if (Math.abs(this.aliveHumans[i].x - creature.x) < this.targetDistance) {
-        if (
-          Math.abs(this.aliveHumans[i].y - creature.y) < this.targetDistance
-        ) {
+        if (Math.abs(this.aliveHumans[i].y - creature.y) < this.targetDistance) {
           if (!this.aliveHumans[i].vip) {
             this.aliveHumans[i].zombieTarget = creature;
             this.aliveHumans[i].target = creature;
@@ -408,9 +396,7 @@ Creatures = {
     var healingDone = creature.attackDamage;
     for (var i = 0; i < this.aliveZombies.length; i++) {
       if (Math.abs(this.aliveZombies[i].x - creature.x) < this.targetDistance) {
-        if (
-          Math.abs(this.aliveZombies[i].y - creature.y) < this.targetDistance
-        ) {
+        if (Math.abs(this.aliveZombies[i].y - creature.y) < this.targetDistance) {
           this.healZombie(this.aliveZombies[i], healingDone);
         }
       }
@@ -418,9 +404,7 @@ Creatures = {
     for (var i = 0; i < this.creatures.length; i++) {
       if (!this.creatures[i].dead && this.creatures[i].visible) {
         if (Math.abs(this.creatures[i].x - creature.x) < this.targetDistance) {
-          if (
-            Math.abs(this.creatures[i].y - creature.y) < this.targetDistance
-          ) {
+          if (Math.abs(this.creatures[i].y - creature.y) < this.targetDistance) {
             this.healZombie(this.creatures[i], healingDone);
           }
         }
@@ -432,12 +416,8 @@ Creatures = {
     var fireBalls = 5;
     for (var i = 0; i < this.aliveHumans.length; i++) {
       if (fireBalls > 0) {
-        if (
-          Math.abs(this.aliveHumans[i].x - creature.x) < this.targetDistance
-        ) {
-          if (
-            Math.abs(this.aliveHumans[i].y - creature.y) < this.targetDistance
-          ) {
+        if (Math.abs(this.aliveHumans[i].x - creature.x) < this.targetDistance) {
+          if (Math.abs(this.aliveHumans[i].y - creature.y) < this.targetDistance) {
             fireBalls--;
             Bullets.newBullet(
               creature,
@@ -445,11 +425,11 @@ Creatures = {
               creature.attackDamage / 2,
               false,
               false,
-              true,
+              true
             );
           }
         }
       }
     }
-  },
+  }
 };

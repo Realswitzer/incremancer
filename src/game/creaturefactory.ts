@@ -24,7 +24,7 @@ const CreatureFactory = {
     earthGolem: 1,
     airGolem: 2,
     fireGolem: 3,
-    waterGolem: 4,
+    waterGolem: 4
   } as const,
 
   creatureScaling: 1.75,
@@ -41,28 +41,23 @@ const CreatureFactory = {
         }
       } else {
         if (
-          typeof creatureCount[this.creatures[i].type] !== "undefined" &&
+          typeof creatureCount[this.creatures[i].type] !== 'undefined' &&
           creatureCount[this.creatures[i].type] < this.creatures[i].autobuild
         ) {
           this.startBuilding(this.creatures[i]);
         }
       }
       if (GameModel.persistentData.creatureLevels[this.creatures[i].id])
-        this.creatures[i].level =
-          GameModel.persistentData.creatureLevels[this.creatures[i].id];
+        this.creatures[i].level = GameModel.persistentData.creatureLevels[this.creatures[i].id];
     }
   },
 
   purchasePrice(creature: Creature): number {
-    return (
-      creature.baseCost * Math.pow(this.creatureCostScaling, creature.level - 1)
-    );
+    return creature.baseCost * Math.pow(this.creatureCostScaling, creature.level - 1);
   },
 
   levelPrice(creature: Creature): number {
-    return (
-      creature.baseCost * Math.pow(this.creatureCostScaling, creature.level) * 5
-    );
+    return creature.baseCost * Math.pow(this.creatureCostScaling, creature.level) * 5;
   },
 
   levelCreature(creature: Creature): void {
@@ -94,10 +89,7 @@ const CreatureFactory = {
     if (!this.canAffordCreature(creature)) {
       return;
     }
-    if (
-      this.creaturesBuildingCount() + GameModel.creatureCount >=
-      GameModel.creatureLimit
-    ) {
+    if (this.creaturesBuildingCount() + GameModel.creatureCount >= GameModel.creatureLimit) {
       return;
     }
     creature.building = true;
@@ -108,8 +100,7 @@ const CreatureFactory = {
   creatureAutoBuildNumber(creature, number) {
     if (creature.autobuild + number >= 0) {
       creature.autobuild += number;
-      GameModel.persistentData.creatureAutobuild[creature.id] =
-        creature.autobuild;
+      GameModel.persistentData.creatureAutobuild[creature.id] = creature.autobuild;
     }
   },
 
@@ -135,13 +126,7 @@ const CreatureFactory = {
       creature.baseDamage *
       Math.pow(this.creatureScaling, creature.level - 1) *
       GameModel.golemDamagePCMod;
-    Creatures.spawnCreature(
-      health,
-      damage,
-      creature.speed,
-      creature.type,
-      creature.level
-    );
+    Creatures.spawnCreature(health, damage, creature.speed, creature.type, creature.level);
   },
 
   spawnSavedCreatures() {
@@ -151,9 +136,7 @@ const CreatureFactory = {
         creaturesSpawned++;
         if (creaturesSpawned <= GameModel.creatureLimit) {
           var savedCreature = GameModel.persistentData.savedCreatures[i];
-          var creature = this.creatures.filter(
-            (c) => c.type == savedCreature.t
-          )[0];
+          var creature = this.creatures.filter((c) => c.type == savedCreature.t)[0];
           creature.level = savedCreature.l;
           this.spawnCreature(creature);
         }
@@ -174,9 +157,7 @@ const CreatureFactory = {
           creature.baseDamage *
           Math.pow(this.creatureScaling, creature.level - 1) *
           GameModel.golemDamagePCMod,
-        cost:
-          creature.baseCost *
-          Math.pow(this.creatureCostScaling, creature.level - 1),
+        cost: creature.baseCost * Math.pow(this.creatureCostScaling, creature.level - 1)
       },
       nextLevel: {
         level: creature.level + 1,
@@ -188,56 +169,54 @@ const CreatureFactory = {
           creature.baseDamage *
           Math.pow(this.creatureScaling, creature.level) *
           GameModel.golemDamagePCMod,
-        cost:
-          creature.baseCost *
-          Math.pow(this.creatureCostScaling, creature.level),
-      },
+        cost: creature.baseCost * Math.pow(this.creatureCostScaling, creature.level)
+      }
     };
   },
 
-  Creature = Creature,
+  Creature = Creature
 };
 
 CreatureFactory.creatures = [
   new CreatureFactory.Creature(
     1,
     CreatureFactory.types.earthGolem,
-    "Earth Golem",
+    'Earth Golem',
     3000,
     75,
     30,
     800,
-    "A golem born from rocks and mud, able to take a lot of punishment and taunt enemies to attack it"
+    'A golem born from rocks and mud, able to take a lot of punishment and taunt enemies to attack it'
   ),
   new CreatureFactory.Creature(
     2,
     CreatureFactory.types.airGolem,
-    "Air Golem",
+    'Air Golem',
     1200,
     110,
     45,
     900,
-    "A fast moving golem able to cover large distances and chase targets down"
+    'A fast moving golem able to cover large distances and chase targets down'
   ),
   new CreatureFactory.Creature(
     3,
     CreatureFactory.types.fireGolem,
-    "Fire Golem",
+    'Fire Golem',
     1200,
     130,
     32,
     1000,
-    "A fireball spewing golem that ignites everything it touches"
+    'A fireball spewing golem that ignites everything it touches'
   ),
   new CreatureFactory.Creature(
     4,
     CreatureFactory.types.waterGolem,
-    "Water Golem",
+    'Water Golem',
     1500,
     90,
     30,
     1100,
-    "A calming golem that restores health to nearby units"
-  ),
+    'A calming golem that restores health to nearby units'
+  )
 ];
 export default CreatureFactory;

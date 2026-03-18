@@ -15,7 +15,7 @@ export function fastDistance(x1, y1, x2, y2) {
 export function RotateVector2d(x, y, radians) {
   return {
     x: x * Math.cos(radians) - y * Math.sin(radians),
-    y: x * Math.sin(radians) + y * Math.cos(radians),
+    y: x * Math.sin(radians) + y * Math.cos(radians)
   };
 }
 
@@ -40,55 +40,42 @@ export function formatWhole(input) {
 
 export function formatNumber(input, decimals) {
   if (!input) input = 0;
-  if (input >= 1000000000000000)
-    return input.toExponential(decimals).replace("+", "");
-  if (input >= 1000000000000)
-    return (input / 1000000000000).toFixed(decimals) + "T";
-  if (input >= 1000000000) return (input / 1000000000).toFixed(decimals) + "B";
-  if (input >= 1000000) return (input / 1000000).toFixed(decimals) + "M";
-  if (input >= 1000) return (input / 1000).toFixed(decimals) + "K";
+  if (input >= 1000000000000000) return input.toExponential(decimals).replace('+', '');
+  if (input >= 1000000000000) return (input / 1000000000000).toFixed(decimals) + 'T';
+  if (input >= 1000000000) return (input / 1000000000).toFixed(decimals) + 'B';
+  if (input >= 1000000) return (input / 1000000).toFixed(decimals) + 'M';
+  if (input >= 1000) return (input / 1000).toFixed(decimals) + 'K';
 
   return input.toFixed(decimals);
 }
 
-export function getMaxUpgrades(
-  basePrice,
-  exponent,
-  numberOwned,
-  resourcesOwned
-) {
+export function getMaxUpgrades(basePrice, exponent, numberOwned, resourcesOwned) {
   if (exponent == 1) {
     return Math.floor(resourcesOwned / basePrice);
   }
   return Math.floor(
     Math.log(
-      (resourcesOwned * (exponent - 1)) /
-        (basePrice * Math.pow(exponent, numberOwned)) +
-        1
+      (resourcesOwned * (exponent - 1)) / (basePrice * Math.pow(exponent, numberOwned)) + 1
     ) / Math.log(exponent)
   );
 }
 
-export function getCostForUpgrades(
-  basePrice,
-  exponent,
-  numberOwned,
-  numberToBuy
-) {
+export function getCostForUpgrades(basePrice, exponent, numberOwned, numberToBuy) {
   if (exponent == 1) {
     return basePrice * numberToBuy;
   }
   return (
     basePrice *
-    ((Math.pow(exponent, numberOwned) * (Math.pow(exponent, numberToBuy) - 1)) /
-      (exponent - 1))
+    ((Math.pow(exponent, numberOwned) * (Math.pow(exponent, numberToBuy) - 1)) / (exponent - 1))
   );
 }
 
 export function moveToolTip(event, element) {
-  var menuRect = document.getElementById("champ-hold").getBoundingClientRect();
+  var menuRect = document.getElementById('champ-hold').getBoundingClientRect();
   var x = event.clientX - menuRect.x;
   var y = event.clientY - menuRect.y;
-  element.getElementsByClassName("tooltip")[0].style.top = y + 20 + "px";
-  element.getElementsByClassName("tooltip")[0].style.left = x + 20 + "px";
+  element.getElementsByClassName('tooltip')[0].style.top = y + 20 + 'px';
+  element.getElementsByClassName('tooltip')[0].style.left = x + 20 + 'px';
 }
+
+export { format2Places as decimal, formatWhole as whole };

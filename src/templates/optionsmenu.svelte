@@ -1,7 +1,10 @@
-<div class="shop" ng-if="sidePanels.options">
+<div
+  class="shop"
+  ng-if="sidePanels.options"
+>
   <div class="shop-title">
     <h2>Options</h2>
-    <button on:click={closeSidePanels();}>Close</button>
+    <button on:click={closeSidePanels()}>Close</button>
   </div>
   <div class="upgrades">
     <div class="upgrade">
@@ -13,11 +16,11 @@
     <div class="upgrade">
       <h4>Auto Start Next Level</h4>
       <p>
-        Automatically start the next level after 3 seconds. If you want to play
-        without actually playing.
+        Automatically start the next level after 3 seconds. If you want to play without actually
+        playing.
       </p>
-      <button on:click={toggleAutoStart();}>
-        {model.persistentData.autoStart ? "On" : "Off"}
+      <button on:click={toggleAutoStart()}>
+        {model.persistentData.autoStart ? 'On' : 'Off'}
       </button>
     </div>
     <div class="upgrade">
@@ -26,24 +29,23 @@
       <p>50% will run better on slower hardware but may look blurry.</p>
       <p>100% will pixel match the resolution reported by your browser.</p>
       <p>
-        200% will double the reported values which may look better on retina
-        devices or smartphones.
+        200% will double the reported values which may look better on retina devices or smartphones.
       </p>
       <button
         on:click={toggleResolution(0.5)}
-        class="{getResolution() == 0.5 ? 'active' : ''}"
+        class={getResolution() == 0.5 ? 'active' : ''}
       >
         50%
       </button>
       <button
         on:click={toggleResolution(1)}
-        class="{getResolution() == 1 ? 'active' : ''}"
+        class={getResolution() == 1 ? 'active' : ''}
       >
         100%
       </button>
       <button
         on:click={toggleResolution(2)}
-        class="{getResolution() == 2 ? 'active' : ''}"
+        class={getResolution() == 2 ? 'active' : ''}
       >
         200%
       </button>
@@ -51,60 +53,57 @@
     <div class="upgrade">
       <h4>Particle Effects</h4>
       <p>Disable particles like blood and smoke to improve performance</p>
-      <button on:click={toggleParticles();}>
-        {model.persistentData.particles ? "On" : "Off"}
+      <button on:click={toggleParticles()}>
+        {model.persistentData.particles ? 'On' : 'Off'}
       </button>
     </div>
-    <div class="upgrade" ng-if="model.deferredPrompt">
+    <div
+      class="upgrade"
+      ng-if="model.deferredPrompt"
+    >
       <h4>Add to Home Screen</h4>
       <p>
-        You can add this game to your smartphones home screen without having to
-        install anything.
+        You can add this game to your smartphones home screen without having to install anything.
       </p>
-      <button on:click={addToHomeScreen();}>Add to Home Screen</button>
+      <button on:click={addToHomeScreen()}>Add to Home Screen</button>
     </div>
     <div class="upgrade">
       <h4>Toggle Full Screen</h4>
       <p>Toggle full screen mode. Can be helpful on smaller screen devices.</p>
-      <button on:click={model.toggleFullscreen();}>
-        Toggle Full Screen
-      </button>
+      <button on:click={model.toggleFullscreen()}> Toggle Full Screen </button>
     </div>
     <div class="upgrade">
       <h4>Show Zoom Buttons</h4>
       <p>
-        If you're unable to zoom with other methods this will add some buttons
-        to the screen for zooming the map.
+        If you're unable to zoom with other methods this will add some buttons to the screen for
+        zooming the map.
       </p>
-      <button on:click={toggleZoomButtons();}>
-        {model.persistentData.zoomButtons ? "On" : "Off"}
+      <button on:click={toggleZoomButtons()}>
+        {model.persistentData.zoomButtons ? 'On' : 'Off'}
       </button>
     </div>
     <div class="upgrade">
       <h4>Show Framerate Counter</h4>
       <p>Used for performance testing</p>
-      <button on:click={toggleShowFps();}>
-        {model.persistentData.showfps ? "On" : "Off"}
+      <button on:click={toggleShowFps()}>
+        {model.persistentData.showfps ? 'On' : 'Off'}
       </button>
     </div>
     <div class="upgrade">
       <h4>Manage Save</h4>
       <p>Import or export a saved game</p>
       <label class="blood"
-        >Warning: Importing a save game will overwrite your current
-        progress</label
+        >Warning: Importing a save game will overwrite your current progress</label
       >
       <a
         ng-if="model.encodedContent"
-        href="{model.encodedContent}"
-        download="{model.savefilename}"
+        href={model.encodedContent}
+        download={model.savefilename}
         class="button"
       >
         <button>Download Save File</button>
       </a>
-      <button on:click={document.getElementById('import-file').click()}>
-        Import Save
-      </button>
+      <button on:click={document.getElementById('import-file').click()}> Import Save </button>
       <input
         type="file"
         id="import-file"
@@ -117,11 +116,8 @@
     </div>
     <div class="upgrade">
       <h4>Reset Game</h4>
-      <p>
-        This will reset all save data if you want to start from the very
-        beginning again.
-      </p>
-      <button on:click={resetGame();}>Reset Game</button>
+      <p>This will reset all save data if you want to start from the very beginning again.</p>
+      <button on:click={resetGame()}>Reset Game</button>
     </div>
   </div>
 </div>

@@ -1,5 +1,5 @@
-import { gameModel } from "./gameModel";
-import { default as upgrades } from "./upgrades";
+import { gameModel } from './gameModel';
+import { default as upgrades } from './upgrades';
 
 export interface TrophyStat {
   type: string;
@@ -19,7 +19,7 @@ export class Trophies {
     { type: upgrades.types.brainsRate, value: 2 },
     { type: upgrades.types.zombieHealthPC, value: 0.02, percentage: true },
     { type: upgrades.types.bonesRate, value: 2 },
-    { type: upgrades.types.zombieDmgPC, value: 0.02, percentage: true },
+    { type: upgrades.types.zombieDmgPC, value: 0.02, percentage: true }
   ];
 
   isPercentage(type: string): boolean {
@@ -47,7 +47,7 @@ export class Trophies {
       effect: trophy.value * (multiplier + 1),
       rank: 1,
       owned,
-      escaped,
+      escaped
     };
   }
 
@@ -62,9 +62,9 @@ export class Trophies {
       gameModel.saveData();
       upgrades.applyUpgrades();
 
-      gameModel.sendMessage("The VIP has been killed! - New Trophy Acquired");
+      gameModel.sendMessage('The VIP has been killed! - New Trophy Acquired');
     } else {
-      gameModel.sendMessage("The VIP has been killed!");
+      gameModel.sendMessage('The VIP has been killed!');
     }
   }
 
@@ -82,13 +82,7 @@ export class Trophies {
 
     const trophies = [];
     for (let i = 5; i <= max; i += 5) {
-      trophies.push(
-        this.createTrophy(
-          i,
-          data.trophies.includes(i),
-          data.vipEscaped.includes(i)
-        )
-      );
+      trophies.push(this.createTrophy(i, data.trophies.includes(i), data.vipEscaped.includes(i)));
     }
 
     return trophies;

@@ -1,32 +1,33 @@
 {
-	"name": "incremancer-port",
-	"private": true,
-	"version": "0.0.0",
-	"type": "module",
-	"scripts": {
-		"dev": "vite",
-		"build": "tsc && vite build",
-		"preview": "vite preview",
-		"format": "prettier --plugin-search-dir . --write \"src/**/*\"",
-		"lint": "prettier --check ."
-	},
-	"devDependencies": {
-		"esbuild": "^0.27.2",
-		"eslint": "^10.0.3",
-		"globals": "^17.0.0",
-		"prettier": "^3.8.1",
-		"prettier-plugin-svelte": "^3.4.1",
-		"typescript": "~5.9.3",
-		"vite": "^8.0.0"
-	},
-	"dependencies": {
-		"angular": "1.7.8",
-		"lz-string": "^1.5.0",
-		"pixi.js-legacy": "5.3.8"
-	},
-	"pnpm": {
-		"onlyBuiltDependencies": [
-			"esbuild"
-		]
-	}
+  "name": "incremancer-port",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "format": "prettier --plugin-search-dir . --write \"src/**/*\"",
+    "format:stackblitz": "pnpx prettier@3.3.3 --write \"src/**/*\"",
+    "lint": "prettier --check ."
+  },
+  "devDependencies": {
+    "esbuild": "^0.27.2",
+    "eslint": "^10.0.3",
+    "globals": "^17.0.0",
+    "prettier": "^3.8.1",
+    "prettier-plugin-svelte": "^3.4.1",
+    "typescript": "~5.9.3",
+    "vite": "^8.0.0"
+  },
+  "dependencies": {
+    "angular": "1.7.8",
+    "lz-string": "^1.5.0",
+    "pixi.js-legacy": "5.3.8"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
+  }
 }

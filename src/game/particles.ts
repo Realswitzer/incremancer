@@ -16,7 +16,7 @@ const Particles = {
     Smoke.update(timeDiff);
     Fragments.update(timeDiff);
     PrestigePoints.update(timeDiff);
-  },
+  }
 };
 
 export const PrestigePoints = {
@@ -31,11 +31,11 @@ export const PrestigePoints = {
     if (!this.container) {
       this.container = new PIXI.Container();
       foregroundContainer.addChild(this.container);
-      this.texture = PIXI.Texture.from("pp.png");
+      this.texture = PIXI.Texture.from('pp.png');
     }
 
-    this.targetElement = document.getElementById("prestige-button");
-    this.animElement = document.getElementById("prestige-bg");
+    this.targetElement = document.getElementById('prestige-button');
+    this.animElement = document.getElementById('prestige-bg');
 
     if (this.sprites.length < this.maxParts) {
       for (var i = 0; i < this.maxParts; i++) {
@@ -72,7 +72,7 @@ export const PrestigePoints = {
   updatePart(sprite, timeDiff, target) {
     var vector = ZmMap.normalizeVector({
       x: target.x - sprite.x,
-      y: target.y - sprite.y,
+      y: target.y - sprite.y
     });
     var xDiff = vector.x * 300 - sprite.xSpeed;
     var yDiff = vector.y * 300 - sprite.ySpeed;
@@ -86,9 +86,9 @@ export const PrestigePoints = {
       sprite.y = 100;
       if (this.animElement) {
         var prestigeBg = this.animElement;
-        prestigeBg.classList.toggle("levelup");
+        prestigeBg.classList.toggle('levelup');
         setTimeout(function () {
-          prestigeBg.classList.toggle("levelup");
+          prestigeBg.classList.toggle('levelup');
         }, 3000);
       }
     }
@@ -107,7 +107,7 @@ export const PrestigePoints = {
     sprite.scale = { x: 2, y: 2 };
     sprite.xSpeed = 0;
     sprite.ySpeed = -100;
-  },
+  }
 };
 
 export const Blood = {
@@ -121,10 +121,10 @@ export const Blood = {
   spraySpeed: 20,
   fadeSpeed: 0.7,
   getTexture(color) {
-    var blast = document.createElement("canvas");
+    var blast = document.createElement('canvas');
     blast.width = 1;
     blast.height = 1;
-    var blastCtx = blast.getContext("2d");
+    var blastCtx = blast.getContext('2d');
 
     // draw shape
     blastCtx.fillStyle = color;
@@ -137,8 +137,8 @@ export const Blood = {
       this.container = new PIXI.Container();
       backgroundSpriteContainer.addChild(this.container);
 
-      this.texture = this.getTexture("#ff0000");
-      this.plagueTexture = this.getTexture("#00ff00");
+      this.texture = this.getTexture('#ff0000');
+      this.plagueTexture = this.getTexture('#00ff00');
     }
 
     if (this.sprites.length < this.maxParts) {
@@ -202,8 +202,7 @@ export const Blood = {
     sprite.alpha = 1;
     sprite.scale = { x: 1, y: 1 };
     if (Math.random() > 0.5) sprite.scale = { x: 2, y: 2 };
-    var xSpeed =
-      Math.random() * (plague ? this.spraySpeed * 1.5 : this.spraySpeed);
+    var xSpeed = Math.random() * (plague ? this.spraySpeed * 1.5 : this.spraySpeed);
     sprite.xSpeed = Math.random() > 0.5 ? -1 * xSpeed : xSpeed;
     sprite.ySpeed = -1 * (plague ? this.spraySpeed * 1.5 : this.spraySpeed);
   },
@@ -228,7 +227,7 @@ export const Blood = {
     for (var i = 0; i < this.partsPerSplatter; i++) {
       this.newPart(x, y, true);
     }
-  },
+  }
 };
 
 export const Bones = {
@@ -244,13 +243,13 @@ export const Bones = {
   fadeSpeed: 0.2,
   fadeBones: false,
   getTexture() {
-    var blast = document.createElement("canvas");
+    var blast = document.createElement('canvas');
     blast.width = 4;
     blast.height = 1;
-    var blastCtx = blast.getContext("2d");
+    var blastCtx = blast.getContext('2d');
 
     // draw shape
-    blastCtx.fillStyle = "#dddddd";
+    blastCtx.fillStyle = '#dddddd';
     blastCtx.fillRect(0, 0, 4, 1);
     return PIXI.Texture.from(blast);
   },
@@ -346,7 +345,7 @@ export const Bones = {
     for (var i = 0; i < this.partsPerSplatter; i++) {
       this.newPart(x, y);
     }
-  },
+  }
 };
 
 export const Exclamations = {
@@ -362,12 +361,12 @@ export const Exclamations = {
       this.container = new PIXI.Container();
       foregroundContainer.addChild(this.container);
 
-      this.healTexture = PIXI.Texture.from("healing.png");
-      this.exclamationTexture = PIXI.Texture.from("exclamation.png");
-      this.radioTexture = PIXI.Texture.from("radio.png");
-      this.fireTexture = PIXI.Texture.from("fire.png");
-      this.shieldTexture = PIXI.Texture.from("shield.png");
-      this.poisonTexture = PIXI.Texture.from("poison.png");
+      this.healTexture = PIXI.Texture.from('healing.png');
+      this.exclamationTexture = PIXI.Texture.from('exclamation.png');
+      this.radioTexture = PIXI.Texture.from('radio.png');
+      this.fireTexture = PIXI.Texture.from('fire.png');
+      this.shieldTexture = PIXI.Texture.from('shield.png');
+      this.poisonTexture = PIXI.Texture.from('poison.png');
     }
 
     for (var i = 0; i < this.sprites.length; i++) {
@@ -452,7 +451,7 @@ export const Exclamations = {
         this.discardedSprites.push(sprite);
       }
     }
-  },
+  }
 };
 
 export const Bullets = {
@@ -463,26 +462,26 @@ export const Bullets = {
   discardedSprites: [],
   fadeSpeed: 0.2,
   getTexture() {
-    var blast = document.createElement("canvas");
+    var blast = document.createElement('canvas');
     blast.width = 1;
     blast.height = 1;
-    var blastCtx = blast.getContext("2d");
+    var blastCtx = blast.getContext('2d');
 
     // draw shape
-    blastCtx.fillStyle = "#ffffff";
+    blastCtx.fillStyle = '#ffffff';
     blastCtx.fillRect(0, 0, 1, 1);
     return PIXI.Texture.from(blast);
   },
   getFireballTexture() {
-    var blast = document.createElement("canvas");
+    var blast = document.createElement('canvas');
     blast.width = 8;
     blast.height = 8;
-    var blastCtx = blast.getContext("2d");
+    var blastCtx = blast.getContext('2d');
 
     var radgrad = blastCtx.createRadialGradient(4, 4, 0, 4, 4, 4);
-    radgrad.addColorStop(0, "rgba(255,255,0,1)");
-    radgrad.addColorStop(0.8, "rgba(255,0,0,0.2)");
-    radgrad.addColorStop(1, "rgba(255,0,0,0)");
+    radgrad.addColorStop(0, 'rgba(255,255,0,1)');
+    radgrad.addColorStop(0.8, 'rgba(255,0,0,0.2)');
+    radgrad.addColorStop(1, 'rgba(255,0,0,0)');
 
     // draw shape
     blastCtx.fillStyle = radgrad;
@@ -518,10 +517,7 @@ export const Bullets = {
     }
   },
   updatePart(sprite, timeDiff) {
-    if (
-      fastDistance(sprite.x, sprite.y + 8, sprite.target.x, sprite.target.y) <
-      sprite.hitbox
-    ) {
+    if (fastDistance(sprite.x, sprite.y + 8, sprite.target.x, sprite.target.y) < sprite.hitbox) {
       if (sprite.plague) {
         Zombies.inflictPlague(sprite.target);
         Humans.damageHuman(sprite.target, sprite.damage);
@@ -534,25 +530,13 @@ export const Bullets = {
           sprite.target.bulletReflect &&
           Math.random() < sprite.target.bulletReflect
         ) {
-          this.newBullet(
-            sprite.target,
-            sprite.source,
-            sprite.damage,
-            false,
-            false,
-            false
-          );
+          this.newBullet(sprite.target, sprite.source, sprite.damage, false, false, false);
         } else {
           if (sprite.rocket) {
             if (sprite.target.graveyard) {
               Graveyard.damageGraveyard(sprite.damage);
             }
-            Army.droneExplosion(
-              sprite.target.x,
-              sprite.target.y,
-              false,
-              sprite.damage
-            );
+            Army.droneExplosion(sprite.target.x, sprite.target.y, false, sprite.damage);
           } else {
             if (sprite.target.zombie) {
               Zombies.damageZombie(sprite.target, sprite.damage, sprite.source);
@@ -578,14 +562,7 @@ export const Bullets = {
       characterContainer.removeChild(sprite);
     }
   },
-  newBullet(
-    source,
-    target,
-    damage,
-    plague = false,
-    rocket = false,
-    fireball = false
-  ) {
+  newBullet(source, target, damage, plague = false, rocket = false, fireball = false) {
     var sprite;
     if (this.discardedSprites.length > 0) {
       sprite = this.discardedSprites.pop();
@@ -629,7 +606,7 @@ export const Bullets = {
     sprite.ySpeed = yVector * ratio * this.speed;
 
     sprite.rotation = Math.atan2(sprite.ySpeed, sprite.xSpeed);
-  },
+  }
 };
 
 export const Blasts = {
@@ -637,15 +614,15 @@ export const Blasts = {
   partCounter: 0,
   sprites: [],
   getTexture() {
-    var blast = document.createElement("canvas");
+    var blast = document.createElement('canvas');
     blast.width = 32;
     blast.height = 32;
-    var blastCtx = blast.getContext("2d");
+    var blastCtx = blast.getContext('2d');
 
     var radgrad = blastCtx.createRadialGradient(16, 16, 0, 16, 16, 16);
-    radgrad.addColorStop(0, "rgba(255,255,255,1)");
-    radgrad.addColorStop(0.8, "rgba(255,255,128,0.2)");
-    radgrad.addColorStop(1, "rgba(255,180,0,0)");
+    radgrad.addColorStop(0, 'rgba(255,255,255,1)');
+    radgrad.addColorStop(0.8, 'rgba(255,255,128,0.2)');
+    radgrad.addColorStop(1, 'rgba(255,180,0,0)');
 
     // draw shape
     blastCtx.fillStyle = radgrad;
@@ -710,7 +687,7 @@ export const Blasts = {
     sprite.x = x;
     sprite.y = y;
     Smoke.newDroneCloud(x, y);
-  },
+  }
 };
 
 export const Smoke = {
@@ -721,12 +698,12 @@ export const Smoke = {
   tint: 0xffffff,
   getTexture() {
     var size = 8;
-    var blast = document.createElement("canvas");
+    var blast = document.createElement('canvas');
     blast.width = size + 4;
     blast.height = size + 4;
-    var blastCtx = blast.getContext("2d");
+    var blastCtx = blast.getContext('2d');
     blastCtx.shadowBlur = 5;
-    blastCtx.shadowColor = "white";
+    blastCtx.shadowColor = 'white';
     var radgrad = blastCtx.createRadialGradient(
       size / 2 + 2,
       size / 2 + 2,
@@ -735,19 +712,16 @@ export const Smoke = {
       size / 2 + 2,
       size / 2
     );
-    radgrad.addColorStop(0, "rgba(255,255,255,0.05)");
-    radgrad.addColorStop(0.5, "rgba(255,255,255,0.1)");
-    radgrad.addColorStop(1, "rgba(255,255,255,0)");
+    radgrad.addColorStop(0, 'rgba(255,255,255,0.05)');
+    radgrad.addColorStop(0.5, 'rgba(255,255,255,0.1)');
+    radgrad.addColorStop(1, 'rgba(255,255,255,0)');
     blastCtx.fillStyle = radgrad;
     blastCtx.fillRect(0, 0, size + 4, size + 4);
     return PIXI.Texture.from(blast);
   },
   initialize() {
     this.viewableArea = viewableArea;
-    this.allowTint =
-      GameModel.app &&
-      GameModel.app.renderer &&
-      GameModel.app.renderer.type == 1;
+    this.allowTint = GameModel.app && GameModel.app.renderer && GameModel.app.renderer.type == 1;
 
     if (!this.texture) {
       this.texture = this.getTexture();
@@ -798,8 +772,7 @@ export const Smoke = {
 
     var sizeVariance = 0.2;
     sprite.ySpeed = -0.5;
-    sprite.scale.x = sprite.scale.y =
-      1.6 - sizeVariance + Math.random() * sizeVariance * 2;
+    sprite.scale.x = sprite.scale.y = 1.6 - sizeVariance + Math.random() * sizeVariance * 2;
     sprite.visible = true;
     sprite.x = x - variance + Math.random() * variance * 2;
     sprite.y = y - variance + Math.random() * variance * 2;
@@ -837,7 +810,7 @@ export const Smoke = {
     for (var i = 0; i < 5; i++) {
       this.newSmoke(x, y, 6);
     }
-  },
+  }
 };
 
 export const Fragments = {
@@ -850,13 +823,13 @@ export const Fragments = {
   spraySpeed: 50,
   fadeSpeed: 0.7,
   getTexture() {
-    var blast = document.createElement("canvas");
+    var blast = document.createElement('canvas');
     blast.width = 5;
     blast.height = 1;
-    var blastCtx = blast.getContext("2d");
+    var blastCtx = blast.getContext('2d');
 
     // draw shape
-    blastCtx.fillStyle = "#FFFFFF";
+    blastCtx.fillStyle = '#FFFFFF';
     blastCtx.fillRect(0, 0, 5, 1);
     return PIXI.Texture.from(blast);
   },
@@ -866,7 +839,7 @@ export const Fragments = {
       this.container = new PIXI.Container();
       backgroundSpriteContainer.addChild(this.container);
 
-      this.texture = this.getTexture("#ff0000");
+      this.texture = this.getTexture('#ff0000');
     }
 
     if (this.sprites.length < this.maxParts) {
@@ -943,6 +916,6 @@ export const Fragments = {
     for (var i = 0; i < this.partsPerSplatter; i++) {
       this.newPart(x, y, tint);
     }
-  },
+  }
 };
 export default Particles;

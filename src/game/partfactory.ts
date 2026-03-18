@@ -1,7 +1,7 @@
 PartFactory = {
   costs: {
-    blood: "blood",
-    parts: "parts",
+    blood: 'blood',
+    parts: 'parts'
   },
 
   generatorsApplied: [],
@@ -11,12 +11,11 @@ PartFactory = {
     var partsPerSec = 0;
     for (var i = 0; i < this.generatorsApplied.length; i++) {
       machines += this.generatorsApplied[i].rank;
-      partsPerSec +=
-        this.generatorsApplied[i].total / this.generatorsApplied[i].time;
+      partsPerSec += this.generatorsApplied[i].total / this.generatorsApplied[i].time;
     }
     return {
       machines: machines,
-      partsPerSec: partsPerSec * GameModel.partsPCMod,
+      partsPerSec: partsPerSec * GameModel.partsPCMod
     };
   },
 
@@ -25,8 +24,7 @@ PartFactory = {
       this.generatorsApplied[i].timeLeft -= timeDiff;
       if (this.generatorsApplied[i].timeLeft < 0) {
         this.generatorsApplied[i].timeLeft = this.generatorsApplied[i].time;
-        GameModel.persistentData.parts +=
-          this.generatorsApplied[i].total * GameModel.partsPCMod;
+        GameModel.persistentData.parts += this.generatorsApplied[i].total * GameModel.partsPCMod;
       }
     }
   },
@@ -34,9 +32,7 @@ PartFactory = {
   updateLongTime(timeDiff) {
     var partsCreated = 0;
     for (var i = 0; i < this.generatorsApplied.length; i++) {
-      partsCreated +=
-        this.generatorsApplied[i].total *
-        (timeDiff / this.generatorsApplied[i].time);
+      partsCreated += this.generatorsApplied[i].total * (timeDiff / this.generatorsApplied[i].time);
     }
     return partsCreated * GameModel.partsPCMod;
   },
@@ -52,10 +48,7 @@ PartFactory = {
   },
 
   purchasePrice(generator) {
-    return Math.round(
-      generator.basePrice *
-        Math.pow(generator.multi, this.currentRank(generator)),
-    );
+    return Math.round(generator.basePrice * Math.pow(generator.multi, this.currentRank(generator)));
   },
 
   upgradeMaxAffordable(upgrade) {
@@ -67,7 +60,7 @@ PartFactory = {
           upgrade.basePrice,
           upgrade.multi,
           currentRank,
-          GameModel.persistentData.blood,
+          GameModel.persistentData.blood
         );
         break;
       case this.costs.parts:
@@ -75,7 +68,7 @@ PartFactory = {
           upgrade.basePrice,
           upgrade.multi,
           currentRank,
-          GameModel.persistentData.parts,
+          GameModel.persistentData.parts
         );
         break;
     }
@@ -86,12 +79,7 @@ PartFactory = {
   },
 
   upgradeMaxPrice(upgrade, number) {
-    return getCostForUpgrades(
-      upgrade.basePrice,
-      upgrade.multi,
-      this.currentRank(upgrade),
-      number,
-    );
+    return getCostForUpgrades(upgrade.basePrice, upgrade.multi, this.currentRank(upgrade), number);
   },
 
   canAffordGenerator(generator) {
@@ -132,7 +120,7 @@ PartFactory = {
       if (!owned)
         GameModel.persistentData.generators.push({
           id: generator.id,
-          rank: 1,
+          rank: 1
         });
       if (save) {
         GameModel.saveData();
@@ -158,7 +146,7 @@ PartFactory = {
         total: generator.produces * rank,
         rank: rank,
         time: generator.time,
-        timeLeft: generator.time,
+        timeLeft: generator.time
       });
     }
   },
@@ -172,16 +160,7 @@ PartFactory = {
     }
   },
 
-  Generator: function (
-    id,
-    name,
-    costType,
-    basePrice,
-    multi,
-    produces,
-    time,
-    description,
-  ) {
+  Generator: function (id, name, costType, basePrice, multi, produces, time, description) {
     this.id = id;
     this.name = name;
     this.costType = costType;
@@ -191,68 +170,68 @@ PartFactory = {
     this.time = time;
     this.description = description;
     this.cap = 0;
-  },
+  }
 };
 
 PartFactory.generators = [
   new PartFactory.Generator(
     1,
-    "Simple Machine",
+    'Simple Machine',
     PartFactory.costs.blood,
     1000000,
     1.08,
     1,
     2,
-    "A simple device that produces 1 part every 2 seconds",
+    'A simple device that produces 1 part every 2 seconds'
   ),
   new PartFactory.Generator(
     2,
-    "Part Duplicator",
+    'Part Duplicator',
     PartFactory.costs.parts,
     100,
     1.09,
     4,
     3,
-    "A more advanced device that produces 4 parts every 3 seconds",
+    'A more advanced device that produces 4 parts every 3 seconds'
   ),
   new PartFactory.Generator(
     3,
-    "Stamp Press",
+    'Stamp Press',
     PartFactory.costs.parts,
     1000,
     1.1,
     16,
     5,
-    "An industrial press that produces 16 parts every 5 seconds",
+    'An industrial press that produces 16 parts every 5 seconds'
   ),
   new PartFactory.Generator(
     4,
-    "Conveyor",
+    'Conveyor',
     PartFactory.costs.parts,
     10000,
     1.11,
     64,
     8,
-    "A fantastic new invention that produces 64 parts every 8 seconds",
+    'A fantastic new invention that produces 64 parts every 8 seconds'
   ),
   new PartFactory.Generator(
     5,
-    "Splitter Combiner",
+    'Splitter Combiner',
     PartFactory.costs.parts,
     100000,
     1.12,
     192,
     10,
-    "A wondrous machine that produces 192 parts every 10 seconds",
+    'A wondrous machine that produces 192 parts every 10 seconds'
   ),
   new PartFactory.Generator(
     6,
-    "Batch Converter",
+    'Batch Converter',
     PartFactory.costs.parts,
     500000,
     1.13,
     512,
     12,
-    "An astounding contraption that produces 512 parts every 12 seconds",
-  ),
+    'An astounding contraption that produces 512 parts every 12 seconds'
+  )
 ];

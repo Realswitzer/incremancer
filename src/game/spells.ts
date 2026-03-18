@@ -2,9 +2,9 @@ Spells = {
   spells: [
     {
       id: 1,
-      name: "Time Warp",
-      tooltip: "Speed up the flow of time for 30 seconds",
-      icon: "",
+      name: 'Time Warp',
+      tooltip: 'Speed up the flow of time for 30 seconds',
+      icon: '',
       cooldown: 120,
       duration: 30,
       energyCost: 0,
@@ -13,13 +13,13 @@ Spells = {
       },
       end() {
         GameModel.gameSpeed = 1;
-      },
+      }
     },
     {
       id: 2,
-      name: "Energy Charge",
-      tooltip: "5x Energy rate for 20 seconds, cost 50 energy",
-      icon: "",
+      name: 'Energy Charge',
+      tooltip: '5x Energy rate for 20 seconds, cost 50 energy',
+      icon: '',
       cooldown: 180,
       duration: 20,
       energyCost: 50,
@@ -28,14 +28,13 @@ Spells = {
       },
       end() {
         GameModel.energySpellMultiplier = 1;
-      },
+      }
     },
     {
       id: 3,
-      name: "Detonate",
-      tooltip:
-        "Explode your zombies into clouds of plague, cost 69 energy... nice",
-      icon: "",
+      name: 'Detonate',
+      tooltip: 'Explode your zombies into clouds of plague, cost 69 energy... nice',
+      icon: '',
       cooldown: 120,
       duration: 3,
       energyCost: 69,
@@ -44,14 +43,14 @@ Spells = {
       },
       end() {
         Zombies.detonate = false;
-      },
+      }
     },
     {
       id: 4,
-      name: "Earth Freeze",
+      name: 'Earth Freeze',
       tooltip:
-        "Freeze all humans in place preventing them from moving for 15 seconds, cost 75 energy",
-      icon: "",
+        'Freeze all humans in place preventing them from moving for 15 seconds, cost 75 energy',
+      icon: '',
       cooldown: 60,
       duration: 15,
       energyCost: 75,
@@ -60,14 +59,14 @@ Spells = {
       },
       end() {
         Humans.frozen = false;
-      },
+      }
     },
     {
       id: 5,
-      name: "Gigazombies",
+      name: 'Gigazombies',
       tooltip:
-        "For 5 seconds any zombies spawned will be giants with 10x health and attack damage, cost 100 energy",
-      icon: "",
+        'For 5 seconds any zombies spawned will be giants with 10x health and attack damage, cost 100 energy',
+      icon: '',
       cooldown: 360,
       duration: 5,
       energyCost: 100,
@@ -76,30 +75,30 @@ Spells = {
       },
       end() {
         Zombies.super = false;
-      },
+      }
     },
     {
       id: 6,
-      name: "Incinerate",
-      tooltip: "Burns humans near the skeleton champion",
+      name: 'Incinerate',
+      tooltip: 'Burns humans near the skeleton champion',
       itemText:
-        "Has a chance to cast Incinerate when attacking, burning all humans within a large radius of the Skeleon",
-      icon: "",
+        'Has a chance to cast Incinerate when attacking, burning all humans within a large radius of the Skeleon',
+      icon: '',
       cooldown: 1,
       duration: 10,
       energyCost: 10,
       start() {
         Skeleton.incinerate();
       },
-      end() {},
+      end() {}
     },
     {
       id: 7,
-      name: "Pandemic",
-      tooltip: "Causes plague to spread",
+      name: 'Pandemic',
+      tooltip: 'Causes plague to spread',
       itemText:
-        "Has a chance to cast Pandemic when attacking, causing infected humans to spread the plague to each other for 20 seconds",
-      icon: "",
+        'Has a chance to cast Pandemic when attacking, causing infected humans to spread the plague to each other for 20 seconds',
+      icon: '',
       cooldown: 10,
       duration: 20,
       energyCost: 10,
@@ -108,8 +107,8 @@ Spells = {
       },
       end() {
         Humans.pandemic = false;
-      },
-    },
+      }
+    }
   ],
   lockAllSpells() {
     for (var i = 0; i < this.spells.length; i++) {
@@ -177,7 +176,7 @@ Spells = {
         }
       }
     }
-  },
+  }
 };
 
 for (var i = 0; i < Spells.spells.length; i++) {
