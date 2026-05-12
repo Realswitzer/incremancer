@@ -1,108 +1,105 @@
 GameModel = {
   storageName: "ZombieData",
-  kongregate: false,
-  playFabId : false,
-  titleId : "772D8",
   hidden: false,
-  energy:0,
-  energyMax:10,
-  energyRate:1,
-  brainsRate:0,
-  bonesRate:0,
-  energySpellMultiplier:1,
-  zombieCost:10,
-  bonesPCMod : 1,
-  partsPCMod : 1,
-  bloodMax:1000,
-  bloodPCMod : 1,
-  bloodStorePCMod : 1,
-  brainsMax:50,
-  brainsPCMod : 1,
-  brainsStorePCMod : 1,
-  zombieHealth : 100,
-  zombieHealthPCMod : 1,
-  zombieDamage : 10,
-  zombieDamagePCMod : 1,
-  zombieSpeed : 10,
-  zombieCages : 0,
-  zombiesInCages : 0,
-  golemDamagePCMod :1,
-  golemHealthPCMod : 1,
-  plagueDamageMod : 0,
-  graveyardHealthMod : 1,
-  burningSpeedMod : 1,
-  startingResources : 0,
-  brainRecoverChance:0,
-  riseFromTheDeadChance:0,
-  infectedBiteChance:0,
-  infectedBlastChance:0,
-  constructions : {},
-  construction : 0,
-  boneCollectorCapacity:10,
-  frameRate : 0,
-  humanCount : 50,
-  zombieCount:0,
-  creatureCount:0,
-  creatureLimit:1,
-  harpySpeed:75,
-  tankBuster : false,
+  energy: 0,
+  energyMax: 10,
+  energyRate: 1,
+  brainsRate: 0,
+  bonesRate: 0,
+  energySpellMultiplier: 1,
+  zombieCost: 10,
+  bonesPCMod: 1,
+  partsPCMod: 1,
+  bloodMax: 1000,
+  bloodPCMod: 1,
+  bloodStorePCMod: 1,
+  brainsMax: 50,
+  brainsPCMod: 1,
+  brainsStorePCMod: 1,
+  zombieHealth: 100,
+  zombieHealthPCMod: 1,
+  zombieDamage: 10,
+  zombieDamagePCMod: 1,
+  zombieSpeed: 10,
+  zombieCages: 0,
+  zombiesInCages: 0,
+  golemDamagePCMod: 1,
+  golemHealthPCMod: 1,
+  plagueDamageMod: 0,
+  graveyardHealthMod: 1,
+  burningSpeedMod: 1,
+  startingResources: 0,
+  brainRecoverChance: 0,
+  riseFromTheDeadChance: 0,
+  infectedBiteChance: 0,
+  infectedBlastChance: 0,
+  constructions: {},
+  construction: 0,
+  boneCollectorCapacity: 10,
+  frameRate: 0,
+  humanCount: 50,
+  zombieCount: 0,
+  creatureCount: 0,
+  creatureLimit: 1,
+  harpySpeed: 75,
+  tankBuster: false,
   harpyBombs: 1,
-  runicSyphon : {
+  runicSyphon: {
     percentage: 0,
     blood: 0,
     bones: 0,
-    brains: 0
+    brains: 0,
   },
-  gigazombies : false,
-  endLevelTimer : 3,
-  endLevelDelay : 3,
-  messageQueue : [],
-  runeEffects : {
-    attackSpeed : 1,
-    critChance : 0,
-    critDamage : 0,
-    damageReduction : 1,
-    healthRegen : 0,
-    damageReflection : 0
+  gigazombies: false,
+  endLevelTimer: 3,
+  endLevelDelay: 3,
+  messageQueue: [],
+  runeEffects: {
+    attackSpeed: 1,
+    critChance: 0,
+    critDamage: 0,
+    damageReduction: 1,
+    healthRegen: 0,
+    damageReflection: 0,
   },
-  autoUpgrades : false,
-  autoconstruction : false,
-  autoconstructionUnlocked : false,
-  levelResourcesAdded : false,
-  bulletproofChance : 0,
-  gameSpeed : 1,
-  
-  level:1,
-  
-  currentState : "startGame",
+  autoUpgrades: false,
+  autoconstruction: false,
+  autoconstructionUnlocked: false,
+  levelResourcesAdded: false,
+  bulletproofChance: 0,
+  gameSpeed: 1,
 
-  states : {
-    playingLevel : "playingLevel",
-    levelCompleted : "levelCompleted",
-    startGame : "startGame",
-    prestiged : "prestiged",
-    failed : "failed"
-  },
+  level: 1,
 
-  baseStats : {
-    energyRate : 1,
-    brainsRate : 0,
-    bonesRate : 0,
-    energyMax : 10,
-    bloodMax : 1000,
-    brainsMax : 50,
-    zombieCost : 10,
-    zombieHealth : 100,
-    zombieDamage : 10,
-    zombieSpeed : 10,
-    level : 1,
-    graveyard : 0,
-    construction : 0,
-    boneCollectorCapacity : 10
+  currentState: "startGame",
+
+  states: {
+    playingLevel: "playingLevel",
+    levelCompleted: "levelCompleted",
+    startGame: "startGame",
+    prestiged: "prestiged",
+    failed: "failed",
   },
 
-  zoom : zoom,
-  centerGameContainer : centerGameContainer,
+  baseStats: {
+    energyRate: 1,
+    brainsRate: 0,
+    bonesRate: 0,
+    energyMax: 10,
+    bloodMax: 1000,
+    brainsMax: 50,
+    zombieCost: 10,
+    zombieHealth: 100,
+    zombieDamage: 10,
+    zombieSpeed: 10,
+    level: 1,
+    graveyard: 0,
+    construction: 0,
+    boneCollectorCapacity: 10,
+  },
+
+  zoom: zoom,
+  centerGameContainer: centerGameContainer,
 
   resetToBaseStats() {
     this.energyRate = this.baseStats.energyRate;
@@ -154,17 +151,15 @@ GameModel = {
 
   addEnergy(value) {
     this.energy += value;
-    if (this.energy > this.energyMax)
-      this.energy = this.energyMax;
+    if (this.energy > this.energyMax) this.energy = this.energyMax;
   },
 
   addBlood(value) {
     if (isNaN(this.persistentData.blood)) {
-      this.persistentData.blood = 0;  
+      this.persistentData.blood = 0;
     }
-    if (isNaN(value))
-      return;
-    this.persistentData.blood += (value * this.bloodPCMod);
+    if (isNaN(value)) return;
+    this.persistentData.blood += value * this.bloodPCMod;
     if (this.persistentData.blood > this.bloodMax) {
       this.persistentData.blood = this.bloodMax;
       if (this.constructions.runesmith && this.runicSyphon.percentage > 0) {
@@ -173,17 +168,17 @@ GameModel = {
     }
 
     if (this.runicSyphon.percentage > 0) {
-      this.runicSyphon.blood += value * this.bloodPCMod * this.runicSyphon.percentage;
+      this.runicSyphon.blood +=
+        value * this.bloodPCMod * this.runicSyphon.percentage;
     }
   },
 
   addBrains(value) {
     if (isNaN(this.persistentData.brains)) {
-      this.persistentData.brains = 0;  
+      this.persistentData.brains = 0;
     }
-    if (isNaN(value))
-      return;
-    this.persistentData.brains += (value * this.brainsPCMod);
+    if (isNaN(value)) return;
+    this.persistentData.brains += value * this.brainsPCMod;
 
     if (this.persistentData.brains > this.brainsMax) {
       this.persistentData.brains = this.brainsMax;
@@ -193,30 +188,34 @@ GameModel = {
     }
 
     if (this.runicSyphon.percentage > 0) {
-      this.runicSyphon.brains += value * this.brainsPCMod * this.runicSyphon.percentage;
+      this.runicSyphon.brains +=
+        value * this.brainsPCMod * this.runicSyphon.percentage;
     }
   },
 
   addBones(value) {
     if (isNaN(this.persistentData.bones)) {
-      this.persistentData.bones = 0;  
+      this.persistentData.bones = 0;
     }
-    if (isNaN(value))
-      return;
-    this.persistentData.bones += (value * this.bonesPCMod);
-    this.persistentData.bonesTotal += (value * this.bonesPCMod);
+    if (isNaN(value)) return;
+    this.persistentData.bones += value * this.bonesPCMod;
+    this.persistentData.bonesTotal += value * this.bonesPCMod;
 
     if (this.runicSyphon.percentage > 0) {
-      this.runicSyphon.bones += value * this.bonesPCMod * this.runicSyphon.percentage;
+      this.runicSyphon.bones +=
+        value * this.bonesPCMod * this.runicSyphon.percentage;
     }
   },
 
-  getHumanCount(){
+  getHumanCount() {
     return this.humanCount;
   },
 
   getEnergyRate() {
-    return (this.energySpellMultiplier * this.energyRate) - (this.persistentData.boneCollectors + this.persistentData.harpies);
+    return (
+      this.energySpellMultiplier * this.energyRate -
+      (this.persistentData.boneCollectors + this.persistentData.harpies)
+    );
   },
 
   toggleGigazombies() {
@@ -225,18 +224,18 @@ GameModel = {
   },
 
   update(timeDiff, updateTime) {
-
     // spell update before gamespeed modifier
     Spells.updateSpells(timeDiff);
 
     timeDiff *= this.gameSpeed;
 
-    if (this.hidden) { // force PIXI update
+    if (this.hidden) {
+      // force PIXI update
       update(timeDiff);
     }
 
     PartFactory.update(timeDiff);
-    
+
     this.autoRemoveCollectorsHarpies();
     this.addEnergy(this.getEnergyRate() * timeDiff);
 
@@ -244,20 +243,18 @@ GameModel = {
       this.addBones(this.bonesRate * timeDiff);
       this.addBrains(this.brainsRate * timeDiff);
       Upgrades.updateRunicSyphon(this.runicSyphon);
-      
+
       if (this.lastSave + 30000 < updateTime) {
         this.saveData();
         this.lastSave = updateTime;
       }
 
-      if (this.lastPlayFabSave + 1200000 < updateTime) {
-        this.saveToPlayFab();
-      }
-  
       if (this.getHumanCount() <= 0) {
-
         if (this.endLevelTimer < 0) {
-          if (this.isBossStage(this.level) && Trophies.doesLevelHaveTrophy(this.level)) {
+          if (
+            this.isBossStage(this.level) &&
+            Trophies.doesLevelHaveTrophy(this.level)
+          ) {
             Trophies.trophyAquired(this.level);
           }
           this.prestigePointsEarned = this.prestigePointsForLevel(this.level);
@@ -270,16 +267,16 @@ GameModel = {
             this.persistentData.levelsCompleted.push(this.level);
           }
           this.persistentData.levelUnlocked = this.level + 1;
-          if (!this.persistentData.allTimeHighestLevel || this.level > this.persistentData.allTimeHighestLevel) {
+          if (
+            !this.persistentData.allTimeHighestLevel ||
+            this.level > this.persistentData.allTimeHighestLevel
+          ) {
             this.persistentData.allTimeHighestLevel = this.level;
-            if (window.kongregate) {
-              window.kongregate.stats.submit("level", this.persistentData.allTimeHighestLevel);
-            }
           }
           this.startTimer = 3;
         } else {
           this.endLevelTimer -= timeDiff;
-        } 
+        }
       }
       Upgrades.updateConstruction(timeDiff);
       Upgrades.updateAutoUpgrades();
@@ -333,7 +330,7 @@ GameModel = {
 
   releaseCagedZombies() {
     if (this.currentState == this.states.playingLevel) {
-      for (var i=0; i < this.zombiesInCages; i++) {
+      for (var i = 0; i < this.zombiesInCages; i++) {
         Zombies.createZombie(Graveyard.sprite.x, Graveyard.sprite.y);
       }
       this.zombiesInCages = 0;
@@ -349,10 +346,10 @@ GameModel = {
 
   cagedZombieSacrificeValue() {
     return {
-      blood:this.zombiesInCages * this.zombieHealth * 0.5,
-      brains:this.zombiesInCages,
-      bones:this.zombiesInCages * 3
-    }
+      blood: this.zombiesInCages * this.zombieHealth * 0.5,
+      brains: this.zombiesInCages,
+      bones: this.zombiesInCages * 3,
+    };
   },
 
   startLevel(level) {
@@ -371,7 +368,7 @@ GameModel = {
     this.currentState = this.states.playingLevel;
     this.setupLevel();
     this.updatePlayingLevel();
-    if(this.persistentData.autoRelease) {
+    if (this.persistentData.autoRelease) {
       this.releaseCagedZombies();
     }
   },
@@ -383,7 +380,7 @@ GameModel = {
     Humans.populate();
     Zombies.populate();
     Graveyard.initialize();
-    setTimeout(centerGameContainer,10);
+    setTimeout(centerGameContainer, 10);
     Upgrades.applyUpgrades();
     Upgrades.updateRuneEffects();
     PartFactory.applyGenerators();
@@ -395,35 +392,35 @@ GameModel = {
 
   populateStats() {
     this.stats = {
-      skeleton : {
-        show : Skeleton.persistent.skeletons > 0,
-        health : this.zombieHealth * 10,
-        damage : this.zombieDamage * 10,
-        speed: Skeleton.moveSpeed
+      skeleton: {
+        show: Skeleton.persistent.skeletons > 0,
+        health: this.zombieHealth * 10,
+        damage: this.zombieDamage * 10,
+        speed: Skeleton.moveSpeed,
       },
-      zombie : {
-        health : this.zombieHealth,
-        damage : this.zombieDamage,
-        speed : this.zombieSpeed
+      zombie: {
+        health: this.zombieHealth,
+        damage: this.zombieDamage,
+        speed: this.zombieSpeed,
       },
-      human : {
-        health : Humans.getMaxHealth(this.level),
-        damage : Humans.attackDamage,
-        speed : Humans.maxRunSpeed
+      human: {
+        health: Humans.getMaxHealth(this.level),
+        damage: Humans.attackDamage,
+        speed: Humans.maxRunSpeed,
       },
-      police : {
-        show : Police.getMaxPolice() > 0,
-        health : Police.getMaxHealth(),
-        damage : Police.attackDamage,
-        speed : Police.maxRunSpeed
+      police: {
+        show: Police.getMaxPolice() > 0,
+        health: Police.getMaxHealth(),
+        damage: Police.attackDamage,
+        speed: Police.maxRunSpeed,
       },
-      army : {
-        show : Army.getMaxArmy() > 0,
-        health : Army.getMaxHealth(),
-        damage : Army.attackDamage,
-        speed : Army.maxRunSpeed
-      }
-    }
+      army: {
+        show: Army.getMaxArmy() > 0,
+        health: Army.getMaxHealth(),
+        damage: Army.attackDamage,
+        speed: Army.maxRunSpeed,
+      },
+    };
   },
 
   updateStats() {
@@ -473,39 +470,38 @@ GameModel = {
     Upgrades.upgradeIdCheck();
   },
 
-  lastSave:0,
-  lastPlayFabSave : Date.now() - 15000,
+  lastSave: 0,
 
-  persistentData : {
-    saveCreated : Date.now(),
-    autoStart : false,
-    levelUnlocked : 1,
-    allTimeHighestLevel : 0,
-    blood : 0,
-    brains : 0,
+  persistentData: {
+    saveCreated: Date.now(),
+    autoStart: false,
+    levelUnlocked: 1,
+    allTimeHighestLevel: 0,
+    blood: 0,
+    brains: 0,
     bones: 0,
     parts: 0,
-    bonesTotal : 0,
-    upgrades : [],
-    constructions : [],
-    prestigePointsEarned : 0,
-    prestigePointsToSpend : 0,
-    boneCollectors : 0,
-    graveyardZombies : 1,
-    harpies : 0,
-    resolution : 1,
-    zoomButtons : false,
-    particles : true,
-    generators : [],
-    creatureLevels : [],
-    creatures : [],
-    creatureAutobuild : [],
-    savedCreatures : [],
-    levelsCompleted : []
+    bonesTotal: 0,
+    upgrades: [],
+    constructions: [],
+    prestigePointsEarned: 0,
+    prestigePointsToSpend: 0,
+    boneCollectors: 0,
+    graveyardZombies: 1,
+    harpies: 0,
+    resolution: 1,
+    zoomButtons: false,
+    particles: true,
+    generators: [],
+    creatureLevels: [],
+    creatures: [],
+    creatureAutobuild: [],
+    savedCreatures: [],
+    levelsCompleted: [],
   },
 
   addPrestigePoints(points) {
-    if (typeof this.persistentData.prestigePointsEarned == 'undefined') {
+    if (typeof this.persistentData.prestigePointsEarned == "undefined") {
       this.persistentData.prestigePointsEarned = 0;
       this.persistentData.prestigePointsToSpend = 0;
     }
@@ -521,13 +517,16 @@ GameModel = {
       this.persistentData.parts = 0;
       this.persistentData.generators = [];
       this.persistentData.bonesTotal = 0;
-      this.persistentData.upgrades = this.persistentData.upgrades.filter(upgrade => upgrade.costType == Upgrades.costs.prestigePoints);
+      this.persistentData.upgrades = this.persistentData.upgrades.filter(
+        (upgrade) => upgrade.costType == Upgrades.costs.prestigePoints,
+      );
       this.persistentData.constructions = [];
       this.persistentData.boneCollectors = 0;
       this.persistentData.currentConstruction = false;
       this.persistentData.harpies = 0;
       this.persistentData.graveyardZombies = 1;
-      this.persistentData.prestigePointsToSpend += this.persistentData.prestigePointsEarned;
+      this.persistentData.prestigePointsToSpend +=
+        this.persistentData.prestigePointsEarned;
       this.persistentData.prestigePointsEarned = 0;
       this.persistentData.runes = false;
       this.persistentData.vipEscaped = [];
@@ -541,12 +540,12 @@ GameModel = {
       this.persistentData.gigazombiesOn = false;
       this.gigazombies = false;
       this.runeEffects = {
-        attackSpeed : 1,
-        critChance : 0,
-        critDamage : 0,
-        damageReduction : 1,
-        healthRegen : 0,
-        damageReflection : 0
+        attackSpeed: 1,
+        critChance: 0,
+        critDamage: 0,
+        damageReduction: 1,
+        healthRegen: 0,
+        damageReflection: 0,
       };
       BoneCollectors.update(0.1);
       PartFactory.generatorsApplied = [];
@@ -565,8 +564,14 @@ GameModel = {
   saveData() {
     this.persistentData.dateOfSave = Date.now();
     try {
-      localStorage.setItem(this.storageName, JSON.stringify(this.persistentData));
-      localStorage.setItem(Skeleton.storageName, JSON.stringify(Skeleton.persistent));
+      localStorage.setItem(
+        this.storageName,
+        JSON.stringify(this.persistentData),
+      );
+      localStorage.setItem(
+        Skeleton.storageName,
+        JSON.stringify(Skeleton.persistent),
+      );
     } catch (e) {
       console.log(e);
     }
@@ -574,14 +579,18 @@ GameModel = {
   loadData() {
     try {
       if (localStorage.getItem(this.storageName) !== null) {
-        this.persistentData = JSON.parse(localStorage.getItem(this.storageName));
+        this.persistentData = JSON.parse(
+          localStorage.getItem(this.storageName),
+        );
         this.level = this.persistentData.levelUnlocked;
         if (localStorage.getItem(Skeleton.storageName) !== null) {
-          Skeleton.persistent = JSON.parse(localStorage.getItem(Skeleton.storageName));
+          Skeleton.persistent = JSON.parse(
+            localStorage.getItem(Skeleton.storageName),
+          );
         }
         this.updatePersistentData();
         this.calcOfflineProgress();
-      } 
+      }
     } catch (e) {
       console.log(e);
     }
@@ -594,7 +603,10 @@ GameModel = {
       var timeDiff = (Date.now() - this.persistentData.dateOfSave) / 1000;
       var partsCreated = PartFactory.updateLongTime(timeDiff);
       if (partsCreated > 0) {
-        this.offlineMessage = "Your factory has generated " + formatWhole(partsCreated) + " parts while you were away";
+        this.offlineMessage =
+          "Your factory has generated " +
+          formatWhole(partsCreated) +
+          " parts while you were away";
         this.persistentData.parts += partsCreated;
       }
     }
@@ -603,7 +615,6 @@ GameModel = {
     try {
       localStorage.removeItem(this.storageName);
       localStorage.removeItem(Skeleton.storageName);
-      this.saveToPlayFab(true);
     } catch (e) {
       console.log(e);
     }
@@ -633,7 +644,7 @@ GameModel = {
     if (!this.persistentData.saveCreated) {
       this.persistentData.saveCreated = Date.now();
     }
-    if (typeof this.persistentData.particles == 'undefined') {
+    if (typeof this.persistentData.particles == "undefined") {
       this.persistentData.particles = true;
     }
     if (!this.persistentData.runeshatter) {
@@ -649,8 +660,7 @@ GameModel = {
   },
 
   setResolution(resolution) {
-    if(!this.app)
-      return;
+    if (!this.app) return;
 
     this.app.renderer.resolution = resolution;
 
@@ -658,15 +668,25 @@ GameModel = {
       this.app.renderer.rootRenderTarget.resolution = resolution;
 
     this.app.renderer.plugins.interaction.resolution = resolution;
-    this.app.renderer.resize(document.body.clientWidth, document.body.clientHeight);
+    this.app.renderer.resize(
+      document.body.clientWidth,
+      document.body.clientHeight,
+    );
   },
 
   downloadSaveGame() {
     this.persistentData.skeleton = Skeleton.persistent;
-    this.blob = new Blob([LZString.compressToEncodedURIComponent(JSON.stringify(this.persistentData))], {type: "octet/stream"});
+    this.blob = new Blob(
+      [
+        LZString.compressToEncodedURIComponent(
+          JSON.stringify(this.persistentData),
+        ),
+      ],
+      { type: "octet/stream" },
+    );
     delete this.persistentData.skeleton;
     this.encodedContent = window.URL.createObjectURL(this.blob);
-    var datestamp = new Date().toISOString().replace(/:|T|Z|\./g,"");
+    var datestamp = new Date().toISOString().replace(/:|T|Z|\./g, "");
     this.savefilename = "incremancer-" + datestamp + ".sav";
   },
 
@@ -676,16 +696,17 @@ GameModel = {
     if (files && files.length == 1) {
       var file = files[0];
       var reader = new FileReader();
-      reader.onload = function(event) {
-        var savegame = JSON.parse(LZString.decompressFromEncodedURIComponent(event.target.result));
+      reader.onload = function (event) {
+        var savegame = JSON.parse(
+          LZString.decompressFromEncodedURIComponent(event.target.result),
+        );
         if (savegame.dateOfSave) {
           if (savegame.skeleton) {
             Skeleton.persistent = savegame.skeleton;
             delete savegame.skeleton;
           }
-          GameModel.persistentData = savegame;          
+          GameModel.persistentData = savegame;
           GameModel.updatePersistentData();
-          GameModel.saveToPlayFab();
           GameModel.level = GameModel.persistentData.levelUnlocked;
           CreatureFactory.spawnedSavedCreatures = false;
           GameModel.setupLevel();
@@ -698,10 +719,12 @@ GameModel = {
   },
 
   toggleFullscreen() {
-    if (document.fullscreenElement ||
-        document.webkitFullscreenElement ||
-        document.mozFullScreenElement ||
-        document.msFullscreenElement) {
+    if (
+      document.fullscreenElement ||
+      document.webkitFullscreenElement ||
+      document.mozFullScreenElement ||
+      document.msFullscreenElement
+    ) {
       if (document.exitFullscreen) {
         document.exitFullscreen();
       } else if (document.webkitExitFullscreen) {
@@ -736,14 +759,16 @@ GameModel = {
   bossCompleted(level) {
     var bossLevel = Math.floor((level - 1) / 50) * 50;
 
-    if (bossLevel < 50)
-      return true;
+    if (bossLevel < 50) return true;
 
     return this.persistentData.levelsCompleted.includes(bossLevel);
   },
 
   levelLocked(level) {
-    return level > this.persistentData.allTimeHighestLevel + 1 || !this.bossCompleted(level);
+    return (
+      level > this.persistentData.allTimeHighestLevel + 1 ||
+      !this.bossCompleted(level)
+    );
   },
 
   isBossStage(level) {
@@ -752,135 +777,11 @@ GameModel = {
 
   levelInfo(level) {
     return {
-      level : level,
-      bossStage : this.isBossStage(level),
-      completed : this.persistentData.levelsCompleted.includes(level),
-      locked : this.levelLocked(level),
-      trophy : Trophies.doesLevelHaveTrophy(level)
-    }
+      level: level,
+      bossStage: this.isBossStage(level),
+      completed: this.persistentData.levelsCompleted.includes(level),
+      locked: this.levelLocked(level),
+      trophy: Trophies.doesLevelHaveTrophy(level),
+    };
   },
-
-  loginInUsingPlayFab() {
-
-    if (window.kongregate) {
-
-      try {
-        // Setting up playfab title ID
-        PlayFab.settings.titleId = this.titleId;
-
-        // forming request
-        var request = {
-          TitleId: PlayFab.settings.titleId,
-          AuthTicket: window.kongregate.services.getGameAuthToken(),
-          KongregateId : window.kongregate.services.getUserId(),
-          CreateAccount: true
-        };
-
-        var model = this;
-
-        // Invoke LoginWithKongregate API call and visualize both results (success or failue)
-        PlayFabClientSDK.LoginWithKongregate(request,
-          function(result){
-            if (result && result.data && result.data.PlayFabId) {
-              model.playFabId = result.data.PlayFabId;
-              model.loadFromPlayFab();
-            }
-          },
-          function(err){
-            console.log(err);
-          }
-        );
-      } catch (e) {
-        console.error(e);
-      }
-    }
-  },
-
-  saveToPlayFab(remove = false) {
-    this.lastPlayFabSave = Date.now();
-    if (this.playFabId) {
-      var trophies = this.persistentData.trophies;
-      delete this.persistentData.trophies;
-      var request = {
-        TitleId : this.titleId,
-        PlayFabId : this.playFabId,
-        Data : {
-          save : remove ? false : LZString.compressToEncodedURIComponent(JSON.stringify(this.persistentData)),
-          trophies : remove ? false : LZString.compressToEncodedURIComponent(JSON.stringify(trophies)),
-          skeleton : remove ? false : LZString.compressToEncodedURIComponent(JSON.stringify(Skeleton.persistent))
-        }
-      }
-      this.persistentData.trophies = trophies;
-      try {
-        PlayFab.ClientApi.UpdateUserData(request,
-          function(result){
-            if (remove) {
-              GameModel.resetToBaseStats();
-              GameModel.setupLevel();
-              window.location.reload();
-            } else {
-              GameModel.messageQueue.push("Game Saved to Cloud");
-            }
-          },
-          function(err){
-            console.log(err);
-          }
-        );
-      } catch (e) {
-        console.log(e);
-      }
-    } else {
-      if (remove) {
-        this.resetToBaseStats();
-        this.setupLevel();
-        window.location.reload();
-      }
-    }
-  },
-
-
-  loadFromPlayFab(force = false) {
-    if (this.playFabId) {
-      var request = {
-        TitleId : this.titleId,
-        PlayFabId : this.playFabId,
-        Keys : ["save","trophies","skeleton"]
-      }
-      try {
-        var model = this;
-        PlayFab.ClientApi.GetUserData(request,
-          function(result){
-            if (result.data.Data.save) {
-              var savegame = JSON.parse(LZString.decompressFromEncodedURIComponent(result.data.Data.save.Value));
-              // playfab save is older so overwrite
-              if (force || savegame.saveCreated < model.persistentData.saveCreated || (savegame.saveCreated == model.persistentData.saveCreated && savegame.dateOfSave > model.persistentData.dateOfSave)) {
-                model.persistentData = savegame;
-                if (result.data.Data.trophies) {
-                  model.persistentData.trophies = JSON.parse(LZString.decompressFromEncodedURIComponent(result.data.Data.trophies.Value));
-                }
-                if (result.data.Data.skeleton) {
-                  Skeleton.persistent = JSON.parse(LZString.decompressFromEncodedURIComponent(result.data.Data.skeleton.Value));
-                }
-                model.level = model.persistentData.levelUnlocked;
-                model.updatePersistentData();
-                model.calcOfflineProgress();
-                model.setupLevel();
-                GameModel.messageQueue.push("Game Loaded from Cloud");
-              }
-            }
-          },
-          function(err){
-            console.log(err);
-          }
-        );
-      } catch (e) {
-        console.log(e);
-      }
-    }
-  },
-
-  allowPlayFabAction() {
-    return this.lastPlayFabSave + 15000 < Date.now();
-  }
-
 };
