@@ -1,9 +1,10 @@
-html,body {
+html,
+body {
   font-family: sans-serif;
   height: 100%;
   width: 100%;
   margin: 0;
-  color:#fff;
+  color: #fff;
   overflow: hidden;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
@@ -13,10 +14,12 @@ html,body {
   user-select: none;
   touch-action: manipulation;
   overscroll-behavior: contain;
-  font-size:16px;
+  font-size: 16px;
 }
 
-.clear {clear:both;}
+.clear {
+  clear: both;
+}
 
 canvas {
   height: 100%;
@@ -31,22 +34,23 @@ div.top-bar {
   top: 10px;
   position: absolute;
   max-width: 100%;
-  left:50%;
-  transform:translateX(-50%);
+  left: 50%;
+  transform: translateX(-50%);
   padding: 10px;
   text-align: center;
-  background-color: rgba(0,0,0,0.4);
+  background-color: rgba(0, 0, 0, 0.4);
 }
 
 div.shop {
   touch-action: manipulation;
   position: absolute;
-  top:0;
-  right:0;
-  padding:10px;
+  top: 0;
+  right: 0;
+  padding: 10px;
   height: calc(100% - 20px);
-  background-color: rgba(10,60,10,0.8);
-  width:20%;
+  background-color: rgba(10, 60, 10, 1);
+  box-shadow: inset 2px 2px 15px #131;
+  width: 20%;
   min-width: 310px;
   display: flex;
   flex-direction: column;
@@ -64,8 +68,8 @@ button.active {
 
 div.shop div.upgrades {
   overflow-y: auto;
-  flex:1;
-  margin-top:5px;
+  flex: 1;
+  margin-top: 5px;
   overscroll-behavior: contain;
 }
 
@@ -73,10 +77,10 @@ div.shop div.upgrade.uncollected {
   opacity: 0.5;
 }
 div.shop div.upgrade.owned {
-  color:#ffee10;
+  color: #ffee10;
 }
 div.shop div.upgrade span.escaped {
-  color:#f33;
+  color: #f33;
   float: right;
 }
 
@@ -98,24 +102,26 @@ div.shop div.upgrade div.progress > div {
   position: absolute;
   height: 100%;
   background: #a1980f;
-  top:0;
+  top: 0;
   z-index: 50;
 }
 
-div.start-game, div.end-level, div.level-select {
+div.start-game,
+div.end-level,
+div.level-select {
   position: absolute;
   top: 50%;
-  left:50%;
-  transform:translate(-50%,-50%);
-  padding:15px;
-  background-color: rgb(10,40,45);
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 15px;
+  background-color: rgb(10, 40, 45);
   text-align: center;
   border-radius: 5px;
-  box-shadow: inset 0 0 15px rgb(5,20,20);
+  box-shadow: inset 0 0 15px rgb(5, 20, 20);
   max-height: 90%;
 }
 
-div.level-select.scroll { 
+div.level-select.scroll {
   overflow: auto;
 }
 
@@ -125,7 +131,7 @@ div.start-game ul > li {
 }
 
 button {
-  background: rgba(0,0,0,0.5);
+  background: rgba(0, 0, 0, 0.5);
   border: none;
   color: #ccc;
   cursor: pointer;
@@ -138,7 +144,7 @@ a.button {
 }
 
 button:hover:not(:disabled) {
-  background: rgba(0,0,0,0.8);
+  background: rgba(0, 0, 0, 0.8);
   color: #ff3;
   box-shadow: 0 0 5px #ffee10;
   text-shadow: 0 0 5px #ffee10;
@@ -148,15 +154,17 @@ button:hover:disabled {
   box-shadow: inset 0 0 5px #f33;
 }
 button:disabled {
-  color:#666;
+  color: #666;
 }
-button:focus {outline:0;}
+button:focus {
+  outline: 0;
+}
 
 div.shop > p {
-  margin:8px 0 6px 0;
+  margin: 8px 0 6px 0;
 }
 
-div.start-game button, 
+div.start-game button,
 div.end-level button,
 div.level-select div.start button {
   padding: 8px 10px;
@@ -168,7 +176,7 @@ div.shop button {
   padding: 8px 8px;
 }
 div.shop-title h2 {
-  float:left;
+  float: left;
   margin: 4px 0 8px;
   font-size: 1.2em;
 }
@@ -182,64 +190,68 @@ button.info {
   margin-left: 3px;
 }
 
-div.shop div.upgrade, div.shop div.bone-collectors {
-  background-color: rgba(20,30,20,0.8);
-  padding:10px;
-  margin-bottom:10px;
+div.shop div.upgrade,
+div.shop div.bone-collectors {
+  background-color: rgba(20, 30, 20, 0.8);
+  padding: 10px;
+  margin-bottom: 10px;
   position: relative;
 }
 
 div.shop h4 > button {
-  float:right;
+  float: right;
   margin: -5px 0 5px 0 !important;
 }
 
 div.shop div.bone-collectors button {
   margin: 5px 0 0 0;
-  padding : 8px 15px;
+  padding: 8px 15px;
 }
 div.shop div.bone-collectors .cages button {
-  padding : 8px 8px;
+  padding: 8px 8px;
 }
 div.shop div.bone-collectors label {
-  margin:10px;
+  margin: 10px;
 }
 div.shop h3 {
   margin: 0;
   font-size: 1em;
 }
 div.shop div.upgrade h4 {
-  float:left;
+  float: left;
 }
-div.shop div.upgrade h4, div.shop div.bone-collectors h4 {
+div.shop div.upgrade h4,
+div.shop div.bone-collectors h4 {
   font-size: 1em;
   line-height: 1em;
   margin: 0 0 5px 0;
   clear: both;
 }
 
-div.shop div.upgrade:not(.current-construction) p, div.shop div.bone-collectors p{
-  margin:5px 0;
+div.shop div.upgrade:not(.current-construction) p,
+div.shop div.bone-collectors p {
+  margin: 5px 0;
   font-style: italic;
   line-height: 20px;
-  clear:both;
+  clear: both;
 }
 div.shop div.upgrade.current-construction {
-  margin-top:5px;
+  margin-top: 5px;
 }
 
 div.shop div.upgrade p {
-  clear:both;
+  clear: both;
 }
 div.shop div.upgrade label {
   display: block;
 }
 
-div.shop div.upgrade label, div.shop div.bone-collectors label {
+div.shop div.upgrade label,
+div.shop div.bone-collectors label {
   font-weight: bold;
   font-size: 1em;
   margin-bottom: 5px;
-  clear:both;
+  clear: both;
 }
 
 div.shop div.upgrade h4.cost {
@@ -256,15 +268,15 @@ span.percent {
 }
 div.stats {
   white-space: nowrap;
-  bottom:10px;
-  left:50%;
+  bottom: 10px;
+  left: 50%;
   transform: translateX(-50%);
   position: absolute;
-  background-color: rgba(0,0,0,0.5);
-  padding:5px;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 5px;
 }
 div.stats label {
-  font-size:1em;
+  font-size: 1em;
   text-shadow: 2px 2px #000;
   margin: 10px;
   white-space: nowrap;
@@ -277,26 +289,26 @@ div.zoom-buttons {
 }
 
 div.zoom-buttons button {
-  padding:10px 15px;
-  font-size:1em;
+  padding: 10px 15px;
+  font-size: 1em;
 }
 
 div.buttons {
   position: absolute;
-  top:90px;
-  right:0;
-  padding:10px;
+  top: 90px;
+  right: 0;
+  padding: 10px;
 }
 
 div.spells {
-  position:absolute;
-  bottom:-10px;
-  left:0;
+  position: absolute;
+  bottom: -10px;
+  left: 0;
   transform: translateY(100%);
 }
 
 div.spells > button.spell {
-  padding:8px 10px;
+  padding: 8px 10px;
   position: relative;
   display: block;
   width: 100%;
@@ -305,21 +317,21 @@ div.spells > button.spell {
 }
 
 div.spells > button.spell.active {
-  color:#fff;
+  color: #fff;
 }
 
 div.spells > button.spell.cooldown {
-  color:#555;
+  color: #555;
 }
 div.spells > button.spell span.tooltip {
   display: none;
   position: absolute;
   top: 50%;
   right: -10px;
-  transform: translate(100%,-50%);
+  transform: translate(100%, -50%);
   width: 200%;
   padding: 10px;
-  background: rgba(0,0,0,0.4);
+  background: rgba(0, 0, 0, 0.4);
   z-index: 10;
 }
 
@@ -330,7 +342,7 @@ div.spells > button.spell span.timer {
   transform: translateX(100%);
   width: 35px;
   padding: 8px 10px;
-  background: rgba(0,0,0,0.4);
+  background: rgba(0, 0, 0, 0.4);
   z-index: 5;
 }
 
@@ -339,17 +351,17 @@ div.spells > button.spell:hover span.tooltip {
 }
 
 div.buttons.open {
-  right:calc(20% + 15px);
+  right: calc(20% + 15px);
 }
 
 div.buttons button {
   position: relative;
-  display:block;
+  display: block;
   padding: 8px 10px;
   font-size: 1em;
   margin: 5px 5px 0 0;
-  width:100%;
-  background: rgba(0,0,0,0.5);
+  width: 100%;
+  background: rgba(0, 0, 0, 0.5);
   border: none;
   color: #ccc;
   cursor: pointer;
@@ -357,7 +369,12 @@ div.buttons button {
 }
 
 div.buttons button.shatter {
-  background: linear-gradient(270deg, rgba(0,0,0,0.5) 25%, dodgerblue 50%, rgba(0,0,0,0.5) 75%);
+  background: linear-gradient(
+    270deg,
+    rgba(0, 0, 0, 0.5) 25%,
+    dodgerblue 50%,
+    rgba(0, 0, 0, 0.5) 75%
+  );
   background-size: 400% 400%;
 
   -webkit-animation: levelup-animation 4s ease infinite;
@@ -365,8 +382,9 @@ div.buttons button.shatter {
   animation: levelup-animation 4s ease infinite;
 }
 
-div.buttons button:not(.cooldown):hover, div.buttons button.active {
-  background: rgba(0,0,0,0.8);
+div.buttons button:not(.cooldown):hover,
+div.buttons button.active {
+  background: rgba(0, 0, 0, 0.8);
   color: #ff3;
 }
 
@@ -377,7 +395,7 @@ div.buttons button span.tag {
 }
 
 p.prestige-info {
-  margin:5px 0;
+  margin: 5px 0;
 }
 
 .energy {
@@ -422,7 +440,7 @@ p.prestige-info {
 
 ul {
   padding-inline-start: 20px;
-  clear:both;
+  clear: both;
 }
 
 div.generator-progress.active {
@@ -438,22 +456,24 @@ div.generator-progress {
 div.generator-progress.active > span.percent {
   height: 100%;
   border-radius: 15px;
-  animation:width-animation 4s linear infinite reverse;
+  animation: width-animation 4s linear infinite reverse;
 }
 
 @media screen and (min-width: 1700px) {
-  html,body {
+  html,
+  body {
     font-size: 18px;
   }
 }
 
 @media screen and (max-width: 900px) {
-  html,body {
+  html,
+  body {
     font-size: 14px;
   }
   div.stats.zoom {
-    bottom:10px;
-    right:10px;
+    bottom: 10px;
+    right: 10px;
     transform: none;
     left: auto;
   }
@@ -463,11 +483,13 @@ div.generator-progress.active > span.percent {
   div.shop div.tabs button {
     margin-right: 0;
   }
-  div.start-game button, div.end-level button, div.shop button {
+  div.start-game button,
+  div.end-level button,
+  div.shop button {
     padding: 6px 6px;
   }
   div.level-select {
-    width:60%;
+    width: 60%;
   }
 }
 @media screen and (max-width: 1509px) {
@@ -475,49 +497,52 @@ div.generator-progress.active > span.percent {
     right: 325px;
   }
   div.level-select {
-    width:70%;
+    width: 70%;
   }
 }
 
 @media screen and (max-width: 1040px) {
-  div.start-game, div.end-level {
+  div.start-game,
+  div.end-level {
     width: 90%;
   }
   div.level-select {
-    width:80%;
+    width: 80%;
   }
   .inventory .item {
-    width:3.5em !important;
-    height:3.5em !important;
+    width: 3.5em !important;
+    height: 3.5em !important;
   }
 }
 @media screen and (max-width: 579px) {
   div.shop {
-    width:80%;
+    width: 80%;
   }
   div.buttons {
-    top:auto;
+    top: auto;
     bottom: 40px;
   }
   div.buttons.open {
-    right:0;
+    right: 0;
   }
   div.buttons button {
     padding: 5px 10px;
   }
-  div.start-game button, div.end-level button, div.shop button {
-    padding:10px;
+  div.start-game button,
+  div.end-level button,
+  div.shop button {
+    padding: 10px;
   }
 }
 
 div.message {
-  background-color: rgba(0,0,0,0.4);
+  background-color: rgba(0, 0, 0, 0.4);
   position: absolute;
-  top:10px;
+  top: 10px;
   left: 50%;
   transform: translateX(-50%);
   font-size: 1.5em;
-  padding:0 15px;
+  padding: 0 15px;
   z-index: 150;
 }
 
@@ -528,31 +553,40 @@ div.message > p {
 }
 
 div.message > p::after {
-  content:"";
-  height:2px;
+  content: "";
+  height: 2px;
   background-color: #fff;
   position: absolute;
-  animation:width-animation 4s linear;
-  bottom:0;
-  left:50%;
+  animation: width-animation 4s linear;
+  bottom: 0;
+  left: 50%;
   transform: translateX(-50%);
 }
 
 @keyframes width-animation {
-  0% {width:100%;}
-  100% {width:0%;}
+  0% {
+    width: 100%;
+  }
+  100% {
+    width: 0%;
+  }
 }
 
 #prestige-bg {
   position: absolute;
   width: 100%;
   height: 100%;
-  left:0;
-  top:0;
+  left: 0;
+  top: 0;
 }
 
 .levelup {
-  background: linear-gradient(270deg, rgba(0,0,0,0) 25%, #ffee10 50%, rgba(0,0,0,0) 75%);
+  background: linear-gradient(
+    270deg,
+    rgba(0, 0, 0, 0) 25%,
+    #ffee10 50%,
+    rgba(0, 0, 0, 0) 75%
+  );
   background-size: 400% 400%;
 
   -webkit-animation: levelup-animation 2s ease;
@@ -561,9 +595,15 @@ div.message > p::after {
 }
 
 @keyframes levelup-animation {
-  0%{background-position:0% 50%}
-  50%{background-position:100% 50%}
-  100%{background-position:0% 50%}
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 ::-webkit-scrollbar {
@@ -585,15 +625,15 @@ div.message > p::after {
 div.upgrade .row {
   clear: both;
   display: table;
-  width:100%;
-  margin:5px 0;
+  width: 100%;
+  margin: 5px 0;
 }
 div.upgrade .col {
-  float:left;
+  float: left;
   width: 65%;
 }
 div.upgrade .col button {
-  width:100%;
+  width: 100%;
 }
 div.upgrade .col:nth-of-type(2) {
   width: 35%;
@@ -604,10 +644,10 @@ div.level-stats {
   bottom: 55px;
   left: 50%;
   transform: translateX(-50%);
-  background-color: rgba(0,0,0,0.5);
+  background-color: rgba(0, 0, 0, 0.5);
   text-align: left;
   text-shadow: 2px 2px #000;
-  padding:10px;
+  padding: 10px;
 }
 
 div.level-stats td {
@@ -618,30 +658,30 @@ div.resources {
   position: absolute;
   left: 10px;
   top: 10px;
-  background-color: rgba(0,0,0,0.5);
+  background-color: rgba(0, 0, 0, 0.5);
 }
 
 div.resources label {
   position: relative;
-  display:block;
-  font-size:1.2em;
-  margin:10px;
+  display: block;
+  font-size: 1.2em;
+  margin: 10px;
   text-shadow: 2px 2px #000;
 }
 
 div.resources label > span.value {
-  float:right;
+  float: right;
   margin-left: 0.5em;
 }
 
 div.spells > div.skeleton {
   position: absolute;
-  height:5em;
+  height: 5em;
   width: 100%;
-  left:0;
-  top:100%;
+  left: 0;
+  top: 100%;
   cursor: pointer;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0, 0, 0, 0.5);
   background-image: url("images/skeleton.png");
   background-repeat: no-repeat;
   background-size: cover;
@@ -667,7 +707,7 @@ div.skeleton > div.xp {
   position: absolute;
   right: 0;
   background-color: #000;
-  height:100%;
+  height: 100%;
   width: 5px;
 }
 div.skeleton > div.xp > span {
@@ -683,19 +723,20 @@ div.skeleton > div.lvl {
   text-align: center;
   bottom: 0;
   position: absolute;
-  background: rgba(0,0,0,0.8);
+  background: rgba(0, 0, 0, 0.8);
 }
 
 div.skeleton > div.lvl.dead {
-  color:#fd5252;
+  color: #fd5252;
 }
 .inventory {
   margin: 1em 0;
-  height:400px;
+  height: 400px;
   overflow: visible;
 }
-.inventory .equipped, .inventory .items {
-  float:left;
+.inventory .equipped,
+.inventory .items {
+  float: left;
   max-height: 100%;
   overflow-y: auto;
   overflow-x: hidden;
@@ -705,13 +746,13 @@ div.skeleton > div.lvl.dead {
   width: 40%;
 }
 .inventory .items {
-  width:60%;
+  width: 60%;
 }
 
 .inventory .item {
-  width:4em;
-  height:4em;
-  border:1px solid white;
+  width: 4em;
+  height: 4em;
+  border: 1px solid white;
   margin: 0.5em;
   position: relative;
   display: inline-block;
@@ -719,17 +760,18 @@ div.skeleton > div.lvl.dead {
 
 .inventory .item .icon {
   position: absolute;
-  height:100%;
+  height: 100%;
   width: 100%;
-  top:0;
-  left:0;
+  top: 0;
+  left: 0;
   image-rendering: -moz-crisp-edges;
   image-rendering: -webkit-crisp-edges;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
 }
 
-.inventory .items .item, .inventory .equipped .item.trash {
+.inventory .items .item,
+.inventory .equipped .item.trash {
   cursor: pointer;
 }
 
@@ -747,7 +789,7 @@ div.skeleton > div.lvl.dead {
   background-color: dodgerblue;
 }
 .inventory .item.epic {
-  background-color:#fb2;
+  background-color: #fb2;
 }
 .inventory .item.legendary {
   background: linear-gradient(270deg, #6b1610, #fc3503, #6b1610);
@@ -785,19 +827,30 @@ div.skeleton > div.lvl.dead {
 .inventory .item .icon {
   background-size: contain !important;
 }
-.inventory .equipped.helmet .item.helmet.over, .inventory .equipped.chest .item.chest.over, .inventory .equipped.legs .item.legs.over, .inventory .equipped.gloves .item.gloves.over,
-.inventory .equipped.boots .item.boots.over, .inventory .equipped.sword .item.sword.over, .inventory .equipped.shield .item.shield.over, .inventory .equipped .item.trash.over {
+.inventory .equipped.helmet .item.helmet.over,
+.inventory .equipped.chest .item.chest.over,
+.inventory .equipped.legs .item.legs.over,
+.inventory .equipped.gloves .item.gloves.over,
+.inventory .equipped.boots .item.boots.over,
+.inventory .equipped.sword .item.sword.over,
+.inventory .equipped.shield .item.shield.over,
+.inventory .equipped .item.trash.over {
   color: #ff3;
   box-shadow: 0 0 40px #ffee10;
 }
-.inventory .equipped.helmet .item:not(.helmet):not(.trash), .inventory .equipped.chest .item:not(.chest):not(.trash), .inventory .equipped.legs .item:not(.legs):not(.trash), .inventory .equipped.gloves .item:not(.gloves):not(.trash),
-.inventory .equipped.boots .item:not(.boots):not(.trash), .inventory .equipped.sword .item:not(.sword):not(.trash), .inventory .equipped.shield .item:not(.shield):not(.trash)  {
+.inventory .equipped.helmet .item:not(.helmet):not(.trash),
+.inventory .equipped.chest .item:not(.chest):not(.trash),
+.inventory .equipped.legs .item:not(.legs):not(.trash),
+.inventory .equipped.gloves .item:not(.gloves):not(.trash),
+.inventory .equipped.boots .item:not(.boots):not(.trash),
+.inventory .equipped.sword .item:not(.sword):not(.trash),
+.inventory .equipped.shield .item:not(.shield):not(.trash) {
   opacity: 0.2;
 }
 
 .inventory .item .level {
-  float:right;
-  color:#333;
+  float: right;
+  color: #333;
   position: relative;
   font-weight: bold;
   margin-right: 0.2em;
@@ -806,11 +859,11 @@ div.skeleton > div.lvl.dead {
 .inventory .item .tooltip {
   position: fixed;
   display: none;
-  background-color: rgb(12,55,55);
-  box-shadow:rgb(0, 0, 0) 5px 5px 15px;
+  background-color: rgb(12, 55, 55);
+  box-shadow: rgb(0, 0, 0) 5px 5px 15px;
   border-radius: 5px;
   width: 250px;
-  padding:0.5em;
+  padding: 0.5em;
   z-index: 150;
 }
 #champ-hold:not(.no-tooltip) .inventory .item:hover .tooltip {
@@ -821,12 +874,14 @@ div.skeleton > div.lvl.dead {
   display: block;
   margin-bottom: 0.3em;
 }
-.inventory .item .tooltip span.desc, .inventory .item .tooltip span.stat, .inventory .item .tooltip span.effect {
-  display:block;
+.inventory .item .tooltip span.desc,
+.inventory .item .tooltip span.stat,
+.inventory .item .tooltip span.effect {
+  display: block;
   line-height: 1.5em;
 }
 .inventory .item .tooltip span.stat {
-  color:#3aca51;
+  color: #3aca51;
 }
 .inventory .item .tooltip span.xp {
   font-size: 0.8em;
@@ -837,24 +892,24 @@ div.skeleton > div.lvl.dead {
 }
 
 div.level-select > div.levels > button {
-  display:block;
-  float:left;
-  width:calc(10% - 4px);
-  border:1px solid #aaa;
-  padding:5px 0;
+  display: block;
+  float: left;
+  width: calc(10% - 4px);
+  border: 1px solid #aaa;
+  padding: 5px 0;
   text-align: center;
-  margin:2px;
+  margin: 2px;
   cursor: pointer;
   position: relative;
 }
 
 div.level-select > div.levels > button.boss {
-  color:#fd5252;
+  color: #fd5252;
   font-weight: bold;
 }
 
 div.level-select > div.levels > button.completed {
-  color:mediumseagreen;
+  color: mediumseagreen;
 }
 
 div.level-select > div.levels > button.active {
@@ -863,7 +918,7 @@ div.level-select > div.levels > button.active {
 }
 
 div.level-select > div.levels > button.completed:after {
-  content:"\2714";
+  content: "\2714";
   position: absolute;
   top: 2%;
   right: 25%;
@@ -871,7 +926,7 @@ div.level-select > div.levels > button.completed:after {
 }
 
 div.level-select > div.levels > button.boss:not(.completed):after {
-  content:"\1F451";
+  content: "\1F451";
   position: absolute;
   top: 0;
   right: 25%;
@@ -880,7 +935,7 @@ div.level-select > div.levels > button.boss:not(.completed):after {
 }
 
 div.level-select > div.levels > button.trophy:not(.boss):after {
-  content:"\1F3C6";
+  content: "\1F3C6";
   position: absolute;
   top: 10%;
   right: 25%;
@@ -894,11 +949,12 @@ div.level-select div.ranges button {
 }
 
 div.level-select div.start label {
-  display:block;
-  margin-bottom:1em;
+  display: block;
+  margin-bottom: 1em;
 }
 
-div.level-select div.start, div.level-select div.ranges {
+div.level-select div.start,
+div.level-select div.ranges {
   padding: 1em;
 }
 
@@ -907,5 +963,5 @@ div.level-select > label {
 }
 
 .mt-5 {
-  margin-top:5px;
+  margin-top: 5px;
 }
