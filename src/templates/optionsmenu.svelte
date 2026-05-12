@@ -2,7 +2,7 @@
   <div class="shop">
     <div class="shop-title">
       <h2>Options</h2>
-      <button on:click={closeSidePanels()}>Close</button>
+      <button onclick={closeSidePanels()}>Close</button>
     </div>
     <div class="upgrades">
       <div class="upgrade">
@@ -16,7 +16,7 @@
       <div class="upgrade">
         <h4>Auto Start Next Level</h4>
         <p>Automatically start the next level after 3 seconds. If you want to play without actually playing.</p>
-        <button on:click={toggleAutoStart()}>
+        <button onclick={toggleAutoStart()}>
           {model.persistentData.autoStart ? 'On' : 'Off'}
         </button>
       </div>
@@ -27,19 +27,19 @@
         <p>100% will pixel match the resolution reported by your browser.</p>
         <p>200% will double the reported values which may look better on retina devices or smartphones.</p>
         <button
-          on:click={toggleResolution(0.5)}
+          onclick={toggleResolution(0.5)}
           class:active={getResolution() === 0.5}
         >
           50%
         </button>
         <button
-          on:click={toggleResolution(1)}
+          onclick={toggleResolution(1)}
           class:active={getResolution() === 1}
         >
           100%
         </button>
         <button
-          on:click={toggleResolution(2)}
+          onclick={toggleResolution(2)}
           class:active={getResolution() === 2}
         >
           200%
@@ -48,7 +48,7 @@
       <div class="upgrade">
         <h4>Particle Effects</h4>
         <p>Disable particles like blood and smoke to improve performance</p>
-        <button on:click={toggleParticles()}>
+        <button onclick={toggleParticles()}>
           {model.persistentData.particles ? 'On' : 'Off'}
         </button>
       </div>
@@ -56,25 +56,25 @@
         <div class="upgrade">
           <h4>Add to Home Screen</h4>
           <p>You can add this game to your smartphones home screen without having to install anything.</p>
-          <button on:click={addToHomeScreen()}>Add to Home Screen</button>
+          <button onclick={addToHomeScreen()}>Add to Home Screen</button>
         </div>
       {/if}
       <div class="upgrade">
         <h4>Toggle Full Screen</h4>
         <p>Toggle full screen mode. Can be helpful on smaller screen devices.</p>
-        <button on:click={model.toggleFullscreen()}> Toggle Full Screen </button>
+        <button onclick={model.toggleFullscreen()}> Toggle Full Screen </button>
       </div>
       <div class="upgrade">
         <h4>Show Zoom Buttons</h4>
         <p>If you're unable to zoom with other methods this will add some buttons to the screen for zooming the map.</p>
-        <button on:click={toggleZoomButtons()}>
+        <button onclick={toggleZoomButtons()}>
           {model.persistentData.zoomButtons ? 'On' : 'Off'}
         </button>
       </div>
       <div class="upgrade">
         <h4>Show Framerate Counter</h4>
         <p>Used for performance testing</p>
-        <button on:click={toggleShowFps()}>
+        <button onclick={toggleShowFps()}>
           {model.persistentData.showfps ? 'On' : 'Off'}
         </button>
       </div>
@@ -91,7 +91,7 @@
             <button>Download Save File</button>
           </a>
         {/if}
-        <button on:click={document.getElementById('import-file').click()}> Import Save </button>
+        <button onclick={document.getElementById('import-file').click()}> Import Save </button>
         <input
           type="file"
           id="import-file"
@@ -105,7 +105,7 @@
       <div class="upgrade">
         <h4>Reset Game</h4>
         <p>This will reset all save data if you want to start from the very beginning again.</p>
-        <button on:click={resetGame()}>Reset Game</button>
+        <button onclick={resetGame()}>Reset Game</button>
       </div>
     </div>
   </div>

@@ -2,7 +2,7 @@
   <div class="shop">
     <div class="shop-title">
       <h2>Runesmith</h2>
-      <button on:click={closeSidePanels()}>Close</button>
+      <button onclick={closeSidePanels()}>Close</button>
     </div>
     <p>
       The runesmith enchants your zombies with magical symbols of life and death. These runes can be infused with resources to increase
@@ -11,35 +11,35 @@
     <div class="tabs">
       <strong>Amount: </strong>
       <button
-        on:click={() => {
+        onclick={() => {
           infusionAmount = 1000;
           infusionMax = false;
         }}
         class={infusionMax != true && infusionAmount == 1000 ? 'active' : ''}>1K</button
       >
       <button
-        on:click={() => {
+        onclick={() => {
           infusionAmount = 10000;
           infusionMax = false;
         }}
         class={infusionMax != true && infusionAmount == 10000 ? 'active' : ''}>10K</button
       >
       <button
-        on:click={() => {
+        onclick={() => {
           infusionAmount = 100000;
           infusionMax = false;
         }}
         class={infusionMax != true && infusionAmount == 100000 ? 'active' : ''}>100K</button
       >
       <button
-        on:click={() => {
+        onclick={() => {
           infusionAmount = 1000000;
           infusionMax = false;
         }}
         class={infusionMax != true && infusionAmount == 1000000 ? 'active' : ''}>1M</button
       >
       <button
-        on:click={() => {
+        onclick={() => {
           infusionMax = true;
         }}
         class={infusionMax == true ? 'active' : ''}>Max</button
@@ -56,7 +56,7 @@
           </div>
           <div class="col">
             <button
-              on:click={infuseRune('life', 'blood')}
+              onclick={infuseRune('life', 'blood')}
               disabled={infusionMax != true && model.persistentData.blood < infusionAmount}>Infuse {infuseButtonText()} Blood</button
             >
           </div>
@@ -68,7 +68,7 @@
           </div>
           <div class="col">
             <button
-              on:click={infuseRune('life', 'brains')}
+              onclick={infuseRune('life', 'brains')}
               disabled={infusionMax != true && model.persistentData.brains < infusionAmount}>Infuse {infuseButtonText()} Brains</button
             >
           </div>
@@ -80,7 +80,7 @@
           </div>
           <div class="col">
             <button
-              on:click={infuseRune('life', 'bones')}
+              onclick={infuseRune('life', 'bones')}
               disabled={infusionMax != true && model.persistentData.bones < infusionAmount}>Infuse {infuseButtonText()} Bones</button
             >
           </div>
@@ -92,7 +92,7 @@
           <div class="col">
             <button
               disabled={model.persistentData.blood < shatterBloodCost(model.persistentData.runes.life)}
-              on:click={shatterSatiate('life', model.persistentData.runes.life)}
+              onclick={shatterSatiate('life', model.persistentData.runes.life)}
               >Infuse {whole(shatterBloodCost(model.persistentData.runes.life))} Blood</button
             >
           </div>
@@ -108,7 +108,7 @@
           </div>
           <div class="col">
             <button
-              on:click={infuseRune('death', 'blood')}
+              onclick={infuseRune('death', 'blood')}
               disabled={infusionMax != true && model.persistentData.blood < infusionAmount}>Infuse {infuseButtonText()} Blood</button
             >
           </div>
@@ -120,7 +120,7 @@
           </div>
           <div class="col">
             <button
-              on:click={infuseRune('death', 'brains')}
+              onclick={infuseRune('death', 'brains')}
               disabled={infusionMax != true && model.persistentData.brains < infusionAmount}>Infuse {infuseButtonText()} Brains</button
             >
           </div>
@@ -132,7 +132,7 @@
           </div>
           <div class="col">
             <button
-              on:click={infuseRune('death', 'bones')}
+              onclick={infuseRune('death', 'bones')}
               disabled={infusionMax != true && model.persistentData.bones < infusionAmount}>Infuse {infuseButtonText()} Bones</button
             >
           </div>
@@ -144,7 +144,7 @@
           <div class="col">
             <button
               disabled={model.persistentData.blood < shatterBloodCost(model.persistentData.runes.death)}
-              on:click={shatterSatiate('death', model.persistentData.runes.death)}
+              onclick={shatterSatiate('death', model.persistentData.runes.death)}
               >Infuse {whole(shatterBloodCost(model.persistentData.runes.death))} Blood</button
             >
           </div>
@@ -160,11 +160,11 @@
         <label class="blood">Effect: {shatterEffect() | decimal}% Health/Damage</label>
         <label class="blood">Zombie Summon Cost: {whole(model.zombieCost)} energy</label>
         <button
-          on:click={doShatter()}
+          onclick={doShatter()}
           disabled={!canShatter()}>Shatter</button
         >
         <button
-          on:click={(model.autoShatter = !model.autoShatter)}
+          onclick={(model.autoShatter = !model.autoShatter)}
           class={model.autoShatter ? 'active' : ''}>Auto Shatter {model.autoShatter ? 'On' : 'Off'}</button
         >
       </div>

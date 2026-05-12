@@ -2,20 +2,20 @@
   <div class="shop">
     <div class="shop-title">
       <h2>Unholy Construction</h2>
-      <button on:click={closeSidePanels()}>Close</button>
+      <button onclick={closeSidePanels()}>Close</button>
     </div>
     <div class="tabs">
       <button
-        on:click={filterConstruction('available')}
+        onclick={filterConstruction('available')}
         class:active={currentConstructionFilter === 'available'}>Available</button
       >
       <button
-        on:click={filterConstruction('completed')}
+        onclick={filterConstruction('completed')}
         class:active={currentConstructionFilter === 'completed'}>Completed</button
       >
       {#if model.autoconstructionUnlocked}
         <button
-          on:click={(model.autoconstruction = !model.autoconstruction)}
+          onclick={(model.autoconstruction = !model.autoconstruction)}
           class:active={model.autoconstruction}>{model.autoconstruction ? 'Auto On' : 'Auto Off'}</button
         >
       {/if}
@@ -74,9 +74,8 @@
             </strong>
           </p>
         {/if}
-        <button on:click={playPauseConstruction()}>{model.persistentData.currentConstruction.state == 'paused' ? 'Resume' : 'Pause'}</button
-        >
-        <button on:click={cancelConstruction()}>Cancel</button>
+        <button onclick={playPauseConstruction()}>{model.persistentData.currentConstruction.state == 'paused' ? 'Resume' : 'Pause'}</button>
+        <button onclick={cancelConstruction()}>Cancel</button>
       </div>
     {/if}
     <div class="upgrades">
@@ -115,7 +114,7 @@
               Current Rank: {currentRankConstruction(upgrade)} / {upgrade.cap}
             </p>
             <button
-              on:click={startConstruction(upgrade)}
+              onclick={startConstruction(upgrade)}
               disabled={model.persistentData.currentConstruction}>Begin Construction</button
             >
           {/if}

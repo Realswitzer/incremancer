@@ -97,32 +97,32 @@ const CreatureFactory = {
     GameModel.persistentData.parts -= this.purchasePrice(creature);
   },
 
-  creatureAutoBuildNumber(creature, number) {
+  creatureAutoBuildNumber(creature: Creature, number: number): void {
     if (creature.autobuild + number >= 0) {
       creature.autobuild += number;
       GameModel.persistentData.creatureAutobuild[creature.id] = creature.autobuild;
     }
   },
 
-  updateAutoBuild() {
+  updateAutoBuild(): void {
     for (var i = 0; i < this.creatures.length; i++) {
       this.creatures[i].autobuild = GameModel.persistentData.creatureAutobuild[this.creatures[i].id] || 0;
     }
   },
 
-  resetLevels() {
+  resetLevels(): void {
     for (var i = 0; i < this.creatures.length; i++) {
       this.creatures[i].level = 1;
     }
   },
 
-  spawnCreature(creature) {
+  spawnCreature(creature): void {
     var health = creature.baseHealth * Math.pow(this.creatureScaling, creature.level - 1) * GameModel.golemHealthPCMod;
     var damage = creature.baseDamage * Math.pow(this.creatureScaling, creature.level - 1) * GameModel.golemDamagePCMod;
     Creatures.spawnCreature(health, damage, creature.speed, creature.type, creature.level);
   },
 
-  spawnSavedCreatures() {
+  spawnSavedCreatures(): void {
     if (!this.spawnedSavedCreatures) {
       var creaturesSpawned = 0;
       for (var i = 0; i < GameModel.persistentData.savedCreatures.length; i++) {
@@ -138,7 +138,7 @@ const CreatureFactory = {
     }
   },
 
-  creatureStats(creature) {
+  creatureStats(creature: Creature) {
     return {
       thisLevel: {
         level: creature.level,

@@ -1,6 +1,6 @@
-import { getRandomElementFromArray } from './utilsfunctions';
-
-const ZmMap = {
+import { getRandomElementFromArray } from './utilsfunctions.ts';
+import { GameModel } from './gamemodel.ts';
+export const ZmMap = {
   buildings: [],
   buildingsByPopularity: [],
   buildingTextures: false,
@@ -807,4 +807,3 @@ const ZmMap = {
     }
   }
 };
-export default ZmMap;

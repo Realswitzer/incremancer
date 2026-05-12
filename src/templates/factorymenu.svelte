@@ -2,17 +2,17 @@
   <div class="shop">
     <div class="shop-title">
       <h2>Factory</h2>
-      <button on:click={closeSidePanels()}>Close</button>
+      <button onclick={closeSidePanels()}>Close</button>
     </div>
     <div class="tabs">
       <button
-        on:click={factory.changeFactoryTab('parts')}
+        onclick={factory.changeFactoryTab('parts')}
         class="parts"
         class:active={factoryTab === 'parts'}>Parts</button
       >
       {#if model.constructions.monsterFactory}
         <button
-          on:click={factory.changeFactoryTab('creatures')}
+          onclick={factory.changeFactoryTab('creatures')}
           class="blood"
           class:active={factoryTab === 'creatures'}>Creatures</button
         >
@@ -20,7 +20,7 @@
 
       {#if model.constructions.monsterFactory}
         <button
-          on:click={factory.changeFactoryTab('level')}
+          onclick={factory.changeFactoryTab('level')}
           class="blood"
           class:active={factoryTab === 'level'}>Upgrade</button
         >
@@ -53,7 +53,7 @@
               ></span>
             </div>
             <button
-              on:click={factory.buyGenerator(generator)}
+              onclick={factory.buyGenerator(generator)}
               disabled={upgradeTooExpensive(generator)}
               >{upgradeButtonText(generator)}
               <span
@@ -64,12 +64,12 @@
               ></span>
             </button>
             <button
-              on:click={(generator.selected = !generator.selected)}
+              onclick={(generator.selected = !generator.selected)}
               class="info {generator.selected ? 'active' : ''}">i</button
             >
             {#if model.autoUpgrades}
               <button
-                on:click={(generator.auto = !generator.auto)}
+                onclick={(generator.auto = !generator.auto)}
                 class="info"
                 class:active={generator.auto}>{generator.auto ? 'On' : 'Auto'}</button
               >
@@ -100,7 +100,7 @@
             <h4 class="cost">{whole(factory.creaturePrice(creature))} parts</h4>
             <div class="clear"></div>
             <button
-              on:click={factory.buyCreature(creature)}
+              onclick={factory.buyCreature(creature)}
               disabled={!factory.canBuildCreature(creature)}
               >{factory.creatureButtonText(creature)}
               <span
@@ -111,7 +111,7 @@
               ></span>
             </button>
             <button
-              on:click={(creature.selected = !creature.selected)}
+              onclick={(creature.selected = !creature.selected)}
               class="info"
               class:active={creature.selected}>i</button
             >
@@ -120,9 +120,8 @@
               class="clear"
               style="margin-top:5px;"
             >
-              <button on:click={factory.autoBuild(creature, -1)}>-</button><span style="padding:0 10px"
-                >Auto build {creature.autobuild}</span
-              ><button on:click={factory.autoBuild(creature, 1)}>+</button>
+              <button onclick={factory.autoBuild(creature, -1)}>-</button><span style="padding:0 10px">Auto build {creature.autobuild}</span
+              ><button onclick={factory.autoBuild(creature, 1)}>+</button>
             </div>
           </div>
         {/each}
@@ -142,7 +141,7 @@
             <h4 class="cost">{whole(factory.creatureLevelPrice(creature))} parts</h4>
             <div class="clear"></div>
             <button
-              on:click={factory.levelCreature(creature)}
+              onclick={factory.levelCreature(creature)}
               disabled={!factory.canLevelCreature(creature)}
               >{factory.creatureLevelButtonText(creature)}
               <span
@@ -153,7 +152,7 @@
               ></span>
             </button>
             <button
-              on:click={(creature.selected = !creature.selected)}
+              onclick={(creature.selected = !creature.selected)}
               class="info"
               class:active={creature.selected}>i</button
             >

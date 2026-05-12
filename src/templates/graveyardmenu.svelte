@@ -2,15 +2,15 @@
   <div class="shop">
     <div class="shop-title">
       <h2>Cursed Graveyard</h2>
-      <button on:click={closeSidePanels()}>Close</button>
+      <button onclick={closeSidePanels()}>Close</button>
     </div>
     <div class="tabs">
       <button
-        on:click={graveyardTabSelect('minions')}
+        onclick={graveyardTabSelect('minions')}
         class:active={graveyardTab === 'minions'}>Minions</button
       >
       <button
-        on:click={graveyardTabSelect('trophies')}
+        onclick={graveyardTabSelect('trophies')}
         class:active={graveyardTab === 'trophies'}>Trophies</button
       >
     </div>
@@ -19,7 +19,7 @@
         <div class="bone-collectors bones">
           <h4>
             Bone Collectors <button
-              on:click={(bcinfo = !bcinfo)}
+              onclick={(bcinfo = !bcinfo)}
               class:active={bcinfo}>Info</button
             >
           </h4>
@@ -28,13 +28,13 @@
             second. They're hungry little creatures. Must be all that running around.
           </p>
           <h4>Energy rate {decimal(model.getEnergyRate())} per second</h4>
-          <button on:click={subtractBoneCollector()}>-</button><label>{whole(model.persistentData.boneCollectors)} bone collectors</label
-          ><button on:click={addBoneCollector()}>+</button>
+          <button onclick={subtractBoneCollector()}>-</button><label>{whole(model.persistentData.boneCollectors)} bone collectors</label
+          ><button onclick={addBoneCollector()}>+</button>
         </div>
         <div class="bone-collectors bones">
           <h4>
             Zombies to Spawn <button
-              on:click={(zsinfo = !zsinfo)}
+              onclick={(zsinfo = !zsinfo)}
               class:active={zsinfo}>Info</button
             >
           </h4>
@@ -42,18 +42,18 @@
             Control how many zombies the graveyard spawns each time your energy is full. This is limited by your maximum energy.
           </p>
           <div class="clear">
-            <button on:click={setGraveyardZombies(0)}>0</button>
-            <button on:click={setGraveyardZombies(model.persistentData.graveyardZombies - 1)}>-</button>
+            <button onclick={setGraveyardZombies(0)}>0</button>
+            <button onclick={setGraveyardZombies(model.persistentData.graveyardZombies - 1)}>-</button>
             <label>{whole(model.persistentData.graveyardZombies)} zombies</label>
-            <button on:click={setGraveyardZombies(model.persistentData.graveyardZombies + 1)}>+</button>
-            <button on:click={setGraveyardZombies(maxGraveyardZombies())}>{maxGraveyardZombies()}</button>
+            <button onclick={setGraveyardZombies(model.persistentData.graveyardZombies + 1)}>+</button>
+            <button onclick={setGraveyardZombies(maxGraveyardZombies())}>{maxGraveyardZombies()}</button>
           </div>
         </div>
         {#if model.zombieCages > 0}
           <div class="bone-collectors bones">
             <h4>
               Caged Zombies <button
-                on:click={(czinfo = !czinfo)}
+                onclick={(czinfo = !czinfo)}
                 class:active={czinfo}>Info</button
               >
             </h4>
@@ -64,15 +64,15 @@
                   .brains} brains, and {model.cagedZombieSacrificeValue().bones} bones
               </p>
               <button
-                on:click={model.releaseCagedZombies()}
+                onclick={model.releaseCagedZombies()}
                 disabled={model.zombiesInCages === 0 || model.currentState !== model.states.playingLevel}>Release</button
               >
               <button
-                on:click={(model.persistentData.autoRelease = !model.persistentData.autoRelease)}
+                onclick={(model.persistentData.autoRelease = !model.persistentData.autoRelease)}
                 class:active={model.persistentData.autoRelease}>Auto Release</button
               >
               <button
-                on:click={model.sacrificeCagedZombies()}
+                onclick={model.sacrificeCagedZombies()}
                 disabled={model.zombiesInCages === 0}>Sacrifice</button
               >
             </div>
@@ -82,7 +82,7 @@
           <div class="bone-collectors bones">
             <h4>
               Harpies <button
-                on:click={(hpinfo = !hpinfo)}
+                onclick={(hpinfo = !hpinfo)}
                 class:active={hpinfo}>Info</button
               >
             </h4>
@@ -92,18 +92,18 @@
               health.
             </p>
             <h4>Energy rate {decimal(model.getEnergyRate())} per second</h4>
-            <button on:click={setHarpies(model.persistentData.harpies - 1)}>-</button><label
+            <button onclick={setHarpies(model.persistentData.harpies - 1)}>-</button><label
               >{whole(model.persistentData.harpies)} harpies</label
-            ><button on:click={setHarpies(model.persistentData.harpies + 1)}>+</button>
+            ><button onclick={setHarpies(model.persistentData.harpies + 1)}>+</button>
           </div>
         {/if}
         <!-- NOTE: side tangent, but gigazombies looks like it was intended to be perm, not a spell.
         thats kind of weird trivia.-->
         <!-- <div class="bone-collectors bones" ng-if="model.gigazombies">
-            <h4>Gigazombies <button on:click={gzinfo = ! gzinfo} class="{gzinfo ? 'active' : ''}">Info</button></h4>
+            <h4>Gigazombies <button onclick={gzinfo = ! gzinfo} class="{gzinfo ? 'active' : ''}">Info</button></h4>
             <p ng-show="gzinfo">Causes any zombie spawned using energy to be a Gigazombie. This will increase their health and damage by 10x, and energy cost by 5x.</p>
             <h4>Energy cost per zombie {model.zombieCost}</h4>
-            <button on:click={model.toggleGigazombies();} class="{model.persistentData.gigazombiesOn ? 'active' : ''}">{model.persistentData.gigazombiesOn ? 'Gigazombies On' : 'Gigazombies Off'}</button>
+            <button onclick={model.toggleGigazombies();} class="{model.persistentData.gigazombiesOn ? 'active' : ''}">{model.persistentData.gigazombiesOn ? 'Gigazombies On' : 'Gigazombies Off'}</button>
           </div> -->
       </div>
     {/if}
@@ -114,19 +114,19 @@
       </p>
       <div class="tabs">
         <button
-          on:click={trophyTabSelect('all')}
+          onclick={trophyTabSelect('all')}
           class={trophyTab == 'all' ? 'active' : ''}>All</button
         >
         <button
-          on:click={trophyTabSelect('collected')}
+          onclick={trophyTabSelect('collected')}
           class={trophyTab == 'collected' ? 'active' : ''}>Collected</button
         >
         <button
-          on:click={trophyTabSelect('uncollected')}
+          onclick={trophyTabSelect('uncollected')}
           class={trophyTab == 'uncollected' ? 'active' : ''}>Uncollected</button
         >
         <button
-          on:click={trophyTabSelect('totals')}
+          onclick={trophyTabSelect('totals')}
           class={trophyTab == 'totals' ? 'active' : ''}>Stat Totals</button
         >
       </div>

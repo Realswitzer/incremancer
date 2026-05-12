@@ -2,24 +2,24 @@
   <div class="shop">
     <div class="shop-title">
       <h2>Shop</h2>
-      <button on:click{closeSidePanels()}>Close</button>
+      <button onclick{closeSidePanels()}>Close</button>
     </div>
     <div class="tabs">
       <button
-        on:click={filterShop('blood')}
+        onclick={filterShop('blood')}
         class="blood"
         class:active={currentShopFilter === 'blood'}
       >
         Blood
       </button>
       <button
-        on:click={filterShop('brains')}
+        onclick={filterShop('brains')}
         class="brains"
         class:active={currentShopFilter === 'brains'}>Brains</button
       >
       {#if model.constructions.graveyard}
         <button
-          on:click={filterShop('bones')}
+          onclick={filterShop('bones')}
           class="bones"
           ,
           class:active={currentShopFilter === 'bones'}>Bones</button
@@ -27,14 +27,14 @@
       {/if}
       {#if model.constructions.monsterFactory}
         <button
-          on:click={filterShop('parts')}
+          onclick={filterShop('parts')}
           class="parts"
           ,
           class:active={currentShopFilter === 'parts'}>Parts</button
         >
       {/if}
       <button
-        on:click={filterShop('completed')}
+        onclick={filterShop('completed')}
         class="bones"
         ,
         class:active={currentShopFilter === 'completed'}>Complete</button
@@ -47,7 +47,7 @@
           <h4 class="cost">{whole(upgradePrice(upgrade))} {upgrade.costType}</h4>
           <label>{upgradeSubtitle(upgrade)}</label>
           <button
-            on:click={buyUpgrade(upgrade)}
+            onclick={buyUpgrade(upgrade)}
             disabled={upgradeTooExpensive(upgrade)}
             >{upgradeButtonText(upgrade)}
             <span
@@ -58,13 +58,13 @@
             ></span>
           </button>
           <button
-            on:click={(upgrade.selected = !upgrade.selected)}
+            onclick={(upgrade.selected = !upgrade.selected)}
             class="info"
             class:active={upgrade.selected}>i</button
           >
           {#if currentShopFilter != 'completed' && model.autoUpgrades}
             <button
-              on:click={(upgrade.auto = !upgrade.auto)}
+              onclick={(upgrade.auto = !upgrade.auto)}
               class="info"
               class:active={upgrade.auto}
             >

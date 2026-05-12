@@ -6,7 +6,7 @@
       {#each levelSelect.levelRanges as range}
         <button
           class={levelSelect.start == range ? 'active' : null}
-          on:click={() => levelSelect.selectRange(range)}
+          onclick={() => levelSelect.selectRange(range)}
         >
           Levels {range} to {range + levelSelect.levelsPerPage - 1}
         </button>
@@ -15,7 +15,7 @@
     <div class="levels">
       {#each levelSelect.levels as level}
         <button
-          on:click={levelSelect.select(level)}
+          onclick={levelSelect.select(level)}
           class={[
             level.trophy && 'trophy',
             level.completed && 'completed',
@@ -43,12 +43,12 @@
       {/if}
       {#if levelSelect.level}
         <button
-          on:click={levelSelect.startLevel()}
+          onclick={levelSelect.startLevel()}
           class="clear">Start Level {levelSelect.level.level}</button
         >
       {/if}
       <button
-        on:click={levelSelect.show()}
+        onclick={levelSelect.show()}
         class="clear">Cancel</button
       >
     </div>

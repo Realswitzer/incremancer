@@ -733,4 +733,3 @@ export class GameModel {
     };
   }
 }
-export default GameModel;

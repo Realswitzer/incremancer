@@ -68,7 +68,7 @@
     <div class="stats {model.persistentData.zoomButtons ? 'zoom' : ''}">
       <label>Level: {model.level}</label>
       <button
-        on:click={(showStats = !showStats)}
+        onclick={(showStats = !showStats)}
         class:active={showStats}
       >
         Stats
@@ -117,7 +117,7 @@
       <div class="spells">
         {#each spells.getUnlockedSpells() as spell}
           <button
-            on:click={spells.castSpell(spell)}
+            onclick={spells.castSpell(spell)}
             class="spell {spell.active ? 'active' : spell.onCooldown ? 'cooldown' : ''}"
             disabled={spell.onCooldown || spell.energyCost > model.energy}
           >
@@ -133,7 +133,7 @@
         {#if model.persistentData.allTimeHighestLevel >= 50}
           <div
             class="skeleton"
-            on:click={skeletonMenu.show()}
+            onclick={skeletonMenu.show()}
           >
             <div
               class="bg"
@@ -166,14 +166,14 @@
       class:open={sidePanels.open}
     >
       <button
-        on:click={OpenSidePanel('shop')}
+        onclick={OpenSidePanel('shop')}
         class:active={sidePanels.shop}
       >
         Shop
       </button>
       {#if model.construction}
         <button
-          on:click={openSidePanel('construction')}
+          onclick={openSidePanel('construction')}
           class:active={sidePanels.construction}
         >
           {#if model.persistentData.currentConstruction}
@@ -183,7 +183,7 @@
       {/if}
       {#if model.constructions.graveyard}
         <button
-          on:click={openSidePanel('graveyard')}
+          onclick={openSidePanel('graveyard')}
           class:active={sidePanels.graveyard}
         >
           Graveyard
@@ -191,7 +191,7 @@
       {/if}
       {#if model.constructions.factory}
         <button
-          on:click={openSidePanel('factory')}
+          onclick={openSidePanel('factory')}
           class:active={sidePanels.factory}
         >
           Factory
@@ -199,7 +199,7 @@
       {/if}
       {#if model.constructions.runesmith}
         <button
-          on:click={openSidePanel('runesmith')}
+          onclick={openSidePanel('runesmith')}
           class:active={sidePanels.runesmith}
           class:shatter={canShatter()}
         >
@@ -208,7 +208,7 @@
       {/if}
       {#if isShowPrestige()}
         <button
-          on:click={openSidePanel('prestige')}
+          onclick={openSidePanel('prestige')}
           class:active={sidePanels.prestige}
           id="prestige-button"
         >
@@ -217,14 +217,14 @@
         </button>
       {/if}
       <button
-        on:click={openSidePanel('options')}
+        onclick={openSidePanel('options')}
         class:active={sidePanels.options}
       >
         Options
       </button>
       {#if levelSelect.showButton()}
         <button
-          on:click={levelSelect.show()}
+          onclick={levelSelect.show()}
           class:active={levelSelect.shown}
         >
           Level Select
@@ -234,9 +234,9 @@
 
     {#if model.persistentData.zoomButtons}
       <div class="zoom-buttons">
-        <button on:click={zoom(-1)}>-</button>
-        <button on:click={resetZoom()}>Reset</button>
-        <button on:click={zoom(+1)}>+</button>
+        <button onclick={zoom(-1)}>-</button>
+        <button onclick={resetZoom()}>Reset</button>
+        <button onclick={zoom(+1)}>+</button>
       </div>
     {/if}
 
@@ -265,7 +265,7 @@
             {model.offlineMessage}
           </h2>
         {/if}
-        <button on:click={startGame()}>Start Level {model.level}</button>
+        <button onclick={startGame()}>Start Level {model.level}</button>
       </div>
     {/if}
 
@@ -273,10 +273,10 @@
       <div class="end-level">
         <h2>Level {model.level} Failed</h2>
         <h4>You have been defeated</h4>
-        <button on:click={model.startLevel(model.level - 1)}>
+        <button onclick={model.startLevel(model.level - 1)}>
           Go back to Level {model.level - 1}
         </button>
-        <button on:click={model.startLevel(model.level)}>
+        <button onclick={model.startLevel(model.level)}>
           Retry Level {model.level}
         </button>
       </div>
@@ -296,7 +296,7 @@
             Your bone collectors have gathered the remaining {model.endLevelBones} bones from the town
           </h4>
         {/if}
-        <button on:click={nextLevel()}>Start Level {model.level + 1}</button>
+        <button onclick={nextLevel()}>Start Level {model.level + 1}</button>
       </div>
     {/if}
 
@@ -307,7 +307,7 @@
         <h4>You have {model.persistentData.prestigePointsToSpend} prestige points to spend</h4>
         <p>It is recommended to spend your points before clicking start game</p>
         <p>as some of their effects will only activate when a new level is started.</p>
-        <button on:click={startGame()}>Start Level {model.level}</button>
+        <button onclick={startGame()}>Start Level {model.level}</button>
       </div>
     {/if}
   </body>

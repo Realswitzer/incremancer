@@ -5,7 +5,7 @@
   >
     <div class="shop-title">
       <h2>Skeleton Champion</h2>
-      <button on:click={skeletonMenu.show()}>Close</button>
+      <button onclick={skeletonMenu.show()}>Close</button>
       <div style="clear: both;"></div>
     </div>
     {#if skeleton().skeletons == 0}
@@ -14,16 +14,16 @@
         <p>
           <em>Give me those trophies of yours as tribute and I will fight for you to scour the humans from this world!</em>
         </p>
-        <button on:click={skeletonMenu.acceptOffer()}>Accept the offer</button>
-        <button on:click={skeletonMenu.show()}>Reject the offer</button>
+        <button onclick={skeletonMenu.acceptOffer()}>Accept the offer</button>
+        <button onclick={skeletonMenu.show()}>Reject the offer</button>
       </div>
     {/if}
     {#if skeletonMenu.anotherOffer()}
       <div class="ranges">
         <p>The Skeleton Champion has another offer for you.</p>
         <p><em>Give me some more of those trophies and I'll work twice as hard, I promise!</em></p>
-        <button on:click={skeletonMenu.acceptOffer()}>Accept the offer</button>
-        <button on:click={skeletonMenu.show()}>Reject the offer</button>
+        <button onclick={skeletonMenu.acceptOffer()}>Accept the offer</button>
+        <button onclick={skeletonMenu.show()}>Reject the offer</button>
       </div>
     {/if}
     {#if skeleton().skeletons > 0}
@@ -39,7 +39,7 @@
                     droppable-target="true"
                     dropType={item.s}
                     dropEndCall="skeletonMenu.itemDropped"
-                    on:click={item.s != -1 || skeletonMenu.trashAll()}
+                    onclick={item.s != -1 || skeletonMenu.trashAll()}
                   >
                     <div class="icon"></div>
                     <div class="tooltip">
@@ -72,8 +72,8 @@
               <div
                 class="item {skeletonMenu.itemClass(item)} {skeletonMenu.itemType(item)}"
                 use:draggable={item.id}
-                on:mousemove={(e) => moveToolTip(e, e.currentTarget)}
-                on:click={() => skeletonMenu.equipItem(item)}
+                onmousemove={(e) => moveToolTip(e, e.currentTarget)}
+                onclick={() => skeletonMenu.equipItem(item)}
               >
                 <div class="icon"></div>
                 {#if item.l}
