@@ -1,0 +1,5 @@
+{
+  "conventionalCommits.scopes": ["port:jamesmgittins"],
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode"
+}
