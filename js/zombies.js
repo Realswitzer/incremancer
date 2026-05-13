@@ -41,7 +41,7 @@ Zombies = {
         var animated = [];
         for (var j = 0; j < 3; j++) {
           animated.push(
-            PIXI.Texture.from("zombie" + (i + 1) + "_" + (j + 1) + ".png"),
+            PIXI.Texture.from("zombie" + (i + 1) + "_" + (j + 1) + ".png")
           );
         }
         this.textures.push({
@@ -168,12 +168,12 @@ Zombies = {
   spawnAllZombies(x, y) {
     var numZombies = Math.min(
       Math.floor(this.model.energy / this.model.zombieCost),
-      100,
+      100
     );
     for (var i = 0; i < numZombies; i++) {
       this.spawnZombie(
         x + 4 * (Math.random() - 1),
-        y + 4 * (Math.random() - 1),
+        y + 4 * (Math.random() - 1)
       );
     }
   },
@@ -193,7 +193,7 @@ Zombies = {
     zombie.health -= damage * this.model.runeEffects.damageReduction;
     zombie.speedMultiplier = Math.max(
       Math.min(1, zombie.health / zombie.maxHealth),
-      0.4,
+      0.4
     );
     if (zombie.burning) {
       zombie.speedMultiplier = this.model.burningSpeedMod;
@@ -214,7 +214,7 @@ Zombies = {
     if (human && this.model.runeEffects.damageReflection > 0) {
       Humans.damageHuman(
         human,
-        damage * this.model.runeEffects.damageReflection,
+        damage * this.model.runeEffects.damageReflection
       );
     }
   },
@@ -235,7 +235,7 @@ Zombies = {
               zombie.x,
               zombie.y,
               this.aliveHumans[i].x,
-              this.aliveHumans[i].y,
+              this.aliveHumans[i].y
             ) < explosionRadius
           ) {
             this.inflictPlague(this.aliveHumans[i]);
@@ -254,7 +254,7 @@ Zombies = {
                 zombie.x,
                 zombie.y,
                 this.aliveZombies[i].x,
-                this.aliveZombies[i].y,
+                this.aliveZombies[i].y
               ) < explosionRadius
             ) {
               this.healZombie(this.aliveZombies[i], healingDone);
@@ -317,7 +317,7 @@ Zombies = {
         this.zombieCursorText.visible = true;
         var numZombies = Math.min(
           Math.floor(this.model.energy / this.model.zombieCost),
-          100,
+          100
         );
         if (this.zombieCursorText.text != numZombies) {
           this.zombieCursorText.text = numZombies;
@@ -389,7 +389,7 @@ Zombies = {
           zombie.position.x,
           zombie.position.y,
           zombie.target.x,
-          zombie.target.y,
+          zombie.target.y
         );
 
         if (distanceToHumanTarget < this.attackDistance) {
@@ -404,7 +404,7 @@ Zombies = {
             zombie,
             zombie.target,
             this.model.zombieDamage / 2,
-            true,
+            true
           );
           zombie.attackTimer =
             this.attackSpeed * this.model.runeEffects.attackSpeed;
@@ -425,7 +425,7 @@ Zombies = {
           zombie.position.x,
           zombie.position.y,
           zombie.target.x,
-          zombie.target.y,
+          zombie.target.y
         );
         if (distanceToTarget < this.attackDistance) {
           zombie.scale.x =
@@ -464,6 +464,11 @@ Zombies = {
         if (zombie.health > zombie.maxHealth) {
           zombie.health = zombie.maxHealth;
         }
+
+        zombie.speedMultiplier = Math.max(
+          Math.min(1, zombie.health / zombie.maxHealth),
+          0.4
+        );
       }
     }
   },
@@ -537,7 +542,7 @@ Zombies = {
               zombie.x,
               zombie.y,
               this.graveyardAttackers[i].x,
-              this.graveyardAttackers[i].y,
+              this.graveyardAttackers[i].y
             );
             if (distanceToHuman < distanceToTarget) {
               zombie.target = this.graveyardAttackers[i];
@@ -557,7 +562,7 @@ Zombies = {
               zombie.x,
               zombie.y,
               this.aliveHumans[i].x,
-              this.aliveHumans[i].y,
+              this.aliveHumans[i].y
             );
             if (distanceToHuman < distanceToTarget) {
               zombie.target = this.aliveHumans[i];
@@ -578,7 +583,7 @@ Zombies = {
             this.aliveHumans[i].x,
             this.aliveHumans[i].y,
             building,
-            0,
+            0
           )
         ) {
           zombie.target = this.aliveHumans[i];
@@ -612,7 +617,7 @@ Zombies = {
       var dogSpeed = zombie.isDog ? 1.5 : 1;
       var zombieMaxSpeed = Math.max(
         this.maxSpeed * zombie.speedMultiplier * dogSpeed,
-        8,
+        8
       );
       zombie.xSpeed = zombie.targetVector.x * zombieMaxSpeed;
       zombie.ySpeed = zombie.targetVector.y * zombieMaxSpeed;
@@ -625,7 +630,7 @@ Zombies = {
       var speedMagnitudeSq = this.dotProduct(zombie.xSpeed, zombie.ySpeed);
       var zombieMaxSpeedSq = Math.pow(
         Math.max(this.maxSpeed * zombie.speedMultiplier, 8),
-        2,
+        2
       );
       if (speedMagnitudeSq > zombieMaxSpeedSq) {
         zombie.xSpeed *= zombieMaxSpeedSq / speedMagnitudeSq;
@@ -713,7 +718,7 @@ Zombies = {
               zombie.x,
               zombie.y,
               neighbours[i].x,
-              neighbours[i].y,
+              neighbours[i].y
             )
           );
         }
