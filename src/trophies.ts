@@ -116,9 +116,6 @@ export class Trophies {
       this.gameModel.persistentData.trophies.sort();
       this.gameModel.saveData();
       this.upgrades.applyUpgrades();
-      if (window.kongregate) {
-        window.kongregate.stats.submit("trophies", this.gameModel.persistentData.trophies.length);
-      }
       this.gameModel.sendMessage("The VIP has been killed! - New Trophy Aquired");
     } else {
       this.gameModel.sendMessage("The VIP has been killed!");
