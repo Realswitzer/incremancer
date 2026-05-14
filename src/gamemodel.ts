@@ -1,13 +1,32 @@
-import {zoom, centerGameContainer, update, setGameFieldSizeForLevel, Trophies, Particles, Bones, CreatureFactory, BoneCollectors, 
-  Graveyard, Spells, PartFactory, Creatures, Skeleton, Upgrades, Zombies, Army, Humans, Police, formatWhole} from './internal';
+import {
+  zoom,
+  centerGameContainer,
+  update,
+  setGameFieldSizeForLevel,
+  Trophies,
+  Particles,
+  Bones,
+  CreatureFactory,
+  BoneCollectors,
+  Graveyard,
+  Spells,
+  PartFactory,
+  Creatures,
+  Skeleton,
+  Upgrades,
+  Zombies,
+  Army,
+  Humans,
+  Police,
+  formatWhole,
+} from "./internal";
 
 export class GameModel {
-
-  private static instance : GameModel;
+  private static instance: GameModel;
   private constructor() {
     //
   }
-  static getInstance() : GameModel {
+  static getInstance(): GameModel {
     if (!GameModel.instance) {
       GameModel.instance = new GameModel();
       GameModel.instance.particles = new Particles();
@@ -26,7 +45,7 @@ export class GameModel {
       GameModel.instance.police = new Police();
       GameModel.instance.army = new Army();
     }
-      
+
     return GameModel.instance;
   }
   particles: Particles;
@@ -44,7 +63,7 @@ export class GameModel {
   humans: Humans;
   police: Police;
   army: Army;
-  app : PIXI.Application;
+  app: PIXI.Application;
   storageName = "ZombieData";
   hidden = false;
   autoShatter = false;
@@ -103,7 +122,7 @@ export class GameModel {
     percentage: 0,
     blood: 0,
     bones: 0,
-    brains: 0
+    brains: 0,
   };
   gigazombies = false;
   endLevelTimer = 3;
@@ -111,56 +130,56 @@ export class GameModel {
   messageQueue = [];
   offlineMessage = "";
   runeEffects = {
-    attackSpeed : 1,
-    critChance : 0,
-    critDamage : 0,
-    damageReduction : 1,
-    healthRegen : 0,
-    damageReflection : 0
+    attackSpeed: 1,
+    critChance: 0,
+    critDamage: 0,
+    damageReduction: 1,
+    healthRegen: 0,
+    damageReflection: 0,
   };
   encodedContent = "";
   savefilename = "";
-  blob : Blob;
+  blob: Blob;
   autoUpgrades = false;
   autoconstruction = false;
   autoconstructionUnlocked = false;
   levelResourcesAdded = false;
   bulletproofChance = 0;
   gameSpeed = 1;
-  
+
   level = 1;
-  
+
   currentState = "startGame";
 
   states = {
-    playingLevel : "playingLevel",
-    levelCompleted : "levelCompleted",
-    startGame : "startGame",
-    prestiged : "prestiged",
-    failed : "failed"
+    playingLevel: "playingLevel",
+    levelCompleted: "levelCompleted",
+    startGame: "startGame",
+    prestiged: "prestiged",
+    failed: "failed",
   };
 
   baseStats = {
-    energyRate : 1,
-    brainsRate : 0,
-    bonesRate : 0,
-    energyMax : 10,
-    bloodMax : 1000,
-    brainsMax : 50,
-    zombieCost : 10,
-    zombieHealth : 100,
-    zombieDamage : 10,
-    zombieSpeed : 10,
-    level : 1,
-    graveyard : 0,
-    construction : 0,
-    boneCollectorCapacity : 10
+    energyRate: 1,
+    brainsRate: 0,
+    bonesRate: 0,
+    energyMax: 10,
+    bloodMax: 1000,
+    brainsMax: 50,
+    zombieCost: 10,
+    zombieHealth: 100,
+    zombieDamage: 10,
+    zombieSpeed: 10,
+    level: 1,
+    graveyard: 0,
+    construction: 0,
+    boneCollectorCapacity: 10,
   };
 
   zoom = zoom;
   centerGameContainer = centerGameContainer;
 
-  resetToBaseStats() : void {
+  resetToBaseStats(): void {
     this.energyRate = this.baseStats.energyRate;
     this.brainsRate = this.baseStats.brainsRate;
     this.bonesRate = this.baseStats.bonesRate;
@@ -209,19 +228,17 @@ export class GameModel {
     this.harpyBombs = 1;
   }
 
-  addEnergy(value : number) : void {
+  addEnergy(value: number): void {
     this.energy += value;
-    if (this.energy > this.energyMax)
-      this.energy = this.energyMax;
+    if (this.energy > this.energyMax) this.energy = this.energyMax;
   }
 
-  addBlood(value : number) : void {
+  addBlood(value: number): void {
     if (isNaN(this.persistentData.blood)) {
-      this.persistentData.blood = 0;  
+      this.persistentData.blood = 0;
     }
-    if (isNaN(value))
-      return;
-    this.persistentData.blood += (value * this.bloodPCMod);
+    if (isNaN(value)) return;
+    this.persistentData.blood += value * this.bloodPCMod;
     if (this.persistentData.blood > this.bloodMax) {
       this.persistentData.blood = this.bloodMax;
       if (this.constructions.runesmith && this.runicSyphon.percentage > 0) {
@@ -230,17 +247,17 @@ export class GameModel {
     }
 
     if (this.runicSyphon.percentage > 0) {
-      this.runicSyphon.blood += value * this.bloodPCMod * this.runicSyphon.percentage;
+      this.runicSyphon.blood +=
+        value * this.bloodPCMod * this.runicSyphon.percentage;
     }
   }
 
-  addBrains(value : number) : void {
+  addBrains(value: number): void {
     if (isNaN(this.persistentData.brains)) {
-      this.persistentData.brains = 0;  
+      this.persistentData.brains = 0;
     }
-    if (isNaN(value))
-      return;
-    this.persistentData.brains += (value * this.brainsPCMod);
+    if (isNaN(value)) return;
+    this.persistentData.brains += value * this.brainsPCMod;
 
     if (this.persistentData.brains > this.brainsMax) {
       this.persistentData.brains = this.brainsMax;
@@ -250,45 +267,49 @@ export class GameModel {
     }
 
     if (this.runicSyphon.percentage > 0) {
-      this.runicSyphon.brains += value * this.brainsPCMod * this.runicSyphon.percentage;
+      this.runicSyphon.brains +=
+        value * this.brainsPCMod * this.runicSyphon.percentage;
     }
   }
 
-  addBones(value : number) : void {
+  addBones(value: number): void {
     if (isNaN(this.persistentData.bones)) {
-      this.persistentData.bones = 0;  
+      this.persistentData.bones = 0;
     }
-    if (isNaN(value))
-      return;
-    this.persistentData.bones += (value * this.bonesPCMod);
-    this.persistentData.bonesTotal += (value * this.bonesPCMod);
+    if (isNaN(value)) return;
+    this.persistentData.bones += value * this.bonesPCMod;
+    this.persistentData.bonesTotal += value * this.bonesPCMod;
 
     if (this.runicSyphon.percentage > 0) {
-      this.runicSyphon.bones += value * this.bonesPCMod * this.runicSyphon.percentage;
+      this.runicSyphon.bones +=
+        value * this.bonesPCMod * this.runicSyphon.percentage;
     }
   }
 
-  getHumanCount() : number {
+  getHumanCount(): number {
     return this.humanCount;
   }
 
-  getEnergyRate() : number {
-    return (this.energySpellMultiplier * this.energyRate) - (this.persistentData.boneCollectors + this.persistentData.harpies);
+  getEnergyRate(): number {
+    return (
+      this.energySpellMultiplier * this.energyRate -
+      (this.persistentData.boneCollectors + this.persistentData.harpies)
+    );
   }
 
-  update(timeDiff : number, updateTime : number) : void {
-
+  update(timeDiff: number, updateTime: number): void {
     // spell update before gamespeed modifier
     this.spells.updateSpells(timeDiff);
 
     timeDiff *= this.gameSpeed;
 
-    if (this.hidden) { // force PIXI update
+    if (this.hidden) {
+      // force PIXI update
       update(timeDiff, this.app);
     }
 
     this.partFactory.update(timeDiff);
-    
+
     this.autoRemoveCollectorsHarpies();
     this.addEnergy(this.getEnergyRate() * timeDiff);
 
@@ -296,18 +317,18 @@ export class GameModel {
       this.addBones(this.bonesRate * timeDiff);
       this.addBrains(this.brainsRate * timeDiff);
       this.upgrades.updateRunicSyphon(this.runicSyphon);
-      
+
       if (this.lastSave + 30000 < updateTime) {
         this.saveData();
         this.lastSave = updateTime;
       }
 
-
-  
       if (this.getHumanCount() <= 0) {
-
         if (this.endLevelTimer < 0) {
-          if (this.isBossStage(this.level) && this.trophies.doesLevelHaveTrophy(this.level)) {
+          if (
+            this.isBossStage(this.level) &&
+            this.trophies.doesLevelHaveTrophy(this.level)
+          ) {
             this.trophies.trophyAquired(this.level);
           }
           this.prestigePointsEarned = this.prestigePointsForLevel(this.level);
@@ -320,14 +341,16 @@ export class GameModel {
             this.persistentData.levelsCompleted.push(this.level);
           }
           this.persistentData.levelUnlocked = this.level + 1;
-          if (!this.persistentData.allTimeHighestLevel || this.level > this.persistentData.allTimeHighestLevel) {
+          if (
+            !this.persistentData.allTimeHighestLevel ||
+            this.level > this.persistentData.allTimeHighestLevel
+          ) {
             this.persistentData.allTimeHighestLevel = this.level;
-
           }
           this.startTimer = 3;
         } else {
           this.endLevelTimer -= timeDiff;
-        } 
+        }
       }
       this.upgrades.updateConstruction(timeDiff);
       this.upgrades.updateAutoUpgrades();
@@ -348,7 +371,7 @@ export class GameModel {
     this.updateStats();
   }
 
-  calculateEndLevelBones() : void {
+  calculateEndLevelBones(): void {
     let endLevelBones = 0;
     if (this.persistentData.boneCollectors > 0 && this.bones.uncollected) {
       endLevelBones = this.bones.uncollected.length;
@@ -356,15 +379,15 @@ export class GameModel {
     }
   }
 
-  calculateEndLevelZombieCages() : void {
+  calculateEndLevelZombieCages(): void {
     if (this.zombieCages > 0) {
       this.zombiesInCages += this.zombieCount;
       if (this.zombiesInCages > this.zombieCages)
         this.zombiesInCages = this.zombieCages;
     }
   }
- 
-  autoRemoveCollectorsHarpies() : void {
+
+  autoRemoveCollectorsHarpies(): void {
     if (this.getEnergyRate() < 0) {
       const energyRate = this.getEnergyRate();
       if (this.persistentData.harpies > 0) {
@@ -379,59 +402,66 @@ export class GameModel {
     }
   }
 
-  releaseCagedZombies() : void {
+  releaseCagedZombies(): void {
     if (this.currentState == this.states.playingLevel) {
-      for (let i=0; i < this.zombiesInCages; i++) {
-        this.zombies.createZombie(this.graveyard.sprite.x, this.graveyard.sprite.y);
+      for (let i = 0; i < this.zombiesInCages; i++) {
+        this.zombies.createZombie(
+          this.graveyard.sprite.x,
+          this.graveyard.sprite.y,
+        );
       }
       this.zombiesInCages = 0;
     }
   }
 
-  sacrificeCagedZombies() : void {
+  sacrificeCagedZombies(): void {
     this.addBlood(this.cagedZombieSacrificeValue().blood);
     this.addBrains(this.cagedZombieSacrificeValue().brains);
     this.addBones(this.cagedZombieSacrificeValue().bones);
     this.zombiesInCages = 0;
   }
 
-  cagedZombieSacrificeValue() : {blood:number, brains:number, bones:number} {
+  cagedZombieSacrificeValue(): {
+    blood: number;
+    brains: number;
+    bones: number;
+  } {
     return {
-      blood:this.zombiesInCages * this.zombieHealth * 0.5,
-      brains:this.zombiesInCages,
-      bones:this.zombiesInCages * 3
-    }
+      blood: this.zombiesInCages * this.zombieHealth * 0.5,
+      brains: this.zombiesInCages,
+      bones: this.zombiesInCages * 3,
+    };
   }
 
-  startLevel(level : number) : void {
+  startLevel(level: number): void {
     this.level = level;
     this.startGame();
   }
 
-  startGame() : void {
+  startGame(): void {
     this.currentState = this.states.playingLevel;
     this.setupLevel();
     this.updatePlayingLevel();
   }
 
-  nextLevel() : void {
+  nextLevel(): void {
     this.level++;
     this.currentState = this.states.playingLevel;
     this.setupLevel();
     this.updatePlayingLevel();
-    if(this.persistentData.autoRelease) {
+    if (this.persistentData.autoRelease) {
       this.releaseCagedZombies();
     }
   }
 
-  setupLevel() : void {
+  setupLevel(): void {
     this.endLevelTimer = this.endLevelDelay;
     setGameFieldSizeForLevel();
     this.particles.initialize();
     this.humans.populate();
     this.zombies.populate();
     this.graveyard.initialize();
-    setTimeout(centerGameContainer,10);
+    setTimeout(centerGameContainer, 10);
     this.upgrades.applyUpgrades();
     this.upgrades.updateRuneEffects();
     this.partFactory.applyGenerators();
@@ -441,40 +471,40 @@ export class GameModel {
     this.populateStats();
   }
 
-  populateStats() : void {
+  populateStats(): void {
     this.stats = {
-      skeleton : {
-        show : this.skeleton.persistent.skeletons > 0,
-        health : this.zombieHealth * 10,
-        damage : this.zombieDamage * 10,
-        speed: this.skeleton.moveSpeed
+      skeleton: {
+        show: this.skeleton.persistent.skeletons > 0,
+        health: this.zombieHealth * 10,
+        damage: this.zombieDamage * 10,
+        speed: this.skeleton.moveSpeed,
       },
-      zombie : {
-        health : this.zombieHealth,
-        damage : this.zombieDamage,
-        speed : this.zombieSpeed
+      zombie: {
+        health: this.zombieHealth,
+        damage: this.zombieDamage,
+        speed: this.zombieSpeed,
       },
-      human : {
-        health : this.humans.getMaxHealth(this.level),
-        damage : this.humans.attackDamage,
-        speed : this.humans.maxRunSpeed
+      human: {
+        health: this.humans.getMaxHealth(this.level),
+        damage: this.humans.attackDamage,
+        speed: this.humans.maxRunSpeed,
       },
-      police : {
-        show : this.police.getMaxPolice() > 0,
-        health : this.police.getMaxHealth(),
-        damage : this.police.attackDamage,
-        speed : this.police.maxRunSpeed
+      police: {
+        show: this.police.getMaxPolice() > 0,
+        health: this.police.getMaxHealth(),
+        damage: this.police.attackDamage,
+        speed: this.police.maxRunSpeed,
       },
-      army : {
-        show : this.army.getMaxArmy() > 0,
-        health : this.army.getMaxHealth(),
-        damage : this.army.attackDamage,
-        speed : this.army.maxRunSpeed
-      }
-    }
+      army: {
+        show: this.army.getMaxArmy() > 0,
+        health: this.army.getMaxHealth(),
+        damage: this.army.attackDamage,
+        speed: this.army.maxRunSpeed,
+      },
+    };
   }
 
-  updateStats() : void {
+  updateStats(): void {
     if (this.stats) {
       this.stats.zombie.health = this.zombieHealth;
       this.stats.zombie.damage = this.zombieDamage;
@@ -486,7 +516,7 @@ export class GameModel {
     }
   }
 
-  vipEscaped() : void {
+  vipEscaped(): void {
     if (!this.persistentData.vipEscaped) {
       this.persistentData.vipEscaped = [];
     }
@@ -494,11 +524,11 @@ export class GameModel {
     this.saveData();
   }
 
-  updatePlayingLevel() : void {
+  updatePlayingLevel(): void {
     this.saveData();
   }
 
-  addStartLevelResources() : void {
+  addStartLevelResources(): void {
     this.energy = this.energyMax;
 
     if (!this.levelResourcesAdded) {
@@ -517,66 +547,69 @@ export class GameModel {
     }
   }
 
-  onReady() : void {
+  onReady(): void {
     this.upgrades.upgradeIdCheck();
   }
 
   lastSave = 0;
 
   persistentData = {
-    saveCreated : Date.now(),
-    dateOfSave : Date.now(),
-    autoStart : false,
-    levelUnlocked : 1,
-    allTimeHighestLevel : 0,
-    blood : 0,
-    brains : 0,
+    saveCreated: Date.now(),
+    dateOfSave: Date.now(),
+    autoStart: false,
+    levelUnlocked: 1,
+    allTimeHighestLevel: 0,
+    blood: 0,
+    brains: 0,
     bones: 0,
     parts: 0,
-    bonesTotal : 0,
-    upgrades : [],
-    constructions : [],
-    prestigePointsEarned : 0,
-    prestigePointsToSpend : 0,
-    boneCollectors : 0,
-    graveyardZombies : 1,
-    harpies : 0,
-    resolution : 1,
-    zoomButtons : false,
-    particles : true,
-    generators : [],
-    currentConstruction : null,
-    creatureLevels : [],
-    creatures : [],
-    creatureAutobuild : [],
-    savedCreatures : [],
-    levelsCompleted : [],
-    showfps : false,
-    runeshatter : 0,
-    runes : {life : {
-      blood : 0,
-      brains : 0,
-      bones : 0
-    }, death : {
-      blood : 0,
-      brains : 0,
-      bones : 0
-    }},
-    trophies : [],
-    vipEscaped : [],
-    autoRelease : false,
-    skeleton : null
+    bonesTotal: 0,
+    upgrades: [],
+    constructions: [],
+    prestigePointsEarned: 0,
+    prestigePointsToSpend: 0,
+    boneCollectors: 0,
+    graveyardZombies: 1,
+    harpies: 0,
+    resolution: 1,
+    zoomButtons: false,
+    particles: true,
+    generators: [],
+    currentConstruction: null,
+    creatureLevels: [],
+    creatures: [],
+    creatureAutobuild: [],
+    savedCreatures: [],
+    levelsCompleted: [],
+    showfps: false,
+    runeshatter: 0,
+    runes: {
+      life: {
+        blood: 0,
+        brains: 0,
+        bones: 0,
+      },
+      death: {
+        blood: 0,
+        brains: 0,
+        bones: 0,
+      },
+    },
+    trophies: [],
+    vipEscaped: [],
+    autoRelease: false,
+    skeleton: null,
   };
 
-  addPrestigePoints(points : number) : void {
-    if (typeof this.persistentData.prestigePointsEarned == 'undefined') {
+  addPrestigePoints(points: number): void {
+    if (typeof this.persistentData.prestigePointsEarned == "undefined") {
       this.persistentData.prestigePointsEarned = 0;
       this.persistentData.prestigePointsToSpend = 0;
     }
     this.persistentData.prestigePointsEarned += points;
   }
 
-  prestige() : void {
+  prestige(): void {
     if (this.persistentData.prestigePointsEarned > 0) {
       this.persistentData.levelUnlocked = 1;
       this.persistentData.blood = 0;
@@ -585,13 +618,16 @@ export class GameModel {
       this.persistentData.parts = 0;
       this.persistentData.generators = [];
       this.persistentData.bonesTotal = 0;
-      this.persistentData.upgrades = this.persistentData.upgrades.filter(upgrade => upgrade.costType == this.upgrades.costs.prestigePoints);
+      this.persistentData.upgrades = this.persistentData.upgrades.filter(
+        (upgrade) => upgrade.costType == this.upgrades.costs.prestigePoints,
+      );
       this.persistentData.constructions = [];
       this.persistentData.boneCollectors = 0;
       this.persistentData.currentConstruction = false;
       this.persistentData.harpies = 0;
       this.persistentData.graveyardZombies = 1;
-      this.persistentData.prestigePointsToSpend += this.persistentData.prestigePointsEarned;
+      this.persistentData.prestigePointsToSpend +=
+        this.persistentData.prestigePointsEarned;
       this.persistentData.prestigePointsEarned = 0;
       this.persistentData.runes = null;
       this.persistentData.vipEscaped = [];
@@ -604,12 +640,12 @@ export class GameModel {
       this.levelResourcesAdded = false;
       this.gigazombies = false;
       this.runeEffects = {
-        attackSpeed : 1,
-        critChance : 0,
-        critDamage : 0,
-        damageReduction : 1,
-        healthRegen : 0,
-        damageReflection : 0
+        attackSpeed: 1,
+        critChance: 0,
+        critDamage: 0,
+        damageReduction: 1,
+        healthRegen: 0,
+        damageReflection: 0,
       };
       this.boneCollectors.update(0.1);
       this.partFactory.generatorsApplied = [];
@@ -625,33 +661,43 @@ export class GameModel {
     }
   }
 
-  saveData() : void {
+  saveData(): void {
     this.persistentData.dateOfSave = Date.now();
     try {
-      localStorage.setItem(this.storageName, JSON.stringify(this.persistentData));
-      localStorage.setItem(this.skeleton.storageName, JSON.stringify(this.skeleton.persistent));
+      localStorage.setItem(
+        this.storageName,
+        JSON.stringify(this.persistentData),
+      );
+      localStorage.setItem(
+        this.skeleton.storageName,
+        JSON.stringify(this.skeleton.persistent),
+      );
     } catch (e) {
       console.log(e);
     }
   }
 
-  loadData() : void {
+  loadData(): void {
     try {
       if (localStorage.getItem(this.storageName) !== null) {
-        this.persistentData = JSON.parse(localStorage.getItem(this.storageName));
+        this.persistentData = JSON.parse(
+          localStorage.getItem(this.storageName),
+        );
         this.level = this.persistentData.levelUnlocked;
         if (localStorage.getItem(this.skeleton.storageName) !== null) {
-          this.skeleton.persistent = JSON.parse(localStorage.getItem(this.skeleton.storageName));
+          this.skeleton.persistent = JSON.parse(
+            localStorage.getItem(this.skeleton.storageName),
+          );
         }
         this.updatePersistentData();
         this.calcOfflineProgress();
-      } 
+      }
     } catch (e) {
       console.log(e);
     }
   }
 
-  calcOfflineProgress() : void {
+  calcOfflineProgress(): void {
     this.upgrades.applyUpgrades();
     this.upgrades.updateRuneEffects();
     this.partFactory.applyGenerators();
@@ -659,13 +705,16 @@ export class GameModel {
       const timeDiff = (Date.now() - this.persistentData.dateOfSave) / 1000;
       const partsCreated = this.partFactory.updateLongTime(timeDiff);
       if (partsCreated > 0) {
-        this.offlineMessage = "Your factory has generated " + formatWhole(partsCreated) + " parts while you were away";
+        this.offlineMessage =
+          "Your factory has generated " +
+          formatWhole(partsCreated) +
+          " parts while you were away";
         this.persistentData.parts += partsCreated;
       }
     }
   }
 
-  resetData() : void {
+  resetData(): void {
     try {
       localStorage.removeItem(this.storageName);
       localStorage.removeItem(this.skeleton.storageName);
@@ -674,7 +723,7 @@ export class GameModel {
     }
   }
 
-  updatePersistentData() : void {
+  updatePersistentData(): void {
     if (!this.persistentData.constructions) {
       this.persistentData.constructions = [];
     }
@@ -699,7 +748,7 @@ export class GameModel {
     if (!this.persistentData.saveCreated) {
       this.persistentData.saveCreated = Date.now();
     }
-    if (typeof this.persistentData.particles == 'undefined') {
+    if (typeof this.persistentData.particles == "undefined") {
       this.persistentData.particles = true;
     }
     if (!this.persistentData.runeshatter) {
@@ -708,15 +757,14 @@ export class GameModel {
     this.creatureFactory.updateAutoBuild();
   }
 
-  sendMessage(message : string) : void {
+  sendMessage(message: string): void {
     if (this.messageQueue.indexOf(message) == -1) {
       this.messageQueue.push(message);
     }
   }
 
-  setResolution(resolution : number) : void {
-    if(!this.app)
-      return;
+  setResolution(resolution: number): void {
+    if (!this.app) return;
 
     this.app.renderer.resolution = resolution;
 
@@ -724,33 +772,45 @@ export class GameModel {
       (this.app.renderer as any).rootRenderTarget.resolution = resolution;
 
     this.app.renderer.plugins.interaction.resolution = resolution;
-    this.app.renderer.resize(document.body.clientWidth, document.body.clientHeight);
+    this.app.renderer.resize(
+      document.body.clientWidth,
+      document.body.clientHeight,
+    );
   }
 
-  downloadSaveGame() : void {
+  downloadSaveGame(): void {
     this.persistentData.skeleton = this.skeleton.persistent;
-    this.blob = new Blob([LZString.compressToEncodedURIComponent(JSON.stringify(this.persistentData))], {type: "octet/stream"});
+    this.blob = new Blob(
+      [
+        LZString.compressToEncodedURIComponent(
+          JSON.stringify(this.persistentData),
+        ),
+      ],
+      { type: "octet/stream" },
+    );
     delete this.persistentData.skeleton;
     this.encodedContent = window.URL.createObjectURL(this.blob);
-    const datestamp = new Date().toISOString().replace(/:|T|Z|\./g,"");
+    const datestamp = new Date().toISOString().replace(/:|T|Z|\./g, "");
     this.savefilename = "incremancer-" + datestamp + ".sav";
   }
 
-  importFile() : void {
+  importFile(): void {
     const files = document.getElementById("import-file").files;
 
     if (files && files.length == 1) {
       const file = files[0];
       const reader = new FileReader();
       const model = GameModel.getInstance();
-      reader.onload = function(event) {
-        const savegame = JSON.parse(LZString.decompressFromEncodedURIComponent(event.target.result));
+      reader.onload = function (event) {
+        const savegame = JSON.parse(
+          LZString.decompressFromEncodedURIComponent(event.target.result),
+        );
         if (savegame.dateOfSave) {
           if (savegame.skeleton) {
             model.skeleton.persistent = savegame.skeleton;
             delete savegame.skeleton;
           }
-          model.persistentData = savegame;          
+          model.persistentData = savegame;
           model.updatePersistentData();
           model.level = model.persistentData.levelUnlocked;
           model.creatureFactory.spawnedSavedCreatures = false;
@@ -763,11 +823,13 @@ export class GameModel {
     }
   }
 
-  toggleFullscreen() : void {
-    if (document.fullscreenElement ||
-        document.webkitFullscreenElement ||
-        document.mozFullScreenElement ||
-        document.msFullscreenElement) {
+  toggleFullscreen(): void {
+    if (
+      document.fullscreenElement ||
+      document.webkitFullscreenElement ||
+      document.mozFullScreenElement ||
+      document.msFullscreenElement
+    ) {
       if (document.exitFullscreen) {
         document.exitFullscreen();
       } else if (document.webkitExitFullscreen) {
@@ -791,7 +853,7 @@ export class GameModel {
     }
   }
 
-  prestigePointsForLevel(level : number) : number {
+  prestigePointsForLevel(level: number): number {
     if (this.persistentData.levelsCompleted.indexOf(level) > -1) {
       return 0;
     } else {
@@ -799,30 +861,38 @@ export class GameModel {
     }
   }
 
-  bossCompleted(level : number) : boolean {
+  bossCompleted(level: number): boolean {
     const bossLevel = Math.floor((level - 1) / 50) * 50;
 
-    if (bossLevel < 50)
-      return true;
+    if (bossLevel < 50) return true;
 
     return this.persistentData.levelsCompleted.indexOf(bossLevel) > -1;
   }
 
-  levelLocked(level : number) : boolean {
-    return level > this.persistentData.allTimeHighestLevel + 1 || !this.bossCompleted(level);
+  levelLocked(level: number): boolean {
+    return (
+      level > this.persistentData.allTimeHighestLevel + 1 ||
+      !this.bossCompleted(level)
+    );
   }
 
-  isBossStage(level : number) : boolean {
+  isBossStage(level: number): boolean {
     return level > 0 && level % 50 == 0;
   }
 
-  levelInfo(level : number) : {level:number, bossStage : boolean, completed : boolean, locked : boolean, trophy : boolean} {
+  levelInfo(level: number): {
+    level: number;
+    bossStage: boolean;
+    completed: boolean;
+    locked: boolean;
+    trophy: boolean;
+  } {
     return {
-      level : level,
-      bossStage : this.isBossStage(level),
-      completed : this.persistentData.levelsCompleted.indexOf(level) > -1,
-      locked : this.levelLocked(level),
-      trophy : this.trophies.doesLevelHaveTrophy(level)
-    }
+      level: level,
+      bossStage: this.isBossStage(level),
+      completed: this.persistentData.levelsCompleted.indexOf(level) > -1,
+      locked: this.levelLocked(level),
+      trophy: this.trophies.doesLevelHaveTrophy(level),
+    };
   }
 }

@@ -1,35 +1,46 @@
-import { Human } from './classes/humanclasses';
+import { Human } from "./classes/humanclasses";
 import {
-  foregroundContainer, gameFieldSize, characterContainer, backgroundContainer, ZmMap, Blood, Bones, Smoke, GameModel,
-  Zombies, Humans, Tanks, fastDistance, RotateVector2d, getRandomElementFromArray
-} from './internal';
+  foregroundContainer,
+  gameFieldSize,
+  characterContainer,
+  backgroundContainer,
+  ZmMap,
+  Blood,
+  Bones,
+  Smoke,
+  GameModel,
+  Zombies,
+  Humans,
+  Tanks,
+  fastDistance,
+  RotateVector2d,
+  getRandomElementFromArray,
+} from "./internal";
 
 export class GraveyardSprite extends PIXI.Sprite {
   graveyard = true;
 }
 
 export class Graveyard {
-
   private static instance: Graveyard;
 
   constructor() {
-    if (Graveyard.instance)
-      return Graveyard.instance;
+    if (Graveyard.instance) return Graveyard.instance;
     Graveyard.instance = this;
   }
-  spikeTexture : PIXI.Texture;
-  boneCollectors : BoneCollectors;
-  bones : Bones;
-  gameModel : GameModel;
-  zmMap : ZmMap;
-  zombies : Zombies;
-  smoke : Smoke;
-  harpies : Harpies;
-  blood : Blood;
-  humans : Humans;
+  spikeTexture: PIXI.Texture;
+  boneCollectors: BoneCollectors;
+  bones: Bones;
+  gameModel: GameModel;
+  zmMap: ZmMap;
+  zombies: Zombies;
+  smoke: Smoke;
+  harpies: Harpies;
+  blood: Blood;
+  humans: Humans;
 
-  sprite : GraveyardSprite;
-  fortSprite : PIXI.Sprite;
+  sprite: GraveyardSprite;
+  fortSprite: PIXI.Sprite;
   spikeSprites = [];
   level = 1;
   spikeTimer = 5;
@@ -41,7 +52,7 @@ export class Graveyard {
   target = {
     graveyard: true,
     x: 0,
-    y: 0
+    y: 0,
   };
 
   healthBar = null;
@@ -56,7 +67,7 @@ export class Graveyard {
     this.harpies = new Harpies();
     this.blood = new Blood();
     this.humans = new Humans();
-    if (typeof this.gameModel.persistentData.graveyardZombies == 'undefined') {
+    if (typeof this.gameModel.persistentData.graveyardZombies == "undefined") {
       this.gameModel.persistentData.graveyardZombies = 1;
     }
 
@@ -81,14 +92,15 @@ export class Graveyard {
   drawHealthBar(): void {
     if (this.gameModel.isBossStage(this.gameModel.level)) {
       this.gameModel.sendMessage("Defend the Graveyard!");
-      this.graveyardHealth = this.graveyardMaxHealth = this.gameModel.zombieHealth * 100 * this.gameModel.graveyardHealthMod;
+      this.graveyardHealth = this.graveyardMaxHealth =
+        this.gameModel.zombieHealth * 100 * this.gameModel.graveyardHealthMod;
       if (!this.healthBar) {
         this.healthBar = {
           container: new PIXI.Container(),
           background: new PIXI.Graphics(),
           foreground: new PIXI.Graphics(),
-          percentage: 100
-        }
+          percentage: 100,
+        };
         this.healthBar.container.addChild(this.healthBar.background);
         this.healthBar.container.addChild(this.healthBar.foreground);
         foregroundContainer.addChild(this.healthBar.container);
@@ -110,7 +122,6 @@ export class Graveyard {
       this.healthBar.foreground.lineStyle(8, 0xfd5252);
       this.healthBar.foreground.moveTo(0, 0);
       this.healthBar.foreground.lineTo(100, 0);
-
     } else {
       if (this.healthBar) {
         this.healthBar.background.clear();
@@ -121,7 +132,10 @@ export class Graveyard {
   }
 
   updateHealthBar(): void {
-    const percentage = Math.max(Math.round((this.graveyardHealth / this.graveyardMaxHealth) * 100), 0);
+    const percentage = Math.max(
+      Math.round((this.graveyardHealth / this.graveyardMaxHealth) * 100),
+      0,
+    );
     if (percentage != this.healthBar.percentage) {
       this.healthBar.foreground.clear();
       if (percentage > 0) {
@@ -133,7 +147,7 @@ export class Graveyard {
     }
   }
 
-  drawGraveyard() : void {
+  drawGraveyard(): void {
     if (!this.spikeTexture) {
       this.spikeTexture = PIXI.Texture.from("spikes.png");
     }
@@ -184,7 +198,6 @@ export class Graveyard {
     this.zmMap.graveyardCollision = false;
 
     if (fortTexture) {
-
       if (this.fortSprite) {
         this.fortSprite.texture = PIXI.Texture.from(fortTexture);
       } else {
@@ -198,10 +211,9 @@ export class Graveyard {
       this.fortSprite.visible = false;
       characterContainer.addChild(this.fortSprite);
     }
-
   }
 
-  fence : PIXI.Container = null;
+  fence: PIXI.Container = null;
 
   drawFence(): void {
     if (this.fence) {
@@ -215,18 +227,24 @@ export class Graveyard {
 
     const textures = [];
     for (let i = 0; i < 4; i++) {
-      textures.push(PIXI.Texture.from('fencepost' + (i + 1) + '.png'));
+      textures.push(PIXI.Texture.from("fencepost" + (i + 1) + ".png"));
     }
 
     const numPosts = Math.round(this.fenceRadius * 0.4);
-    const radiansPerFencePost = Math.PI * 2 / numPosts;
+    const radiansPerFencePost = (Math.PI * 2) / numPosts;
     for (let i = 0; i < numPosts; i++) {
-      const postSprite = new PIXI.Sprite(getRandomElementFromArray(textures, Math.random()));
+      const postSprite = new PIXI.Sprite(
+        getRandomElementFromArray(textures, Math.random()),
+      );
       this.fence.addChild(postSprite);
       postSprite.anchor.set(0.5, 1);
       postSprite.scale.x = Math.random() > 0.5 ? 1 : -1;
       const positionWobble = -5 + Math.random() * 10;
-      const pos = RotateVector2d(0, this.fenceRadius + positionWobble, radiansPerFencePost * i)
+      const pos = RotateVector2d(
+        0,
+        this.fenceRadius + positionWobble,
+        radiansPerFencePost * i,
+      );
       postSprite.position.set(pos.x, pos.y);
     }
     this.fence.cacheAsBitmap = true;
@@ -235,7 +253,6 @@ export class Graveyard {
 
     this.fence.x = graveyardPosition.x;
     this.fence.y = graveyardPosition.y;
-
   }
 
   update(timeDiff: number): void {
@@ -246,13 +263,20 @@ export class Graveyard {
       this.updateHealthBar();
     }
 
-    if (!this.gameModel.constructions.graveyard || this.gameModel.currentState != this.gameModel.states.playingLevel) {
+    if (
+      !this.gameModel.constructions.graveyard ||
+      this.gameModel.currentState != this.gameModel.states.playingLevel
+    ) {
       this.sprite.visible = false;
       return;
     }
 
-    if (this.level < 2 && this.gameModel.constructions.crypt || this.level < 3 && this.gameModel.constructions.fort ||
-      this.level < 4 && this.gameModel.constructions.fortress || this.level < 5 && this.gameModel.constructions.citadel)
+    if (
+      (this.level < 2 && this.gameModel.constructions.crypt) ||
+      (this.level < 3 && this.gameModel.constructions.fort) ||
+      (this.level < 4 && this.gameModel.constructions.fortress) ||
+      (this.level < 5 && this.gameModel.constructions.citadel)
+    )
       this.drawGraveyard();
 
     this.sprite.visible = true;
@@ -267,13 +291,18 @@ export class Graveyard {
         } else {
           this.smoke.newFireSmoke(this.sprite.x + 20, this.sprite.y - 113);
         }
-
       }
     }
 
-    if (this.gameModel.energy >= this.gameModel.energyMax && !this.gameModel.hidden) {
+    if (
+      this.gameModel.energy >= this.gameModel.energyMax &&
+      !this.gameModel.hidden
+    ) {
       for (let i = 0; i < this.gameModel.persistentData.graveyardZombies; i++) {
-        this.zombies.spawnZombie(this.sprite.x, this.sprite.y + (this.level > 2 ? 8 : 0));
+        this.zombies.spawnZombie(
+          this.sprite.x,
+          this.sprite.y + (this.level > 2 ? 8 : 0),
+        );
       }
     }
 
@@ -281,7 +310,10 @@ export class Graveyard {
     this.boneCollectors.update(timeDiff);
     this.harpies.update(timeDiff);
 
-    if (!this.gameModel.constructions.fence || this.gameModel.currentState != this.gameModel.states.playingLevel) {
+    if (
+      !this.gameModel.constructions.fence ||
+      this.gameModel.currentState != this.gameModel.states.playingLevel
+    ) {
       this.fence.visible = false;
     } else {
       this.fence.visible = true;
@@ -291,7 +323,7 @@ export class Graveyard {
     }
 
     this.updatePlagueSpikes(timeDiff);
-    this.updateSpikeSprites(timeDiff)
+    this.updateSpikeSprites(timeDiff);
   }
 
   updatePlagueSpikes(timeDiff: number): void {
@@ -303,10 +335,23 @@ export class Graveyard {
         for (let i = 0; i < aliveHumans.length; i++) {
           if (Math.abs(aliveHumans[i].x - this.sprite.x) < this.fenceRadius) {
             if (Math.abs(aliveHumans[i].y - this.sprite.y) < this.fenceRadius) {
-              if (this.fastDistance(this.sprite.x, this.sprite.y, aliveHumans[i].x, aliveHumans[i].y) < this.fenceRadius) {
+              if (
+                this.fastDistance(
+                  this.sprite.x,
+                  this.sprite.y,
+                  aliveHumans[i].x,
+                  aliveHumans[i].y,
+                ) < this.fenceRadius
+              ) {
                 this.zombies.inflictPlague(aliveHumans[i]);
-                this.humans.damageHuman(aliveHumans[i], this.gameModel.zombieDamage);
-                this.blood.newPlagueSplatter(aliveHumans[i].x, aliveHumans[i].y);
+                this.humans.damageHuman(
+                  aliveHumans[i],
+                  this.gameModel.zombieDamage,
+                );
+                this.blood.newPlagueSplatter(
+                  aliveHumans[i].x,
+                  aliveHumans[i].y,
+                );
                 this.addSpikeSprite(aliveHumans[i]);
               }
             }
@@ -316,7 +361,7 @@ export class Graveyard {
     }
   }
 
-  addSpikeSprite(human : PIXI.AnimatedSprite): void {
+  addSpikeSprite(human: PIXI.AnimatedSprite): void {
     let sprite = null as PIXI.Sprite;
     for (let i = 0; i < this.spikeSprites.length; i++) {
       if (!this.spikeSprites[i].visible) {
@@ -350,13 +395,23 @@ export class Graveyard {
     }
   }
 
-  isWithinFence(position : {x:number, y:number}) : boolean {
-    if (!this.gameModel.constructions.fence || this.gameModel.currentState != this.gameModel.states.playingLevel) {
+  isWithinFence(position: { x: number; y: number }): boolean {
+    if (
+      !this.gameModel.constructions.fence ||
+      this.gameModel.currentState != this.gameModel.states.playingLevel
+    ) {
       return false;
     }
-    if (position.x > this.fence.x - this.fenceRadius && position.x < this.fence.x + this.fenceRadius &&
-      position.y > this.fence.y - this.fenceRadius && position.y < this.fence.y + this.fenceRadius) {
-      return this.fastDistance(position.x, position.y, this.fence.x, this.fence.y) <= this.fenceRadius;
+    if (
+      position.x > this.fence.x - this.fenceRadius &&
+      position.x < this.fence.x + this.fenceRadius &&
+      position.y > this.fence.y - this.fenceRadius &&
+      position.y < this.fence.y + this.fenceRadius
+    ) {
+      return (
+        this.fastDistance(position.x, position.y, this.fence.x, this.fence.y) <=
+        this.fenceRadius
+      );
     }
     return false;
   }
@@ -369,35 +424,35 @@ class BoneCollector extends PIXI.AnimatedSprite {
   speedFactor = 0;
   boneList = [];
   target = null;
-  state : BoneCollectorState;
-  constructor(textures : PIXI.Texture[]) {
+  state: BoneCollectorState;
+  constructor(textures: PIXI.Texture[]) {
     super(textures);
     this.animationSpeed = 0.2;
   }
 }
 
 enum BoneCollectorState {
-  collecting, returning, waiting
+  collecting,
+  returning,
+  waiting,
 }
 
 export class BoneCollectors {
-
   private static instance: BoneCollectors;
   constructor() {
-    if (BoneCollectors.instance)
-      return BoneCollectors.instance;
+    if (BoneCollectors.instance) return BoneCollectors.instance;
     BoneCollectors.instance = this;
   }
 
-  sprites : BoneCollector[] = [];
+  sprites: BoneCollector[] = [];
   maxSpeed = 125;
-  texture : PIXI.Texture[];
+  texture: PIXI.Texture[];
   scaling = 2;
   collectDistance = 10;
   fastDistance = fastDistance;
-  bones : Bones;
-  gameModel : GameModel;
-  graveyard : Graveyard;
+  bones: Bones;
+  gameModel: GameModel;
+  graveyard: Graveyard;
 
   populate(): void {
     this.graveyard = new Graveyard();
@@ -406,13 +461,18 @@ export class BoneCollectors {
     if (!this.texture) {
       this.texture = [];
       for (let i = 0; i < 2; i++) {
-        this.texture.push(PIXI.Texture.from('bonecollector' + (i + 1) + '.png'));
+        this.texture.push(
+          PIXI.Texture.from("bonecollector" + (i + 1) + ".png"),
+        );
       }
     }
     for (let i = 0; i < this.sprites.length; i++) {
       this.sprites[i].boneList = [];
       this.sprites[i].target = false;
-      this.sprites[i].position.set(this.graveyard.sprite.x, this.graveyard.sprite.y);
+      this.sprites[i].position.set(
+        this.graveyard.sprite.x,
+        this.graveyard.sprite.y,
+      );
       this.sprites[i].state = BoneCollectorState.collecting;
     }
   }
@@ -435,7 +495,10 @@ export class BoneCollectors {
       sprite.position.set(this.graveyard.sprite.x, this.graveyard.sprite.y);
       sprite.zIndex = sprite.position.y;
       sprite.visible = true;
-      sprite.scale.set(Math.random() > 0.5 ? this.scaling : -1 * this.scaling, this.scaling);
+      sprite.scale.set(
+        Math.random() > 0.5 ? this.scaling : -1 * this.scaling,
+        this.scaling,
+      );
       sprite.xSpeed = 0;
       sprite.ySpeed = 0;
       sprite.bones = 0;
@@ -454,8 +517,7 @@ export class BoneCollectors {
     }
   }
 
-  findNearestBone(boneCollector : BoneCollector): void {
-
+  findNearestBone(boneCollector: BoneCollector): void {
     if (!boneCollector.boneList) {
       boneCollector.boneList = [];
     }
@@ -467,8 +529,16 @@ export class BoneCollectors {
         let nearestBone = null;
         let distanceToNearest = 2000;
         for (let i = 0; i < this.bones.uncollected.length; i++) {
-          if (!this.bones.uncollected[i].collected && !this.bones.uncollected[i].collector) {
-            const distance = this.fastDistance(x, y, this.bones.uncollected[i].x, this.bones.uncollected[i].y);
+          if (
+            !this.bones.uncollected[i].collected &&
+            !this.bones.uncollected[i].collector
+          ) {
+            const distance = this.fastDistance(
+              x,
+              y,
+              this.bones.uncollected[i].x,
+              this.bones.uncollected[i].y,
+            );
             if (distance < distanceToNearest) {
               distanceToNearest = distance;
               nearestBone = this.bones.uncollected[i];
@@ -493,26 +563,43 @@ export class BoneCollectors {
     }
   }
 
-  updateBoneCollector(boneCollector : BoneCollector, timeDiff: number): void {
-
-    if (boneCollector.target && !(boneCollector.target.graveyard && boneCollector.state == BoneCollectorState.collecting))
+  updateBoneCollector(boneCollector: BoneCollector, timeDiff: number): void {
+    if (
+      boneCollector.target &&
+      !(
+        boneCollector.target.graveyard &&
+        boneCollector.state == BoneCollectorState.collecting
+      )
+    )
       this.updateSpeed(boneCollector, timeDiff);
 
     switch (boneCollector.state) {
-
       case BoneCollectorState.collecting:
-
-        if (!boneCollector.target || boneCollector.target.collected || !boneCollector.target.visible) {
+        if (
+          !boneCollector.target ||
+          boneCollector.target.collected ||
+          !boneCollector.target.visible
+        ) {
           this.findNearestBone(boneCollector);
         }
         if (boneCollector.target && !boneCollector.target.collected) {
-          if (this.fastDistance(boneCollector.position.x, boneCollector.position.y, boneCollector.target.x, boneCollector.target.y) < this.collectDistance) {
+          if (
+            this.fastDistance(
+              boneCollector.position.x,
+              boneCollector.position.y,
+              boneCollector.target.x,
+              boneCollector.target.y,
+            ) < this.collectDistance
+          ) {
             boneCollector.bones++;
             boneCollector.target.collected = true;
             boneCollector.speedFactor = 0;
           }
         }
-        if (boneCollector.bones >= this.gameModel.boneCollectorCapacity || !boneCollector.target) {
+        if (
+          boneCollector.bones >= this.gameModel.boneCollectorCapacity ||
+          !boneCollector.target
+        ) {
           boneCollector.state = BoneCollectorState.returning;
           boneCollector.target = this.graveyard.sprite;
           return;
@@ -523,7 +610,14 @@ export class BoneCollectors {
         if (!boneCollector.target) {
           boneCollector.target = this.graveyard.sprite;
         }
-        if (this.fastDistance(boneCollector.position.x, boneCollector.position.y, boneCollector.target.x, boneCollector.target.y) < this.collectDistance) {
+        if (
+          this.fastDistance(
+            boneCollector.position.x,
+            boneCollector.position.y,
+            boneCollector.target.x,
+            boneCollector.target.y,
+          ) < this.collectDistance
+        ) {
           boneCollector.target = false;
           this.gameModel.addBones(boneCollector.bones);
           boneCollector.bones = 0;
@@ -534,21 +628,24 @@ export class BoneCollectors {
     }
   }
 
-  updateSpeed(boneCollector : BoneCollector, timeDiff: number): void {
-
-    boneCollector.speedFactor = Math.min(1, boneCollector.speedFactor += timeDiff * 3);
+  updateSpeed(boneCollector: BoneCollector, timeDiff: number): void {
+    boneCollector.speedFactor = Math.min(
+      1,
+      (boneCollector.speedFactor += timeDiff * 3),
+    );
 
     const xVector = boneCollector.target.x - boneCollector.x;
     const yVector = boneCollector.target.y - boneCollector.y;
     const ax = Math.abs(xVector);
     const ay = Math.abs(yVector);
-    if (Math.max(ax, ay) == 0)
-      return;
+    if (Math.max(ax, ay) == 0) return;
     let ratio = 1 / Math.max(ax, ay);
     ratio = ratio * (1.29289 - (ax + ay) * ratio * 0.29289);
 
-    boneCollector.xSpeed = xVector * ratio * this.maxSpeed * boneCollector.speedFactor;
-    boneCollector.ySpeed = yVector * ratio * this.maxSpeed * boneCollector.speedFactor;
+    boneCollector.xSpeed =
+      xVector * ratio * this.maxSpeed * boneCollector.speedFactor;
+    boneCollector.ySpeed =
+      yVector * ratio * this.maxSpeed * boneCollector.speedFactor;
 
     boneCollector.position.x += boneCollector.xSpeed * timeDiff;
     boneCollector.position.y += boneCollector.ySpeed * timeDiff;
@@ -557,7 +654,8 @@ export class BoneCollectors {
 }
 
 enum HarpyStates {
-  bombing, returning
+  bombing,
+  returning,
 }
 
 class Harpy extends PIXI.AnimatedSprite {
@@ -592,11 +690,9 @@ class Bomb extends PIXI.Sprite {
 }
 
 export class Harpies {
-
   private static instance: Harpies;
   constructor() {
-    if (Harpies.instance)
-      return Harpies.instance;
+    if (Harpies.instance) return Harpies.instance;
     Harpies.instance = this;
   }
 
@@ -625,15 +721,18 @@ export class Harpies {
       for (let i = 0; i < 2; i++) {
         this.textures.push(PIXI.Texture.from("harpy" + (i + 1) + ".png"));
       }
-      this.bombTexture = PIXI.Texture.from("harpybomb.png")
+      this.bombTexture = PIXI.Texture.from("harpybomb.png");
     }
-    if (typeof this.model.persistentData.harpies === 'undefined') {
+    if (typeof this.model.persistentData.harpies === "undefined") {
       this.model.persistentData.harpies = 0;
     }
 
     for (let i = 0; i < this.sprites.length; i++) {
       this.sprites[i].target = false;
-      this.sprites[i].position.set(this.graveyard.sprite.x, this.graveyard.sprite.y - this.bombHeight);
+      this.sprites[i].position.set(
+        this.graveyard.sprite.x,
+        this.graveyard.sprite.y - this.bombHeight,
+      );
       this.sprites[i].state = HarpyStates.returning;
     }
 
@@ -654,9 +753,15 @@ export class Harpies {
     }
     if (this.sprites.length < this.model.persistentData.harpies) {
       const sprite = new Harpy(this.textures);
-      sprite.position.set(this.graveyard.sprite.x, this.graveyard.sprite.y - this.bombHeight);
+      sprite.position.set(
+        this.graveyard.sprite.x,
+        this.graveyard.sprite.y - this.bombHeight,
+      );
       sprite.zIndex = sprite.position.y;
-      sprite.scale.set(Math.random() > 0.5 ? this.scaling : -1 * this.scaling, this.scaling);
+      sprite.scale.set(
+        Math.random() > 0.5 ? this.scaling : -1 * this.scaling,
+        this.scaling,
+      );
       sprite.state = HarpyStates.returning;
       sprite.play();
       this.sprites.push(sprite);
@@ -686,7 +791,11 @@ export class Harpies {
         if (bomb.fire) {
           this.humans.burnHuman(bomb.target, this.model.zombieHealth * 0.1);
         }
-        this.zombies.causePlagueExplosion(bomb, this.model.zombieHealth * 0.2, false);
+        this.zombies.causePlagueExplosion(
+          bomb,
+          this.model.zombieHealth * 0.2,
+          false,
+        );
       }
     } else {
       bomb.x = bomb.harpy.x;
@@ -697,15 +806,32 @@ export class Harpies {
   updateHarpy(harpy: Harpy, timeDiff: number): void {
     switch (harpy.state) {
       case HarpyStates.bombing:
-
         if (!harpy.target || harpy.target.graveyard || harpy.target.dead) {
-          if (this.model.tankBuster && this.model.isBossStage(this.model.level) && this.tanks.aliveTanks.length > 0) {
-            harpy.target = getRandomElementFromArray(this.tanks.aliveTanks, Math.random());
+          if (
+            this.model.tankBuster &&
+            this.model.isBossStage(this.model.level) &&
+            this.tanks.aliveTanks.length > 0
+          ) {
+            harpy.target = getRandomElementFromArray(
+              this.tanks.aliveTanks,
+              Math.random(),
+            );
             harpy.bomb.fire = true;
           } else {
             for (let i = 0; i < 8; i++) {
-              harpy.target = getRandomElementFromArray(this.humans.aliveHumans, Math.random());
-              if (!harpy.target || (this.fastDistance(harpy.x, harpy.y, harpy.target.x, harpy.target.y - this.bombHeight) < 500)) {
+              harpy.target = getRandomElementFromArray(
+                this.humans.aliveHumans,
+                Math.random(),
+              );
+              if (
+                !harpy.target ||
+                this.fastDistance(
+                  harpy.x,
+                  harpy.y,
+                  harpy.target.x,
+                  harpy.target.y - this.bombHeight,
+                ) < 500
+              ) {
                 break;
               }
             }
@@ -719,8 +845,14 @@ export class Harpies {
           return;
         }
 
-
-        if (this.fastDistance(harpy.x, harpy.y, harpy.target.x, harpy.target.y - this.bombHeight) < 10) {
+        if (
+          this.fastDistance(
+            harpy.x,
+            harpy.y,
+            harpy.target.x,
+            harpy.target.y - this.bombHeight,
+          ) < 10
+        ) {
           harpy.bombs--;
           harpy.bomb.dropped = true;
           harpy.bomb.floor = harpy.target.y;
@@ -733,19 +865,24 @@ export class Harpies {
           } else {
             this.getBomb(harpy);
           }
-
         } else {
           this.updateHarpySpeed(harpy, timeDiff);
         }
 
         break;
       case HarpyStates.returning:
-
         if (!harpy.target) {
           harpy.target = this.graveyard.sprite;
         }
 
-        if (this.fastDistance(harpy.x, harpy.y, harpy.target.x, harpy.target.y - this.bombHeight) < 10) {
+        if (
+          this.fastDistance(
+            harpy.x,
+            harpy.y,
+            harpy.target.x,
+            harpy.target.y - this.bombHeight,
+          ) < 10
+        ) {
           harpy.bombs = this.model.harpyBombs;
           this.getBomb(harpy);
           harpy.state = HarpyStates.bombing;
@@ -778,14 +915,13 @@ export class Harpies {
   }
 
   updateHarpySpeed(harpy: Harpy, timeDiff: number): void {
-    harpy.speedFactor = Math.min(1, harpy.speedFactor += timeDiff * 2);
+    harpy.speedFactor = Math.min(1, (harpy.speedFactor += timeDiff * 2));
 
     const xVector = harpy.target.x - harpy.x;
-    const yVector = (harpy.target.y - this.bombHeight) - harpy.y;
+    const yVector = harpy.target.y - this.bombHeight - harpy.y;
     const ax = Math.abs(xVector);
     const ay = Math.abs(yVector);
-    if (Math.max(ax, ay) == 0)
-      return;
+    if (Math.max(ax, ay) == 0) return;
     let ratio = 1 / Math.max(ax, ay);
     ratio = ratio * (1.29289 - (ax + ay) * ratio * 0.29289);
 

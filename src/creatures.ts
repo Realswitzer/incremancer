@@ -1,34 +1,47 @@
 import { Creature, CreatureState } from "./classes/creatureclasses";
 import { CharacterFlags } from "./classes/gameobject";
-import { Bullets, Smoke, fastDistance, magnitude, CreatureFactory, GameModel, Graveyard, Humans, ZmMap,
-  Blasts, Blood, Bones, Exclamations, characterContainer, Zombies } from "./internal";
-
+import {
+  Bullets,
+  Smoke,
+  fastDistance,
+  magnitude,
+  CreatureFactory,
+  GameModel,
+  Graveyard,
+  Humans,
+  ZmMap,
+  Blasts,
+  Blood,
+  Bones,
+  Exclamations,
+  characterContainer,
+  Zombies,
+} from "./internal";
 
 export class Creatures {
-  private static instance : Creatures;
+  private static instance: Creatures;
   constructor() {
-    if (Creatures.instance)
-      return Creatures.instance;
+    if (Creatures.instance) return Creatures.instance;
     Creatures.instance = this;
   }
   creatureFactory = new CreatureFactory();
-  map : ZmMap;
-  model : GameModel;
-  graveyard : Graveyard;
-  smoke : Smoke;
-  bullets : Bullets;
-  humans : Humans;
+  map: ZmMap;
+  model: GameModel;
+  graveyard: Graveyard;
+  smoke: Smoke;
+  bullets: Bullets;
+  humans: Humans;
   zombies = new Zombies();
-  exclamations : Exclamations;
-  blood : Blood;
-  bones : Bones;
-  blasts : Blasts;
-  creatures : Creature[] = [];
+  exclamations: Exclamations;
+  blood: Blood;
+  bones: Bones;
+  blasts: Blasts;
+  creatures: Creature[] = [];
   creatureCount = [];
-  aliveCreatures : Creature[] = [];
+  aliveCreatures: Creature[] = [];
   aliveZombies = [];
   graveyardAttackers = [];
-  discardedSprites : Creature[] = [];
+  discardedSprites: Creature[] = [];
   aliveHumans = [];
   scaling = 1.6;
   moveTargetDistance = 15;
@@ -40,19 +53,19 @@ export class Creatures {
   scanTime = 3;
   creatureTypes = this.creatureFactory.types;
   golemTextures = {
-    set:false,
-    down : [] as PIXI.Texture[],
-    up : [] as PIXI.Texture[],
-    left : [] as PIXI.Texture[],
-    right : [] as PIXI.Texture[],
-    dead : [] as PIXI.Texture[]
+    set: false,
+    down: [] as PIXI.Texture[],
+    up: [] as PIXI.Texture[],
+    left: [] as PIXI.Texture[],
+    right: [] as PIXI.Texture[],
+    dead: [] as PIXI.Texture[],
   };
   directions = {
-    down:1,
-    up:2,
-    right:3,
-    left:4,
-    dead:5
+    down: 1,
+    up: 2,
+    right: 3,
+    left: 4,
+    dead: 5,
   };
   burnTickTimer = 5;
   smokeTimer = 0.3;
@@ -66,7 +79,7 @@ export class Creatures {
   inflictPlague = this.zombies.inflictPlague;
   healZombie = this.zombies.healZombie;
 
-  populate() : void {
+  populate(): void {
     this.map = new ZmMap();
     this.model = GameModel.getInstance();
     this.graveyard = new Graveyard();
@@ -83,16 +96,16 @@ export class Creatures {
       this.golemTextures.up = [];
       this.golemTextures.right = [];
       this.golemTextures.dead = [];
-      for (let i=0; i < 3; i++) {
-        this.golemTextures.down.push(PIXI.Texture.from('golem' + i + '.png'));
+      for (let i = 0; i < 3; i++) {
+        this.golemTextures.down.push(PIXI.Texture.from("golem" + i + ".png"));
       }
-      for (let i=3; i < 6; i++) {
-        this.golemTextures.up.push(PIXI.Texture.from('golem' + i + '.png'));
+      for (let i = 3; i < 6; i++) {
+        this.golemTextures.up.push(PIXI.Texture.from("golem" + i + ".png"));
       }
-      for (let i=6; i < 9; i++) {
-        this.golemTextures.right.push(PIXI.Texture.from('golem' + i + '.png'));
+      for (let i = 6; i < 9; i++) {
+        this.golemTextures.right.push(PIXI.Texture.from("golem" + i + ".png"));
       }
-      this.golemTextures.dead.push(PIXI.Texture.from('golem9.png'));
+      this.golemTextures.dead.push(PIXI.Texture.from("golem9.png"));
       this.golemTextures.set = true;
     }
 
@@ -106,7 +119,8 @@ export class Creatures {
         if (!this.creatures[i].flags.dead) {
           creatures.push(this.creatures[i]);
           this.creatures[i].x = this.graveyard.sprite.x;
-          this.creatures[i].zIndex = this.creatures[i].y = this.graveyard.sprite.y + (this.graveyard.level > 2 ? 8 : 0);
+          this.creatures[i].zIndex = this.creatures[i].y =
+            this.graveyard.sprite.y + (this.graveyard.level > 2 ? 8 : 0);
           this.creatures[i].target = null;
           this.creatures[i].state = CreatureState.lookingForTarget;
         } else {
@@ -121,29 +135,34 @@ export class Creatures {
     this.creatureFactory.spawnSavedCreatures();
   }
 
-  spawnCreature(health : number, damage : number, speed : number, type : number, level : number) : void {
-
+  spawnCreature(
+    health: number,
+    damage: number,
+    speed: number,
+    type: number,
+    level: number,
+  ): void {
     if (this.model.creatureCount >= this.model.creatureLimit) {
       return;
     }
 
-    let creature : Creature;
+    let creature: Creature;
     if (this.discardedSprites.length > 0) {
       creature = this.discardedSprites.pop();
       creature.textures = this.golemTextures.down;
     } else {
       creature = new Creature(this.golemTextures.down);
     }
-    switch(type) {
+    switch (type) {
       case this.creatureTypes.earthGolem:
-        creature.tint = 0xA87f32;
+        creature.tint = 0xa87f32;
         creature.bulletReflect = this.model.bulletproofChance;
         break;
       case this.creatureTypes.airGolem:
-        creature.tint = 0x9CA5B8;
+        creature.tint = 0x9ca5b8;
         break;
       case this.creatureTypes.fireGolem:
-        creature.tint = 0xDB471A;
+        creature.tint = 0xdb471a;
         creature.immuneToBurns = true;
         break;
       case this.creatureTypes.waterGolem:
@@ -161,8 +180,11 @@ export class Creatures {
     creature.lastKnownBuilding = false;
     creature.alpha = 1;
     creature.animationSpeed = 0.15;
-    creature.anchor.set(8.5/16,1);
-    creature.position.set(this.graveyard.sprite.x, this.graveyard.sprite.y + (this.graveyard.level > 2 ? 8 : 0));
+    creature.anchor.set(8.5 / 16, 1);
+    creature.position.set(
+      this.graveyard.sprite.x,
+      this.graveyard.sprite.y + (this.graveyard.level > 2 ? 8 : 0),
+    );
     creature.target = null;
     creature.zIndex = creature.position.y;
     creature.visible = true;
@@ -189,7 +211,7 @@ export class Creatures {
     this.model.creatureCount++;
   }
 
-  update(timeDiff : number) : void {
+  update(timeDiff: number): void {
     let aliveCreatures = 0;
     this.aliveHumans = this.humans.aliveHumans;
     this.graveyardAttackers = this.humans.graveyardAttackers;
@@ -201,32 +223,31 @@ export class Creatures {
 
     this.model.persistentData.savedCreatures = [];
 
-    for (let i=0; i < this.creatures.length; i++) {
+    for (let i = 0; i < this.creatures.length; i++) {
       if (this.creatures[i].visible) {
         this.updateCreature(this.creatures[i], timeDiff);
       }
     }
-    for (let i=0; i < this.creatures.length; i++) {
+    for (let i = 0; i < this.creatures.length; i++) {
       if (this.creatures[i].visible) {
         if (!this.creatures[i].flags.dead) {
           this.aliveZombies.push(this.creatures[i]);
           aliveCreatures++;
           this.creatureCount[this.creatures[i].creatureType]++;
           this.model.persistentData.savedCreatures.push({
-            t:this.creatures[i].creatureType,
-            l:this.creatures[i].level
+            t: this.creatures[i].creatureType,
+            l: this.creatures[i].level,
           });
         }
       }
     }
     this.model.creatureCount = aliveCreatures;
-  }  
+  }
 
-  updateCreature(creature : Creature, timeDiff : number) : void {
+  updateCreature(creature: Creature, timeDiff: number): void {
     if (creature.flags.dead) {
-      if (!creature.visible)
-        return;
-      
+      if (!creature.visible) return;
+
       creature.alpha -= this.fadeSpeed * timeDiff;
       if (creature.alpha < 0) {
         creature.visible = false;
@@ -234,22 +255,22 @@ export class Creatures {
       }
       return;
     }
-    
+
     creature.timer.attack -= timeDiff;
     creature.timer.scan -= timeDiff;
     creature.timer.ability -= timeDiff;
-    
+
     if (this.model.runeEffects.healthRegen > 0) {
       this.updateZombieRegen(creature, timeDiff);
     }
-    
+
     if (creature.flags.burning && !creature.immuneToBurns) {
       this.updateBurns(creature, timeDiff);
     }
-    
+
     if (creature.timer.ability < 0) {
       creature.timer.ability = 4;
-      switch(creature.creatureType) {
+      switch (creature.creatureType) {
         case this.creatureTypes.earthGolem:
           this.golemTaunt(creature);
           break;
@@ -262,14 +283,15 @@ export class Creatures {
       }
     }
 
-    if ((!creature.target || creature.target.flags.dead) && creature.timer.scan < 0) {
+    if (
+      (!creature.target || creature.target.flags.dead) &&
+      creature.timer.scan < 0
+    ) {
       creature.state = CreatureState.lookingForTarget;
     }
 
-    switch(creature.state) {
-
+    switch (creature.state) {
       case CreatureState.lookingForTarget:
-
         this.searchClosestTarget(creature);
         if (creature.target) {
           creature.state = CreatureState.movingToTarget;
@@ -277,14 +299,22 @@ export class Creatures {
         break;
 
       case CreatureState.movingToTarget: {
-        const distanceToHumanTarget = this.fastDistance(creature.position.x, creature.position.y, creature.target.x, creature.target.y);
+        const distanceToHumanTarget = this.fastDistance(
+          creature.position.x,
+          creature.position.y,
+          creature.target.x,
+          creature.target.y,
+        );
 
         if (distanceToHumanTarget < this.attackDistance) {
           creature.state = CreatureState.attackingTarget;
           break;
         }
 
-        if (distanceToHumanTarget > this.attackDistance * 3 && creature.timer.scan < 0) {
+        if (
+          distanceToHumanTarget > this.attackDistance * 3 &&
+          creature.timer.scan < 0
+        ) {
           this.searchClosestTarget(creature);
         }
         this.updateCreatureSpeed(creature, timeDiff);
@@ -292,17 +322,29 @@ export class Creatures {
         break;
       }
       case CreatureState.attackingTarget: {
-        const distanceToTarget = this.fastDistance(creature.position.x, creature.position.y, creature.target.x, creature.target.y);
+        const distanceToTarget = this.fastDistance(
+          creature.position.x,
+          creature.position.y,
+          creature.target.x,
+          creature.target.y,
+        );
         if (distanceToTarget < this.attackDistance) {
-          creature.scale.x = creature.target.x > creature.x ? creature.scaling : -creature.scaling;
+          creature.scale.x =
+            creature.target.x > creature.x
+              ? creature.scaling
+              : -creature.scaling;
           if (creature.timer.attack < 0) {
-            this.humans.damageHuman(creature.target, this.calculateDamage(creature));
+            this.humans.damageHuman(
+              creature.target,
+              this.calculateDamage(creature),
+            );
             if (creature.creatureType == this.creatureTypes.fireGolem) {
               this.humans.burnHuman(creature.target, creature.attackDamage / 2);
             }
-            creature.timer.attack = this.attackSpeed * this.model.runeEffects.attackSpeed;
+            creature.timer.attack =
+              this.attackSpeed * this.model.runeEffects.attackSpeed;
             if (creature.flags.burning) {
-              creature.timer.attack *= (1 / this.model.burningSpeedMod);
+              creature.timer.attack *= 1 / this.model.burningSpeedMod;
             }
           }
           if (distanceToTarget > this.attackDistance / 2) {
@@ -315,10 +357,9 @@ export class Creatures {
       }
     }
   }
-  
 
-  getCreatureDirection(creature : Creature) : number {
-    if(Math.abs(creature.xSpeed) > Math.abs(creature.ySpeed)) {
+  getCreatureDirection(creature: Creature): number {
+    if (Math.abs(creature.xSpeed) > Math.abs(creature.ySpeed)) {
       //left right
       if (creature.xSpeed < 0) {
         return this.directions.left;
@@ -333,10 +374,10 @@ export class Creatures {
     }
   }
 
-  changeTextureDirection(creature : Creature) : void {
+  changeTextureDirection(creature: Creature): void {
     const direction = this.getCreatureDirection(creature);
     if (direction !== creature.currentDirection) {
-      switch(direction) {
+      switch (direction) {
         case this.directions.up:
           creature.textures = creature.textureSet.up;
           creature.scale.x = creature.scaling;
@@ -359,7 +400,7 @@ export class Creatures {
     }
   }
 
-  updateCreatureSpeed(creature : Creature, timeDiff : number) : void {
+  updateCreatureSpeed(creature: Creature, timeDiff: number): void {
     if (creature.timer.dogStun && creature.timer.dogStun > 0) {
       creature.timer.dogStun -= timeDiff;
       return;
@@ -368,14 +409,17 @@ export class Creatures {
     if (!creature.timer.target || !creature.targetVector) {
       creature.timer.target = 0;
     }
-    creature.timer.target-=timeDiff;
+    creature.timer.target -= timeDiff;
     if (creature.timer.target <= 0) {
-      creature.targetVector = this.map.howDoIGetToMyTarget(creature, creature.target);
+      creature.targetVector = this.map.howDoIGetToMyTarget(
+        creature,
+        creature.target,
+      );
       creature.timer.target = 0.2;
     }
 
     const speedMod = creature.speedMultiplier * creature.maxSpeed;
-    
+
     creature.xSpeed = creature.targetVector.x * speedMod;
     creature.ySpeed = creature.targetVector.y * speedMod;
 
@@ -385,18 +429,23 @@ export class Creatures {
     this.changeTextureDirection(creature);
   }
 
-  calculateDamage(creature : Creature) : number {
+  calculateDamage(creature: Creature): number {
     let damage = creature.attackDamage;
-    if (this.model.runeEffects.critChance > 0 && Math.random() < this.model.runeEffects.critChance) {
+    if (
+      this.model.runeEffects.critChance > 0 &&
+      Math.random() < this.model.runeEffects.critChance
+    ) {
       damage *= this.model.runeEffects.critDamage;
     }
     return damage;
   }
 
-  golemTaunt(creature : Creature) : void {
-    for (let i=0; i < this.aliveHumans.length; i++) {
+  golemTaunt(creature: Creature): void {
+    for (let i = 0; i < this.aliveHumans.length; i++) {
       if (Math.abs(this.aliveHumans[i].x - creature.x) < this.targetDistance) {
-        if (Math.abs(this.aliveHumans[i].y - creature.y) < this.targetDistance) {
+        if (
+          Math.abs(this.aliveHumans[i].y - creature.y) < this.targetDistance
+        ) {
           if (!this.aliveHumans[i].vip) {
             this.aliveHumans[i].zombieTarget = creature;
             this.aliveHumans[i].target = creature;
@@ -406,19 +455,23 @@ export class Creatures {
     }
   }
 
-  golemHeal(creature : Creature) : void {
+  golemHeal(creature: Creature): void {
     const healingDone = creature.attackDamage;
     for (let i = 0; i < this.aliveZombies.length; i++) {
       if (Math.abs(this.aliveZombies[i].x - creature.x) < this.targetDistance) {
-        if (Math.abs(this.aliveZombies[i].y - creature.y) < this.targetDistance) {
+        if (
+          Math.abs(this.aliveZombies[i].y - creature.y) < this.targetDistance
+        ) {
           this.healZombie(this.aliveZombies[i], healingDone);
         }
       }
     }
-    for (let i=0; i < this.creatures.length; i++) {
+    for (let i = 0; i < this.creatures.length; i++) {
       if (!this.creatures[i].flags.dead && this.creatures[i].visible) {
         if (Math.abs(this.creatures[i].x - creature.x) < this.targetDistance) {
-          if (Math.abs(this.creatures[i].y - creature.y) < this.targetDistance) {
+          if (
+            Math.abs(this.creatures[i].y - creature.y) < this.targetDistance
+          ) {
             this.healZombie(this.creatures[i], healingDone);
           }
         }
@@ -426,14 +479,25 @@ export class Creatures {
     }
   }
 
-  golemFireball(creature : Creature) : void {
+  golemFireball(creature: Creature): void {
     let fireBalls = 5;
-    for (let i=0; i < this.aliveHumans.length; i++) {
+    for (let i = 0; i < this.aliveHumans.length; i++) {
       if (fireBalls > 0) {
-        if (Math.abs(this.aliveHumans[i].x - creature.x) < this.targetDistance) {
-          if (Math.abs(this.aliveHumans[i].y - creature.y) < this.targetDistance) {
+        if (
+          Math.abs(this.aliveHumans[i].x - creature.x) < this.targetDistance
+        ) {
+          if (
+            Math.abs(this.aliveHumans[i].y - creature.y) < this.targetDistance
+          ) {
             fireBalls--;
-            this.bullets.newBullet(creature, this.aliveHumans[i], creature.attackDamage / 2, false, false, true);
+            this.bullets.newBullet(
+              creature,
+              this.aliveHumans[i],
+              creature.attackDamage / 2,
+              false,
+              false,
+              true,
+            );
           }
         }
       }
