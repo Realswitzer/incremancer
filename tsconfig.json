@@ -1,0 +1,10 @@
+{
+    "typeAcquisition": {
+        "enable": true,
+        "include": [
+            "pixi.js-legacy",
+            "lz-string",
+            "angular@1.7.3"
+        ]
+    }
+}
