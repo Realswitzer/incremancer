@@ -204,6 +204,7 @@ function setupContainers(app) {
   vipTexture = PIXI.RenderTexture.create({ width: 300, height: 300 });
   vipSprite = new PIXI.Sprite(vipTexture);
   vipSprite.visible = false;
+  vipSprite.alpha = 0;
   uiContainer.addChild(vipSprite);
 
   gameContainer.addChild(backgroundContainer);
