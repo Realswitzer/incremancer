@@ -318,15 +318,6 @@ let frameCount = 0;
 let timeSinceLastFrameCount = 1;
 
 function update(timeDiff: number, app: PIXI.Application): void {
-  if (gameModel.persistentData.showfps) {
-    frameCount++;
-    timeSinceLastFrameCount -= timeDiff;
-    if (timeSinceLastFrameCount < 0) {
-      gameModel.frameRate = frameCount;
-      frameCount = 0;
-      timeSinceLastFrameCount = 1;
-    }
-  }
   scrollGameContainer(timeDiff);
   viewableArea.update();
 
@@ -420,6 +411,7 @@ function startGame() {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       app.ticker.add((_delta: number) => {
         update(app.ticker.deltaMS / 1000, app);
+        gameModel.frameRate = app.ticker.FPS;
       });
     });
 }

@@ -72,6 +72,7 @@ export class GameModel {
   energyRate = 1;
   brainsRate = 0;
   bonesRate = 0;
+  endLevelBones = 0;
   energySpellMultiplier = 1;
   prestigePointsEarned = 0;
   zombieCost = 10;
@@ -372,10 +373,10 @@ export class GameModel {
   }
 
   calculateEndLevelBones(): void {
-    let endLevelBones = 0;
+    this.endLevelBones = 0;
     if (this.persistentData.boneCollectors > 0 && this.bones.uncollected) {
-      endLevelBones = this.bones.uncollected.length;
-      this.addBones(endLevelBones);
+      this.endLevelBones = this.bones.uncollected.length;
+      this.addBones(this.endLevelBones);
     }
   }
 
