@@ -66,9 +66,8 @@ export class ZmMap {
     if (
       this.gameModel.level % 5 == 0 &&
       !this.gameModel.isBossStage(this.gameModel.level) &&
-      position.y < this.roadSprite.y + this.roadSprite.height / 2 &&
-      position.y + position.height >
-        this.roadSprite.y - this.roadSprite.height / 2
+      position.y < this.roadSprite.y + this.roadSprite.height &&
+      position.y + position.height > this.roadSprite.y
     ) {
       return false;
     }
