@@ -1,4 +1,8 @@
-import { Creature, CreatureState } from "./classes/creatureclasses";
+import {
+  Creature,
+  CreatureState,
+  spawnCritText,
+} from "./classes/creatureclasses";
 import { CharacterFlags } from "./classes/gameobject";
 import {
   characterContainer,
