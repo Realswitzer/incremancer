@@ -392,7 +392,7 @@ export class GameModel {
     if (this.getEnergyRate() < 0) {
       const energyRate = this.getEnergyRate();
       if (this.persistentData.harpies > 0) {
-        this.persistentData.harpies -= Math.round(Math.abs(energyRate));
+        this.persistentData.harpies -= Math.ceil(Math.abs(energyRate));
         if (this.persistentData.harpies < 0) {
           this.persistentData.harpies = 0;
         }
