@@ -191,7 +191,16 @@ angular
         if (zm.model.persistentData.boneCollectors > 0)
           zm.model.persistentData.boneCollectors--;
       };
-
+      zm.maxBoneCollectors = function () {
+        return Math.floor(
+          zm.model.getEnergyRate() + zm.model.persistentData.boneCollectors,
+        );
+      };
+      zm.setBoneCollectors = function (number: number) {
+        zm.model.getEnergyRate() >=
+          number - zm.model.persistentData.boneCollectors &&
+          (zm.model.persistentData.boneCollectors = number);
+      };
       zm.setHarpies = function (number: number) {
         if (
           (number >= 0 && number < zm.model.persistentData.harpies) ||
@@ -200,7 +209,11 @@ angular
           zm.model.persistentData.harpies = number;
         }
       };
-
+      zm.maxHarpies = function () {
+        return Math.floor(
+          zm.model.getEnergyRate() + zm.model.persistentData.harpies,
+        );
+      };
       zm.setGraveyardZombies = function (number: number) {
         if (number <= zm.maxGraveyardZombies() && number >= 0)
           zm.model.persistentData.graveyardZombies = number;

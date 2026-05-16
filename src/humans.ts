@@ -741,14 +741,15 @@ export class Humans {
     human.timer.scan = this.scanTime;
     let zombieSpottedCount = 0;
     for (let i = 0; i < aliveZombies.length; i++) {
-      if (!aliveZombies[i].flags.dead) {
-        if (Math.abs(aliveZombies[i].x - human.x) < human.visionDistance) {
-          if (Math.abs(aliveZombies[i].y - human.y) < human.visionDistance) {
-            human.zombieTarget = aliveZombies[i];
-            zombieSpottedCount++;
-          }
-        }
-      }
+      if (
+        !aliveZombies[i].flags.dead &&
+        Math.abs(aliveZombies[i].x - human.x) < human.visionDistance &&
+        Math.abs(aliveZombies[i].y - human.y) < human.visionDistance &&
+        ((human.zombieTarget = aliveZombies[i]),
+        zombieSpottedCount++,
+        zombieSpottedCount > 9)
+      )
+        return zombieSpottedCount;
     }
     return zombieSpottedCount;
   }
