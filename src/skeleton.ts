@@ -493,7 +493,18 @@ export class Skeleton {
       creature.timer.target = 0.2;
     }
 
-    const speedMod = creature.speedMultiplier * creature.maxSpeed;
+    const distanceToTarget =
+      4 *
+      this.fastDistance(
+        creature.x,
+        creature.y,
+        creature.target.x,
+        creature.target.y,
+      );
+    const speedMod = Math.min(
+      creature.speedMultiplier * creature.maxSpeed,
+      distanceToTarget,
+    );
 
     creature.xSpeed = creature.targetVector.x * speedMod;
     creature.ySpeed = creature.targetVector.y * speedMod;
@@ -511,6 +522,7 @@ export class Skeleton {
       Math.random() < this.model.runeEffects.critChance
     ) {
       damage *= this.model.runeEffects.critDamage;
+      spawnCritText(creature.x, creature.y, damage);
     }
     return damage;
   }
@@ -810,12 +822,14 @@ export class Skeleton {
   }
   destroyAllItems(): void {
     this.addXp(this.xpForItems());
-    this.persistent.items = this.persistent.items.filter((i) => i.q);
+    this.persistent.items = this.persistent.items.filter(
+      (i) => i.q || i.r == this.rarity.legendary,
+    );
   }
   xpForItems(): number {
     let xp = 0;
     this.persistent.items
-      .filter((i) => !i.q)
+      .filter((i) => !i.q || i.r != this.rarity.legendary)
       .forEach(function (item) {
         xp += item.l * item.r * 10;
       });

@@ -1,3 +1,4 @@
+import { critTexts } from "./classes/creatureclasses";
 import { GameObject, SpritePool } from "./classes/gameobject";
 import {
   GameModel,
@@ -47,6 +48,9 @@ export class Particles {
     this.smoke.update(timeDiff);
     this.fragments.update(timeDiff);
     this.prestigePoints.update(timeDiff);
+    for (const crit of critTexts) {
+      crit.updateCritText(timeDiff);
+    }
   }
 }
 

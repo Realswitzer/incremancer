@@ -556,6 +556,7 @@ export class Zombies {
       Math.random() < this.model.runeEffects.critChance
     ) {
       damage *= this.model.runeEffects.critDamage;
+      spawnCritText(creature.x, creature.y, damage);
     }
     return damage;
   }

@@ -1,4 +1,8 @@
-import { Creature, CreatureState } from "./classes/creatureclasses";
+import {
+  Creature,
+  CreatureState,
+  spawnCritText,
+} from "./classes/creatureclasses";
 import { CharacterFlags } from "./classes/gameobject";
 import {
   Bullets,
@@ -436,6 +440,7 @@ export class Creatures {
       Math.random() < this.model.runeEffects.critChance
     ) {
       damage *= this.model.runeEffects.critDamage;
+      spawnCritText(creature.x, creature.y, damage);
     }
     return damage;
   }

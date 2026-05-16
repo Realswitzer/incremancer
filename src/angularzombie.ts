@@ -927,6 +927,11 @@ angular
               skeleton.persistent.xpRate * 20
           );
         },
+        trophies() {
+          return skeleton.persistent.skeletons > 0
+            ? ` - ${zm.model.persistentData.trophies.length} / ${20 * skeleton.persistent.xpRate} Trophies`
+            : "";
+        },
         xpPercent() {
           return Math.round(
             Math.min(1, zm.skeleton().xp / skeleton.xpForNextLevel()) * 100,
@@ -1060,7 +1065,7 @@ angular
             }
           }
           if (item.s == -1) {
-            return "Click this to destroy all non-equipped items. Or drag items here to destroy them.";
+            return "Click this to destroy all non-equipped items (legendary items will not be automatically destroyed). Or drag items here to destroy them.";
           }
         },
         itemStats(item) {

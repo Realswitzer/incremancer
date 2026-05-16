@@ -1096,8 +1096,8 @@ export class Upgrades {
       rune: "death",
       effect: "critDamage",
       cost: "bones",
-      logBase: 1.03,
-      adjustment: -200,
+      logBase: 1.05,
+      adjustment: -100,
       cap: 0,
     },
     {
@@ -1223,7 +1223,7 @@ export class Upgrades {
     const runeEffects = {
       attackSpeed: 1,
       critChance: 0,
-      critDamage: 0,
+      critDamage: 1,
       damageReduction: 1,
       healthRegen: 0,
       damageReflection: 0,

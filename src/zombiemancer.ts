@@ -462,6 +462,7 @@ const KeysPressed = {
 
 window.onblur = function () {
   KeysPressed.w = KeysPressed.a = KeysPressed.s = KeysPressed.d = false;
+  KeysPressed.shift = false;
 };
 
 window.onkeydown = function (e) {
