@@ -397,6 +397,7 @@ function startGame() {
       setGameFieldSizeForLevel();
 
       grass = new PIXI.TilingSprite(PIXI.Texture.from("grass.png"));
+      grass.texture.baseTexture.mipmap = PIXI.MIPMAP_MODES.OFF;
       grass.width = gameFieldSize.x;
       grass.height = gameFieldSize.y;
       backgroundContainer.addChild(grass);

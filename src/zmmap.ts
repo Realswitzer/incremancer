@@ -366,12 +366,13 @@ export class ZmMap {
         );
       }
       this.roadSprite = new PIXI.TilingSprite(PIXI.Texture.from("road.png"));
+      this.roadSprite.texture.baseTexture.mipmap = PIXI.MIPMAP_MODES.OFF;
       this.roadSprite.width = gameFieldSize.x;
       this.roadSprite.tileScale.set(3, 3);
       this.roadSprite.height = 96;
       backgroundContainer.addChild(this.roadSprite);
       this.roadSprite.visible = false;
-      this.roadSprite.anchor.set(0.5, 0.5);
+      this.roadSprite.anchor.set(0, 0);
     }
 
     if (this.buildings.length > 0) {
@@ -404,8 +405,8 @@ export class ZmMap {
     } else if (this.gameModel.level % 5 == 0) {
       this.roadSprite.visible = true;
       this.roadSprite.width = gameFieldSize.x;
-      this.roadSprite.x = gameFieldSize.x / 2;
-      this.roadSprite.y = gameFieldSize.y / 2;
+      this.roadSprite.x = 0;
+      this.roadSprite.y = gameFieldSize.y / 2 - 48;
     }
 
     while (spaceToCreate > 0 || minBuildings > 0) {
