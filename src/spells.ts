@@ -197,7 +197,7 @@ export class Spells {
 
   castSpellNoMana(spellId: number): void {
     const spell = this.spellMap.get(spellId);
-    if (spell && !spell.onCooldown && !spell.active) {
+    if (spell && !spell.active) {
       spell.active = true;
       spell.timer = spell.duration;
       spell.start();

@@ -214,43 +214,59 @@ export class Graveyard {
   }
 
   fence: PIXI.Container = null;
+  fencePosts: PIXI.Sprite[] = [];
+  fenceTextures: PIXI.Texture[] = null;
 
   drawFence(): void {
-    if (this.fence) {
-      backgroundContainer.removeChild(this.fence);
+    if (!this.fence) {
+      this.fence = new PIXI.Container();
+      backgroundContainer.addChild(this.fence);
     }
 
     this.fenceRadius = this.gameModel.fenceRadius;
-    this.fence = new PIXI.Container();
-    this.fence.visible = false;
-    backgroundContainer.addChild(this.fence);
 
-    const textures = [];
-    for (let i = 0; i < 4; i++) {
-      textures.push(PIXI.Texture.from("fencepost" + (i + 1) + ".png"));
+    if (!this.fenceTextures) {
+      this.fenceTextures = [];
+      for (let i = 0; i < 4; i++) {
+        this.fenceTextures.push(PIXI.Texture.from(`fencepost${i + 1}.png`));
+      }
     }
 
-    const numPosts = Math.round(this.fenceRadius * 0.4);
-    const radiansPerFencePost = (Math.PI * 2) / numPosts;
+    this.fencePosts.forEach((post) => (post.visible = false));
+
+    this.fence.cacheAsBitmap = false;
+    const numPosts = Math.round(0.4 * this.fenceRadius);
+    const radiansPerFencePosts = (2 * Math.PI) / numPosts;
     for (let i = 0; i < numPosts; i++) {
-      const postSprite = new PIXI.Sprite(
-        getRandomElementFromArray(textures, Math.random()),
-      );
-      this.fence.addChild(postSprite);
-      postSprite.anchor.set(0.5, 1);
-      postSprite.scale.x = Math.random() > 0.5 ? 1 : -1;
-      const positionWobble = -5 + Math.random() * 10;
-      const pos = RotateVector2d(
-        0,
-        this.fenceRadius + positionWobble,
-        radiansPerFencePost * i,
-      );
-      postSprite.position.set(pos.x, pos.y);
+      let fencePost;
+
+      if (this.fencePosts[i]) {
+        fencePost = this.fencePosts[i];
+        fencePost.visible = true;
+      } else {
+        fencePost = new PIXI.Sprite(
+          getRandomElementFromArray(this.fenceTextures, Math.random()),
+        );
+        this.fencePosts.push(fencePost);
+        this.fence.addChild(fencePost);
+      }
+
+      fencePost.anchor.set(0.5, 1);
+      fencePost.scale.x = Math.random() > 0.5 ? 1 : -1;
+      const positionWobble = 10 * Math.random() - 5;
+
+      const radius = this.fenceRadius + positionWobble;
+      const angle = radiansPerFencePosts * i;
+
+      const pos = {
+        x: radius * Math.sin(angle),
+        y: radius * Math.cos(angle),
+      };
+
+      fencePost.position.set(pos.x, pos.y);
     }
     this.fence.cacheAsBitmap = true;
-
     const graveyardPosition = this.zmMap.graveYardLocation;
-
     this.fence.x = graveyardPosition.x;
     this.fence.y = graveyardPosition.y;
   }
@@ -268,7 +284,7 @@ export class Graveyard {
       this.gameModel.currentState != this.gameModel.states.playingLevel
     ) {
       this.sprite.visible = false;
-      return;
+      return void (this.fence.visible = false);
     }
 
     if (
@@ -276,21 +292,21 @@ export class Graveyard {
       (this.level < 3 && this.gameModel.constructions.fort) ||
       (this.level < 4 && this.gameModel.constructions.fortress) ||
       (this.level < 5 && this.gameModel.constructions.citadel)
-    )
+    ) {
       this.drawGraveyard();
+    }
 
     this.sprite.visible = true;
+
     if (this.fortSprite) {
       this.fortSprite.visible = true;
     }
 
-    if (this.level == 5) {
-      if (Math.random() > 0.9) {
-        if (Math.random() > 0.5) {
-          this.smoke.newFireSmoke(this.sprite.x - 20, this.sprite.y - 113);
-        } else {
-          this.smoke.newFireSmoke(this.sprite.x + 20, this.sprite.y - 113);
-        }
+    if (this.level == 5 && Math.random() > 0.9) {
+      if (Math.random() > 0.5) {
+        this.smoke.newFireSmoke(this.sprite.x - 20, this.sprite.y - 113);
+      } else {
+        this.smoke.newFireSmoke(this.sprite.x + 20, this.sprite.y - 113);
       }
     }
 
@@ -298,7 +314,7 @@ export class Graveyard {
       this.gameModel.energy >= this.gameModel.energyMax &&
       !this.gameModel.hidden
     ) {
-      for (let i = 0; i < this.gameModel.persistentData.graveyardZombies; i++) {
+      for (let e = 0; e < this.gameModel.persistentData.graveyardZombies; e++) {
         this.zombies.spawnZombie(
           this.sprite.x,
           this.sprite.y + (this.level > 2 ? 8 : 0),
@@ -311,15 +327,15 @@ export class Graveyard {
     this.harpies.update(timeDiff);
 
     if (
-      !this.gameModel.constructions.fence ||
-      this.gameModel.currentState != this.gameModel.states.playingLevel
+      this.gameModel.constructions.fence &&
+      this.gameModel.currentState == this.gameModel.states.playingLevel
     ) {
-      this.fence.visible = false;
-    } else {
-      this.fence.visible = true;
       if (this.fenceRadius !== this.gameModel.fenceRadius) {
         this.drawFence();
       }
+      this.fence.visible = true;
+    } else {
+      this.fence.visible = false;
     }
 
     this.updatePlagueSpikes(timeDiff);
@@ -702,6 +718,7 @@ export class Harpies {
   humans: Humans;
   tanks: Tanks;
   sprites: Harpy[] = [];
+  discardedSprites: Harpy[] = [];
   bombSprites: Bomb[] = [];
   discardedBombSprites: Bomb[] = [];
   bombHeight = 100;
@@ -743,16 +760,20 @@ export class Harpies {
 
   addAndRemoveHarpies(): void {
     if (this.sprites.length > this.model.persistentData.harpies) {
-      const harpy = this.sprites.pop();
+      const harpy = this.sprites.pop()!;
       harpy.target = false;
       if (harpy.bomb) {
         harpy.bomb.dropped = true;
         harpy.bomb.floor = harpy.bomb.y + this.bombHeight;
       }
       foregroundContainer.removeChild(harpy);
+      this.discardedSprites.push(harpy);
     }
     if (this.sprites.length < this.model.persistentData.harpies) {
-      const sprite = new Harpy(this.textures);
+      const sprite =
+        this.discardedSprites.length > 0
+          ? this.discardedSprites.pop()!
+          : new Harpy(this.textures);
       sprite.position.set(
         this.graveyard.sprite.x,
         this.graveyard.sprite.y - this.bombHeight,

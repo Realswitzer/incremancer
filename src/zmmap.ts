@@ -669,15 +669,6 @@ export class ZmMap {
     };
   }
 
-  isBuildingClose(position: Position, building: Building): boolean {
-    return (
-      position.x > building.x - this.cornerDistance &&
-      position.x < building.x + building.width + this.cornerDistance &&
-      position.y > building.y - this.cornerDistance &&
-      position.y < building.y + building.height + this.cornerDistance
-    );
-  }
-
   findBuilding(position: Position): Building {
     return this.getBuildingFromMap(position.x, position.y);
   }
@@ -743,6 +734,7 @@ export class ZmMap {
     start: Position,
     end: Position,
     building: Building,
+    distance: number,
   ): boolean {
     this.dx = end.x - start.x;
     this.dy = end.y - start.y;
@@ -753,7 +745,10 @@ export class ZmMap {
     if (this.dy > 0 && start.y > building.y + building.width + 4) return false;
 
     this.step = this.pathStepCalc(start, end);
-    this.stepsToTake = 10;
+    this.stepsToTake = Math.min(
+      distance / this.pathFindStepSize - this.pathFindStepSize,
+      30,
+    );
     this.hasHit = false;
     this.testPosition = { x: start.x, y: start.y };
     while (!this.hasHit && this.stepsToTake > 0) {
@@ -821,7 +816,12 @@ export class ZmMap {
     }
 
     // am I going to hit this building
-    this.hitbuilding = this.willVectorHitBuilding(position, target, building);
+    this.hitbuilding = this.willVectorHitBuilding(
+      position,
+      target,
+      building,
+      distanceToTarget,
+    );
 
     // if not return straight to target
     if (!this.hitbuilding) {
@@ -835,6 +835,7 @@ export class ZmMap {
       position,
       this.corner,
       building,
+      distanceToTarget,
     );
     if (!this.hitbuilding) {
       this.vector.x = this.corner.x - position.x;
@@ -991,9 +992,8 @@ export class ZmMap {
   populateTrees(): void {
     if (this.treeSprites.length > 0) {
       for (let i = 0; i < this.treeSprites.length; i++) {
-        characterContainer.removeChild(this.treeSprites[i]);
+        this.treeSprites[i].visible = false;
       }
-      this.treeSprites = [];
     }
 
     if (this.treeTextures.length == 0) {
@@ -1003,21 +1003,18 @@ export class ZmMap {
       this.armyTextures.push(PIXI.Texture.from("hedgehog.png"));
       this.armyTextures.push(PIXI.Texture.from("sandbags.png"));
     }
-
     let treesToCreate = Math.round(gameFieldSize.x / 50);
-    if (this.gameModel.isBossStage(this.gameModel.level)) {
-      treesToCreate = Math.round(treesToCreate * 1.5);
-    }
-
+    let treeSpriteIndex = 0;
     while (treesToCreate > 0) {
-      let foundPosition = false;
       let testPosition;
-      let counter = 1000;
+      let foundPosition = false;
+      let counter = 1000; /* 1e3 */
       const spaceFromEdges = 8;
       const roomSize = 2;
 
       while (!foundPosition && counter > 0) {
         counter--;
+
         testPosition = {
           x:
             spaceFromEdges +
@@ -1028,11 +1025,13 @@ export class ZmMap {
           width: roomSize,
           height: roomSize,
         };
+
         foundPosition = this.isValidTreePosition(testPosition);
       }
 
       if (foundPosition) {
-        let alivePercent = 0.4 + Math.random() * 0.6;
+        let alivePercent = 0.4 + 0.6 * Math.random();
+
         if (this.gameModel.constructions.graveyard) {
           alivePercent = Math.min(
             (this.fastDistance(
@@ -1046,28 +1045,41 @@ export class ZmMap {
             1,
           );
         }
+
+        let treeSprite;
+
         let texture =
           this.treeTextures[
             this.treeTextures.length -
               1 -
               Math.round((this.treeTextures.length - 1) * alivePercent)
           ];
+
         if (
           this.gameModel.isBossStage(this.gameModel.level) &&
           Math.random() > 0.7
         ) {
           texture = getRandomElementFromArray(this.armyTextures, Math.random());
         }
-        const treeSprite = new PIXI.Sprite(texture);
+
+        if (this.treeSprites.length > treeSpriteIndex) {
+          treeSprite = this.treeSprites[treeSpriteIndex];
+          treeSprite.visible = true;
+        } else {
+          treeSprite = new PIXI.Sprite(texture);
+          this.treeSprites.push(treeSprite);
+          characterContainer.addChild(treeSprite);
+        }
+
+        treeSpriteIndex++;
         treeSprite.anchor.set(0.5, 1);
         treeSprite.x = testPosition.x;
         treeSprite.y = testPosition.y;
         treeSprite.zIndex = treeSprite.y;
-        treeSprite.scale.x = treeSprite.scale.y = 2;
+        treeSprite.scale.x = 2;
+        treeSprite.scale.y = 2;
         treeSprite.scale.x =
           Math.random() > 0.5 ? treeSprite.scale.x : -1 * treeSprite.scale.x;
-        this.treeSprites.push(treeSprite);
-        characterContainer.addChild(treeSprite);
       }
       treesToCreate--;
     }

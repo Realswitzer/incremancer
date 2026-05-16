@@ -30,7 +30,7 @@ export class PartFactory {
   update(timeDiff: number): void {
     for (let i = 0; i < this.generatorsApplied.length; i++) {
       this.generatorsApplied[i].timeLeft -= timeDiff;
-      if (this.generatorsApplied[i].timeLeft < 0) {
+      if (this.generatorsApplied[i].timeLeft <= 0) {
         this.generatorsApplied[i].timeLeft = this.generatorsApplied[i].time;
         this.gameModel.persistentData.parts +=
           this.generatorsApplied[i].total * this.gameModel.partsPCMod;
