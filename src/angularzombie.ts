@@ -197,10 +197,15 @@ angular
         );
       };
       zm.setBoneCollectors = function (number: number) {
-        zm.model.getEnergyRate() >=
-          number - zm.model.persistentData.boneCollectors &&
-          (zm.model.persistentData.boneCollectors = number);
+        if (
+          number >= 0 &&
+          zm.model.getEnergyRate() >=
+            number - zm.model.persistentData.boneCollectors
+        ) {
+          zm.model.persistentData.boneCollectors = number;
+        }
       };
+
       zm.setHarpies = function (number: number) {
         if (
           (number >= 0 && number < zm.model.persistentData.harpies) ||
