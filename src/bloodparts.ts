@@ -287,9 +287,9 @@ class Bone extends GameObject {
   fadeTime = 0;
   floor = 0;
   rotSpeed = 0;
+  value = 1;
   collector = null;
   hitFloor = false;
-  collected = false;
 }
 
 export class Bones {
@@ -299,7 +299,7 @@ export class Bones {
     Bones.instance = this;
   }
 
-  maxParts = 100;
+  partsLimit = 100;
   partsPerSplatter = 3;
   container = null;
   sprites: Bone[] = [];
@@ -334,18 +334,11 @@ export class Bones {
     }
 
     for (let i = 0; i < this.sprites.length; i++) {
-      this.sprites[i].collected = true;
+      this.sprites[i].value = 0;
       this.sprites[i].visible = false;
       this.container.removeChild(this.sprites[i]);
     }
 
-    if (this.sprites.length < this.maxParts) {
-      for (let i = 0; i < this.maxParts; i++) {
-        const sprite = new Bone(this.texture);
-        sprite.visible = false;
-        this.sprites.push(sprite);
-      }
-    }
     this.discardedSprites = this.sprites.slice();
   }
 
@@ -362,7 +355,7 @@ export class Bones {
   }
 
   updatePart(sprite: Bone, timeDiff: number): void {
-    if (sprite.collected) {
+    if (sprite.value <= 0) {
       sprite.visible = false;
       this.discardedSprites.push(sprite);
       this.container.removeChild(sprite);
@@ -390,12 +383,12 @@ export class Bones {
     }
   }
 
-  newPart(x: number, y: number): void {
+  newPart(x: number, y: number, value: number): void {
     let sprite = null;
     if (this.discardedSprites.length > 0) {
       sprite = this.discardedSprites.pop();
     } else {
-      sprite = new PIXI.Sprite(this.texture);
+      sprite = new Bone(this.texture);
       this.sprites.push(sprite);
     }
     this.container.addChild(sprite);
@@ -406,12 +399,12 @@ export class Bones {
     sprite.rotSpeed = -2 + Math.random() * 4;
     sprite.floor = y;
     sprite.hitFloor = false;
-    sprite.collected = false;
     sprite.collector = false;
     sprite.visible = true;
+    sprite.value = value;
     sprite.alpha = 1;
-    sprite.scale = { x: 1, y: 1 };
-    if (Math.random() > 0.5) sprite.scale = { x: 1.5, y: 1.5 };
+    sprite.scale.set(1, 1);
+    if (Math.random() > 0.5) sprite.scale.set(1.5, 1.5);
     const xSpeed = Math.random() * this.spraySpeed;
     sprite.xSpeed = Math.random() > 0.5 ? -1 * xSpeed : xSpeed;
     sprite.ySpeed = -1 * this.spraySpeed;
@@ -419,8 +412,13 @@ export class Bones {
 
   newBones(x: number, y: number): void {
     if (!this.gameModel.constructions.graveyard) return;
-    for (let i = 0; i < this.partsPerSplatter; i++) {
-      this.newPart(x, y);
+
+    if (this.sprites.length - this.discardedSprites.length > this.partsLimit) {
+      this.newPart(x, y, 3);
+    } else {
+      for (let i = 0; i < this.partsPerSplatter; i++) {
+        this.newPart(x, y, 1);
+      }
     }
   }
 }

@@ -546,7 +546,7 @@ export class BoneCollectors {
         let distanceToNearest = 2000;
         for (let i = 0; i < this.bones.uncollected.length; i++) {
           if (
-            !this.bones.uncollected[i].collected &&
+            this.bones.uncollected[i].value > 0 &&
             !this.bones.uncollected[i].collector
           ) {
             const distance = this.fastDistance(
@@ -593,12 +593,12 @@ export class BoneCollectors {
       case BoneCollectorState.collecting:
         if (
           !boneCollector.target ||
-          boneCollector.target.collected ||
+          !boneCollector.target.value ||
           !boneCollector.target.visible
         ) {
           this.findNearestBone(boneCollector);
         }
-        if (boneCollector.target && !boneCollector.target.collected) {
+        if (boneCollector.target && boneCollector.target.value > 0) {
           if (
             this.fastDistance(
               boneCollector.position.x,
@@ -607,8 +607,8 @@ export class BoneCollectors {
               boneCollector.target.y,
             ) < this.collectDistance
           ) {
-            boneCollector.bones++;
-            boneCollector.target.collected = true;
+            boneCollector.bones += boneCollector.target.value;
+            boneCollector.target.value = 0;
             boneCollector.speedFactor = 0;
           }
         }

@@ -20,7 +20,7 @@ export class ZmMap {
 
   gameModel = GameModel.getInstance();
   humans = new Humans();
-
+  discardedWalls: Wall[] = [];
   buildings: Building[] = [];
   buildingsByPopularity: Building[] = [];
   buildingMap: Building[] = [];
@@ -74,7 +74,14 @@ export class ZmMap {
 
     return true;
   }
-
+  getWall(texture: PIXI.Texture): Wall {
+    if (this.discardedWalls.length > 0) {
+      const wall = this.discardedWalls.pop()!;
+      wall.texture = texture;
+      return wall;
+    }
+    return new Wall(texture);
+  }
   makeHorizontalWall(
     walls: Wall[],
     texture: PIXI.Texture,
@@ -84,21 +91,21 @@ export class ZmMap {
     width: number,
   ): void {
     if (hasEntrance) {
-      const wall1 = new Wall(texture);
+      const wall1 = this.getWall(texture);
       wall1.x = x;
       wall1.y = y;
       wall1.width = width / 2 - this.entranceWidth;
       wall1.height = 4;
       walls.push(wall1);
 
-      const wall2 = new Wall(texture);
+      const wall2 = this.getWall(texture);
       wall2.x = x + width / 2 + this.entranceWidth;
       wall2.y = y;
       wall2.width = width / 2 - this.entranceWidth;
       wall2.height = 4;
       walls.push(wall2);
     } else {
-      const wall = new Wall(texture);
+      const wall = this.getWall(texture);
       wall.x = x;
       wall.y = y;
       wall.width = width;
@@ -116,21 +123,21 @@ export class ZmMap {
     height: number,
   ): void {
     if (hasEntrance) {
-      const wall1 = new Wall(texture);
+      const wall1 = this.getWall(texture);
       wall1.x = x;
       wall1.y = y;
       wall1.width = 4;
       wall1.height = height / 2 - this.entranceWidth;
       walls.push(wall1);
 
-      const wall2 = new Wall(texture);
+      const wall2 = this.getWall(texture);
       wall2.x = x;
       wall2.y = y + height / 2 + this.entranceWidth;
       wall2.width = 4;
       wall2.height = height / 2 - this.entranceWidth;
       walls.push(wall2);
     } else {
-      const wall = new Wall(texture);
+      const wall = this.getWall(texture);
       wall.x = x;
       wall.y = y;
       wall.width = 4;
@@ -377,6 +384,10 @@ export class ZmMap {
     if (this.buildings.length > 0) {
       for (let i = 0; i < this.buildings.length; i++) {
         backgroundContainer.removeChild(this.buildings[i].container);
+        this.buildings[i].walls.forEach((wall) => {
+          this.discardedWalls.push(wall);
+          this.buildings[i].container.removeChild(wall);
+        });
         this.buildings[i].container.destroy();
         // backgroundContainer.removeChild(this.buildings[i].floorSprite);
         for (let j = 0; j < this.buildings[i].walls.length; j++) {
@@ -1064,6 +1075,7 @@ export class ZmMap {
 
         if (this.treeSprites.length > treeSpriteIndex) {
           treeSprite = this.treeSprites[treeSpriteIndex];
+          treeSprite.texture = texture;
           treeSprite.visible = true;
         } else {
           treeSprite = new PIXI.Sprite(texture);

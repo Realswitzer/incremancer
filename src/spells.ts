@@ -134,7 +134,7 @@ export class Spells {
       6,
       "Incinerate",
       "Burns humans near the skeleton champion",
-      "Has a chance to cast Incinerate when attacking, burning all humans within a large radius of the Skeleon",
+      "Has a chance to cast Incinerate when attacking, burning all humans within a large radius of the Skeleton",
       1,
       10,
       10,

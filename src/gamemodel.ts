@@ -375,7 +375,9 @@ export class GameModel {
   calculateEndLevelBones(): void {
     this.endLevelBones = 0;
     if (this.persistentData.boneCollectors > 0 && this.bones.uncollected) {
-      this.endLevelBones = this.bones.uncollected.length;
+      this.endLevelBones = this.bones.uncollected
+        .map((bone) => bone.value)
+        .reduce((prev, curr) => prev + curr, 0);
       this.addBones(this.endLevelBones);
     }
   }
