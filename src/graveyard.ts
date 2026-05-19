@@ -743,18 +743,20 @@ export class Harpies {
     if (typeof this.model.persistentData.harpies === "undefined") {
       this.model.persistentData.harpies = 0;
     }
-
+    for (let e = 0; e < this.bombSprites.length; e++) {
+      if (this.bombSprites[e].visible) {
+        this.bombSprites[e].visible = false;
+        this.discardedBombSprites.push(this.bombSprites[e]);
+      }
+    }
     for (let i = 0; i < this.sprites.length; i++) {
+      this.sprites[i].bomb = null;
       this.sprites[i].target = false;
       this.sprites[i].position.set(
         this.graveyard.sprite.x,
         this.graveyard.sprite.y - this.bombHeight,
       );
       this.sprites[i].state = HarpyStates.returning;
-    }
-
-    for (let i = 0; i < this.bombSprites.length; i++) {
-      this.bombSprites[i].visible = false;
     }
   }
 
@@ -905,7 +907,7 @@ export class Harpies {
           ) < 10
         ) {
           harpy.bombs = this.model.harpyBombs;
-          this.getBomb(harpy);
+          harpy.bomb || this.getBomb(harpy);
           harpy.state = HarpyStates.bombing;
           harpy.speedFactor = 0;
         } else {
