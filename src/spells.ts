@@ -24,7 +24,7 @@ class Spell {
     duration: number,
     energyCost: number,
     start: () => void,
-    end: () => void,
+    end: () => void
   ) {
     this.id = id;
     this.name = name;
@@ -50,6 +50,10 @@ export class Spells {
     this.spells.forEach((s) => this.spellMap.set(s.id, s));
   }
 
+  cooldownReduction = 0;
+  timeExtension = 0;
+  costReduction = 0;
+
   skeleton = new Skeleton();
   zombies = new Zombies();
   humans = new Humans();
@@ -68,7 +72,7 @@ export class Spells {
       },
       function () {
         GameModel.getInstance().gameSpeed = 1;
-      },
+      }
     ),
     new Spell(
       2,
@@ -83,7 +87,7 @@ export class Spells {
       },
       function () {
         GameModel.getInstance().energySpellMultiplier = 1;
-      },
+      }
     ),
     new Spell(
       3,
@@ -98,7 +102,7 @@ export class Spells {
       },
       function () {
         new Spells().zombies.detonate = false;
-      },
+      }
     ),
     new Spell(
       4,
@@ -113,7 +117,7 @@ export class Spells {
       },
       function () {
         new Spells().humans.frozen = false;
-      },
+      }
     ),
     new Spell(
       5,
@@ -128,7 +132,7 @@ export class Spells {
       },
       function () {
         new Spells().zombies.super = false;
-      },
+      }
     ),
     new Spell(
       6,
@@ -143,7 +147,7 @@ export class Spells {
       },
       function () {
         //
-      },
+      }
     ),
     new Spell(
       7,
@@ -158,7 +162,7 @@ export class Spells {
       },
       function () {
         new Spells().humans.pandemic = false;
-      },
+      }
     ),
   ];
 
@@ -184,13 +188,13 @@ export class Spells {
     const model = GameModel.getInstance();
     if (spell.onCooldown || spell.active || !spell.unlocked) return;
 
-    if (spell.energyCost > model.energy) return;
+    if (spell.energyCost - this.costReduction > model.energy) return;
 
-    model.energy -= spell.energyCost;
+    model.energy -= spell.energyCost - this.costReduction;
     spell.onCooldown = true;
-    spell.cooldownLeft = spell.cooldown;
+    spell.cooldownLeft = spell.cooldown * this.cooldownReduction;
     spell.active = true;
-    spell.timer = spell.duration;
+    spell.timer = spell.duration + this.timeExtension;
     spell.start();
     model.sendMessage(spell.name);
   }
@@ -199,7 +203,7 @@ export class Spells {
     const spell = this.spellMap.get(spellId);
     if (spell && !spell.active) {
       spell.active = true;
-      spell.timer = spell.duration;
+      spell.timer = spell.duration + this.timeExtension;
       spell.start();
       GameModel.getInstance().sendMessage(spell.name);
     }

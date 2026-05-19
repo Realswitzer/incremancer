@@ -13,4 +13,5 @@ export * from "./skeleton";
 export * from "./creatures";
 export * from "./graveyard";
 export * from "./bloodparts";
+export * from "./talents";
 export * from "./angularzombie";

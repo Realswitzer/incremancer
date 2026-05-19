@@ -410,7 +410,7 @@ export class GameModel {
       for (let i = 0; i < this.zombiesInCages; i++) {
         this.zombies.createZombie(
           this.graveyard.sprite.x,
-          this.graveyard.sprite.y,
+          this.graveyard.sprite.y
         );
       }
       this.zombiesInCages = 0;
@@ -602,6 +602,7 @@ export class GameModel {
     vipEscaped: [],
     autoRelease: false,
     skeleton: null,
+    skeletonTalents: [],
   };
 
   addPrestigePoints(points: number): void {
@@ -622,7 +623,7 @@ export class GameModel {
       this.persistentData.generators = [];
       this.persistentData.bonesTotal = 0;
       this.persistentData.upgrades = this.persistentData.upgrades.filter(
-        (upgrade) => upgrade.costType == this.upgrades.costs.prestigePoints,
+        (upgrade) => upgrade.costType == this.upgrades.costs.prestigePoints
       );
       this.persistentData.constructions = [];
       this.persistentData.boneCollectors = 0;
@@ -656,6 +657,7 @@ export class GameModel {
       this.creatureFactory.resetLevels();
       this.level = 1;
       this.currentState = this.states.prestiged;
+      this.skeleton.persistent.talentReset = true;
       this.setupLevel();
       this.saveData();
       for (let i = 0; i < this.upgrades.upgrades.length; i++) {
@@ -669,11 +671,15 @@ export class GameModel {
     try {
       localStorage.setItem(
         this.storageName,
-        JSON.stringify(this.persistentData),
+        JSON.stringify(this.persistentData)
       );
       localStorage.setItem(
         this.skeleton.storageName,
-        JSON.stringify(this.skeleton.persistent),
+        JSON.stringify(this.skeleton.persistent)
+      );
+      localStorage.setItem(
+        this.skeleton.talentsStorageName,
+        JSON.stringify(this.skeleton.talents)
       );
     } catch (e) {
       console.log(e);
@@ -684,13 +690,30 @@ export class GameModel {
     try {
       if (localStorage.getItem(this.storageName) !== null) {
         this.persistentData = JSON.parse(
-          localStorage.getItem(this.storageName),
+          localStorage.getItem(this.storageName)
         );
         this.level = this.persistentData.levelUnlocked;
         if (localStorage.getItem(this.skeleton.storageName) !== null) {
           this.skeleton.persistent = JSON.parse(
-            localStorage.getItem(this.skeleton.storageName),
+            localStorage.getItem(this.skeleton.storageName)
           );
+        } else {
+          this.skeleton.persistent = {
+            xpRate: 0,
+            skeletons: 0,
+            level: 1,
+            xp: 0,
+            items: [],
+            currItemId: 0,
+            talentReset: false,
+          };
+        }
+        if (localStorage.getItem(this.skeleton.talentsStorageName) !== null) {
+          this.skeleton.talents = JSON.parse(
+            localStorage.getItem(this.skeleton.talentsStorageName)
+          );
+        } else {
+          this.skeleton.talents = [];
         }
         this.updatePersistentData();
         this.calcOfflineProgress();
@@ -721,6 +744,7 @@ export class GameModel {
     try {
       localStorage.removeItem(this.storageName);
       localStorage.removeItem(this.skeleton.storageName);
+      localStorage.removeItem(this.skeleton.talentsStorageName);
     } catch (e) {
       console.log(e);
     }
@@ -777,19 +801,20 @@ export class GameModel {
     this.app.renderer.plugins.interaction.resolution = resolution;
     this.app.renderer.resize(
       document.body.clientWidth,
-      document.body.clientHeight,
+      document.body.clientHeight
     );
   }
 
   downloadSaveGame(): void {
     this.persistentData.skeleton = this.skeleton.persistent;
+    this.persistentData.skeletonTalents = this.skeleton.talents;
     this.blob = new Blob(
       [
         LZString.compressToEncodedURIComponent(
-          JSON.stringify(this.persistentData),
+          JSON.stringify(this.persistentData)
         ),
       ],
-      { type: "octet/stream" },
+      { type: "octet/stream" }
     );
     delete this.persistentData.skeleton;
     this.encodedContent = window.URL.createObjectURL(this.blob);
@@ -806,12 +831,18 @@ export class GameModel {
       const model = GameModel.getInstance();
       reader.onload = function (event) {
         const savegame = JSON.parse(
-          LZString.decompressFromEncodedURIComponent(event.target.result),
+          LZString.decompressFromEncodedURIComponent(event.target.result)
         );
         if (savegame.dateOfSave) {
           if (savegame.skeleton) {
             model.skeleton.persistent = savegame.skeleton;
             delete savegame.skeleton;
+          }
+          if (savegame.skeletonTalents) {
+            model.skeleton.talents = savegame.skeletonTalents;
+            delete savegame.skeletonTalents;
+          } else {
+            model.skeleton.talents = [];
           }
           model.persistentData = savegame;
           model.updatePersistentData();
