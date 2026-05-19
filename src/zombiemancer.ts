@@ -368,6 +368,11 @@ function startGame() {
     resizeTo: window,
   });
   document.body.appendChild(app.view);
+  if (!PIXI.utils.isWebGLSupported()) {
+    console.error(
+      "Warning: WebGL support not detected. Game performance may be slower.",
+    );
+  }
 
   setupContainers(app);
 
@@ -427,7 +432,7 @@ function setSizes(): void {
   };
   KeysPressed.scrollSpeed = Math.max(x, y) / 4;
 }
-
+new Map();
 window.onload = function () {
   setupClasses();
   gameModel.loadData();

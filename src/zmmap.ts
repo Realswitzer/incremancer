@@ -21,6 +21,8 @@ export class ZmMap {
   gameModel = GameModel.getInstance();
   humans = new Humans();
   discardedWalls: Wall[] = [];
+  discardedContainers: PIXI.Container[] = [];
+  discardedFloorSprites: PIXI.Sprite[] = [];
   buildings: Building[] = [];
   buildingsByPopularity: Building[] = [];
   buildingMap: Building[] = [];
@@ -145,10 +147,24 @@ export class ZmMap {
       walls.push(wall);
     }
   }
-
+  getContainer() {
+    if (this.discardedContainers.length > 0) {
+      return this.discardedContainers.pop();
+    } else {
+      return new PIXI.Container();
+    }
+  }
+  getFloorSprite() {
+    if (this.discardedFloorSprites.length > 0) {
+      return this.discardedFloorSprites.pop();
+    } else {
+      return new PIXI.TilingSprite(PIXI.Texture.WHITE);
+    }
+  }
   addBuilding(poi: Building): void {
-    poi.container = new PIXI.Container();
-    poi.floorSprite = new PIXI.TilingSprite(PIXI.Texture.WHITE);
+    poi.container = this.getContainer();
+    poi.container.cacheAsBitmap = false;
+    poi.floorSprite = this.getFloorSprite(PIXI.Texture.WHITE);
     poi.floorSprite.tint = rgbToHex(
       10 + Math.round(Math.random() * 50),
       10 + Math.round(Math.random() * 50),
@@ -388,11 +404,9 @@ export class ZmMap {
           this.discardedWalls.push(wall);
           this.buildings[i].container.removeChild(wall);
         });
-        this.buildings[i].container.destroy();
-        // backgroundContainer.removeChild(this.buildings[i].floorSprite);
-        for (let j = 0; j < this.buildings[i].walls.length; j++) {
-          // backgroundContainer.removeChild(this.buildings[i].walls[j]);
-        }
+        this.buildings[i].container.removeChild(this.buildings[i].floorSprite);
+        this.discardedFloorSprites.push(this.buildings[i].floorSprite);
+        this.discardedContainers.push(this.buildings[i].container);
       }
     }
 
