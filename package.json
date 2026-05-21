@@ -1,6 +1,7 @@
 {
   "scripts": {
     "build": "bun build src/internal.ts --outfile=dist/bundle.js --target=browser",
+    "build:sm": "bunx esbuild src/internal.ts --outfile=dist/bundle.js --sourcemap=external --bundle",
     "dev": "bunx vite"
   },
   "dependencies": {
