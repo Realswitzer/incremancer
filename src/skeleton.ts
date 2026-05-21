@@ -4,6 +4,7 @@ import {
   spawnCritText,
 } from "./classes/creatureclasses";
 import { CharacterFlags } from "./classes/gameobject";
+import { Human } from "./classes/humanclasses";
 import {
   characterContainer,
   GameModel,
@@ -23,9 +24,54 @@ import {
   Bones,
   Blasts,
   Exclamations,
+  Bullets,
 } from "./internal";
 
-class SkeletonCharacter extends Creature {}
+class SkeletonCharacter extends Creature {
+  boneshieldTimer = 3;
+  boneshield = 0;
+  boneshieldContainer = new BoneshieldContainer();
+}
+class Boneshield extends PIXI.Sprite {
+  speed = { x: 0, y: 0 };
+  flying = false;
+}
+class BoneshieldContainer extends PIXI.Container {
+  spacing = (Math.PI * 2) / 10;
+  bones: Boneshield[] = [];
+  texture: PIXI.Texture | null = null;
+
+  getTexture(): PIXI.Texture {
+    if (this.texture) {
+      return this.texture;
+    }
+    const canv = document.createElement("canvas");
+    canv.width = 4;
+    canv.height = 1;
+    const ctx = canv.getContext("2d")!;
+    ctx.fillStyle = "#ddd";
+    ctx.fillRect(0, 0, 4, 1);
+    this.texture = PIXI.Texture.from(canv);
+    return this.texture;
+  }
+
+  getBone(): Boneshield {
+    const bone = new Boneshield(this.getTexture());
+    bone.anchor.set(0.5, 20);
+    this.addChild(bone);
+    this.bones.push(bone);
+    return bone;
+  }
+
+  update(boneshield: number): void {
+    if (boneshield > this.bones.length) {
+      this.getBone().rotation = this.spacing * this.bones.length;
+    }
+    for (let i = 0; i < this.bones.length; i++) {
+      this.bones[i].visible = i < boneshield;
+    }
+  }
+}
 
 export class Skeleton {
   private static instance: Skeleton;
@@ -43,6 +89,7 @@ export class Skeleton {
   zombies: Zombies;
   prestigePoints: PrestigePoints;
   exclamations: Exclamations;
+  bullets: Bullets;
   bones: Bones;
   blasts: Blasts;
   blood: Blood;
@@ -92,6 +139,7 @@ export class Skeleton {
   healZombie = null;
 
   storageName = "incremancerskele";
+  talentsStorageName = "incremancertalents";
   persistent = {
     xpRate: 0,
     skeletons: 0,
@@ -99,8 +147,22 @@ export class Skeleton {
     xp: 0,
     items: [] as Loot[],
     currItemId: 0,
+    talentReset: false,
   };
+  talents: number[] = [];
+  talentPoints = 0;
+  killingBlowParts = 0;
+  lootChanceMod = 1;
+  darkorb = 0;
+  darkorbTimer = 0;
+  boneshield = 0;
 
+  getUsedPoints(): number {
+    return this.talents.reduce((prev, curr) => prev + curr, 0);
+  }
+  getAvailablePoints(): number {
+    return this.talentPoints - this.getUsedPoints();
+  }
   xpForNextLevel(): number {
     return 1000 * Math.pow(this.persistent.level, 2);
   }
@@ -167,6 +229,7 @@ export class Skeleton {
     this.map = new ZmMap();
     this.graveyard = new Graveyard();
     this.exclamations = new Exclamations();
+    this.bullets = new Bullets();
     this.spells = new Spells();
     this.smoke = new Smoke();
     this.upgrades = new Upgrades();
@@ -211,6 +274,7 @@ export class Skeleton {
           this.graveyard.sprite.y + (this.graveyard.level > 2 ? 8 : 0);
         this.skeletons[i].target = null;
         this.skeletons[i].state = CreatureState.lookingForTarget;
+        this.skeletons[i].timer.scan = 0;
       } else {
         this.discardedSprites.push(this.skeletons[i]);
         characterContainer.removeChild(this.skeletons[i]);
@@ -231,6 +295,8 @@ export class Skeleton {
       creature.textures = this.textures.down;
     } else {
       creature = new SkeletonCharacter(this.textures.down);
+      creature.addChild(creature.boneshieldContainer);
+      creature.boneshieldContainer.position.set(0, -16);
     }
     creature.tint = 0xeeeeee;
     creature.immuneToBurns = false;
@@ -323,6 +389,40 @@ export class Skeleton {
       return;
     }
 
+    if (this.boneshield > 0 && creature.boneshield < this.boneshield) {
+      creature.boneshieldTimer -= timeDiff;
+      if (creature.boneshieldTimer < 0) {
+        creature.boneshieldTimer = 10 / this.boneshield;
+        creature.boneshield++;
+      }
+    }
+    if (this.boneshield) {
+      creature.boneshieldContainer.visible = true;
+      creature.boneshieldContainer.update(creature.boneshield);
+      creature.boneshieldContainer.rotation += timeDiff;
+    } else {
+      creature.boneshieldContainer.visible = false;
+    }
+    if (this.darkorb > 0) {
+      this.darkorbTimer -= timeDiff;
+      if (
+        this.darkorbTimer < 0 &&
+        creature.target &&
+        !creature.target.flags.dead
+      ) {
+        this.darkorbTimer = this.darkorb;
+        this.bullets.newBullet(
+          creature,
+          creature.target,
+          this.calculateDamage(creature),
+          false,
+          false,
+          false,
+          true,
+        );
+      }
+    }
+
     creature.timer.attack -= timeDiff;
     creature.timer.scan -= timeDiff;
     creature.timer.ability -= timeDiff;
@@ -391,10 +491,19 @@ export class Skeleton {
               creature.target,
               this.calculateDamage(creature),
             );
-            if (creature.target.flags.dead && this.lastKillingBlow <= 0) {
-              this.model.addPrestigePoints(this.persistent.level);
-              this.lastKillingBlow = 20;
-              this.prestigePoints.newPart(creature.target.x, creature.target.y);
+            if (creature.target.flags.dead) {
+              if (this.killingBlowParts) {
+                this.model.persistentData.parts +=
+                  this.killingBlowParts * this.model.partsPCMod;
+              }
+              if (this.lastKillingBlow <= 0) {
+                this.model.addPrestigePoints(this.persistent.level);
+                this.lastKillingBlow = 20;
+                this.prestigePoints.newPart(
+                  creature.target.x,
+                  creature.target.y,
+                );
+              }
             }
             creature.timer.attack =
               this.attackSpeed * this.model.runeEffects.attackSpeed;
@@ -416,6 +525,27 @@ export class Skeleton {
           creature.state = CreatureState.movingToTarget;
         }
         break;
+      }
+    }
+  }
+
+  orbHit(creature: Human) {
+    if (creature.flags.dead) {
+      if (this.killingBlowParts) {
+        this.model.persistentData.parts +=
+          this.killingBlowParts * this.model.partsPCMod;
+      }
+      if (this.lastKillingBlow <= 0) {
+        this.model.addPrestigePoints(this.persistent.level);
+        this.lastKillingBlow = 20;
+        this.prestigePoints.newPart(creature.x, creature.y);
+      }
+    }
+    if (this.randomSpells.length > 0) {
+      for (let i = 0; i < this.randomSpells.length; i++) {
+        if (Math.random() < 0.07) {
+          this.spells.castSpellNoMana(this.randomSpells[i]);
+        }
       }
     }
   }
@@ -755,11 +885,11 @@ export class Skeleton {
     const position = Math.round(Math.random() * 6) + 1;
     let rarity = this.rarity.common;
     const specialEffects = [];
-    if (Math.random() < 0.2) {
+    if (Math.random() < this.lootChanceMod * 0.2) {
       rarity = this.rarity.rare;
-      if (Math.random() < 0.2) {
+      if (Math.random() < this.lootChanceMod * 0.2) {
         rarity = this.rarity.epic;
-        if (Math.random() < 0.1) {
+        if (Math.random() < this.lootChanceMod * 0.1) {
           rarity = this.rarity.legendary;
           const spell = getRandomElementFromArray(
             this.spells.spells,

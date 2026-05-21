@@ -10,6 +10,10 @@ import {
   format2Places,
   moveToolTip,
   formatWhole,
+  TalentUpgrades,
+  Talent,
+  TalentData,
+  applyTalents,
 } from "./internal";
 
 angular
@@ -115,6 +119,7 @@ angular
                   upgrade.cap !== 0 && zm.currentRank(upgrade) >= upgrade.cap,
               ),
             );
+            zm.upgrades = zm.upgrades.filter((upg) => upg.id !== 115);
             zm.sidePanels.prestige = true;
             break;
           case "options":
@@ -920,8 +925,17 @@ angular
       // ---- Skeleton Functions ---- //
       zm.skeletonMenu = {
         isShown: false,
+        tab: "inventory",
+        changeTab(tab: string) {
+          this.tab = tab;
+        },
         equipped: [],
         show() {
+          this.tab = "inventory";
+          this.upgrade = upgrades.prestigeUpgrades.filter(
+            (upg) => upg.id === 115,
+          )[0];
+          this.upgrades = TalentUpgrades;
           this.isShown = !this.isShown;
           if (this.isShown) {
             this.updateEquippedItems();
@@ -949,6 +963,29 @@ angular
           return skeleton.persistent.skeletons > 0
             ? ` - ${zm.model.persistentData.trophies.length} / ${20 * skeleton.persistent.xpRate} Trophies`
             : "";
+        },
+        talentPoints: () => skeleton.talentPoints,
+        talentsAssigned: () => skeleton.getUsedPoints(),
+        talentValue: (talent: Talent) =>
+          skeleton.talents[talent.id] + " / " + talent.maxPoints,
+        talentSet(talent: Talent, points: number) {
+          talent.set(points);
+          applyTalents();
+        },
+        talentReset(talent: Talent) {
+          talent.reset();
+          applyTalents();
+        },
+        canReset: () => skeleton.persistent.talentReset,
+        talentsReset() {
+          if (skeleton.persistent.talentReset) {
+            TalentData.forEach((talent) => talent.reset());
+            skeleton.persistent.talentReset = false;
+          }
+        },
+        talentMax(talent: Talent) {
+          talent.max();
+          applyTalents();
         },
         xpPercent() {
           return Math.round(

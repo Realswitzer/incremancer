@@ -12,6 +12,7 @@ export class Creature extends CharacterObject {
   maxSpeed = 0;
   graveyard = false;
   regenTimer = 0;
+  bloodbornTimer = 0;
   level = 0;
   creatureType = 0;
   scaling = 0;

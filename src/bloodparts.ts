@@ -13,6 +13,7 @@ import {
   backgroundSpriteContainer,
   characterContainer,
   fastDistance,
+  Skeleton,
 } from "./internal";
 
 export class Particles {
@@ -553,6 +554,7 @@ class Bullet extends GameObject {
   plague = false;
   rocket = false;
   fireball = false;
+  darkorb = false;
   target = null;
   source = null;
   hitbox = 0;
@@ -608,11 +610,27 @@ export class Bullets {
 
     return PIXI.Texture.from(blast);
   }
+  getDarkOrbTexture(): PIXI.Texture {
+    const darkorb = document.createElement("canvas");
+    darkorb.width = 8;
+    darkorb.height = 8;
+    const darkorbCtx = darkorb.getContext("2d")!;
 
+    const radgrad = darkorbCtx.createRadialGradient(4, 4, 0, 4, 4, 4);
+    radgrad.addColorStop(0, "rgba(0,0,0,1)");
+    radgrad.addColorStop(0.8, "rgba(0,0,128,0.5)");
+    radgrad.addColorStop(1, "rgba(0,0,255,0)");
+
+    darkorbCtx.fillStyle = radgrad;
+    darkorbCtx.fillRect(0, 0, 8, 8);
+
+    return PIXI.Texture.from(darkorb);
+  }
   initialize(): void {
     if (!this.texture) {
       this.texture = this.getTexture();
       this.fireballTexture = this.getFireballTexture();
+      this.darkOrbTexture = this.getDarkOrbTexture();
     }
     for (let i = 0; i < this.sprites.length; i++) {
       characterContainer.removeChild(this.sprites[i]);
@@ -649,6 +667,10 @@ export class Bullets {
       } else if (sprite.fireball) {
         this.humans.burnHuman(sprite.target, sprite.damage);
         this.humans.damageHuman(sprite.target, sprite.damage);
+      } else if (sprite.darkorb) {
+        this.humans.damageHuman(sprite.target, sprite.damage);
+        sprite.target.timer.dogStun = 5;
+        new Skeleton().orbHit(sprite.target);
       } else {
         if (
           !sprite.rocket &&
@@ -694,7 +716,11 @@ export class Bullets {
       sprite.y += sprite.ySpeed * timeDiff;
       sprite.zIndex = sprite.y;
     }
-    sprite.alpha -= this.fadeSpeed * timeDiff;
+    if (sprite.darkorb) {
+      sprite.alpha -= this.fadeSpeed * timeDiff * 0.4;
+    } else {
+      sprite.alpha -= this.fadeSpeed * timeDiff;
+    }
     if (sprite.alpha < 0) {
       sprite.visible = false;
       this.discardedSprites.push(sprite);
@@ -709,6 +735,7 @@ export class Bullets {
     plague = false,
     rocket = false,
     fireball = false,
+    darkorb = false,
   ): void {
     let sprite: Bullet;
     if (this.discardedSprites.length > 0) {
@@ -719,7 +746,11 @@ export class Bullets {
       this.sprites.push(sprite);
     }
     characterContainer.addChild(sprite);
-    sprite.texture = fireball ? this.fireballTexture : this.texture;
+    sprite.texture = darkorb
+      ? this.darkOrbTexture
+      : fireball
+        ? this.fireballTexture
+        : this.texture;
     sprite.source = source;
     sprite.x = source.x;
     sprite.y = source.y - 8;
@@ -736,6 +767,7 @@ export class Bullets {
     sprite.plague = plague;
     sprite.rocket = rocket;
     sprite.fireball = fireball;
+    sprite.darkorb = darkorb;
     sprite.tint = plague ? 0x00ff00 : rocket ? 0xffec00 : 0xffffff;
     sprite.scale.x = sprite.scale.y = rocket ? 2.5 : 2;
     if (fireball) {

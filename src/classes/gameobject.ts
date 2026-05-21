@@ -49,6 +49,7 @@ export class CharacterFlags {
   burning = false;
   infected = false;
   dead = false;
+  golem = false;
 }
 
 export class CharacterObject extends PIXI.AnimatedSprite {

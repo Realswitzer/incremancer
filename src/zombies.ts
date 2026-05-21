@@ -22,6 +22,7 @@ import {
   fastDistance,
   magnitude,
   getRandomElementFromArray,
+  CreatureFactory,
 } from "./internal";
 
 class ZombieFlags extends CharacterFlags {
@@ -40,6 +41,7 @@ export class Zombie extends Creature {
 
 export class Zombies {
   private static instance: Zombies;
+  creatureFactory: CreatureFactory;
   constructor() {
     if (Zombies.instance) return Zombies.instance;
     Zombies.instance = this;
@@ -65,6 +67,7 @@ export class Zombies {
   attackSpeed = 3;
   targetDistance = 100;
   fadeSpeed = 0.1;
+  refundChance = 0;
   currId = 1;
   scanTime = 3;
   textures = [];
@@ -75,6 +78,10 @@ export class Zombies {
   zombieCursorText = null;
   zombieCursorScale = 3;
   burnTickTimer = 5;
+  bloodpact = 1;
+  bloodborn = 0;
+  gigamutagen = 0;
+  gigamutationTimer = 10;
   smokeTimer = 0.3;
   fastDistance = fastDistance;
   magnitude = magnitude;
@@ -86,6 +93,7 @@ export class Zombies {
     this.model = GameModel.getInstance();
     this.humans = new Humans();
     this.graveyard = new Graveyard();
+    this.creatureFactory = new CreatureFactory();
     this.smoke = new Smoke();
     this.blood = new Blood();
     this.bones = new Bones();
@@ -171,10 +179,6 @@ export class Zombies {
       zombie.mod = 10;
       zombie.scaleMod = 1.5;
     }
-    if (zombie.scaleMod > 2) {
-      zombie.mod = 20;
-      zombie.scaleMod = 2;
-    }
     zombie.flags = new ZombieFlags();
     zombie.flags.dog = isDog;
     zombie.flags.super = this.super;
@@ -187,6 +191,7 @@ export class Zombies {
     zombie.alpha = 1;
     zombie.animationSpeed = 0.15;
     zombie.anchor.set(35 / 80, 1);
+    zombie.bloodbornTimer = this.bloodborn;
     zombie.position.set(x, y);
     zombie.target = null;
     zombie.zIndex = zombie.position.y;
@@ -239,7 +244,16 @@ export class Zombies {
       this.graveyard.damageGraveyard(damage);
       return;
     }
+    if (zombie.boneshield) {
+      zombie.boneshield--;
+      this.bones.newPart(zombie.x, zombie.y, 1);
+      return;
+    }
     if (this.graveyard.isWithinFence(zombie)) {
+      damage *= 0.5;
+      this.exclamations.newShield(zombie);
+    }
+    if (zombie.bloodbornTimer > 0) {
       damage *= 0.5;
       this.exclamations.newShield(zombie);
     }
@@ -258,6 +272,13 @@ export class Zombies {
     if (zombie.health <= 0 && !zombie.flags.dead) {
       this.bones.newBones(zombie.x, zombie.y);
       zombie.flags.dead = true;
+      if (zombie.flags.golem) {
+        if (Math.random() < this.refundChance) {
+          this.model.sendMessage("Golem Refunded!");
+        }
+        // TODO: if this bug isnt fixed later, then patch it
+        this.creatureFactory.refundParts(zombie.creatureType);
+      }
       if (Math.random() < this.model.infectedBlastChance) {
         this.causePlagueExplosion(zombie, zombie.maxHealth * 0.2, true);
       }
@@ -359,6 +380,9 @@ export class Zombies {
     const zombiePartition = [];
     this.aliveHumans = this.humans.aliveHumans;
     this.graveyardAttackers = this.humans.graveyardAttackers;
+    if (this.gigamutagen > 0) {
+      this.gigamutationTimer -= timeDiff;
+    }
     for (let i = 0; i < this.zombies.length; i++) {
       if (this.zombies[i].visible) {
         this.updateZombie(this.zombies[i], timeDiff);
@@ -419,7 +443,16 @@ export class Zombies {
       }
       return;
     }
-
+    if (zombie.mod === 1 && this.gigamutationTimer < 0) {
+      zombie.mod = 10;
+      zombie.scaling *= 1.5;
+      zombie.scale.set(zombie.scaling, zombie.scaling);
+      zombie.maxHealth *= 10;
+      zombie.health *= 10;
+      this.gigamutationTimer = this.gigamutagen;
+      this.smoke.newZombieSpawnCloud(zombie.x, zombie.y - 2);
+    }
+    zombie.bloodbornTimer -= timeDiff;
     zombie.timer.attack -= timeDiff;
     zombie.timer.scan -= timeDiff;
 
@@ -561,6 +594,9 @@ export class Zombies {
     ) {
       damage *= this.model.runeEffects.critDamage;
       spawnCritText(zombie.x, zombie.y, damage);
+    }
+    if (this.bloodpact > 0) {
+      this.model.addBlood(damage * this.bloodpact);
     }
     return damage;
   }

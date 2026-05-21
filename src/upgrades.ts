@@ -71,6 +71,7 @@ export class Upgrades {
     autoconstruction: "autoconstruction",
     autoshop: "autoshop",
     graveyardHealth: "graveyardHealth",
+    talentPoint: "talentPoint",
   };
 
   costs = {
@@ -295,6 +296,9 @@ export class Upgrades {
         return;
       case this.types.graveyardHealth:
         this.gameModel.graveyardHealthMod *= Math.pow(1 + upgrade.effect, rank);
+        return;
+      case this.types.talentPoint:
+        this.skeleton.talentPoints = rank;
         return;
     }
   }
@@ -2250,6 +2254,19 @@ export class Upgrades {
       0.1,
       0,
       "Additional 10% graveyard health during boss levels with each rank.",
+      null,
+      null,
+    ),
+    new Upgrade(
+      115,
+      "Talent Point",
+      this.types.talentPoint,
+      this.costs.prestigePoints,
+      100,
+      1.2,
+      1,
+      0,
+      "Additional skeleton talent point",
       null,
       null,
     ),
