@@ -117,15 +117,15 @@ export const TalentData = [
       skeleton.killingBlowParts = 0;
       const rank = skeleton.talents[this.id];
       if (rank && rank > 0) {
-        skeleton.killingBlowParts = rank * 5;
+        skeleton.killingBlowParts = 0.01 * 5;
       }
     },
     function (this: Talent) {
       const rank = skeleton.talents[this.id];
       if (rank && rank > 0) {
-        return `Skeleton killing blows reward ${rank * 5} creature parts`;
+        return `Skeleton killing blows reward ${rank}% of skeleton damage as parts`;
       } else {
-        return "Skeleton killing blows reward 5 creature parts";
+        return "Skeleton killing blows reward 1% of skeleton damage as parts";
       }
     },
   ),

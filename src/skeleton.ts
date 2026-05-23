@@ -494,7 +494,9 @@ export class Skeleton {
             if (creature.target.flags.dead) {
               if (this.killingBlowParts) {
                 this.model.persistentData.parts +=
-                  this.killingBlowParts * this.model.partsPCMod;
+                  this.killingBlowParts *
+                  creature.attackDamage *
+                  this.model.partsPCMod;
               }
               if (this.lastKillingBlow <= 0) {
                 this.model.addPrestigePoints(this.persistent.level);
@@ -533,7 +535,9 @@ export class Skeleton {
     if (creature.flags.dead) {
       if (this.killingBlowParts) {
         this.model.persistentData.parts +=
-          this.killingBlowParts * this.model.partsPCMod;
+          this.killingBlowParts *
+          this.skeletons[0].attackDamage *
+          this.model.partsPCMod;
       }
       if (this.lastKillingBlow <= 0) {
         this.model.addPrestigePoints(this.persistent.level);
