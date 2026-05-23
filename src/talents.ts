@@ -95,7 +95,7 @@ export const TalentData = [
     function (this: Talent) {
       creatureFactory.creatureCostReduction = 1;
       const rank = skeleton.talents[this.id];
-      if (rank) {
+      if (rank && rank > 0) {
         creatureFactory.creatureCostReduction -= rank * 0.05;
       }
     },
@@ -116,7 +116,7 @@ export const TalentData = [
     function (this: Talent) {
       skeleton.killingBlowParts = 0;
       const rank = skeleton.talents[this.id];
-      if (rank) {
+      if (rank && rank > 0) {
         skeleton.killingBlowParts = rank * 5;
       }
     },
@@ -138,14 +138,14 @@ export const TalentData = [
       creatures.refundChance = 0;
       zombies.refundChance = 0;
       const rank = skeleton.talents[this.id];
-      if (rank) {
+      if (rank && rank > 0) {
         creatures.refundChance = rank * 0.05;
         zombies.refundChance = rank * 0.05;
       }
     },
     function (this: Talent) {
       const rank = skeleton.talents[this.id];
-      if (rank) {
+      if (rank && rank > 0) {
         return rank * 5 + "% chance for parts refund on golem death";
       } else {
         return "Grants 5% chance for parts refund on golem death";
@@ -160,7 +160,7 @@ export const TalentData = [
     function (this: Talent) {
       spells.cooldownReduction = 1;
       const rank = skeleton.talents[this.id];
-      if (rank) {
+      if (rank && rank > 0) {
         spells.cooldownReduction = 1 - rank * 0.05;
       }
     },
@@ -181,7 +181,7 @@ export const TalentData = [
     function (this: Talent) {
       spells.timeExtension = 0;
       const rank = skeleton.talents[this.id];
-      if (rank) {
+      if (rank && rank > 0) {
         spells.timeExtension = rank;
       }
     },
@@ -202,7 +202,7 @@ export const TalentData = [
     function (this: Talent) {
       spells.costReduction = 0;
       const rank = skeleton.talents[this.id];
-      if (rank) {
+      if (rank && rank > 0) {
         spells.costReduction = rank * 5;
       }
     },
@@ -223,7 +223,7 @@ export const TalentData = [
     function (this: Talent) {
       skeleton.lootChanceMod = 1;
       const rank = skeleton.talents[this.id];
-      if (rank) {
+      if (rank && rank > 0) {
         skeleton.lootChanceMod = 1 + rank * 0.1;
       }
     },
@@ -244,7 +244,7 @@ export const TalentData = [
     function (this: Talent) {
       skeleton.darkorb = 0;
       const rank = skeleton.talents[this.id];
-      if (rank) {
+      if (rank && rank > 0) {
         skeleton.darkorb = 12 - rank;
       }
     },
@@ -265,7 +265,7 @@ export const TalentData = [
     function (this: Talent) {
       skeleton.boneshield = 0;
       const rank = skeleton.talents[this.id];
-      if (rank) {
+      if (rank && rank > 0) {
         skeleton.boneshield = rank;
       }
     },
@@ -286,7 +286,7 @@ export const TalentData = [
     function (this: Talent) {
       zombies.gigamutagen = 0;
       const rank = skeleton.talents[this.id];
-      if (rank) {
+      if (rank && rank > 0) {
         zombies.gigamutagen = 16 - rank;
       }
     },
@@ -307,13 +307,13 @@ export const TalentData = [
     function (this: Talent) {
       zombies.bloodpact = 0;
       const rank = skeleton.talents[this.id];
-      if (rank) {
+      if (rank && rank > 0) {
         zombies.bloodpact = rank * 0.05;
       }
     },
     function (this: Talent) {
       const rank = skeleton.talents[this.id];
-      if (rank) {
+      if (rank && rank > 0) {
         return rank * 5 + "% of zombie damage converted to blood";
       } else {
         return "Converts an additional 5% of zombie damage to blood";
@@ -328,13 +328,13 @@ export const TalentData = [
     function (this: Talent) {
       zombies.bloodborn = 0;
       const rank = skeleton.talents[this.id];
-      if (rank) {
+      if (rank && rank > 0) {
         zombies.bloodborn = rank;
       }
     },
     function (this: Talent) {
       const rank = skeleton.talents[this.id];
-      if (rank) {
+      if (rank && rank > 0) {
         return `${rank} seconds of additional 50% damage reduction`;
       } else {
         return "Grants 1 second of additional 50% damage reduction to newly spawned zombies";

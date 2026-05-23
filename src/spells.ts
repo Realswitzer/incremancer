@@ -24,7 +24,7 @@ class Spell {
     duration: number,
     energyCost: number,
     start: () => void,
-    end: () => void
+    end: () => void,
   ) {
     this.id = id;
     this.name = name;
@@ -64,7 +64,7 @@ export class Spells {
       "Time Warp",
       "Speed up the flow of time for 30 seconds",
       "",
-      120,
+      90,
       30,
       0,
       function () {
@@ -72,14 +72,14 @@ export class Spells {
       },
       function () {
         GameModel.getInstance().gameSpeed = 1;
-      }
+      },
     ),
     new Spell(
       2,
       "Energy Charge",
       "5x Energy rate for 20 seconds, cost 50 energy",
       "",
-      180,
+      160,
       20,
       50,
       function () {
@@ -87,14 +87,14 @@ export class Spells {
       },
       function () {
         GameModel.getInstance().energySpellMultiplier = 1;
-      }
+      },
     ),
     new Spell(
       3,
       "Detonate",
       "Explode your zombies into clouds of plague, cost 69 energy... nice",
       "",
-      120,
+      110,
       3,
       69,
       function () {
@@ -102,14 +102,14 @@ export class Spells {
       },
       function () {
         new Spells().zombies.detonate = false;
-      }
+      },
     ),
     new Spell(
       4,
       "Earth Freeze",
       "Freeze all humans in place preventing them from moving for 15 seconds, cost 75 energy",
       "",
-      60,
+      50,
       15,
       75,
       function () {
@@ -117,14 +117,14 @@ export class Spells {
       },
       function () {
         new Spells().humans.frozen = false;
-      }
+      },
     ),
     new Spell(
       5,
       "Gigazombies",
       "For 5 seconds any zombies spawned will be giants with 10x health and attack damage, cost 100 energy",
       "",
-      300,
+      260,
       5,
       100,
       function () {
@@ -132,7 +132,7 @@ export class Spells {
       },
       function () {
         new Spells().zombies.super = false;
-      }
+      },
     ),
     new Spell(
       6,
@@ -147,7 +147,7 @@ export class Spells {
       },
       function () {
         //
-      }
+      },
     ),
     new Spell(
       7,
@@ -162,7 +162,7 @@ export class Spells {
       },
       function () {
         new Spells().humans.pandemic = false;
-      }
+      },
     ),
   ];
 
@@ -213,7 +213,7 @@ export class Spells {
     for (let i = 0; i < this.spells.length; i++) {
       const spell = this.spells[i];
 
-      if (spell.onCooldown) {
+      if (spell.onCooldown && !spell.active) {
         spell.cooldownLeft -= timeDiff;
         if (spell.cooldownLeft <= 0) {
           spell.onCooldown = false;

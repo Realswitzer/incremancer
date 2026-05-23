@@ -234,7 +234,7 @@ angular
       };
 
       zm.upgradePrice = function (upgrade) {
-        if (zm.sidePanels.factory) {
+        if (zm.sidePanels.factory && "prestigePoints" !== upgrade.costType) {
           return partFactory.purchasePrice(upgrade);
         }
         return upgrades.upgradePrice(upgrade);
@@ -981,6 +981,7 @@ angular
           if (skeleton.persistent.talentReset) {
             TalentData.forEach((talent) => talent.reset());
             skeleton.persistent.talentReset = false;
+            applyTalents();
           }
         },
         talentMax(talent: Talent) {

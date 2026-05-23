@@ -512,7 +512,7 @@ export class Skeleton {
             }
             if (this.randomSpells.length > 0) {
               for (let i = 0; i < this.randomSpells.length; i++) {
-                if (Math.random() < 0.07) {
+                if (Math.random() < 0.04) {
                   this.spells.castSpellNoMana(this.randomSpells[i]);
                 }
               }
@@ -543,7 +543,7 @@ export class Skeleton {
     }
     if (this.randomSpells.length > 0) {
       for (let i = 0; i < this.randomSpells.length; i++) {
-        if (Math.random() < 0.07) {
+        if (Math.random() < 0.04) {
           this.spells.castSpellNoMana(this.randomSpells[i]);
         }
       }
