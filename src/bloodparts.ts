@@ -667,7 +667,7 @@ export class Bullets {
       } else if (sprite.fireball) {
         this.humans.burnHuman(sprite.target, sprite.damage);
         this.humans.damageHuman(sprite.target, sprite.damage);
-      } else if (sprite.darkorb) {
+      } else if (sprite.darkorb && !sprite.target.flags.dead) {
         this.humans.damageHuman(sprite.target, sprite.damage);
         sprite.target.timer.dogStun = 5;
         new Skeleton().orbHit(sprite.target);

@@ -495,7 +495,7 @@ export class Skeleton {
               if (this.killingBlowParts) {
                 this.model.persistentData.parts +=
                   this.killingBlowParts *
-                  creature.attackDamage *
+                  this.model.zombieDamage *
                   this.model.partsPCMod;
               }
               if (this.lastKillingBlow <= 0) {
@@ -536,7 +536,7 @@ export class Skeleton {
       if (this.killingBlowParts) {
         this.model.persistentData.parts +=
           this.killingBlowParts *
-          this.skeletons[0].attackDamage *
+          this.model.zombieDamage *
           this.model.partsPCMod;
       }
       if (this.lastKillingBlow <= 0) {
