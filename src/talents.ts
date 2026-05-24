@@ -123,9 +123,9 @@ export const TalentData = [
     function (this: Talent) {
       const rank = skeleton.talents[this.id];
       if (rank && rank > 0) {
-        return `Skeleton killing blows reward ${rank}% of zombie damage as parts`;
+        return `Skeleton killing blows reward ${rank}% of zombie damage as parts (20 sec cooldown)`;
       } else {
-        return "Skeleton killing blows reward 1% of zombie damage as parts";
+        return "Skeleton killing blows reward 1% of zombie damage as parts (20 sec cooldown)";
       }
     },
   ),

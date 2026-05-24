@@ -492,19 +492,17 @@ export class Skeleton {
               this.calculateDamage(creature),
             );
             if (creature.target.flags.dead) {
-              if (this.killingBlowParts) {
-                this.model.persistentData.parts +=
-                  this.killingBlowParts *
-                  this.model.zombieDamage *
-                  this.model.partsPCMod;
-              }
-              if (this.lastKillingBlow <= 0) {
+              if (this.killingBlowParts && this.lastKillingBlow <= 0) {
                 this.model.addPrestigePoints(this.persistent.level);
                 this.lastKillingBlow = 20;
                 this.prestigePoints.newPart(
                   creature.target.x,
                   creature.target.y,
                 );
+                this.model.persistentData.parts +=
+                  this.killingBlowParts *
+                  this.model.zombieDamage *
+                  this.model.partsPCMod;
               }
             }
             creature.timer.attack =
