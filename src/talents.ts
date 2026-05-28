@@ -24,6 +24,7 @@ export class Talent {
   apply: (this: Talent) => void;
   description: (this: Talent) => string;
   active: () => boolean;
+  full: (this: Talent) => boolean;
   reset: () => void;
   max: () => void;
   set: (rank: number) => void;
@@ -43,6 +44,9 @@ export class Talent {
 
     this.active = function (this: Talent) {
       return !!(skeleton.talents[this.id] && skeleton.talents[this.id] > 0);
+    };
+    this.full = function (this: Talent) {
+      return !!(skeleton.talents[this.id] && skeleton.talents[this.id] === 10);
     };
     this.reset = function (this: Talent) {
       skeleton.talents[this.id] = 0;
@@ -287,15 +291,15 @@ export const TalentData = [
       zombies.gigamutagen = 0;
       const rank = skeleton.talents[this.id];
       if (rank && rank > 0) {
-        zombies.gigamutagen = 16 - rank;
+        zombies.gigamutagen = 14 - rank;
       }
     },
     function (this: Talent) {
       const rank = skeleton.talents[this.id];
       if (rank && rank > 0) {
-        return `Gigazombie mutation every ${16 - rank} seconds`;
+        return `Gigazombie mutation every ${14 - rank} seconds`;
       } else {
-        return "Mutates a random zombie into a gigazombie every 15 seconds";
+        return "Mutates a random zombie into a gigazombie every 13 seconds";
       }
     },
   ),
