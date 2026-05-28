@@ -4,7 +4,7 @@ import {
   spawnCritText,
 } from "./classes/creatureclasses";
 import { CharacterFlags } from "./classes/gameobject";
-import { Human } from "./classes/humanclasses";
+import { Human as Creature, Human } from "./classes/humanclasses";
 import {
   characterContainer,
   GameModel,
@@ -413,6 +413,7 @@ export class Skeleton {
         creature.target &&
         !creature.target.flags.dead
       ) {
+        console.log("shot darkorb");
         this.darkorbTimer = this.darkorb;
         this.bullets.newBullet(
           creature,
@@ -495,19 +496,7 @@ export class Skeleton {
               this.calculateDamage(creature),
             );
             if (creature.target.flags.dead) {
-              if (this.killingBlowParts) {
-                this.model.persistentData.parts +=
-                  this.killingBlowParts *
-                  this.partFactory.factoryStats().partsPerSec;
-              }
-              if (this.lastKillingBlow <= 0) {
-                this.model.addPrestigePoints(this.persistent.level);
-                this.lastKillingBlow = 20;
-                this.prestigePoints.newPart(
-                  creature.target.x,
-                  creature.target.y,
-                );
-              }
+              this.killingBlow(creature.target);
             }
             creature.timer.attack =
               this.attackSpeed * this.model.runeEffects.attackSpeed;
@@ -533,17 +522,21 @@ export class Skeleton {
     }
   }
 
+  killingBlow(creature: Human) {
+    if (this.killingBlowParts) {
+      this.model.persistentData.parts +=
+        this.killingBlowParts * this.partFactory.factoryStats().partsPerSec;
+    }
+    if (this.lastKillingBlow <= 0) {
+      this.model.addPrestigePoints(this.persistent.level);
+      this.lastKillingBlow = 20;
+      this.prestigePoints.newPart(creature.x, creature.y);
+    }
+  }
+
   orbHit(creature: Human) {
     if (creature.flags.dead) {
-      if (this.killingBlowParts) {
-        this.model.persistentData.parts +=
-          this.killingBlowParts * this.partFactory.factoryStats().partsPerSec;
-      }
-      if (this.lastKillingBlow <= 0) {
-        this.model.addPrestigePoints(this.persistent.level);
-        this.lastKillingBlow = 20;
-        this.prestigePoints.newPart(creature.x, creature.y);
-      }
+      this.killingBlow(creature);
     }
     if (this.randomSpells.length > 0) {
       for (let i = 0; i < this.randomSpells.length; i++) {

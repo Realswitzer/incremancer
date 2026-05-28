@@ -785,6 +785,15 @@ export class Upgrades {
 
   constructionTickTimer = 1;
 
+  removeUpgrade(upgrade: Upgrade) {
+    for (let i = 0; i < this.gameModel.persistentData.upgrades.length; i++)
+      if (upgrade.id == this.gameModel.persistentData.upgrades[i].id) {
+        this.gameModel.persistentData.upgrades[i] = { id: upgrade.id, rank: 0 };
+        break;
+      }
+    this.applyUpgrades();
+  }
+
   consumeResources(costPerTick: {
     blood: number;
     brains: number;

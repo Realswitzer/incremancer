@@ -679,6 +679,10 @@ angular
           }
         }));
 
+      zm.destroyUpgrade = function (upgrade) {
+        upgrades.removeUpgrade(upgrade);
+      };
+
       zm.upgradeStatInfo = function (upgrade) {
         return upgrades.displayStatValue(upgrade);
       };
