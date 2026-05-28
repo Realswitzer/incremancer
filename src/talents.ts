@@ -117,15 +117,15 @@ export const TalentData = [
       skeleton.killingBlowParts = 0;
       const rank = skeleton.talents[this.id];
       if (rank && rank > 0) {
-        skeleton.killingBlowParts = 0.01 * 5;
+        skeleton.killingBlowParts = 10 * rank;
       }
     },
     function (this: Talent) {
       const rank = skeleton.talents[this.id];
       if (rank && rank > 0) {
-        return `Skeleton killing blows reward ${rank}% of zombie damage as parts (20 sec cooldown)`;
+        return `Skeleton killing blows reward ${rank * 10}% of your current parts per second`;
       } else {
-        return "Skeleton killing blows reward 1% of zombie damage as parts (20 sec cooldown)";
+        return "Skeleton killing blows reward 10% of your current parts per second";
       }
     },
   ),
@@ -139,16 +139,16 @@ export const TalentData = [
       zombies.refundChance = 0;
       const rank = skeleton.talents[this.id];
       if (rank && rank > 0) {
-        creatures.refundChance = rank * 0.05;
-        zombies.refundChance = rank * 0.05;
+        creatures.refundChance = rank * 0.08;
+        zombies.refundChance = rank * 0.08;
       }
     },
     function (this: Talent) {
       const rank = skeleton.talents[this.id];
       if (rank && rank > 0) {
-        return rank * 5 + "% chance for parts refund on golem death";
+        return rank * 8 + "% parts refund on golem death";
       } else {
-        return "Grants 5% chance for parts refund on golem death";
+        return "Grants 8% parts refund on golem death";
       }
     },
   ),

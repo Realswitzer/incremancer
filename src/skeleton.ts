@@ -25,6 +25,7 @@ import {
   Blasts,
   Exclamations,
   Bullets,
+  PartFactory,
 } from "./internal";
 
 class SkeletonCharacter extends Creature {
@@ -75,6 +76,7 @@ class BoneshieldContainer extends PIXI.Container {
 
 export class Skeleton {
   private static instance: Skeleton;
+  partFactory: PartFactory;
   constructor() {
     if (Skeleton.instance) return Skeleton.instance;
     Skeleton.instance = this;
@@ -236,6 +238,7 @@ export class Skeleton {
     this.humans = new Humans();
     this.zombies = new Zombies();
     this.prestigePoints = new PrestigePoints();
+    this.partFactory = new PartFactory();
     this.bones = new Bones();
     this.blasts = new Blasts();
     this.blood = new Blood();
@@ -492,17 +495,19 @@ export class Skeleton {
               this.calculateDamage(creature),
             );
             if (creature.target.flags.dead) {
-              if (this.killingBlowParts && this.lastKillingBlow <= 0) {
+              if (this.killingBlowParts) {
+                this.model.persistentData.parts +=
+                  this.killingBlowParts *
+                  this.partFactory.factoryStats().partsPerSec *
+                  this.model.partsPCMod;
+              }
+              if (this.lastKillingBlow <= 0) {
                 this.model.addPrestigePoints(this.persistent.level);
                 this.lastKillingBlow = 20;
                 this.prestigePoints.newPart(
                   creature.target.x,
                   creature.target.y,
                 );
-                this.model.persistentData.parts +=
-                  this.killingBlowParts *
-                  this.model.zombieDamage *
-                  this.model.partsPCMod;
               }
             }
             creature.timer.attack =
@@ -534,7 +539,7 @@ export class Skeleton {
       if (this.killingBlowParts) {
         this.model.persistentData.parts +=
           this.killingBlowParts *
-          this.model.zombieDamage *
+          this.partFactory.factoryStats().partsPerSec *
           this.model.partsPCMod;
       }
       if (this.lastKillingBlow <= 0) {

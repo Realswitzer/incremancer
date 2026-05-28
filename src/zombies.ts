@@ -273,11 +273,13 @@ export class Zombies {
       this.bones.newBones(zombie.x, zombie.y);
       zombie.flags.dead = true;
       if (zombie.flags.golem) {
-        if (Math.random() < this.refundChance) {
+        if (this.refundChance > 0) {
           this.model.sendMessage("Golem Refunded!");
+          this.creatureFactory.refundParts(
+            zombie.creatureType,
+            this.refundChance,
+          );
         }
-        // TODO: if this bug isnt fixed later, then patch it
-        this.creatureFactory.refundParts(zombie.creatureType);
       }
       if (Math.random() < this.model.infectedBlastChance) {
         this.causePlagueExplosion(zombie, zombie.maxHealth * 0.2, true);
