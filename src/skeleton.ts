@@ -498,8 +498,7 @@ export class Skeleton {
               if (this.killingBlowParts) {
                 this.model.persistentData.parts +=
                   this.killingBlowParts *
-                  this.partFactory.factoryStats().partsPerSec *
-                  this.model.partsPCMod;
+                  this.partFactory.factoryStats().partsPerSec;
               }
               if (this.lastKillingBlow <= 0) {
                 this.model.addPrestigePoints(this.persistent.level);
@@ -538,9 +537,7 @@ export class Skeleton {
     if (creature.flags.dead) {
       if (this.killingBlowParts) {
         this.model.persistentData.parts +=
-          this.killingBlowParts *
-          this.partFactory.factoryStats().partsPerSec *
-          this.model.partsPCMod;
+          this.killingBlowParts * this.partFactory.factoryStats().partsPerSec;
       }
       if (this.lastKillingBlow <= 0) {
         this.model.addPrestigePoints(this.persistent.level);
