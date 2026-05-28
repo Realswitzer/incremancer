@@ -444,11 +444,10 @@ export class Skeleton {
       // do abilities
     }
 
-    if (
-      (!creature.target || creature.target.flags.dead) &&
-      creature.timer.scan < 0
-    ) {
+    if (!(creature.target && !creature.target.flags.dead)) {
       creature.state = CreatureState.lookingForTarget;
+      creature.timer.target = 0;
+      creature.timer.scan = 0;
     }
 
     switch (creature.state) {
