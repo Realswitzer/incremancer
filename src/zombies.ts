@@ -36,7 +36,6 @@ export class Zombie extends Creature {
   scaleMod = 1;
   textureId = 0;
   turnTimer = 0;
-  detonateTimer = 0;
 }
 
 export class Zombies {
@@ -377,6 +376,9 @@ export class Zombies {
 
   update(timeDiff: number): void {
     this.maxSpeed = this.model.zombieSpeed;
+    if (this.detonate) {
+      this.maxSpeed *= 1.5;
+    }
     this.reactionTime = Math.max(0.2, this.aliveZombies.length / 2000);
     const aliveZombies = [];
     const zombiePartition = [];
@@ -419,15 +421,11 @@ export class Zombies {
     }
   }
 
-  detonateZombie(zombie: Zombie, timeDiff: number): void {
-    if (!zombie.detonateTimer) {
-      zombie.detonateTimer = Math.random() * 3;
-    }
-    zombie.detonateTimer -= timeDiff;
-    if (zombie.detonateTimer < 0) {
+  detonateZombie(zombie: Zombie): void {
+    if (zombie.state === CreatureState.attackingTarget) {
       this.bones.newBones(zombie.x, zombie.y);
       zombie.flags.dead = true;
-      this.causePlagueExplosion(zombie, zombie.maxHealth * 0.2, true);
+      this.causePlagueExplosion(zombie, zombie.maxHealth, true);
       if (Math.random() < this.model.brainRecoverChance) {
         this.model.addBrains(1);
       }
@@ -463,7 +461,7 @@ export class Zombies {
     }
 
     if (this.detonate) {
-      this.detonateZombie(zombie, timeDiff);
+      this.detonateZombie(zombie);
     }
 
     if (zombie.flags.burning) this.updateBurns(zombie, timeDiff);

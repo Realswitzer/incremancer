@@ -95,7 +95,7 @@ export class Spells {
       "Explode your zombies into clouds of plague, cost 69 energy... nice",
       "",
       110,
-      3,
+      8,
       69,
       function () {
         new Spells().zombies.detonate = true;
