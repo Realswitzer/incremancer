@@ -260,10 +260,7 @@ export class Zombies {
       damage *= this.model.plagueDmgReduction;
     }
     zombie.health -= damage * this.model.runeEffects.damageReduction;
-    zombie.speedMultiplier = Math.max(
-      Math.min(1, zombie.health / zombie.maxHealth),
-      0.4,
-    );
+    this.setSpeedMultiplier(zombie);
     if (zombie.flags.burning) {
       zombie.speedMultiplier = this.model.burningSpeedMod;
     }
@@ -553,7 +550,16 @@ export class Zombies {
       }
     }
   }
-
+  setSpeedMultiplier(zombie: Creature): void {
+    if (zombie.flags.burning) {
+      zombie.speedMultiplier = this.model.burningSpeedMod;
+    } else {
+      zombie.speedMultiplier = Math.max(
+        Math.min(1, zombie.health / zombie.maxHealth),
+        0.4,
+      );
+    }
+  }
   updateZombieRegen(zombie: Creature, timeDiff: number): void {
     zombie.regenTimer -= timeDiff;
 
@@ -564,10 +570,7 @@ export class Zombies {
         if (zombie.health > zombie.maxHealth) {
           zombie.health = zombie.maxHealth;
         }
-        zombie.speedMultiplier = Math.max(
-          Math.min(1, zombie.health / zombie.maxHealth),
-          0.4,
-        );
+        this.setSpeedMultiplier(zombie);
       }
     }
   }
@@ -579,10 +582,7 @@ export class Zombies {
       if (zombie.health > zombie.maxHealth) {
         zombie.health = zombie.maxHealth;
       }
-      zombie.speedMultiplier = Math.max(
-        Math.min(1, zombie.health / zombie.maxHealth),
-        0.4,
-      );
+      this.setSpeedMultiplier(zombie);
     }
   }
 

@@ -14,6 +14,7 @@ import {
   Talent,
   TalentData,
   applyTalents,
+  resetTalents,
 } from "./internal";
 
 angular
@@ -982,11 +983,8 @@ angular
         },
         canReset: () => skeleton.persistent.talentReset,
         talentsReset() {
-          if (skeleton.persistent.talentReset) {
-            TalentData.forEach((talent) => talent.reset());
-            skeleton.persistent.talentReset = false;
-            applyTalents();
-          }
+          resetTalents();
+          applyTalents();
         },
         talentMax(talent: Talent) {
           talent.max();

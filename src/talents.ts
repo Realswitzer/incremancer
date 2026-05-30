@@ -348,7 +348,22 @@ export const TalentData = [
 ];
 export const TalentUpgrades: TalentUpgrade[] = [];
 export function applyTalents(): void {
+  TalentData.forEach((talent) => {
+    const rank = skeleton.talents[talent.id];
+    if (rank && rank < 0) {
+      skeleton.talents[talent.id] = 0;
+    }
+  });
+  if (skeleton.talentPoints < skeleton.getUsedPoints()) {
+    resetTalents();
+  }
   TalentData.forEach((talent) => talent.apply());
+}
+export function resetTalents(): void {
+  if (skeleton.persistent.talentReset) {
+    TalentData.forEach((talent) => talent.reset());
+    skeleton.persistent.talentReset = false;
+  }
 }
 TalentData.forEach((talent) => {
   if (

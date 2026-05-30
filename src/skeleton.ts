@@ -139,7 +139,7 @@ export class Skeleton {
   causePlagueExplosion = null;
   inflictPlague = null;
   healZombie = null;
-
+  setSpeedMultiplier = null;
   storageName = "incremancerskele";
   talentsStorageName = "incremancertalents";
   persistent = {
@@ -249,6 +249,7 @@ export class Skeleton {
     this.causePlagueExplosion = this.zombies.causePlagueExplosion;
     this.inflictPlague = this.zombies.inflictPlague;
     this.healZombie = this.zombies.healZombie;
+    this.setSpeedMultiplier = this.zombies.setSpeedMultiplier;
     if (!this.textures.set) {
       this.textures.down = [];
       this.textures.up = [];
