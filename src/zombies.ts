@@ -298,10 +298,15 @@ export class Zombies {
     zombie: GameObject,
     damage: number,
     killZombie = true,
+    detonate = false,
   ): void {
-    const explosionRadius = 50;
+    const explosionRadius = detonate ? 75 : 50;
     this.blood.newPlagueSplatter(zombie.x, zombie.y);
-    this.blasts.newBlast(zombie.x, zombie.y - 4);
+    if (detonate) {
+      this.blasts.newDetonateBlast(zombie.x, zombie.y - 4);
+    } else {
+      this.blasts.newZombieBlast(zombie.x, zombie.y - 4);
+    }
     if (killZombie) {
       zombie.visible = false;
       characterContainer.removeChild(zombie);
@@ -422,7 +427,7 @@ export class Zombies {
     if (zombie.state === CreatureState.attackingTarget) {
       this.bones.newBones(zombie.x, zombie.y);
       zombie.flags.dead = true;
-      this.causePlagueExplosion(zombie, zombie.maxHealth, true);
+      this.causePlagueExplosion(zombie, zombie.maxHealth, true, true);
       if (Math.random() < this.model.brainRecoverChance) {
         this.model.addBrains(1);
       }

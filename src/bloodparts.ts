@@ -841,12 +841,38 @@ export class Blasts extends SpritePool<GameObject> {
       }
     }
   }
+
   newBlast(x: number, y: number): void {
     if (this.viewableArea.hideParticle(x, y)) {
       return;
     }
     const sprite = this.getSprite();
     sprite.anchor.set(0.5, 0.5);
+    sprite.tint = 0xffffff;
+    sprite.scale.x = sprite.scale.y = 2;
+    sprite.x = x;
+    sprite.y = y;
+    new Smoke().newCloud(x, y);
+  }
+  newZombieBlast(x: number, y: number): void {
+    if (this.viewableArea.hideParticle(x, y)) {
+      return;
+    }
+    const sprite = this.getSprite();
+    sprite.anchor.set(0.5, 0.5);
+    sprite.tint = 0xaaffaa;
+    sprite.scale.x = sprite.scale.y = 2;
+    sprite.x = x;
+    sprite.y = y;
+    new Smoke().newCloud(x, y);
+  }
+  newDetonateBlast(x: number, y: number): void {
+    if (this.viewableArea.hideParticle(x, y)) {
+      return;
+    }
+    const sprite = this.getSprite();
+    sprite.anchor.set(0.5, 0.5);
+    sprite.tint = 0x66ff66;
     sprite.scale.x = sprite.scale.y = 2;
     sprite.x = x;
     sprite.y = y;
@@ -855,7 +881,9 @@ export class Blasts extends SpritePool<GameObject> {
 
   newDroneBlast(x: number, y: number): void {
     const sprite = this.getSprite();
+    sprite.anchor.set(0.5, 0.5);
     sprite.scale.x = sprite.scale.y = 2;
+    sprite.tint = 0xffffff;
     sprite.x = x;
     sprite.y = y;
     new Smoke().newDroneCloud(x, y);
