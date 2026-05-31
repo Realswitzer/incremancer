@@ -92,9 +92,9 @@ export class Spells {
     new Spell(
       3,
       "Detonate",
-      "Explode your zombies into clouds of plague, cost 69 energy... nice",
+      "Turns your zombies into fast moving living bombs, cost 69 energy... nice",
       "",
-      110,
+      80,
       8,
       69,
       function () {
