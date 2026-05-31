@@ -424,7 +424,10 @@ export class Zombies {
   }
 
   detonateZombie(zombie: Zombie): void {
-    if (zombie.state === CreatureState.attackingTarget) {
+    if (
+      zombie.state === CreatureState.attackingTarget ||
+      (this.aliveHumans.length === 0 && Math.random() < 0.05)
+    ) {
       this.bones.newBones(zombie.x, zombie.y);
       zombie.flags.dead = true;
       this.causePlagueExplosion(zombie, zombie.maxHealth, true, true);
