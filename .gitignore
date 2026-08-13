@@ -1,8 +1,10 @@
 .*.*
 *.piskel
 node_modules/
+# uses bun for deps and build
 pnpm-lock.yaml
 pnpm-workspace.yaml
+package-lock.json
 dist/
 bundle/
 bundle*.js
