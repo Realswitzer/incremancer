@@ -28,7 +28,7 @@ export class CreatureFactory {
       75,
       30,
       800,
-      "A golem born from rocks and mud, able to take a lot of punishment and taunt enemies to attack it",
+      "A golem born from rocks and mud, able to take a lot of punishment and taunt enemies to attack it"
     ),
     new Creature(
       2,
@@ -38,7 +38,7 @@ export class CreatureFactory {
       110,
       45,
       900,
-      "A fast moving golem able to cover large distances and chase targets down",
+      "A fast moving golem able to cover large distances and chase targets down"
     ),
     new Creature(
       3,
@@ -48,7 +48,7 @@ export class CreatureFactory {
       130,
       32,
       1000,
-      "A fireball spewing golem that ignites everything it touches",
+      "A fireball spewing golem that ignites everything it touches"
     ),
     new Creature(
       4,
@@ -58,7 +58,7 @@ export class CreatureFactory {
       90,
       30,
       1100,
-      "A calming golem that restores health to nearby units",
+      "A calming golem that restores health to nearby units"
     ),
   ];
 
@@ -89,22 +89,8 @@ export class CreatureFactory {
           this.gameModel.persistentData.creatureLevels[this.creatures[i].id];
     }
   }
-  refundParts(golemType: number, refundPercent: number): void {
-    let partsToRefund = 0;
-    switch (golemType) {
-      case this.types.earthGolem:
-        partsToRefund = this.purchasePrice(this.creatures[0]);
-        break;
-      case this.types.airGolem:
-        partsToRefund = this.purchasePrice(this.creatures[1]);
-        break;
-      case this.types.fireGolem:
-        partsToRefund = this.purchasePrice(this.creatures[2]);
-        break;
-      case this.types.waterGolem:
-        partsToRefund = this.purchasePrice(this.creatures[3]);
-    }
-    this.gameModel.persistentData.parts += partsToRefund * refundPercent;
+  refundParts(golem: Creature, refundPercent: number): void {
+    this.gameModel.persistentData.parts += golem.price * refundPercent;
   }
 
   purchasePrice(creature: Creature): number {
@@ -203,6 +189,7 @@ export class CreatureFactory {
       creature.speed,
       creature.type,
       creature.level,
+      this.purchasePrice(creature)
     );
   }
 
@@ -218,7 +205,7 @@ export class CreatureFactory {
         if (creaturesSpawned <= this.gameModel.creatureLimit) {
           const savedCreature = this.gameModel.persistentData.savedCreatures[i];
           const creature = this.creatures.filter(
-            (c) => c.type == savedCreature.t,
+            (c) => c.type == savedCreature.t
           )[0];
           creature.level = savedCreature.l;
           this.spawnCreature(creature);
@@ -294,7 +281,7 @@ class Creature {
     baseDamage: number,
     speed: number,
     baseCost: number,
-    description: string,
+    description: string
   ) {
     this.id = id;
     this.type = type;

@@ -18,6 +18,7 @@ export class Creature extends CharacterObject {
   scaling = 0;
   attackDamage = 0;
   speedMultiplier = 1;
+  price = 0;
   immuneToBurns = false;
   zombie = true;
   deadTexture: PIXI.Texture[];

@@ -105,7 +105,7 @@ export class Zombies {
         const animated = [];
         for (let j = 0; j < 3; j++) {
           animated.push(
-            PIXI.Texture.from("zombie" + (i + 1) + "_" + (j + 1) + ".png"),
+            PIXI.Texture.from("zombie" + (i + 1) + "_" + (j + 1) + ".png")
           );
         }
         this.textures.push({
@@ -202,7 +202,7 @@ export class Zombies {
     zombie.scaling = zombie.scaleMod * this.scaling * dogScale;
     zombie.scale.set(
       Math.random() > 0.5 ? zombie.scaling : -1 * zombie.scaling,
-      zombie.scaling,
+      zombie.scaling
     );
     zombie.timer.attack = 0;
     zombie.xSpeed = 0;
@@ -228,12 +228,12 @@ export class Zombies {
   spawnAllZombies(x: number, y: number): void {
     const numZombies = Math.min(
       Math.floor(this.model.energy / this.model.zombieCost),
-      100,
+      100
     );
     for (let i = 0; i < numZombies; i++) {
       this.spawnZombie(
         x + 4 * (Math.random() - 1),
-        y + 4 * (Math.random() - 1),
+        y + 4 * (Math.random() - 1)
       );
     }
   }
@@ -271,10 +271,7 @@ export class Zombies {
       if (zombie.flags.golem) {
         if (this.refundChance > 0) {
           this.model.sendMessage("Golem Refunded!");
-          this.creatureFactory.refundParts(
-            zombie.creatureType,
-            this.refundChance,
-          );
+          this.creatureFactory.refundParts(zombie, this.refundChance);
         }
       }
       if (Math.random() < this.model.infectedBlastChance) {
@@ -289,7 +286,7 @@ export class Zombies {
     if (human && this.model.runeEffects.damageReflection > 0) {
       this.humans.damageHuman(
         human,
-        damage * this.model.runeEffects.damageReflection,
+        damage * this.model.runeEffects.damageReflection
       );
     }
   }
@@ -298,7 +295,7 @@ export class Zombies {
     zombie: GameObject,
     damage: number,
     killZombie = true,
-    detonate = false,
+    detonate = false
   ): void {
     const explosionRadius = detonate ? 75 : 50;
     this.blood.newPlagueSplatter(zombie.x, zombie.y);
@@ -319,7 +316,7 @@ export class Zombies {
               zombie.x,
               zombie.y,
               this.aliveHumans[i].x,
-              this.aliveHumans[i].y,
+              this.aliveHumans[i].y
             ) < explosionRadius
           ) {
             this.inflictPlague(this.aliveHumans[i]);
@@ -338,7 +335,7 @@ export class Zombies {
                 zombie.x,
                 zombie.y,
                 this.aliveZombies[i].x,
-                this.aliveZombies[i].y,
+                this.aliveZombies[i].y
               ) < explosionRadius
             ) {
               this.healZombie(this.aliveZombies[i], healingDone);
@@ -410,7 +407,7 @@ export class Zombies {
         this.zombieCursorText.visible = true;
         const numZombies = Math.min(
           Math.floor(this.model.energy / this.model.zombieCost),
-          100,
+          100
         );
         if (this.zombieCursorText.text != numZombies) {
           this.zombieCursorText.text = numZombies;
@@ -490,7 +487,7 @@ export class Zombies {
           zombie.position.x,
           zombie.position.y,
           zombie.target.x,
-          zombie.target.y,
+          zombie.target.y
         );
 
         if (distanceToHumanTarget < this.attackDistance) {
@@ -505,7 +502,7 @@ export class Zombies {
             zombie,
             zombie.target,
             this.model.zombieDamage / 2,
-            true,
+            true
           );
           zombie.timer.attack =
             this.attackSpeed * this.model.runeEffects.attackSpeed;
@@ -526,7 +523,7 @@ export class Zombies {
           zombie.position.x,
           zombie.position.y,
           zombie.target.x,
-          zombie.target.y,
+          zombie.target.y
         );
         if (distanceToTarget < this.attackDistance) {
           zombie.scale.x =
@@ -534,7 +531,7 @@ export class Zombies {
           if (zombie.timer.attack < 0) {
             this.humans.damageHuman(
               zombie.target,
-              this.calculateDamage(zombie),
+              this.calculateDamage(zombie)
             );
             if (zombie.flags.dog) {
               zombie.target.timer.dogStun = 1;
@@ -564,7 +561,7 @@ export class Zombies {
     } else {
       zombie.speedMultiplier = Math.max(
         Math.min(1, zombie.health / zombie.maxHealth),
-        0.4,
+        0.4
       );
     }
   }
@@ -657,7 +654,7 @@ export class Zombies {
               zombie.x,
               zombie.y,
               this.graveyardAttackers[i].x,
-              this.graveyardAttackers[i].y,
+              this.graveyardAttackers[i].y
             );
             if (distanceToHuman < distanceToTarget) {
               zombie.target = this.graveyardAttackers[i];
@@ -677,7 +674,7 @@ export class Zombies {
               zombie.x,
               zombie.y,
               this.aliveHumans[i].x,
-              this.aliveHumans[i].y,
+              this.aliveHumans[i].y
             );
             if (distanceToHuman < distanceToTarget) {
               zombie.target = this.aliveHumans[i];
@@ -700,7 +697,7 @@ export class Zombies {
             this.aliveHumans[i].x,
             this.aliveHumans[i].y,
             building,
-            0,
+            0
           )
         ) {
           zombie.target = this.aliveHumans[i];
@@ -734,7 +731,7 @@ export class Zombies {
       const dogSpeed = zombie.flags.dog ? 1.5 : 1;
       const zombieMaxSpeed = Math.max(
         this.maxSpeed * zombie.speedMultiplier * dogSpeed,
-        8,
+        8
       );
       zombie.xSpeed = zombie.targetVector.x * zombieMaxSpeed;
       zombie.ySpeed = zombie.targetVector.y * zombieMaxSpeed;
@@ -747,7 +744,7 @@ export class Zombies {
       const speedMagnitudeSq = this.dotProduct(zombie.xSpeed, zombie.ySpeed);
       const zombieMaxSpeedSq = Math.pow(
         Math.max(this.maxSpeed * zombie.speedMultiplier, 8),
-        2,
+        2
       );
       if (speedMagnitudeSq > zombieMaxSpeedSq) {
         zombie.xSpeed *= zombieMaxSpeedSq / speedMagnitudeSq;
@@ -831,7 +828,7 @@ export class Zombies {
               zombie.x,
               zombie.y,
               neighbours[i].x,
-              neighbours[i].y,
+              neighbours[i].y
             )
           );
         }
