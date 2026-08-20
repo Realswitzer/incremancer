@@ -113,6 +113,7 @@ export class Skeleton {
   lastKillingBlow = 0;
   randomSpells = [];
   lootChance = 0.001;
+  spellTimer = 3;
   textures = {
     set: false,
     up: [] as PIXI.Texture[],
@@ -177,7 +178,7 @@ export class Skeleton {
         this.persistent.level++;
         this.upgrades.applyUpgrades();
         this.model.sendMessage(
-          "Skeleton Champion reached level " + this.persistent.level + "!",
+          "Skeleton Champion reached level " + this.persistent.level + "!"
         );
         const skeletonElement = document.getElementById("skeleton");
         if (skeletonElement) {
@@ -317,7 +318,7 @@ export class Skeleton {
     creature.anchor.set(8.5 / 16, 1);
     creature.position.set(
       this.graveyard.sprite.x,
-      this.graveyard.sprite.y + (this.graveyard.level > 2 ? 8 : 0),
+      this.graveyard.sprite.y + (this.graveyard.level > 2 ? 8 : 0)
     );
     creature.target = null;
     creature.zIndex = creature.position.y;
@@ -360,6 +361,8 @@ export class Skeleton {
     this.aliveZombies = this.zombies.aliveZombies;
 
     this.aliveSkeletons = [];
+
+    this.spellTimer -= timeDiff;
 
     for (let i = 0; i < this.skeletons.length; i++) {
       if (this.skeletons[i].visible) {
@@ -423,7 +426,7 @@ export class Skeleton {
           false,
           false,
           false,
-          true,
+          true
         );
       }
     }
@@ -464,7 +467,7 @@ export class Skeleton {
           creature.position.x,
           creature.position.y,
           creature.target.x,
-          creature.target.y,
+          creature.target.y
         );
 
         if (distanceToHumanTarget < this.attackDistance) {
@@ -487,26 +490,27 @@ export class Skeleton {
           creature.position.x,
           creature.position.y,
           creature.target.x,
-          creature.target.y,
+          creature.target.y
         );
         if (distanceToTarget < this.attackDistance) {
           if (creature.timer.attack < 0 && !creature.target.flags.dead) {
             this.humans.damageHuman(
               creature.target,
-              this.calculateDamage(creature),
+              this.calculateDamage(creature)
             );
             if (creature.target.flags.dead) {
               this.killingBlow(creature.target);
             }
             creature.timer.attack =
-              this.attackSpeed * this.model.runeEffects.attackSpeed;
+              this.attackSpeed * (1 / this.model.runeEffects.attackSpeed);
             if (creature.flags.burning) {
               creature.timer.attack *= 1 / this.model.burningSpeedMod;
             }
             if (this.randomSpells.length > 0) {
               for (let i = 0; i < this.randomSpells.length; i++) {
-                if (Math.random() < 0.04) {
+                if (this.spellTimer < 0 && Math.random() < 0.07) {
                   this.spells.castSpellNoMana(this.randomSpells[i]);
+                  this.spellTimer = 3;
                 }
               }
             }
@@ -540,8 +544,9 @@ export class Skeleton {
     }
     if (this.randomSpells.length > 0) {
       for (let i = 0; i < this.randomSpells.length; i++) {
-        if (Math.random() < 0.04) {
+        if (this.spellTimer < 0 && Math.random() < 0.07) {
           this.spells.castSpellNoMana(this.randomSpells[i]);
+          this.spellTimer = 3;
         }
       }
     }
@@ -619,7 +624,7 @@ export class Skeleton {
     if (creature.timer.target <= 0) {
       creature.targetVector = this.map.howDoIGetToMyTarget(
         creature,
-        creature.target,
+        creature.target
       );
       creature.timer.target = 0.2;
     }
@@ -630,11 +635,11 @@ export class Skeleton {
         creature.x,
         creature.y,
         creature.target.x,
-        creature.target.y,
+        creature.target.y
       );
     const speedMod = Math.min(
       creature.speedMultiplier * creature.maxSpeed,
-      distanceToTarget,
+      distanceToTarget
     );
 
     creature.xSpeed = creature.targetVector.x * speedMod;
@@ -834,14 +839,14 @@ export class Skeleton {
             stats.push(
               "+" +
                 formatWhole(this.stats.zombieHealth.scaling * loot.l) +
-                " zombie health",
+                " zombie health"
             );
             break;
           case this.stats.zombieDamage.id:
             stats.push(
               "+" +
                 formatWhole(this.stats.zombieDamage.scaling * loot.l) +
-                " zombie damage",
+                " zombie damage"
             );
             break;
           case this.stats.zombieSpeed.id:
@@ -862,7 +867,7 @@ export class Skeleton {
           spell.itemText ||
             "Has a chance to cast " +
               spell.name +
-              " when attacking, this does not cost energy or trigger a cooldown",
+              " when attacking, this does not cost energy or trigger a cooldown"
         );
       }
     return stats;
@@ -890,7 +895,7 @@ export class Skeleton {
           rarity = this.rarity.legendary;
           const spell = getRandomElementFromArray(
             this.spells.spells,
-            Math.random(),
+            Math.random()
           );
           specialEffects.push(spell.id);
         }
@@ -900,22 +905,22 @@ export class Skeleton {
     switch (rarity) {
       case this.rarity.common:
         prefixIndex = Math.floor(
-          Math.random() * this.prefixes.commonQuality.length,
+          Math.random() * this.prefixes.commonQuality.length
         );
         break;
       case this.rarity.rare:
         prefixIndex = Math.floor(
-          Math.random() * this.prefixes.rareQuality.length,
+          Math.random() * this.prefixes.rareQuality.length
         );
         break;
       case this.rarity.epic:
         prefixIndex = Math.floor(
-          Math.random() * this.prefixes.epicQuality.length,
+          Math.random() * this.prefixes.epicQuality.length
         );
         break;
       case this.rarity.legendary:
         prefixIndex = Math.floor(
-          Math.random() * this.prefixes.legendaryQuality.length,
+          Math.random() * this.prefixes.legendaryQuality.length
         );
         break;
     }
@@ -954,7 +959,7 @@ export class Skeleton {
   destroyAllItems(): void {
     this.addXp(this.xpForItems());
     this.persistent.items = this.persistent.items.filter(
-      (i) => i.q || i.r == this.rarity.legendary,
+      (i) => i.q || i.r == this.rarity.legendary
     );
   }
   xpForItems(): number {

@@ -95,7 +95,7 @@ export class Humans {
       this.blood.newSplatter(human.x, human.y);
       human.speedMod = Math.max(
         Math.min(1, human.health / human.maxHealth),
-        0.25,
+        0.25
       );
     } else {
       this.fragments.newPart(human.x, human.y - 18, 0x7b650e);
@@ -232,7 +232,7 @@ export class Humans {
       return;
     }
     this.attackDamage = Math.round(
-      this.getMaxHealth(this.gameModel.level) / 10,
+      this.getMaxHealth(this.gameModel.level) / 10
     );
   }
 
@@ -283,7 +283,7 @@ export class Humans {
         const animated = [];
         for (let j = 0; j < 3; j++) {
           animated.push(
-            PIXI.Texture.from("human" + (i + 1) + "_" + (j + 1) + ".png"),
+            PIXI.Texture.from("human" + (i + 1) + "_" + (j + 1) + ".png")
           );
         }
         this.textures.push({
@@ -295,7 +295,7 @@ export class Humans {
     if (this.doctorTextures.length == 0) {
       for (let i = 0; i < 3; i++) {
         this.doctorTextures.push(
-          PIXI.Texture.from("doctor" + (i + 1) + ".png"),
+          PIXI.Texture.from("doctor" + (i + 1) + ".png")
         );
       }
       this.doctorDeadTexture = [PIXI.Texture.from("doctor4.png")];
@@ -368,7 +368,7 @@ export class Humans {
       human.anchor.set(35 / 80, 1);
       human.currentPoi = this.map.getRandomBuilding();
       human.position.copyFrom(
-        this.map.randomPositionInBuilding(human.currentPoi),
+        this.map.randomPositionInBuilding(human.currentPoi)
       );
       human.zIndex = human.position.y;
       human.xSpeed = 0;
@@ -396,7 +396,7 @@ export class Humans {
       human.timer.attack = this.attackSpeed;
       human.scale.set(
         Math.random() > 0.5 ? this.scaling : -1 * this.scaling,
-        this.scaling,
+        this.scaling
       );
       this.humans.push(human);
       characterContainer.addChild(human);
@@ -558,7 +558,8 @@ export class Humans {
 
     if (human.timer.plagueTick < 0) {
       this.damageHuman(human, human.plagueDamage);
-      human.timer.plagueTick = this.plagueTickTimer;
+      human.timer.plagueTick =
+        this.plagueTickTimer * (1 / this.gameModel.runeEffects.attackSpeed);
       this.exclamations.newPoison(human);
       human.plagueTicks--;
       if (this.pandemic) {
@@ -582,7 +583,7 @@ export class Humans {
             human,
             this.aliveHumans[i],
             this.gameModel.zombieDamage / 2,
-            true,
+            true
           );
         }
       }
@@ -599,7 +600,7 @@ export class Humans {
         human.health = human.maxHealth;
         human.speedMod = Math.max(
           Math.min(1, human.health / human.maxHealth),
-          0.25,
+          0.25
         );
       }
       this.exclamations.newHealing(human);
@@ -619,7 +620,7 @@ export class Humans {
                 human.x,
                 human.y,
                 this.aliveHumans[i].x,
-                this.aliveHumans[i].y,
+                this.aliveHumans[i].y
               ) < healRadius
             ) {
               this.healHuman(this.aliveHumans[i]);
@@ -675,7 +676,7 @@ export class Humans {
             human.position.x,
             human.position.y,
             human.target.x,
-            human.target.y,
+            human.target.y
           ) < this.moveTargetDistance
         ) {
           human.target = undefined;
@@ -691,7 +692,7 @@ export class Humans {
             human.position.x,
             human.position.y,
             human.target.x,
-            human.target.y,
+            human.target.y
           ) < this.moveTargetDistance
         ) {
           this.smoke.newDroneCloud(human.x, human.y);
@@ -715,14 +716,14 @@ export class Humans {
             human.position.x,
             human.position.y,
             human.target.x,
-            human.target.y,
+            human.target.y
           );
           if (distanceToTarget < this.attackDistance) {
             if (human.timer.attack < 0) {
               this.zombies.damageZombie(
                 human.zombieTarget,
                 this.attackDamage,
-                human,
+                human
               );
               this.inflictBurn(human, human.zombieTarget);
               human.timer.attack = this.attackSpeed;
@@ -811,7 +812,7 @@ export class Police {
   getMaxPolice(): number {
     const maxPolice = Math.min(
       Math.round(this.policePerLevel * this.gameModel.level),
-      100,
+      100
     );
 
     if (this.gameModel.level < 3) return 0;
@@ -884,7 +885,7 @@ export class Police {
       police.anchor.set(35 / 80, 1);
       police.currentPoi = this.map.getRandomBuilding();
       police.position.copyFrom(
-        this.map.randomPositionInBuilding(police.currentPoi),
+        this.map.randomPositionInBuilding(police.currentPoi)
       );
       police.zIndex = police.position.y;
       police.xSpeed = 0;
@@ -906,7 +907,7 @@ export class Police {
       police.timer.attack = this.attackSpeed;
       police.scale.set(
         Math.random() > 0.5 ? this.scaling : -1 * this.scaling,
-        this.scaling,
+        this.scaling
       );
       this.police.push(police);
       characterContainer.addChild(police);
@@ -961,7 +962,7 @@ export class Police {
     dog.timer.attack = this.attackSpeed;
     dog.scale.set(
       Math.random() > 0.5 ? this.dogScaling : -1 * this.dogScaling,
-      this.dogScaling,
+      this.dogScaling
     );
     this.police.push(dog);
     characterContainer.addChild(dog);
@@ -990,7 +991,7 @@ export class Police {
         police.position.x,
         police.position.y,
         police.zombieTarget.x,
-        police.zombieTarget.y,
+        police.zombieTarget.y
       );
 
       if (distanceToTarget > this.shootDistance) {
@@ -1043,7 +1044,7 @@ export class Police {
           police.x,
           police.y,
           this.police[i].x,
-          this.police[i].y,
+          this.police[i].y
         );
         if (distance < closestDistance) {
           closestPolice = this.police[i];
@@ -1064,7 +1065,7 @@ export class Police {
   updatePolice(
     police: PoliceMan,
     timeDiff: number,
-    aliveZombies: Creature[],
+    aliveZombies: Creature[]
   ): void {
     if (police.flags.dead)
       return this.humans.updateDeadHumanFading(police, timeDiff);
@@ -1103,7 +1104,7 @@ export class Police {
             police.position.x,
             police.position.y,
             police.target.x,
-            police.target.y,
+            police.target.y
           ) < this.moveTargetDistance
         ) {
           police.target = false;
@@ -1132,7 +1133,7 @@ export class Police {
             this.zombies.damageZombie(
               police.zombieTarget,
               this.attackDamage,
-              police,
+              police
             );
             police.timer.attack = this.attackSpeed;
           }
@@ -1149,7 +1150,7 @@ export class Police {
             this.bullets.newBullet(
               police,
               police.zombieTarget,
-              this.attackDamage,
+              this.attackDamage
             );
             police.timer.attack = this.attackSpeed;
           }
@@ -1168,7 +1169,7 @@ export class Police {
   updatePoliceDog(
     dog: PoliceMan,
     timeDiff: number,
-    aliveZombies: Creature[],
+    aliveZombies: Creature[]
   ): void {
     if (dog.flags.dead) return this.humans.updateDeadHumanFading(dog, timeDiff);
 
@@ -1198,7 +1199,7 @@ export class Police {
             dog.position.x,
             dog.position.y,
             dog.target.x,
-            dog.target.y,
+            dog.target.y
           ) < this.moveTargetDistance
         ) {
           dog.followTimer = Math.random() * 3;
@@ -1219,7 +1220,7 @@ export class Police {
               dog.position.x,
               dog.position.y,
               dog.zombieTarget.x,
-              dog.zombieTarget.y,
+              dog.zombieTarget.y
             ) < this.moveTargetDistance
           ) {
             dog.scale.x =
@@ -1228,7 +1229,7 @@ export class Police {
               this.zombies.damageZombie(
                 dog.zombieTarget,
                 this.attackDamage,
-                dog,
+                dog
               );
               dog.target.dogStun = 1;
               dog.timer.attack = this.attackSpeed;
@@ -1258,7 +1259,7 @@ export class Police {
             dog.position.x,
             dog.position.y,
             dog.target.x,
-            dog.target.y,
+            dog.target.y
           ) < this.moveTargetDistance
         ) {
           dog.target = {
@@ -1333,7 +1334,7 @@ export class Army {
   getMaxArmy(): number {
     const maxArmy = Math.min(
       Math.round(this.armyPerLevel * this.gameModel.level),
-      100,
+      100
     );
 
     if (this.gameModel.level < 11) return 0;
@@ -1376,7 +1377,7 @@ export class Army {
         const animated = [];
         for (let j = 0; j < 3; j++) {
           animated.push(
-            PIXI.Texture.from("army" + (i + 1) + "_" + (j + 1) + ".png"),
+            PIXI.Texture.from("army" + (i + 1) + "_" + (j + 1) + ".png")
           );
         }
         this.textures.push({
@@ -1440,7 +1441,7 @@ export class Army {
       armyman.anchor.set(35 / 80, 1);
       armyman.currentPoi = this.map.getRandomBuilding();
       armyman.position.copyFrom(
-        this.map.randomPositionInBuilding(armyman.currentPoi),
+        this.map.randomPositionInBuilding(armyman.currentPoi)
       );
       armyman.zIndex = armyman.position.y;
       armyman.xSpeed = 0;
@@ -1463,7 +1464,7 @@ export class Army {
       armyman.attackingGraveyard = false;
       armyman.scale.set(
         Math.random() > 0.5 ? this.scaling : -1 * this.scaling,
-        this.scaling,
+        this.scaling
       );
       this.armymen.push(armyman);
       characterContainer.addChild(armyman);
@@ -1504,7 +1505,7 @@ export class Army {
         armyman.position.x,
         armyman.position.y,
         armyman.target.x,
-        armyman.target.y,
+        armyman.target.y
       );
 
       if (distanceToTarget > this.shootDistance && !armyman.rocketlauncher) {
@@ -1554,7 +1555,7 @@ export class Army {
   updateArmy(
     armyman: ArmyMan,
     timeDiff: number,
-    aliveZombies: Creature[],
+    aliveZombies: Creature[]
   ): void {
     if (armyman.flags.dead)
       return this.humans.updateDeadHumanFading(armyman, timeDiff);
@@ -1601,7 +1602,7 @@ export class Army {
             armyman.position.x,
             armyman.position.y,
             armyman.target.x,
-            armyman.target.y,
+            armyman.target.y
           ) < this.moveTargetDistance
         ) {
           armyman.target = null;
@@ -1632,7 +1633,7 @@ export class Army {
             this.zombies.damageZombie(
               armyman.zombieTarget,
               this.attackDamage,
-              armyman,
+              armyman
             );
             armyman.timer.attack = this.attackSpeed;
           }
@@ -1678,7 +1679,7 @@ export class Army {
                     ? this.attackDamage / 2
                     : this.attackDamage,
                 false,
-                armyman.rocketlauncher,
+                armyman.rocketlauncher
               );
               armyman.shotsLeft--;
             }
@@ -1742,7 +1743,7 @@ export class Army {
       this.droneStrike.target.x + (Math.random() - 1) * variance,
       this.droneStrike.target.y + (Math.random() - 1) * variance,
       aliveZombies,
-      this.attackDamage * 3,
+      this.attackDamage * 3
     );
     this.droneStrike.timer = 0.3;
     this.droneStrike.bombsLeft--;
@@ -1752,7 +1753,7 @@ export class Army {
     x: number,
     y: number,
     aliveZombies: Creature[],
-    damage: number,
+    damage: number
   ): void {
     if (!aliveZombies) {
       aliveZombies = this.aliveZombies;
@@ -1803,11 +1804,11 @@ export class Army {
         this.droneStrike.laser.lineStyle(1, 0xff0000);
         this.droneStrike.laser.moveTo(
           this.droneStrike.caller.x,
-          this.droneStrike.caller.y - 10,
+          this.droneStrike.caller.y - 10
         );
         this.droneStrike.laser.lineTo(
           this.droneStrike.target.x,
-          this.droneStrike.target.y - 10,
+          this.droneStrike.target.y - 10
         );
       }
 
@@ -1880,10 +1881,10 @@ export class Tanks {
     turret: PIXI.Texture;
   };
   attackDamage = 0;
-  attackSpeed = 5;
+  attackSpeed = 3;
   scaling = 3;
   moveTargetDistance = 20;
-  shootDistance = 250;
+  shootDistance = 300;
 
   getMaxTanks(): number {
     if (this.gameModel.isBossStage(this.gameModel.level)) {
@@ -1956,7 +1957,7 @@ export class Tanks {
 
       tank.currentPoi = this.map.getRandomBuilding();
       tank.position.copyFrom(
-        this.map.randomPositionInBuilding(tank.currentPoi),
+        this.map.randomPositionInBuilding(tank.currentPoi)
       );
       tank.zIndex = tank.position.y;
       tank.xSpeed = 0;
@@ -2037,7 +2038,7 @@ export class Tanks {
             tank.position.x,
             tank.position.y,
             tank.target.x,
-            tank.target.y,
+            tank.target.y
           ) < this.moveTargetDistance
         ) {
           tank.target = false;
@@ -2068,7 +2069,7 @@ export class Tanks {
               tank.graveYardTarget || tank.zombieTarget,
               this.attackDamage,
               false,
-              true,
+              true
             );
           }
         } else {
@@ -2103,9 +2104,9 @@ export class Tanks {
         Math.atan2(tank.target.x - tank.x, tank.y - tank.target.y) +
         Math.PI / 2;
       if (tank.turretSprite.rotation > targetAngle) {
-        tank.turretSprite.rotation -= timeDiff * 2;
+        tank.turretSprite.rotation -= timeDiff * 3;
       } else {
-        tank.turretSprite.rotation += timeDiff * 2;
+        tank.turretSprite.rotation += timeDiff * 3;
       }
     }
   }
@@ -2120,7 +2121,7 @@ export class Tanks {
         tank.position.x,
         tank.position.y,
         tank.target.x,
-        tank.target.y,
+        tank.target.y
       );
 
       if (distanceToTarget > this.shootDistance) {

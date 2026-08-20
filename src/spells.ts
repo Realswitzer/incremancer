@@ -164,6 +164,19 @@ export class Spells {
         new Spells().humans.pandemic = false;
       },
     ),
+    new Spell(
+      8,
+      "Part Storm",
+      "Doubles parts",
+      "Has a chance to cast Part Storm when attacking, doubling the parts production of your factory machines for 15 seconds",
+      10,
+      15,
+      10,
+      function(){
+        new Spells().storm = true
+      },
+      function () {new Spells().storm = false}
+    )
   ];
 
   lockAllSpells(): void {

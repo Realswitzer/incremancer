@@ -94,6 +94,7 @@ export class GameModel {
   golemDamagePCMod = 1;
   golemHealthPCMod = 1;
   plagueDamageMod = 0;
+  plagueticks = 2;
   graveyardHealthMod = 1;
   burningSpeedMod = 1;
   startingResources = 0;
@@ -210,6 +211,7 @@ export class GameModel {
     this.golemHealthPCMod = 1;
     this.golemDamagePCMod = 1;
     this.plagueDamageMod = 0;
+    this.plagueticks = 2;
     this.burningSpeedMod = 1;
     this.startingResources = 0;
     this.fenceRadius = 50;
@@ -348,7 +350,7 @@ export class GameModel {
           ) {
             this.persistentData.allTimeHighestLevel = this.level;
           }
-          this.startTimer = 3;
+          this.startTimer = 2;
         } else {
           this.endLevelTimer -= timeDiff;
         }

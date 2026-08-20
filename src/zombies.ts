@@ -505,7 +505,7 @@ export class Zombies {
             true
           );
           zombie.timer.attack =
-            this.attackSpeed * this.model.runeEffects.attackSpeed;
+            this.attackSpeed * (1 / this.model.runeEffects.attackSpeed);
         }
 
         if (
@@ -540,7 +540,7 @@ export class Zombies {
               this.inflictPlague(zombie.target);
             }
             zombie.timer.attack =
-              this.attackSpeed * this.model.runeEffects.attackSpeed;
+              this.attackSpeed * (1 / this.model.runeEffects.attackSpeed);
             if (zombie.flags.burning) {
               zombie.timer.attack *= 1 / this.model.burningSpeedMod;
             }
@@ -611,11 +611,11 @@ export class Zombies {
       this.exclamations.newPoison(human);
       human.plagueDamage =
         this.model.zombieDamage / 2 + this.model.plagueDamageMod;
-      human.plagueTicks = 5;
+      human.plagueTicks = this.model.plagueticks;
     } else {
       human.plagueDamage +=
         this.model.zombieDamage / 2 + this.model.plagueDamageMod;
-      human.plagueTicks += 5;
+      human.plagueTicks = this.model.plagueticks;
     }
     human.flags.infected = true;
   }

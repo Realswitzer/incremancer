@@ -6,6 +6,7 @@ export class PartFactory {
     if (PartFactory.instance) return PartFactory.instance;
     PartFactory.instance = this;
   }
+  storm = false;
   gameModel = GameModel.getInstance();
   costs = {
     blood: "blood",
@@ -23,7 +24,7 @@ export class PartFactory {
     }
     return {
       machines: machines,
-      partsPerSec: partsPerSec * this.gameModel.partsPCMod,
+      partsPerSec: (this.storm? 2:1) * partsPerSec * this.gameModel.partsPCMod,
     };
   }
 
@@ -33,7 +34,7 @@ export class PartFactory {
       if (this.generatorsApplied[i].timeLeft <= 0) {
         this.generatorsApplied[i].timeLeft = this.generatorsApplied[i].time;
         this.gameModel.persistentData.parts +=
-          this.generatorsApplied[i].total * this.gameModel.partsPCMod;
+          this.generatorsApplied[i].total * this.gameModel.partsPCMod * (this.storm?2:1);
       }
     }
   }
