@@ -24,7 +24,7 @@ class Spell {
     duration: number,
     energyCost: number,
     start: () => void,
-    end: () => void,
+    end: () => void
   ) {
     this.id = id;
     this.name = name;
@@ -72,7 +72,7 @@ export class Spells {
       },
       function () {
         GameModel.getInstance().gameSpeed = 1;
-      },
+      }
     ),
     new Spell(
       2,
@@ -87,7 +87,7 @@ export class Spells {
       },
       function () {
         GameModel.getInstance().energySpellMultiplier = 1;
-      },
+      }
     ),
     new Spell(
       3,
@@ -102,7 +102,7 @@ export class Spells {
       },
       function () {
         new Spells().zombies.detonate = false;
-      },
+      }
     ),
     new Spell(
       4,
@@ -117,7 +117,7 @@ export class Spells {
       },
       function () {
         new Spells().humans.frozen = false;
-      },
+      }
     ),
     new Spell(
       5,
@@ -132,7 +132,7 @@ export class Spells {
       },
       function () {
         new Spells().zombies.super = false;
-      },
+      }
     ),
     new Spell(
       6,
@@ -144,10 +144,11 @@ export class Spells {
       10,
       function () {
         new Spells().skeleton.incinerate();
+        this.timer = 1;
       },
       function () {
         //
-      },
+      }
     ),
     new Spell(
       7,
@@ -162,7 +163,7 @@ export class Spells {
       },
       function () {
         new Spells().humans.pandemic = false;
-      },
+      }
     ),
     new Spell(
       8,
@@ -172,11 +173,13 @@ export class Spells {
       10,
       15,
       10,
-      function(){
-        new Spells().storm = true
+      function () {
+        new Spells().storm = true;
       },
-      function () {new Spells().storm = false}
-    )
+      function () {
+        new Spells().storm = false;
+      }
+    ),
   ];
 
   lockAllSpells(): void {
