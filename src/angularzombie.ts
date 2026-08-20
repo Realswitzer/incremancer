@@ -67,7 +67,10 @@ angular
       zm.factoryTab = "parts";
       zm.factoryStats = {};
       zm.moveTooltip = moveToolTip;
-
+      zm.confirmMessage = "";
+      zm.confirmCancel = function () {
+        zm.confirmCallback = false;
+      };
       zm.closeSidePanels = function () {
         zm.currentShopFilter = "blood";
         zm.currentConstructionFilter = "available";
@@ -179,13 +182,12 @@ angular
       };
 
       zm.resetGame = function () {
-        if (
-          confirm(
-            "Are you sure you want to reset everything? If you have a cloud save it will also be deleted. Make sure you export your save game first."
-          )
-        ) {
+        zm.confirmMessage =
+          "Are you sure you want to reset everything? If you have a cloud save it will also be deleted. Make sure you export your save game first.";
+        zm.confirmCallback = function () {
           zm.model.resetData();
-        }
+          zm.confirmCallback = false;
+        };
       };
 
       zm.addBoneCollector = function () {
@@ -456,14 +458,13 @@ angular
       };
 
       zm.cancelConstruction = function () {
-        if (
-          confirm(
-            "Are you sure you want to cancel construction? Used materials will not be refunded"
-          )
-        ) {
+        zm.confirmMessage =
+          "Are you sure you want to cancel construction? Used materials will not be refunded";
+        zm.confirmCallback = function () {
           upgrades.cancelConstruction();
           zm.upgrades = upgrades.getAvailableConstructions();
-        }
+          zm.confirmCallback = false;
+        };
       };
 
       zm.upgradeSubtitle = function (upgrade) {
@@ -743,9 +744,11 @@ angular
       };
 
       zm.doPrestige = function () {
-        if (confirm("Are you sure?")) {
+        zm.confirmMessage = "Are you sure you want to prestige now?";
+        zm.confirmCallback = function () {
           zm.model.prestige();
-        }
+          zm.confirmCallback = false;
+        };
       };
 
       zm.constructionLeadsTo = function (upgrade) {
@@ -1196,15 +1199,14 @@ angular
           this.updateEquippedItems();
         },
         trashAll() {
-          if (
-            confirm(
-              "Are you sure you want to destroy all non-equipped items? You will earn " +
-                formatWhole(skeleton.xpForItems()) +
-                " xp"
-            )
-          ) {
+          zm.confirmMessage =
+            "Are you sure you want to destroy all non-equipped items? You will earn " +
+            n(i.xpForItems()) +
+            " xp";
+          zm.confirmCallback = function () {
+            zm.confirmCallback = false;
             skeleton.destroyAllItems();
-          }
+          };
         },
       };
       // ---- Skeleton Functions ---- //

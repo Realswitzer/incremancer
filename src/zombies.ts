@@ -76,6 +76,7 @@ export class Zombies {
   zombieCursor = null;
   zombieCursorText = null;
   zombieCursorScale = 3;
+  mouseOutOfBounds = false;
   burnTickTimer = 5;
   bloodpact = 1;
   bloodborn = 0;
@@ -402,8 +403,8 @@ export class Zombies {
       this.model.energy >= this.model.zombieCost &&
       this.model.currentState == this.model.states.playingLevel
     ) {
-      this.zombieCursor.visible = true;
-      if (KeysPressed.shift) {
+      this.zombieCursor.visible = !this.mouseOutOfBounds;
+      if (KeysPressed.shift && !this.mouseOutOfBounds) {
         this.zombieCursorText.visible = true;
         const numZombies = Math.min(
           Math.floor(this.model.energy / this.model.zombieCost),

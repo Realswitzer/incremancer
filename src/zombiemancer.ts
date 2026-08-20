@@ -62,7 +62,7 @@ let lastPinchZoom = 0;
 function pinchZoom(event) {
   const curDiff = Math.abs(
     event.data.originalEvent.touches[0].clientX -
-      event.data.originalEvent.touches[1].clientX,
+      event.data.originalEvent.touches[1].clientX
   );
   if (lastDiff) {
     if (lastPinchZoom + 50 < Date.now() && Math.abs(curDiff - lastDiff) > 10) {
@@ -82,6 +82,13 @@ function pinchZoom(event) {
 function onDragMove(event) {
   if (zombies.zombieCursor) {
     zombies.zombieCursor.position = event.data.getLocalPosition(this.parent);
+    // TODO: rename variable when i figure out what getLocalPosition even does
+    const grassPos = event.data.getLocalPosition(grass);
+    zombies.mouseOutOfBounds =
+      grassPos.x < 0 ||
+      grassPos.y < 0 ||
+      grassPos.x > grass.width ||
+      grassPos.y > grass.height;
   }
   if (
     event.data.originalEvent.touches &&
@@ -120,12 +127,12 @@ function onClickTap(event) {
     if (KeysPressed.shift) {
       zombies.spawnAllZombies(
         event.data.getLocalPosition(this).x,
-        event.data.getLocalPosition(this).y,
+        event.data.getLocalPosition(this).y
       );
     } else {
       zombies.spawnZombie(
         event.data.getLocalPosition(this).x,
-        event.data.getLocalPosition(this).y,
+        event.data.getLocalPosition(this).y
       );
     }
   }
@@ -352,7 +359,7 @@ function setGameFieldSizeForLevel(): void {
     0,
     0,
     gameFieldSize.x,
-    gameFieldSize.y,
+    gameFieldSize.y
   );
 }
 
@@ -370,7 +377,7 @@ function startGame() {
   document.body.appendChild(app.view);
   if (!PIXI.utils.isWebGLSupported()) {
     console.error(
-      "Warning: WebGL support not detected. Game performance may be slower.",
+      "Warning: WebGL support not detected. Game performance may be slower."
     );
   }
 
@@ -449,7 +456,7 @@ window.onload = function () {
         gameModel.hidden = false;
       }
     },
-    false,
+    false
   );
 };
 
