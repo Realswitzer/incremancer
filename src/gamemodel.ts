@@ -397,6 +397,8 @@ export class GameModel {
 
   calculateEndLevelBones(): void {
     this.endLevelBones = 0;
+    // TODO: possibly remove bone collector check IF over a certain total obtained points (milestone system?)
+    // If there was a milestone system, also reducing time to build would be nicer.
     if (this.persistentData.boneCollectors > 0 && this.bones.uncollected) {
       this.endLevelBones = this.bones.uncollected
         .map((bone) => bone.value)

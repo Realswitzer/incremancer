@@ -200,6 +200,8 @@ export class Spells {
     return this.spells.filter((spell) => spell.unlocked);
   }
 
+  // TODO: Make casting spells manually extend timer,
+  // possibly also make spells on attacks have a (slim) chance to extend timer
   castSpell(spell: Spell): void {
     const model = GameModel.getInstance();
     if (spell.onCooldown || spell.active || !spell.unlocked) return;
