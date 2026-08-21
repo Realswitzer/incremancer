@@ -793,25 +793,37 @@ export class Skeleton {
 
   getLootName(loot: Loot): string {
     let prefix = "";
-    switch (loot.r) {
-      case this.rarity.common:
-        prefix = this.prefixes.commonQuality[loot.p];
-        break;
-      case this.rarity.rare:
-        prefix = this.prefixes.rareQuality[loot.p];
-        break;
-      case this.rarity.epic:
-        prefix = this.prefixes.epicQuality[loot.p];
-        break;
-      case this.rarity.legendary:
-        prefix = this.prefixes.legendaryQuality[loot.p];
-        break;
-      case this.rarity.ancient:
-        prefix = this.prefixes.ancientQuality[loot.p];
-        break;
-      case this.rarity.divine:
-        prefix = this.prefixes.divineQuality[loot.p];
-        break;
+    try {
+      switch (loot.r) {
+        case this.rarity.common:
+          prefix = this.prefixes.commonQuality[loot.p];
+          break;
+        case this.rarity.rare:
+          prefix = this.prefixes.rareQuality[loot.p];
+          break;
+        case this.rarity.epic:
+          prefix = this.prefixes.epicQuality[loot.p];
+          break;
+        case this.rarity.legendary:
+          prefix = this.prefixes.legendaryQuality[loot.p];
+          break;
+        case this.rarity.ancient:
+          prefix = this.prefixes.ancientQuality[loot.p];
+          break;
+        case this.rarity.divine:
+          prefix = this.prefixes.divineQuality[loot.p];
+          break;
+      }
+    } catch (e: unknown) {
+      // NOTE: This exists to *hopefully* reduce risk of errors
+      // TODO: test invalid items later
+      console.error(e);
+      prefix = this.getLootClass(loot);
+      if (prefix) {
+        prefix = prefix.replace(/\b\w/g, (match) => match.toUpperCase());
+      } else {
+        prefix = "Unknown";
+      }
     }
     // TODO: future bug fix, add default in case it tries to get an item out of
     // the indexs range
