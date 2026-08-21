@@ -171,8 +171,8 @@ export class Skeleton {
     return 1000 * Math.pow(this.persistent.level, 2);
   }
 
-  addXp(xp: number): void {
-    if (this.isAlive()) {
+  addXp(xp: number, ignoreAlive: boolean = false): void {
+    if (this.isAlive() || ignoreAlive) {
       this.persistent.xp += xp * this.persistent.xpRate;
       if (this.persistent.xp > this.xpForNextLevel()) {
         this.persistent.xp -= this.xpForNextLevel();
@@ -1009,7 +1009,7 @@ export class Skeleton {
   }
 
   destroyItem(item: Loot): void {
-    this.addXp(item.l * item.r * 10);
+    this.addXp(item.l * item.r * 10, true);
     for (let i = 0; i < this.persistent.items.length; i++) {
       if (this.persistent.items[i].id === item.id) {
         this.persistent.items.splice(i, 1);
@@ -1017,13 +1017,16 @@ export class Skeleton {
     }
   }
   destroyAllItems(): void {
-    this.addXp(this.xpForItems() - this.xpForAncient() - this.xpForDivine());
+    this.addXp(
+      this.xpForItems() - this.xpForAncient() - this.xpForDivine(),
+      true
+    );
     this.persistent.items = this.persistent.items.filter(
       (i) => i.q || i.r == this.rarity.legendary
     );
   }
   destroyAllItemsLegendary() {
-    this.addXp(this.xpForLegendary());
+    this.addXp(this.xpForLegendary(), true);
     this.persistent.items = this.persistent.items.filter(
       (i) =>
         i.q ||
