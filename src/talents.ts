@@ -35,7 +35,7 @@ export class Talent {
     group: string,
     maxPoints: number,
     apply: () => void,
-    description: () => string,
+    description: () => string
   ) {
     this.id = id;
     this.name = name;
@@ -110,7 +110,7 @@ export const TalentData = [
       } else {
         return "Reduces golem upgrade and summoning cost by 5%";
       }
-    },
+    }
   ),
   new Talent(
     2,
@@ -131,7 +131,7 @@ export const TalentData = [
       } else {
         return "Skeleton killing blows reward 10% of your current parts per second";
       }
-    },
+    }
   ),
   new Talent(
     3,
@@ -154,7 +154,7 @@ export const TalentData = [
       } else {
         return "Grants 8% parts refund on golem death";
       }
-    },
+    }
   ),
   new Talent(
     4,
@@ -175,7 +175,7 @@ export const TalentData = [
       } else {
         return "Reduces spell cooldown time by 5%";
       }
-    },
+    }
   ),
   new Talent(
     5,
@@ -196,28 +196,52 @@ export const TalentData = [
       } else {
         return "Increases spell duration by 1 second";
       }
-    },
+    }
   ),
+  // NOTE: CM replaced Conservation (reduced energy for spell) with Opportunist (increase spell chance from gear)
+  // I've opted to keep Conservation here.
+  // new Talent(
+  //   6,
+  //   "Conservation",
+  //   spellMastery,
+  //   10,
+  //   function (this: Talent) {
+  //     spells.costReduction = 0;
+  //     const rank = skeleton.talents[this.id];
+  //     if (rank && rank > 0) {
+  //       spells.costReduction = rank * 5;
+  //     }
+  //   },
+  //   function (this: Talent) {
+  //     const rank = skeleton.talents[this.id];
+  //     if (rank && rank > 0) {
+  //       return `Spell cost reduced by ${rank * 5} energy`;
+  //     } else {
+  //       return "Reduces spell cost by 5 energy";
+  //     }
+  //   },
+  // ),
   new Talent(
     6,
-    "Conservation",
+    "Opportunist",
     spellMastery,
     10,
-    function (this: Talent) {
+    function () {
       spells.costReduction = 0;
+      skeleton.increaseChance = 0;
       const rank = skeleton.talents[this.id];
       if (rank && rank > 0) {
-        spells.costReduction = rank * 5;
+        skeleton.increaseChance = rank * 0.02;
       }
     },
-    function (this: Talent) {
+    function () {
       const rank = skeleton.talents[this.id];
       if (rank && rank > 0) {
-        return `Spell cost reduced by ${rank * 5} energy`;
+        return `Gear spell activation chance increased by ${e * 2}%`;
       } else {
-        return "Reduces spell cost by 5 energy";
+        return "Increases spell activation chance by 2%";
       }
-    },
+    }
   ),
   new Talent(
     7,
@@ -238,7 +262,7 @@ export const TalentData = [
       } else {
         return "Increases the chance for rare loot by 10%";
       }
-    },
+    }
   ),
   new Talent(
     8,
@@ -259,7 +283,7 @@ export const TalentData = [
       } else {
         return "Releases a dark orb of energy every 11 seconds";
       }
-    },
+    }
   ),
   new Talent(
     9,
@@ -280,7 +304,7 @@ export const TalentData = [
       } else {
         return "Gain a shield of 1 bone to protect the skeleton every 10 seconds";
       }
-    },
+    }
   ),
   new Talent(
     10,
@@ -301,7 +325,7 @@ export const TalentData = [
       } else {
         return "Mutates a random zombie into a gigazombie every 13 seconds";
       }
-    },
+    }
   ),
   new Talent(
     11,
@@ -322,7 +346,7 @@ export const TalentData = [
       } else {
         return "Converts an additional 5% of zombie damage to blood";
       }
-    },
+    }
   ),
   new Talent(
     12,
@@ -343,7 +367,7 @@ export const TalentData = [
       } else {
         return "Grants 1 second of additional 50% damage reduction to newly spawned zombies";
       }
-    },
+    }
   ),
 ];
 export const TalentUpgrades: TalentUpgrade[] = [];
@@ -388,7 +412,7 @@ TalentData.forEach((talent) => {
     TalentUpgrades.push(new TalentUpgrade(group, type));
   }
   TalentUpgrades.filter(
-    (talentUpg) => talentUpg.name == talent.group,
+    (talentUpg) => talentUpg.name == talent.group
   )[0].talents.push(talent);
   skeleton.talents[talent.id] ||= 0;
 });

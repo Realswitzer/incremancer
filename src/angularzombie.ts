@@ -707,6 +707,30 @@ angular
         }
       };
 
+      zm.toggleAutoStartWait = function () {
+        if (zm.model.persistentData.autoStartWait) {
+          zm.model.persistentData.autoStartWait = false;
+        } else {
+          zm.model.persistentData.autoStartWait = true;
+        }
+      };
+
+      zm.toggleAutoSellGear = function () {
+        if (zm.model.persistentData.autoSellGear) {
+          zm.model.persistentData.autoSellGear = false;
+        } else {
+          zm.model.persistentData.autoSellGear = true;
+        }
+      };
+
+      zm.toggleAutoSellGearLegendary = function () {
+        if (zm.model.persistentData.autoSellGearLegendary) {
+          zm.model.persistentData.autoSellGearLegendary = false;
+        } else {
+          zm.model.persistentData.autoSellGearLegendary = true;
+        }
+      };
+
       zm.toggleResolution = function (resolution) {
         zm.model.persistentData.resolution = resolution;
         zm.model.setResolution(zm.model.persistentData.resolution);
@@ -756,6 +780,7 @@ angular
       };
 
       zm.howToPlay = [
+        "This is my (Chalice) mod for incremancer I hope you enjoy the qol changes!",
         "Energy refills over time. You need 10 energy to spawn a zombie by clicking on the ground.",
         "Hold shift or control to spawn multiple zombies with a single click.",
         "Whenever one of your zombies attacks a human you will collect some blood.",
@@ -1125,6 +1150,10 @@ angular
                 return "Epic level " + item.l + " " + this.itemType(item);
               case skeleton.rarity.legendary:
                 return "Legendary level " + item.l + " " + this.itemType(item);
+              case skeleton.rarity.ancient:
+                return "Ancient level " + item.l + " " + this.itemType(item);
+              case skeleton.rarity.divine:
+                return "Divine level " + item.l + " " + this.itemType(item);
             }
           }
           if (item.s == -1) {

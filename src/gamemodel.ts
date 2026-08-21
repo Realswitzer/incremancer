@@ -301,6 +301,16 @@ export class GameModel {
   }
 
   update(timeDiff: number, updateTime: number): void {
+    if (this.currentState != this.states.levelCompleted) {
+      this.startTimer = 2;
+    }
+    if (
+      this.persistentData.autoStartWait == false &&
+      this.currentState != this.states.levelCompleted
+    ) {
+      this.startTimer = 0;
+    }
+
     // spell update before gamespeed modifier
     this.spells.updateSpells(timeDiff);
 
@@ -350,7 +360,6 @@ export class GameModel {
           ) {
             this.persistentData.allTimeHighestLevel = this.level;
           }
-          this.startTimer = 2;
         } else {
           this.endLevelTimer -= timeDiff;
         }
@@ -361,13 +370,25 @@ export class GameModel {
     }
     if (this.currentState == this.states.levelCompleted) {
       this.startTimer -= timeDiff;
-      if (this.startTimer < 0 && this.persistentData.autoStart) {
+    }
+    if (this.startTimer < 0 && this.persistentData.autoStart) {
+      this.startLevel(this.level);
+    }
+    if (this.currentState == this.states.levelCompleted) {
+      if (this.startTimer < 0) {
         this.nextLevel();
       }
     }
     if (this.currentState == this.states.failed) {
       this.startTimer -= timeDiff;
       if (this.startTimer < 0 && this.persistentData.autoStart) {
+        this.startLevel(this.level);
+      }
+    }
+    // TODO: seems unintentional? if not fixed in DM then figure out whats happening
+    if (this.currentState == this.states.failed) {
+      this.startTimer -= timeDiff;
+      if (this.startTimer < 0) {
         this.startLevel(this.level - 1);
       }
     }
@@ -447,6 +468,9 @@ export class GameModel {
     this.currentState = this.states.playingLevel;
     this.setupLevel();
     this.updatePlayingLevel();
+    if (this.persistentData.autoRelease) {
+      this.releaseCagedZombies();
+    }
   }
 
   nextLevel(): void {
@@ -562,6 +586,9 @@ export class GameModel {
     saveCreated: Date.now(),
     dateOfSave: Date.now(),
     autoStart: false,
+    autoStartWait: true,
+    autoSellGear: false,
+    autoSellGearLegendary: false,
     levelUnlocked: 1,
     allTimeHighestLevel: 0,
     blood: 0,
@@ -618,6 +645,7 @@ export class GameModel {
   prestige(): void {
     if (this.persistentData.prestigePointsEarned > 0) {
       this.persistentData.levelUnlocked = 1;
+      this.persistentData.autoUpgrades = [];
       this.persistentData.blood = 0;
       this.persistentData.brains = 0;
       this.persistentData.bones = 0;
@@ -635,7 +663,18 @@ export class GameModel {
       this.persistentData.prestigePointsToSpend +=
         this.persistentData.prestigePointsEarned;
       this.persistentData.prestigePointsEarned = 0;
-      this.persistentData.runes = null;
+      this.persistentData.runes = {
+        life: {
+          blood: 0,
+          brains: 0,
+          bones: 0,
+        },
+        death: {
+          blood: 0,
+          brains: 0,
+          bones: 0,
+        },
+      };
       this.persistentData.vipEscaped = [];
       this.persistentData.creatureLevels = [];
       this.persistentData.creatureAutobuild = [];
@@ -662,9 +701,11 @@ export class GameModel {
       this.skeleton.persistent.talentReset = true;
       this.setupLevel();
       this.saveData();
-      for (let i = 0; i < this.upgrades.upgrades.length; i++) {
-        this.upgrades.upgrades[i].auto = false;
-      }
+      // NOTE: in CM, this block is removed to make autoupgrades persistent
+      // I vaguely remember something finnicky happening if this is removed though I'll have to check later.
+      // for (let i = 0; i < this.upgrades.upgrades.length; i++) {
+      //   this.upgrades.upgrades[i].auto = false;
+      // }
     }
   }
 

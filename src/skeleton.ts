@@ -156,6 +156,7 @@ export class Skeleton {
   talentPoints = 0;
   killingBlowParts = 0;
   lootChanceMod = 1;
+  increaseChance = 0;
   darkorb = 0;
   darkorbTimer = 0;
   boneshield = 0;
@@ -382,6 +383,18 @@ export class Skeleton {
       }
     }
     this.lastKillingBlow -= timeDiff;
+    if (
+      this.model.persistentData.autoSellGear == true &&
+      this.aliveSkeletons.length > 0
+    ) {
+      this.destroyAllItems();
+    }
+    if (
+      this.model.persistentData.autoSellGearLegendary == true &&
+      this.aliveSkeletons.length > 0
+    ) {
+      this.destroyAllItemsLegendary();
+    }
   }
 
   updateCreature(creature: SkeletonCharacter, timeDiff: number): void {
@@ -508,7 +521,10 @@ export class Skeleton {
             }
             if (this.randomSpells.length > 0) {
               for (let i = 0; i < this.randomSpells.length; i++) {
-                if (this.spellTimer < 0 && Math.random() < 0.07) {
+                if (
+                  this.spellTimer < 0 &&
+                  Math.random() < 0.07 + this.increaseChance
+                ) {
                   this.spells.castSpellNoMana(this.randomSpells[i]);
                   this.spellTimer = 3;
                 }
@@ -678,6 +694,8 @@ export class Skeleton {
     rare: 2,
     epic: 3,
     legendary: 4,
+    ancient: 5,
+    divine: 6,
   };
 
   prefixes = {
@@ -722,6 +740,8 @@ export class Skeleton {
       "Terrible",
       "Demoniacal",
     ],
+    ancientQuality: ["Grim", "Miserable", "Luxurious"],
+    divineQuality: ["Divine"],
   };
 
   stats = {
@@ -730,6 +750,7 @@ export class Skeleton {
     zombieHealth: { id: 3, scaling: 24 },
     zombieDamage: { id: 4, scaling: 3 },
     zombieSpeed: { id: 5, scaling: 1 },
+    harpySpeed: { id: 6, scaling: 1 },
   };
 
   applyItemUpgrades(): void {
@@ -759,6 +780,8 @@ export class Skeleton {
             case this.stats.zombieSpeed.id:
               this.model.zombieSpeed++;
               break;
+            case this.stats.harpySpeed.id:
+              this.model.harpySpeed += 10;
           }
         });
         if (item.se)
@@ -783,7 +806,18 @@ export class Skeleton {
       case this.rarity.legendary:
         prefix = this.prefixes.legendaryQuality[loot.p];
         break;
+      case this.rarity.ancient:
+        prefix = this.prefixes.ancientQuality[loot.p];
+        break;
+      case this.rarity.divine:
+        prefix = this.prefixes.divineQuality[loot.p];
+        break;
     }
+    // TODO: future bug fix, add default in case it tries to get an item out of
+    // the indexs range
+    // while im thinking about it, this would make saves easier to transfer
+    // (save game identification, [base, CM, DM]) and allow for the game to not
+    // completely explode if something tiny happens
     let suffix = "";
     switch (loot.s) {
       case this.lootPositions.helmet.id:
@@ -821,6 +855,10 @@ export class Skeleton {
         return "epic";
       case this.rarity.legendary:
         return "legendary";
+      case this.rarity.ancient:
+        return "ancient";
+      case this.rarity.divine:
+        return "divine";
     }
   }
 
@@ -851,6 +889,9 @@ export class Skeleton {
             break;
           case this.stats.zombieSpeed.id:
             stats.push("+1 zombie speed");
+            break;
+          case this.stats.harpySpeed.id:
+            stats.push("+10 harpy speed");
             break;
         }
       }
@@ -893,13 +934,21 @@ export class Skeleton {
         rarity = this.rarity.epic;
         if (Math.random() < this.lootChanceMod * 0.1) {
           rarity = this.rarity.legendary;
-          const spell = getRandomElementFromArray(
-            this.spells.spells,
-            Math.random()
-          );
-          specialEffects.push(spell.id);
+          if (Math.random() < this.lootChanceMod * 0.1) {
+            rarity = this.rarity.ancient;
+            if (Math.random() < this.lootChanceMod * 0.1) {
+              rarity = this.rarity.divine;
+            }
+          }
         }
       }
+    }
+    if (rarity >= this.rarity.legendary) {
+      const spell = getRandomElementFromArray(
+        this.spells.spells,
+        Math.random()
+      );
+      specialEffects.push(spell.id);
     }
     let prefixIndex = 0;
     switch (rarity) {
@@ -923,6 +972,16 @@ export class Skeleton {
           Math.random() * this.prefixes.legendaryQuality.length
         );
         break;
+      case this.rarity.ancient:
+        prefixIndex = Math.floor(
+          Math.random() * this.prefixes.ancientQuality.length
+        );
+        break;
+      case this.rarity.divine:
+        prefixIndex = Math.floor(
+          Math.random() * this.prefixes.divineQuality.length
+        );
+        break;
     }
     const effects = [
       Math.random() > 0.5
@@ -930,9 +989,10 @@ export class Skeleton {
         : this.stats.zombieDamage.id,
     ];
     for (let i = 0; i < rarity - 1; i++) {
-      let effect = Math.ceil(Math.random() * 5);
+      // NOTE: needs to be updated IF new item effect added
+      let effect = Math.ceil(Math.random() * 6);
       while (effects.indexOf(effect) > -1) {
-        effect = Math.ceil(Math.random() * 5);
+        effect = Math.ceil(Math.random() * 6);
       }
       effects.push(effect);
     }
@@ -957,9 +1017,21 @@ export class Skeleton {
     }
   }
   destroyAllItems(): void {
-    this.addXp(this.xpForItems());
+    this.addXp(this.xpForItems() - this.xpForAncient() - this.xpForDivine());
     this.persistent.items = this.persistent.items.filter(
       (i) => i.q || i.r == this.rarity.legendary
+    );
+  }
+  destroyAllItemsLegendary() {
+    this.addXp(this.xpForLegendary());
+    this.persistent.items = this.persistent.items.filter(
+      (i) =>
+        i.q ||
+        i.r == this.rarity.common ||
+        i.r == this.rarity.rare ||
+        i.r == this.rarity.epic ||
+        i.r == this.rarity.ancient ||
+        i.r == this.rarity.divine
     );
   }
   xpForItems(): number {
@@ -970,6 +1042,38 @@ export class Skeleton {
         xp += item.l * item.r * 10;
       });
     return xp;
+  }
+  xpForLegendary() {
+    let xp = 0;
+    this.persistent.items
+      .filter((i) => !i.q && i.r == this.rarity.legendary)
+      .forEach(function (item) {
+        xp += item.l * item.r * 10;
+      });
+    return xp;
+  }
+  xpForAncient() {
+    let xp = 0;
+    this.persistent.items
+      .filter((i) => !i.q && i.r == this.rarity.ancient)
+      .forEach(function (item) {
+        xp += item.l * item.r * 10;
+      });
+    return xp;
+  }
+  xpForDivine() {
+    let xp = 0;
+    this.persistent.items
+      .filter((i) => !i.q && i.r == this.rarity.divine)
+      .forEach(function (item) {
+        xp += item.l * item.r * 10;
+      });
+    return xp;
+  }
+  xpTotal() {
+    // NOTE: in the original version, xpForAncient and xpForDivine are not called (-this.xpForAncient)
+    // I assume this is a bug, and has been fixed here.
+    return this.xpForItems() - this.xpForAncient() - this.xpForDivine();
   }
 }
 
