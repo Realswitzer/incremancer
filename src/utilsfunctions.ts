@@ -115,3 +115,28 @@ export function moveToolTip(event: MouseEvent, element: HTMLElement): void {
   (element.getElementsByClassName("tooltip")[0] as HTMLElement).style.left =
     x + 20 + "px";
 }
+
+const saveType = {
+  base: "base",
+  chalice: "chalice",
+  danemancer: "danemancer",
+} as const;
+
+/** Function to get the game version identified by key characteristics.
+ * May not be fully accurate
+ * `saveData` is an object representing the decoded data, though passing persistentData works fine
+ */
+export function getSaveType(saveData: object) {
+  const keys = Object.keys(saveData);
+  let type = saveType.base;
+  // settings added in CM
+  if (
+    "autoStartWait" in keys ||
+    "autoSellGear" in keys ||
+    "autoSellGearLegendary" in keys
+  ) {
+    type = saveType.chalice;
+  }
+  // TODO: parse skeleton items for ancient/divine quality
+  // and add DM after port, incl. parse for chaos
+}
