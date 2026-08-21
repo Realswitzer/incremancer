@@ -11,13 +11,35 @@
       </ul>
     </div>
     <div class="upgrade">
-      <h4>Auto Start Next Level</h4>
+      <h4>Auto Restart Level</h4>
       <p>
-        Automatically start the next level after 3 seconds. If you want to play
-        without actually playing.
+        Automatically restart the current level after 3 seconds. For when you want to farm. On: will stay at the same level. Off: proceeds to further levels.
       </p>
       <button ng-click="zm.toggleAutoStart();">
         {{zm.model.persistentData.autoStart ? "On" : "Off"}}
+      </button>
+    </div>
+    <div class="upgrade">
+      <h4>3 Second Wait On Level Completion</h4>
+      <p>
+        Keep the 3 second wait for autostarting a level. On: Wait, Off: Removed
+      </p>
+      <button ng-click="zm.toggleAutoStartWait();">
+        {{zm.model.persistentData.autoStartWait ? "On" : "Off"}}
+      </button>
+    </div>
+    <div class="upgrade">
+      <h4>Autosell Gear Without Spells</h4>
+      <p>Autosell those kinds of gear.</p>
+      <button ng-click="zm.toggleAutoSellGear();">
+        {{zm.model.persistentData.autoSellGear ? "On" : "Off"}}
+      </button>
+    </div>
+    <div class="upgrade">
+      <h4>Autosell Legendary Gear</h4>
+      <p>Autosell that gear. Be careful with this..</p>
+      <button ng-click="zm.toggleAutoSellGearLegendary();">
+        {{zm.model.persistentData.autoSellGearLegendary ? "On" : "Off"}}
       </button>
     </div>
     <div class="upgrade">

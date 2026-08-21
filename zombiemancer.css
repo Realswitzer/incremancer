@@ -831,6 +831,21 @@ div.skeleton > div.lvl.dead {
   -moz-animation: levelup-animation 4s linear infinite;
   animation: levelup-animation 4s linear infinite;
 }
+
+.inventory .item.ancient {
+  background: linear-gradient(#e66465, #9198e5);
+  background-size: 190% 200%;
+}
+.inventory .item.divine {
+  background: linear-gradient(
+    90deg,
+    rgba(2, 0, 36, 1) 0%,
+    rgba(187, 210, 210, 1) 35%,
+    rgba(0, 212, 255, 1) 100%
+  );
+  background-size: 190% 200%;
+}
+
 .inventory .item.helmet .icon {
   background: url("images/helmet.png");
 }
