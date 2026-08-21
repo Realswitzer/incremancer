@@ -31,6 +31,10 @@ bun run build # basic build, output in dist/bundle.js
 bun run build:sm # or build with sourcemap
 
 bun run dev # starts vite server
+
+# for node (uses npx)
+npm run build:node
+npm run dev:node
 ```
 
 Since the output build is static, just copying everything and putting it behind Caddy works well enough, or even a `python http.server`. If it can serve static files, it'll work.
