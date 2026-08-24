@@ -2170,7 +2170,7 @@ export class Upgrades {
       this.types.bloodGainPC,
       this.costs.prestigePoints,
       10,
-      1.25,
+      1.1,
       0.2,
       0,
       "Additional 20% blood income rate for each rank.",
