@@ -87,6 +87,8 @@ export class GameModel {
   zombieHealth = 100;
   zombieHealthPCMod = 1;
   HshellHealthPCMod = 1;
+  CryoVatPCMod = 1;
+  PlagueVatPCMod = 1;
   zombieDamage = 10;
   zombieDamagePCMod = 1;
   HstrengthDmgPCMod = 1;
@@ -210,6 +212,8 @@ export class GameModel {
     this.brainsStorePCMod = 1;
     this.zombieHealthPCMod = 1;
     this.HshellHealthPCMod = 1;
+    this.CryoVatPCMod = 1;
+    this.PlagueVatPCMod = 1;
     this.zombieDamagePCMod = 1;
     this.HstrengthDmgPCMod = 1;
     this.golemHealthPCMod = 1;

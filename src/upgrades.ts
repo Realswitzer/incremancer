@@ -67,6 +67,8 @@ export class Upgrades {
     zombieHealthPC: "zombieHealthPC",
     HstrengthDmgPC: "HstrengthDmgPC",
     HshellHealthPC: "HshellHealthPC",
+    CyroVatPC: "CyroVatPC",
+    PlagueVatPC: "PlagueVatPC",
     golemHealthPC: "golemHealthPC",
     golemDamagePC: "golemDamagePC",
     startingPC: "startingPC",
@@ -288,6 +290,11 @@ export class Upgrades {
       case this.types.HshellHealthPC:
         this.gameModel.HshellHealthPCMod *= Math.pow(1 + upgrade.effect, rank);
         return;
+      case this.types.CyroVatPC:
+        this.gameModel.CryoVatPCMod *= Math.pow(1 + upgrade.effect, rank);
+        return;
+      case this.types.PlagueVatPC:
+        this.gameModel.PlagueVatPCMod *= Math.pow(1 + upgrade.effect, rank);
       case this.types.golemDamagePC:
         this.gameModel.golemDamagePCMod *= Math.pow(1 + upgrade.effect, rank);
         return;
@@ -529,6 +536,18 @@ export class Upgrades {
         return (
           "Zombie Health: " +
           Math.round(100 * this.gameModel.HshellHealthPCMod) +
+          "%"
+        );
+      case this.types.CyroVatDmgPC:
+        return (
+          "Zombie Damage: " +
+          Math.round(100 * this.gameModel.CyroVatPCMod) +
+          "%"
+        );
+      case this.types.PlagueVatPC:
+        return (
+          "Zombie Health: " +
+          Math.round(100 * this.gameModel.PlagueVatPCMod) +
           "%"
         );
       case this.types.golemDamagePC:
@@ -2242,6 +2261,32 @@ export class Upgrades {
       "Golem armor shell provides extra protection for your fleshy zombies. Your zombies gain +1% health with each rank of Hybrid Shell.",
       null,
       301
+    ),
+    new Upgrade(
+      64,
+      "Advanced Cyrogenic Vats",
+      this.types.CyroVatPC,
+      this.costs.parts,
+      1e3,
+      1.4,
+      0.1,
+      0,
+      "Cooling these Brains further makes them last much longer. Your brain storage increases +10% with each rank of Advanced Cyrogenic Vats.",
+      null,
+      302
+    ),
+    new Upgrade(
+      65,
+      "Golem Part Plague Vats",
+      this.types.PlagueVatPC,
+      this.costs.parts,
+      1e3,
+      1.5,
+      0.01,
+      0,
+      "Using specialized Golem Parts allows for advancements in plague research. Plague Damage increases +1% with each rank of Golem Part Plague Vats.",
+      null,
+      302
     ),
   ];
 
