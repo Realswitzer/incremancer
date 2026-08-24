@@ -394,8 +394,13 @@ export class Upgrades {
         return;
       case this.constructionTypes.HybridLab:
         this.gameModel.constructions.HybridLab = true;
-        this.gameModel.brainsStorePCMod *= 10;
-        this.gameModel.bloodStorePCMod *= 10;
+        this.gameModel.brainsStorePCMod *= 2;
+        this.gameModel.bloodStorePCMod *= 2;
+        return;
+      case this.constructionTypes.AdvHybridLab:
+        this.gameModel.constructions.AdvHybridLab = true;
+        this.gameModel.brainsStorePCMod *= 2;
+        this.gameModel.bloodStorePCMod *= 2;
         return;
     }
   }
@@ -1315,6 +1320,7 @@ export class Upgrades {
     pit: "pit",
     harpy: "harpy",
     HybridLab: "HybridLab",
+    AdvHybridLab: "AdvHybridLab",
   };
 
   constructionUpgrades = [
@@ -1617,7 +1623,23 @@ export class Upgrades {
       1,
       1,
       222,
-      "Build a new laboratory to unlock the potential of Zombie-Golem Hybrids.  Deep storage tanks for Blood and Brains are needed for research, increase storage by 10x",
+      "Build a new laboratory to unlock the potential of Zombie-Golem Hybrids.  Deep storage tanks for Blood and Brains are needed for research, doubling storage",
+      "New upgrades are available in the shop!"
+    ),
+    new Construction(
+      302,
+      "Advanced Hybrid Laboratory",
+      this.constructionTypes.AdvHybridLab,
+      {
+        bones: 75e8,
+        parts: 9e13,
+      },
+      240,
+      1,
+      1,
+      1,
+      301,
+      "Build an advanced laboratory to further unlock the secrets of Zombie-Golem Hybridization.  Even deeper storage tanks for Blood and Brains are needed for research, doubling storage",
       "New upgrades are available in the shop!"
     ),
   ];
