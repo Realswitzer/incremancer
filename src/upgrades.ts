@@ -1560,7 +1560,7 @@ export class Upgrades {
       50,
       1,
       1,
-      12,
+      25,
       219,
       "A bottomless pit with walls made from creature parts. Drastically increases your capacity to store blood and brains.",
       null
