@@ -65,6 +65,8 @@ export class Upgrades {
     partsGainPC: "partsGainPC",
     zombieDmgPC: "zombieDmgPC",
     zombieHealthPC: "zombieHealthPC",
+    HstrengthDmgPC: "HstrengthDmgPC",
+    HshellHealthPC: "HshellHealthPC",
     golemHealthPC: "golemHealthPC",
     golemDamagePC: "golemDamagePC",
     startingPC: "startingPC",
@@ -280,6 +282,12 @@ export class Upgrades {
       case this.types.zombieHealthPC:
         this.gameModel.zombieHealthPCMod *= Math.pow(1 + upgrade.effect, rank);
         return;
+      case this.types.HstrengthDmgPC:
+        this.gameModel.HstrengthDmgPCMod *= Math.pow(1 + upgrade.effect, rank);
+        return;
+      case this.types.HshellHealthPC:
+        this.gameModel.HshellHealthPCMod *= Math.pow(1 + upgrade.effect, rank);
+        return;
       case this.types.golemDamagePC:
         this.gameModel.golemDamagePCMod *= Math.pow(1 + upgrade.effect, rank);
         return;
@@ -489,6 +497,18 @@ export class Upgrades {
         return (
           "Zombie Health: " +
           Math.round(this.gameModel.zombieHealthPCMod * 100) +
+          "%"
+        );
+      case this.types.HstrengthDmgPC:
+        return (
+          "Zombie Damage: " +
+          Math.round(100 * this.gameModel.HstrengthDmgPCMod) +
+          "%"
+        );
+      case this.types.HshellHealthPC:
+        return (
+          "Zombie Health: " +
+          Math.round(100 * this.gameModel.HshellHealthPCMod) +
           "%"
         );
       case this.types.golemDamagePC:
@@ -2112,26 +2132,26 @@ export class Upgrades {
     new Upgrade(
       62,
       "Hybrid Strength",
-      this.types.zombieDmgPC,
+      this.types.HstrengthDmgPC,
       this.costs.parts,
       1000,
       1.3,
       0.01,
       0,
-      "Your zombies gain +1% damage with each rank of Hybrid Strength.",
+      "Animating Golem parts fused with zombie flesh creates a terrifyingly strong Hybrid. Your zombies gain +1% damage with each rank of Hybrid Strength.",
       null,
       220
     ),
     new Upgrade(
       63,
       "Hybrid Shell",
-      this.types.zombieHealthPC,
+      this.types.HshellHealthPC,
       this.costs.parts,
       1e3,
       1.31,
       0.01,
       0,
-      "Your zombies gain +1% health with each rank of Hybrid Shell.",
+      "Golem armor shell provides extra protection for your fleshy zombies. Your zombies gain +1% health with each rank of Hybrid Shell.",
       null,
       220
     ),
