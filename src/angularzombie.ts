@@ -535,18 +535,6 @@ angular
               formatWhole(Math.round(upgrade.effect * 100)) +
               "% zombie health"
             );
-          case upgrades.types.HstrengthDmgPC:
-            return (
-              "+" +
-              formatWhole(Math.round(100 * upgrade.effect)) +
-              "% hybrid zombie damage"
-            );
-          case upgrades.types.HshellHealthPC:
-            return (
-              "+" +
-              formatWhole(Math.round(100 * upgrade.effect)) +
-              "% hybrid zombie health"
-            );
           case upgrades.types.bonesRate:
             return "+" + upgrade.effect + " bones per second";
           case upgrades.types.brainsRate:
