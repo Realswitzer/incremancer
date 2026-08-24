@@ -217,10 +217,10 @@ export class Humans {
     if (level < 999) {
       return 8500000 * Math.pow(1.03, level - 499);
     }
-    if (level < 998) {
+    if (level > 1499) {
       return 8500000 * Math.pow(1.02, level - 1499);
     }
-    return 17800 * Math.pow(1.015, level - 84);
+    return 8500000 * Math.pow(1.015, level - 999);
   }
 
   getAttackDamage(): void {
