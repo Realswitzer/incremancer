@@ -402,6 +402,16 @@ export class Upgrades {
         this.gameModel.brainsStorePCMod *= 2;
         this.gameModel.bloodStorePCMod *= 2;
         return;
+      case this.constructionTypes.MiniAssembLine:
+        this.gameModel.constructions.MiniAssembLine = true;
+        this.gameModel.brainsStorePCMod *= 2;
+        this.gameModel.bloodStorePCMod *= 2;
+        return;
+      case this.constructionTypes.TechThinkTank:
+        this.gameModel.constructions.TechThinkTank = true;
+        this.gameModel.brainsStorePCMod *= 2;
+        this.gameModel.bloodStorePCMod *= 2;
+        return;
     }
   }
 
@@ -1321,6 +1331,8 @@ export class Upgrades {
     harpy: "harpy",
     HybridLab: "HybridLab",
     AdvHybridLab: "AdvHybridLab",
+    MiniAssembLine: "MiniAssembLine",
+    TechThinkTank: "TechThinkTank",
   };
 
   constructionUpgrades = [
@@ -1632,13 +1644,45 @@ export class Upgrades {
       this.constructionTypes.AdvHybridLab,
       {
         bones: 75e8,
-        parts: 9e13,
+        parts: 7e13,
       },
       240,
       1,
       1,
       1,
       301,
+      "Build a new way to create everything faster!  How deep can these storage tanks go? Doubles storage",
+      "New upgrades are available in the shop!"
+    ),
+    new Construction(
+      303,
+      "Miniturized Assembly Lines",
+      this.constructionTypes.MiniAssembLine,
+      {
+        bones: 75e10,
+        parts: 4e16,
+      },
+      240,
+      1,
+      1,
+      1,
+      302,
+      "Using all these stored brains allows us to harness their raw computational power for even more innovations!  Storage tanks resting on bedrock is as far as we can go. Doubles storage",
+      "New upgrades are available in the shop!"
+    ),
+    new Construction(
+      304,
+      "Technical Think Tank",
+      this.constructionTypes.TechThinkTank,
+      {
+        bones: 75e12,
+        parts: 1e18,
+      },
+      240,
+      1,
+      1,
+      1,
+      303,
       "Build an advanced laboratory to further unlock the secrets of Zombie-Golem Hybridization.  Even deeper storage tanks for Blood and Brains are needed for research, doubling storage",
       "New upgrades are available in the shop!"
     ),
