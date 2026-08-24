@@ -2112,7 +2112,7 @@ export class Upgrades {
     new Upgrade(
       62,
       "Hybrid Strength",
-      this.types.damage,
+      this.types.damagePC,
       this.costs.parts,
       1000,
       1.3,
@@ -2125,7 +2125,7 @@ export class Upgrades {
     new Upgrade(
       63,
       "Hybrid Shell",
-      this.types.health,
+      this.types.healthPC,
       this.costs.parts,
       1e3,
       1.31,
