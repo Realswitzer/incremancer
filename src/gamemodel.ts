@@ -86,8 +86,10 @@ export class GameModel {
   brainsStorePCMod = 1;
   zombieHealth = 100;
   zombieHealthPCMod = 1;
+  HshellHealthPCMod = 1;
   zombieDamage = 10;
   zombieDamagePCMod = 1;
+  HstrengthDmgPCMod = 1;
   zombieSpeed = 10;
   zombieCages = 0;
   zombiesInCages = 0;
@@ -207,7 +209,9 @@ export class GameModel {
     this.brainsPCMod = 1;
     this.brainsStorePCMod = 1;
     this.zombieHealthPCMod = 1;
+    this.HshellHealthPCMod = 1;
     this.zombieDamagePCMod = 1;
+    this.HstrengthDmgPCMod = 1;
     this.golemHealthPCMod = 1;
     this.golemDamagePCMod = 1;
     this.plagueDamageMod = 0;
