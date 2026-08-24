@@ -988,15 +988,16 @@ angular
           this.isShown = false;
         },
         anotherOffer() {
-          return (
-            skeleton.persistent.skeletons > 0 &&
+          return skeleton.persistent.skeletons > 0 &&
             zm.model.persistentData.trophies.length >=
-              skeleton.persistent.xpRate * 20
-          );
+              skeleton.persistent.xpRate <
+              9
+            ? 20 * skeleton.persistent.xpRate
+            : 80 + (Math.log2(skeleton.persistent.xpRate) - 3) * 80;
         },
         trophies() {
           return skeleton.persistent.skeletons > 0
-            ? ` - ${zm.model.persistentData.trophies.length} / ${20 * skeleton.persistent.xpRate} Trophies`
+            ? ` - ${zm.model.persistentData.trophies.length} / ${skeleton.persistent.xpRate < 9 ? 20 * skeleton.persistent.xpRate : 80 + (Math.log2(skeleton.persistent.xpRate) - 3) * 80} Trophies`
             : "";
         },
         talentPoints: () => skeleton.talentPoints,
