@@ -392,6 +392,11 @@ export class Upgrades {
         this.gameModel.constructions.monsterFactory = true;
         this.gameModel.constructions.factory = true;
         return;
+      case this.constructionTypes.HybridLab:
+        this.gameModel.constructions.HybridLab = true;
+        this.gameModel.brainsStorePCMod *= 10;
+        this.gameModel.bloodStorePCMod *= 10;
+        return;
     }
   }
 
@@ -1309,6 +1314,7 @@ export class Upgrades {
     monsterFactory: "monsterFactory",
     pit: "pit",
     harpy: "harpy",
+    HybridLab: "HybridLab",
   };
 
   constructionUpgrades = [
@@ -1597,6 +1603,22 @@ export class Upgrades {
       220,
       "Build an outfitter to upgrade the abilities of your harpies.",
       "Harpy upgrades now available in the shop!"
+    ),
+    new Construction(
+      301,
+      "Hybrid Laboratory",
+      this.constructionTypes.HybridLab,
+      {
+        bones: 75e6,
+        parts: 9e12,
+      },
+      240,
+      1,
+      1,
+      1,
+      222,
+      "Build a new laboratory to unlock the potential of Zombie-Golem Hybrids.  Deep storage tanks for Blood and Brains are needed for research, increase storage by 10x",
+      "New upgrades are available in the shop!"
     ),
   ];
 
