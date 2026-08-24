@@ -2109,6 +2109,32 @@ export class Upgrades {
       null,
       220
     ),
+    new Upgrade(
+      62,
+      "Hybrid Strength",
+      this.types.damage,
+      this.costs.parts,
+      1000,
+      1.3,
+      0.01,
+      0,
+      "Your zombies gain +1% damage with each rank of Hybrid Strength.",
+      null,
+      220
+    ),
+    new Upgrade(
+      63,
+      "Hybrid Shell",
+      this.types.health,
+      this.costs.parts,
+      1e3,
+      1.31,
+      0.01,
+      0,
+      "Your zombies gain +1% health with each rank of Hybrid Shell.",
+      null,
+      220
+    ),
   ];
 
   prestigeUpgrades = [
