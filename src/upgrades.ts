@@ -2112,7 +2112,7 @@ export class Upgrades {
     new Upgrade(
       62,
       "Hybrid Strength",
-      this.types.damagePC,
+      this.types.zombieDmgPC,
       this.costs.parts,
       1000,
       1.3,
@@ -2125,7 +2125,7 @@ export class Upgrades {
     new Upgrade(
       63,
       "Hybrid Shell",
-      this.types.healthPC,
+      this.types.zombieHealthPC,
       this.costs.parts,
       1e3,
       1.31,
