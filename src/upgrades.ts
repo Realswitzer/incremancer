@@ -2162,7 +2162,7 @@ export class Upgrades {
       0,
       "Animating Golem parts fused with zombie flesh creates a terrifyingly strong Hybrid. Your zombies gain +1% damage with each rank of Hybrid Strength.",
       null,
-      220
+      301
     ),
     new Upgrade(
       63,
@@ -2175,7 +2175,7 @@ export class Upgrades {
       0,
       "Golem armor shell provides extra protection for your fleshy zombies. Your zombies gain +1% health with each rank of Hybrid Shell.",
       null,
-      220
+      301
     ),
   ];
 
