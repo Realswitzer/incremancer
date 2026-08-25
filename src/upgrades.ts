@@ -335,7 +335,7 @@ export class Upgrades {
         return;
       case this.types.EnergyCost:
         this.gameModel.zombieCost -= upgrade.effect * rank;
-        this.gameModel.EnergyCost -= upgrade.effect * rank;
+        this.gameModel.EnergyCostMod -= upgrade.effect * rank;
         return;
       case this.types.golemDamagePC:
         this.gameModel.golemDamagePCMod *= Math.pow(1 + upgrade.effect, rank);
