@@ -69,6 +69,10 @@ export class Upgrades {
     HshellHealthPC: "HshellHealthPC",
     CyroVatPC: "CyroVatPC",
     PlagueVatPC: "PlagueVatPC",
+    CloningRepPC: "CloningRepPC",
+    BloodSynPC: "BloodSynPC",
+    SynBonePC: "SynBonePC",
+    SmolPartsPC: "SmolPartsPC",
     golemHealthPC: "golemHealthPC",
     golemDamagePC: "golemDamagePC",
     startingPC: "startingPC",
@@ -299,6 +303,22 @@ export class Upgrades {
       case this.types.PlagueVatPC:
         this.gameModel.plagueDamageMod *= Math.pow(1 + upgrade.effect, rank);
         this.gameModel.PlagueVatPCMod *= Math.pow(1 + upgrade.effect, rank);
+      case this.types.CloningRepPC:
+        this.gameModel.brainsPCMod *= Math.pow(1 + upgrade.effect, rank);
+        this.gameModel.CloningRepPCMod *= Math.pow(1 + upgrade.effect, rank);
+        return;
+      case this.types.BloodSynPC:
+        this.gameModel.bloodPCMod *= Math.pow(1 + upgrade.effect, rank);
+        this.gameModel.BloodSynPCMod *= Math.pow(1 + upgrade.effect, rank);
+        return;
+      case this.types.SynBonePC:
+        this.gameModel.bonesPCMod *= Math.pow(1 + upgrade.effect, rank);
+        this.gameModel.SynBonePCMod *= Math.pow(1 + upgrade.effect, rank);
+        return;
+      case this.types.SmolPartsPC:
+        this.gameModel.partsPCMod *= Math.pow(1 + upgrade.effect, rank);
+        this.gameModel.SynBonePCMod *= Math.pow(1 + upgrade.effect, rank);
+        return;
       case this.types.golemDamagePC:
         this.gameModel.golemDamagePCMod *= Math.pow(1 + upgrade.effect, rank);
         return;
@@ -552,6 +572,28 @@ export class Upgrades {
         return (
           "Plague Damage: " +
           Math.round(100 * this.gameModel.PlagueVatPCMod) +
+          "%"
+        );
+      case this.types.CloningRepPC:
+        return (
+          "Brain Income: " +
+          Math.round(100 * this.gameModel.CloningRepPCMod) +
+          "%"
+        );
+      case this.types.BloodSynPC:
+        return (
+          "Blood Income: " +
+          Math.round(100 * this.gameModel.BloodSynPCMod) +
+          "%"
+        );
+      case this.types.SynBonePC:
+        return (
+          "Bone Income: " + Math.round(100 * this.gameModel.SynBonePCMod) + "%"
+        );
+      case this.types.SmolPartsPC:
+        return (
+          "Parts Income: " +
+          Math.round(100 * this.gameModel.SmolPartsPCMod) +
           "%"
         );
       case this.types.golemDamagePC:
@@ -2291,6 +2333,58 @@ export class Upgrades {
       "Using specialized Golem Parts allows for advancements in plague research. Plague Damage increases +1% with each rank of Golem Part Plague Vats.",
       null,
       302
+    ),
+    new Upgrade(
+      66,
+      "Cloning Replicator",
+      this.types.CloningRepPC,
+      this.costs.parts,
+      1e12,
+      1.25,
+      0.01,
+      0,
+      "Mass produced Cloning Replicators allows for much greater use out of each Brain obtained. Brain Income increases +5% with each rank of Cloning Replicator.",
+      null,
+      303
+    ),
+    new Upgrade(
+      67,
+      "Blood Synthezizer",
+      this.types.BloodSynPC,
+      this.costs.parts,
+      1e12,
+      1.25,
+      0.01,
+      0,
+      "Artificial Blood can augment what we already get allowing for more of everything. Blood Income increases +5% with each rank of Blood Synthesizer.",
+      null,
+      303
+    ),
+    new Upgrade(
+      68,
+      "Synthetic Bone Fabricator",
+      this.types.SynBonePC,
+      this.costs.parts,
+      1e12,
+      1.25,
+      0.01,
+      0,
+      "Synthetic Bones made from Golem Parts?  Genius! Bone Income increases +5% with each rank of Synthetic Bone Fabricator.",
+      null,
+      303
+    ),
+    new Upgrade(
+      69,
+      "Insectoid Parts Assemblers",
+      this.types.SmolPartsPC,
+      this.costs.parts,
+      1e12,
+      1.25,
+      0.01,
+      0,
+      "Insect sized and shaped assemblers are far more efficient at maufacturing Golem parts. Parts Income increases +5% with each rank of Insectoid Parts Assemblers.",
+      null,
+      303
     ),
   ];
 

@@ -89,6 +89,10 @@ export class GameModel {
   HshellHealthPCMod = 1;
   CryoVatPCMod = 1;
   PlagueVatPCMod = 1;
+  CloningRepPCMod = 1;
+  BloodSynPCMod = 1;
+  SynBonePCMod = 1;
+  SmolPartsPCMod = 1;
   zombieDamage = 10;
   zombieDamagePCMod = 1;
   HstrengthDmgPCMod = 1;
@@ -214,6 +218,10 @@ export class GameModel {
     this.HshellHealthPCMod = 1;
     this.CryoVatPCMod = 1;
     this.PlagueVatPCMod = 1;
+    this.CloningRepPCMod = 1;
+    this.BloodSynPCMod = 1;
+    this.SynBonePCMod = 1;
+    this.SmolPartsPCMod = 1;
     this.zombieDamagePCMod = 1;
     this.HstrengthDmgPCMod = 1;
     this.golemHealthPCMod = 1;
