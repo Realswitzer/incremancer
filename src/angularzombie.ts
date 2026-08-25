@@ -991,14 +991,14 @@ angular
           return (
             skeleton.persistent.skeletons > 0 &&
             zm.model.persistentData.trophies.length >=
-              (skeleton.persistent.xpRate < 17
+              (skeleton.persistent.xpRate < 15
                 ? 20 * skeleton.persistent.xpRate
-                : 80 + (Math.log2(skeleton.persistent.xpRate) - 3) * 80)
+                : 160 + (Math.log2(skeleton.persistent.xpRate) - 3) * 80)
           );
         },
         trophies() {
           return skeleton.persistent.skeletons > 0
-            ? ` - ${zm.model.persistentData.trophies.length} / ${skeleton.persistent.xpRate < 17 ? 20 * skeleton.persistent.xpRate : 80 + (Math.log2(skeleton.persistent.xpRate) - 3) * 80} Trophies`
+            ? ` - ${zm.model.persistentData.trophies.length} / ${skeleton.persistent.xpRate < 15 ? 20 * skeleton.persistent.xpRate : 160 + (Math.log2(skeleton.persistent.xpRate) - 3) * 80} Trophies`
             : "";
         },
         talentPoints: () => skeleton.talentPoints,
