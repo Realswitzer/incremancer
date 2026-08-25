@@ -1718,7 +1718,7 @@ export class Upgrades {
       1,
       1,
       301,
-      "Build a new way to create everything faster!  How deep can these storage tanks go? Doubles storage",
+      "Build an advanced laboratory to further unlock the secrets of Zombie-Golem Hybridization. Even deeper storage tanks for Blood and Brains are needed for research. Doubles storage",
       "New upgrades are available in the shop!"
     ),
     new Construction(
@@ -1734,7 +1734,7 @@ export class Upgrades {
       1,
       1,
       302,
-      "Using all these stored brains allows us to harness their raw computational power for even more innovations!  Even deeper storage tanks for Blood and Brains are needed for research. Doubles storage",
+      "Build a new way to create everything faster!  How deep can these storage tanks go? Doubles storage.",
       "New upgrades are available in the shop!"
     ),
     new Construction(
@@ -1750,7 +1750,7 @@ export class Upgrades {
       1,
       1,
       303,
-      "Build an advanced laboratory to further unlock the secrets of Zombie-Golem Hybridization.  Storage tanks resting on bedrock is as far as we can go, doubling storage",
+      "Using all these stored brains allows us to harness their raw computational power for even more innovations!  Storage tanks resting on bedrock is as far as we can go, doubling storage",
       "New upgrades are available in the shop!"
     ),
   ];
