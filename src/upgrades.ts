@@ -544,13 +544,13 @@ export class Upgrades {
         );
       case this.types.CyroVatPC:
         return (
-          "Zombie Damage: " +
+          "Brains Storage: " +
           Math.round(100 * this.gameModel.CyroVatPCMod) +
           "%"
         );
       case this.types.PlagueVatPC:
         return (
-          "Zombie Health: " +
+          "Plague Damage: " +
           Math.round(100 * this.gameModel.PlagueVatPCMod) +
           "%"
         );
