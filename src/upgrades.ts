@@ -1518,7 +1518,7 @@ export class Upgrades {
       44,
       1,
       10,
-      9,
+      5,
       202,
       "Enlarge the fence so a greater area is protected.",
       null
