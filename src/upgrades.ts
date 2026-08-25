@@ -2358,7 +2358,7 @@ export class Upgrades {
       this.types.PlagueVatPC,
       this.costs.brains,
       1e3,
-      1.4,
+      1.35,
       0.01,
       0,
       "Using specialized Golem Parts allows for advancements in plague research. Plague Damage increases +1% with each rank of Golem Part Plague Vats.",
