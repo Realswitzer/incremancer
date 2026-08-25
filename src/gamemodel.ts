@@ -89,7 +89,7 @@ export class GameModel {
   HshellHealthPCMod = 1;
   CryoVatPCMod = 1;
   PlagueVatPCMod = 1;
-  CloningRepPCMod = 1;
+  CloningRep1PCMod = 1;
   BloodSynPCMod = 1;
   SynBonePCMod = 1;
   SmolPartsPCMod = 1;
@@ -218,7 +218,7 @@ export class GameModel {
     this.HshellHealthPCMod = 1;
     this.CryoVatPCMod = 1;
     this.PlagueVatPCMod = 1;
-    this.CloningRepPCMod = 1;
+    this.CloningRep1PCMod = 1;
     this.BloodSynPCMod = 1;
     this.SynBonePCMod = 1;
     this.SmolPartsPCMod = 1;

@@ -69,7 +69,7 @@ export class Upgrades {
     HshellHealthPC: "HshellHealthPC",
     CyroVatPC: "CyroVatPC",
     PlagueVatPC: "PlagueVatPC",
-    CloningRepPC: "CloningRepPC",
+    CloningRep1PC: "CloningRep1PC",
     BloodSynPC: "BloodSynPC",
     SynBonePC: "SynBonePC",
     SmolPartsPC: "SmolPartsPC",
@@ -303,9 +303,9 @@ export class Upgrades {
       case this.types.PlagueVatPC:
         this.gameModel.plagueDamageMod *= Math.pow(1 + upgrade.effect, rank);
         this.gameModel.PlagueVatPCMod *= Math.pow(1 + upgrade.effect, rank);
-      case this.types.CloningRepPC:
+      case this.types.CloningRep1PC:
         this.gameModel.brainsPCMod *= Math.pow(1 + upgrade.effect, rank);
-        this.gameModel.CloningRepPCMod *= Math.pow(1 + upgrade.effect, rank);
+        this.gameModel.CloningRep1PCMod *= Math.pow(1 + upgrade.effect, rank);
         return;
       case this.types.BloodSynPC:
         this.gameModel.bloodPCMod *= Math.pow(1 + upgrade.effect, rank);
@@ -574,10 +574,10 @@ export class Upgrades {
           Math.round(100 * this.gameModel.PlagueVatPCMod) +
           "%"
         );
-      case this.types.CloningRepPC:
+      case this.types.CloningRep1PC:
         return (
           "Additional Brain Income: " +
-          Math.round(100 * this.gameModel.CloningRepPCMod) +
+          Math.round(100 * this.gameModel.CloningRep1PCMod) +
           "%"
         );
       case this.types.BloodSynPC:
@@ -2339,7 +2339,7 @@ export class Upgrades {
     new Upgrade(
       66,
       "Cloning Replicator",
-      this.types.CloningRepPC,
+      this.types.CloningRepPC1,
       this.costs.parts,
       1e12,
       1.25,
