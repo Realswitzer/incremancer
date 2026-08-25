@@ -285,7 +285,7 @@ export class Upgrades {
         this.gameModel.zombieHealthPCMod *= Math.pow(1 + upgrade.effect, rank);
         return;
       case this.types.HstrengthDmgPC:
-        this.gameModel.HstrengthDmgPCMod *= Math.pow(1 + upgrade.effect, rank);
+        this.gameModel.zombieDamagePCMod *= Math.pow(1 + upgrade.effect, rank);
         return;
       case this.types.HshellHealthPC:
         this.gameModel.HshellHealthPCMod *= Math.pow(1 + upgrade.effect, rank);
