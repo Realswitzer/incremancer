@@ -515,7 +515,7 @@ export class Skeleton {
               this.killingBlow(creature.target);
             }
             creature.timer.attack =
-              this.attackSpeed * (1 / this.model.runeEffects.attackSpeed);
+              this.attackSpeed * (1 / this.model.runeEffects.attackSpeed * this.model.ShockPCMod);
             if (creature.flags.burning) {
               creature.timer.attack *= 1 / this.model.burningSpeedMod;
             }

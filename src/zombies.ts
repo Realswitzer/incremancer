@@ -541,7 +541,9 @@ export class Zombies {
               this.inflictPlague(zombie.target);
             }
             zombie.timer.attack =
-              this.attackSpeed * (1 / this.model.runeEffects.attackSpeed);
+              this.attackSpeed *
+              ((1 / this.model.runeEffects.attackSpeed) *
+                this.model.ShockPCMod);
             if (zombie.flags.burning) {
               zombie.timer.attack *= 1 / this.model.burningSpeedMod;
             }

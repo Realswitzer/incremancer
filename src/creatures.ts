@@ -351,7 +351,9 @@ export class Creatures {
               this.humans.burnHuman(creature.target, creature.attackDamage / 2);
             }
             creature.timer.attack =
-              this.attackSpeed * (1 / this.model.runeEffects.attackSpeed);
+              this.attackSpeed *
+              ((1 / this.model.runeEffects.attackSpeed) *
+                this.model.ShockPCMod);
             if (creature.flags.burning) {
               creature.timer.attack *= 1 / this.model.burningSpeedMod;
             }
