@@ -218,7 +218,7 @@ export class Humans {
       return 8500000 * Math.pow(1.03, level - 499);
     }
     if (level > 1499) {
-      return 498e16 * Math.pow(1.02, level - 1499);
+      return 498e16 * Math.pow(1.021, level - 1499);
     }
     return 22e12 * Math.pow(1.025, level - 999);
   }
