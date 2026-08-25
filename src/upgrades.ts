@@ -542,7 +542,7 @@ export class Upgrades {
           Math.round(100 * this.gameModel.HshellHealthPCMod) +
           "%"
         );
-      case this.types.CyroVatDmgPC:
+      case this.types.CyroVatPC:
         return (
           "Zombie Damage: " +
           Math.round(100 * this.gameModel.CyroVatPCMod) +
