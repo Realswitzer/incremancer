@@ -327,10 +327,7 @@ export class Upgrades {
         this.gameModel.AvionicsPCMod += upgrade.effect * rank;
         return;
       case this.types.ShockPC:
-        this.gameModel.runeEffects.attackSpeed *= Math.pow(
-          1 + upgrade.effect,
-          rank
-        );
+        this.gameModel.attackSpeed *= Math.pow(1 + upgrade.effect, rank);
         this.gameModel.ShockPCMod *= Math.pow(1 + upgrade.effect, rank);
         return;
       case this.types.EnergyCost:
