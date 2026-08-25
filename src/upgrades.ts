@@ -290,12 +290,15 @@ export class Upgrades {
         return;
       case this.types.HshellHealthPC:
         this.gameModel.zombieHealthPCMod *= Math.pow(1 + upgrade.effect, rank);
+        this.gameModel.HshellHealthPCMod *= Math.pow(1 + upgrade.effect, rank);
         return;
       case this.types.CyroVatPC:
         this.gameModel.brainsMax *= Math.pow(1 + upgrade.effect, rank);
+        this.gameModel.CyroVatPCMod *= Math.pow(1 + upgrade.effect, rank);
         return;
       case this.types.PlagueVatPC:
         this.gameModel.plagueDamageMod *= Math.pow(1 + upgrade.effect, rank);
+        this.gameModel.PlagueVatPCMod *= Math.pow(1 + upgrade.effect, rank);
       case this.types.golemDamagePC:
         this.gameModel.golemDamagePCMod *= Math.pow(1 + upgrade.effect, rank);
         return;
