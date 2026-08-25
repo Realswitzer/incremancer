@@ -317,7 +317,7 @@ export class Upgrades {
         return;
       case this.types.SmolPartsPC:
         this.gameModel.partsPCMod *= Math.pow(1 + upgrade.effect, rank);
-        this.gameModel.SynBonePCMod *= Math.pow(1 + upgrade.effect, rank);
+        this.gameModel.SmolPartsPCMod *= Math.pow(1 + upgrade.effect, rank);
         return;
       case this.types.golemDamagePC:
         this.gameModel.golemDamagePCMod *= Math.pow(1 + upgrade.effect, rank);
@@ -2341,7 +2341,7 @@ export class Upgrades {
       this.costs.parts,
       1e12,
       1.25,
-      0.01,
+      0.05,
       0,
       "Mass produced Cloning Replicators allows for much greater use out of each Brain obtained. Brain Income increases +5% with each rank of Cloning Replicator.",
       null,
@@ -2354,7 +2354,7 @@ export class Upgrades {
       this.costs.parts,
       1e12,
       1.25,
-      0.01,
+      0.05,
       0,
       "Artificial Blood can augment what we already get allowing for more of everything. Blood Income increases +5% with each rank of Blood Synthesizer.",
       null,
@@ -2367,7 +2367,7 @@ export class Upgrades {
       this.costs.parts,
       1e12,
       1.25,
-      0.01,
+      0.05,
       0,
       "Synthetic Bones made from Golem Parts?  Genius! Bone Income increases +5% with each rank of Synthetic Bone Fabricator.",
       null,
@@ -2380,7 +2380,7 @@ export class Upgrades {
       this.costs.parts,
       1e12,
       1.25,
-      0.01,
+      0.05,
       0,
       "Insect sized and shaped assemblers are far more efficient at maufacturing Golem parts. Parts Income increases +5% with each rank of Insectoid Parts Assemblers.",
       null,
