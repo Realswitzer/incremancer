@@ -576,23 +576,25 @@ export class Upgrades {
         );
       case this.types.CloningRepPC:
         return (
-          "Brain Income: " +
+          "Additional Brain Income: " +
           Math.round(100 * this.gameModel.CloningRepPCMod) +
           "%"
         );
       case this.types.BloodSynPC:
         return (
-          "Blood Income: " +
+          "Additional Blood Income: " +
           Math.round(100 * this.gameModel.BloodSynPCMod) +
           "%"
         );
       case this.types.SynBonePC:
         return (
-          "Bone Income: " + Math.round(100 * this.gameModel.SynBonePCMod) + "%"
+          "Additional Bone Income: " +
+          Math.round(100 * this.gameModel.SynBonePCMod) +
+          "%"
         );
       case this.types.SmolPartsPC:
         return (
-          "Parts Income: " +
+          "Additional Parts Income: " +
           Math.round(100 * this.gameModel.SmolPartsPCMod) +
           "%"
         );
@@ -1669,7 +1671,7 @@ export class Upgrades {
       50,
       1,
       1,
-      25,
+      10,
       219,
       "A bottomless pit with walls made from creature parts. Drastically increases your capacity to store blood and brains.",
       null
