@@ -617,7 +617,7 @@ export class Upgrades {
         return "Harpy speed: " + formatWhole(this.gameModel.harpySpeed);
       case this.types.ShockPC:
         return (
-          "Additional Attack Speed: " +
+          "Attack Speed multiplier: " +
           Math.round(100 * this.gameModel.ShockPCMod) +
           "%"
         );
@@ -2437,7 +2437,7 @@ export class Upgrades {
       this.costs.parts,
       3e14,
       1.2,
-      0.25,
+      0.025,
       0,
       "Using shock collars tuned to the Hybrid Zombie's nervous system causes them to attack and blinding speeds! Attack Speed +0.25% with each rank of Electro-Shock Collars.",
       null,
