@@ -2439,7 +2439,7 @@ export class Upgrades {
       1.2,
       0.0025,
       0,
-      "Using shock collars tuned to the Hybrid Zombie's nervous system causes them to attack and blinding speeds! Attack Speed +0.25% with each rank of Electro-Shock Collars.",
+      "Using shock collars tuned to the Hybrid Zombie's nervous system causes them to attack at blinding speeds! Attack Speed +0.25% with each rank of Electro-Shock Collars.",
       null,
       304
     ),
