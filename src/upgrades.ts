@@ -73,6 +73,9 @@ export class Upgrades {
     BloodSynPC: "BloodSynPC",
     SynBonePC: "SynBonePC",
     SmolPartsPC: "SmolPartsPC",
+    AvionicsPC: "AvionicsPC",
+    ShockPC: "ShockPC",
+    EnergyCost: "EnergyCost",
     golemHealthPC: "golemHealthPC",
     golemDamagePC: "golemDamagePC",
     startingPC: "startingPC",
@@ -318,6 +321,21 @@ export class Upgrades {
       case this.types.SmolPartsPC:
         this.gameModel.partsPCMod *= Math.pow(1 + upgrade.effect, rank);
         this.gameModel.SmolPartsPCMod *= Math.pow(1 + upgrade.effect, rank);
+        return;
+      case this.types.AvionicsPC:
+        this.gameModel.harpySpeed += upgrade.effect * rank;
+        this.gameModel.AvionicsPCMod += upgrade.effect * rank;
+        return;
+      case this.types.ShockPC:
+        this.gameModel.runeEffects.attackSpeed *= Math.pow(
+          1 + upgrade.effect,
+          rank
+        );
+        this.gameModel.ShockPCMod *= Math.pow(1 + upgrade.effect, rank);
+        return;
+      case this.types.EnergyCost:
+        this.gameModel.zombieCost -= upgrade.effect * rank;
+        this.gameModel.EnergyCost -= upgrade.effect * rank;
         return;
       case this.types.golemDamagePC:
         this.gameModel.golemDamagePCMod *= Math.pow(1 + upgrade.effect, rank);
@@ -595,6 +613,20 @@ export class Upgrades {
       case this.types.SmolPartsPC:
         return (
           "Additional Parts Income: " +
+          Math.round(100 * this.gameModel.SmolPartsPCMod) +
+          "%"
+        );
+      case this.types.AvionicsPC:
+        return "Harpy speed: " + formatWhole(this.gameModel.harpySpeed) + "%";
+      case this.types.ShockPC:
+        return (
+          "Additional Attack Speed: " +
+          Math.round(100 * this.gameModel.ShockPCMod) +
+          "%"
+        );
+      case this.types.EnergyCost:
+        return (
+          "Additional zombie cost reduction: " +
           Math.round(100 * this.gameModel.SmolPartsPCMod) +
           "%"
         );
@@ -2385,6 +2417,45 @@ export class Upgrades {
       0.05,
       0,
       "Insect sized and shaped assemblers are far more efficient at maufacturing Golem parts. Parts Income increases +5% with each rank of Insectoid Parts Assemblers.",
+      null,
+      303
+    ),
+    new Upgrade(
+      70,
+      "Golem Avionic",
+      this.types.AvionicsPC,
+      this.costs.parts,
+      2e17,
+      1.25,
+      0.05,
+      50,
+      "Building on the success of hybrid zombies, small golem parts can enhance Harpy-Golem Hybrids. Harpy Speed +2 with each rank of Golem Avionics.",
+      null,
+      304
+    ),
+    new Upgrade(
+      71,
+      "Electro-Shock Collars",
+      this.types.ShockPC,
+      this.costs.parts,
+      3e17,
+      1.2,
+      0.0025,
+      0,
+      "Using shock collars tuned to the Hybrid Zombie's nervous system causes them to attack and blinding speeds! Attack Speed +0.25% with each rank of Electro-Shock Collars.",
+      null,
+      303
+    ),
+    new Upgrade(
+      72,
+      "Power Regulators",
+      this.types.EnergyCost,
+      this.costs.parts,
+      1e18,
+      1.2,
+      1,
+      30,
+      "Golem parts assembled around the graveyard can help regulate and attune necrotic power. Reduces zombie summoning cost by 1 with each rank of Insectoid Parts Assemblers.",
       null,
       303
     ),

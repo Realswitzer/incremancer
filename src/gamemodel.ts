@@ -93,6 +93,9 @@ export class GameModel {
   BloodSynPCMod = 1;
   SynBonePCMod = 1;
   SmolPartsPCMod = 1;
+  AvionicsPCMod = 1;
+  ShockPCMod = 1;
+  EnergyCostMod = 0;
   zombieDamage = 10;
   zombieDamagePCMod = 1;
   HstrengthDmgPCMod = 1;
@@ -222,6 +225,9 @@ export class GameModel {
     this.BloodSynPCMod = 1;
     this.SynBonePCMod = 1;
     this.SmolPartsPCMod = 1;
+    this.AvionicsPCMod = 1;
+    this.ShockPCMod = 1;
+    this.EnergyCostMod = 0;
     this.zombieDamagePCMod = 1;
     this.HstrengthDmgPCMod = 1;
     this.golemHealthPCMod = 1;
