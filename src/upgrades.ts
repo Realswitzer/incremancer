@@ -2452,7 +2452,7 @@ export class Upgrades {
       1.2,
       1,
       30,
-      "Golem parts assembled around the graveyard can help regulate and attune necrotic power. Reduces zombie summoning cost by 1 with each rank of Insectoid Parts Assemblers.",
+      "Golem parts assembled around the graveyard can help regulate and attune necrotic power. Reduces zombie summoning cost by 1 with each rank of Power Regulators.",
       null,
       304
     ),
