@@ -617,7 +617,7 @@ export class Upgrades {
           "%"
         );
       case this.types.AvionicsPC:
-        return "Harpy speed: " + formatWhole(this.gameModel.harpySpeed) + "%";
+        return "Harpy speed: " + formatWhole(this.gameModel.harpySpeed);
       case this.types.ShockPC:
         return (
           "Additional Attack Speed: " +
@@ -626,9 +626,9 @@ export class Upgrades {
         );
       case this.types.EnergyCost:
         return (
-          "Additional zombie cost reduction: " +
+          "Zombie Cost: " +
           Math.round(100 * this.gameModel.SmolPartsPCMod) +
-          "%"
+          " energy"
         );
       case this.types.golemDamagePC:
         return (
@@ -2444,7 +2444,7 @@ export class Upgrades {
       0,
       "Using shock collars tuned to the Hybrid Zombie's nervous system causes them to attack and blinding speeds! Attack Speed +0.25% with each rank of Electro-Shock Collars.",
       null,
-      303
+      304
     ),
     new Upgrade(
       72,
@@ -2457,7 +2457,7 @@ export class Upgrades {
       30,
       "Golem parts assembled around the graveyard can help regulate and attune necrotic power. Reduces zombie summoning cost by 1 with each rank of Insectoid Parts Assemblers.",
       null,
-      303
+      304
     ),
   ];
 
