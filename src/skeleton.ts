@@ -204,6 +204,7 @@ export class Skeleton {
   applyUpgrades(): void {
     if (this.persistent.skeletons > 0) {
       this.applyItemUpgrades();
+      const scalingFactor = Math.pow(1.001, this.persistent.level);
       const multiplier = 1 + this.persistent.level / 100;
       this.model.bloodPCMod *= multiplier;
       this.model.brainsPCMod *= multiplier;
@@ -211,6 +212,7 @@ export class Skeleton {
       this.model.partsPCMod *= multiplier;
       this.model.zombieDamagePCMod *= multiplier;
       this.model.zombieHealthPCMod *= multiplier;
+      this.model.PlagueVatPCMod *= scalingFactor;
     }
   }
 
@@ -515,7 +517,9 @@ export class Skeleton {
               this.killingBlow(creature.target);
             }
             creature.timer.attack =
-              this.attackSpeed * (1 / this.model.runeEffects.attackSpeed * this.model.ShockPCMod);
+              this.attackSpeed *
+              ((1 / this.model.runeEffects.attackSpeed) *
+                this.model.ShockPCMod);
             if (creature.flags.burning) {
               creature.timer.attack *= 1 / this.model.burningSpeedMod;
             }
