@@ -565,8 +565,8 @@ export class Humans {
       this.damageHuman(human, human.plagueDamage);
       human.timer.plagueTick =
         this.plagueTickTimer *
-        ((1 / this.gameModel.runeEffects.attackSpeed) *
-          this.gameModel.ShockPCMod);
+        (1 /
+          (this.gameModel.runeEffects.attackSpeed * this.gameModel.ShockPCMod));
       this.exclamations.newPoison(human);
       human.plagueTicks--;
       if (this.pandemic) {
