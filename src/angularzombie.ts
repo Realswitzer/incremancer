@@ -1030,7 +1030,7 @@ angular
                         ? 260
                         : skeleton.persistent.xpRate < 128
                           ? 340
-                          : skeleton.persistent.xpRate < 265
+                          : skeleton.persistent.xpRate < 256
                             ? 430
                             : skeleton.persistent.xpRate < 512
                               ? 530
