@@ -95,7 +95,7 @@ export const TalentData = [
     1,
     "Efficiency",
     golemMastery,
-    10,
+    12,
     function (this: Talent) {
       creatureFactory.creatureCostReduction = 1;
       const rank = skeleton.talents[this.id];
@@ -247,7 +247,7 @@ export const TalentData = [
     7,
     "Shiny",
     skeletonMastery,
-    10,
+    12,
     function (this: Talent) {
       skeleton.lootChanceMod = 1;
       const rank = skeleton.talents[this.id];
