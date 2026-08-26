@@ -553,7 +553,10 @@ export class Skeleton {
         this.killingBlowParts * this.partFactory.factoryStats().partsPerSec;
     }
     if (this.lastKillingBlow <= 0) {
-      this.model.addPrestigePoints(this.persistent.level);
+      this.model.addPrestigePoints(
+        Math.round(this.persistent.level) *
+          Math.pow(1.00025, this.persistent.level)
+      );
       this.lastKillingBlow = 20;
       this.prestigePoints.newPart(creature.x, creature.y);
     }
