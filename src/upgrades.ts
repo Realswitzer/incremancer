@@ -78,6 +78,7 @@ export class Upgrades {
     EnergyCost: "EnergyCost",
     golemHealthPC: "golemHealthPC",
     golemDamagePC: "golemDamagePC",
+    prest_multPC: "prest_multPC",
     startingPC: "startingPC",
     energyCost: "energyCost",
     autoconstruction: "autoconstruction",
@@ -333,6 +334,9 @@ export class Upgrades {
       case this.types.EnergyCost:
         this.gameModel.zombieCost -= upgrade.effect * rank;
         this.gameModel.EnergyCostMod -= upgrade.effect * rank;
+        return;
+      case this.types.prest_multPC:
+        this.gameModel.prest_multPCMod *= Math.pow(1 + upgrade.effect, rank);
         return;
       case this.types.golemDamagePC:
         this.gameModel.golemDamagePCMod *= Math.pow(1 + upgrade.effect, rank);
@@ -2453,6 +2457,19 @@ export class Upgrades {
       1,
       30,
       "Golem parts assembled around the graveyard can help regulate and attune necrotic power. Reduces zombie summoning cost by 1 with each rank of Power Regulators.",
+      null,
+      304
+    ),
+    new Upgrade(
+      73,
+      "Abyssal Reputation",
+      this.types.prest_multModPC,
+      this.costs.blood,
+      1e20,
+      1.075,
+      1,
+      0,
+      "Astouding levels of blood sacrificed can enhance your reputation. +3% Prestige point gain per level",
       null,
       304
     ),

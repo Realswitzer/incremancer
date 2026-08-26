@@ -232,6 +232,7 @@ export class GameModel {
     this.HstrengthDmgPCMod = 1;
     this.golemHealthPCMod = 1;
     this.golemDamagePCMod = 1;
+    this.prest_multPCMod = 1;
     this.plagueDamageMod = 0;
     this.plagueticks = 2;
     this.burningSpeedMod = 1;
