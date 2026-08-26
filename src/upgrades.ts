@@ -2474,7 +2474,7 @@ export class Upgrades {
       1.25,
       0.03,
       0,
-      "Astouding levels of blood sacrificed can enhance your reputation. +3% Prestige point gain per level",
+      "Astouding levels of blood sacrificed can enhance your reputation with dark entities in the Void. +3% Prestige point gain per kill per rank",
       null,
       304
     ),
