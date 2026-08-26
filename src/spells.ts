@@ -68,8 +68,7 @@ export class Spells {
       30,
       0,
       function () {
-        GameModel.getInstance().gameSpeed =
-          2 * Math.pow(1.0001, this.persistent.level);
+        GameModel.getInstance().gameSpeed = 3;
       },
       function () {
         GameModel.getInstance().gameSpeed = 1;
