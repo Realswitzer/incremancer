@@ -100,15 +100,15 @@ export const TalentData = [
       creatureFactory.creatureCostReduction = 1;
       const rank = skeleton.talents[this.id];
       if (rank && rank > 0) {
-        creatureFactory.creatureCostReduction -= rank * 0.05;
+        creatureFactory.creatureCostReduction -= rank * 0.075;
       }
     },
     function (this: Talent) {
       const rank = skeleton.talents[this.id];
       if (rank && rank > 0) {
-        return `Golem upgrade and summoning cost reduced by ${rank * 5}%`;
+        return `Golem upgrade and summoning cost reduced by ${rank * 7.5}%`;
       } else {
-        return "Reduces golem upgrade and summoning cost by 5%";
+        return "Reduces golem upgrade and summoning cost by 7.5%";
       }
     }
   ),
