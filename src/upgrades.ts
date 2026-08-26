@@ -625,6 +625,11 @@ export class Upgrades {
           Math.round(100 * this.gameModel.ShockPCMod - 100) +
           "%"
         );
+      case this.types.prest_multPC:
+        return (
+          "Prestige per kill multiplier: " +
+          Math.round(100 * this.gameModel.prest_multPCMod)
+        );
       case this.types.EnergyCost:
         return (
           "Zombie Cost: " +
@@ -2463,10 +2468,10 @@ export class Upgrades {
     new Upgrade(
       73,
       "Abyssal Reputation",
-      this.types.prest_multModPC,
+      this.types.prest_multPC,
       this.costs.blood,
       1e20,
-      1.075,
+      1.25,
       1,
       0,
       "Astouding levels of blood sacrificed can enhance your reputation. +3% Prestige point gain per level",
