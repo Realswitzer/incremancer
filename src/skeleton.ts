@@ -554,7 +554,7 @@ export class Skeleton {
     }
     if (this.lastKillingBlow <= 0) {
       this.model.addPrestigePoints(
-        this.persistent.level * this.model.prest_multPCMod
+        Math.round(this.persistent.level * this.model.prest_multPCMod)
       );
       this.lastKillingBlow = 20;
       this.prestigePoints.newPart(creature.x, creature.y);
