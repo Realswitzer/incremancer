@@ -506,8 +506,7 @@ export class Zombies {
             true
           );
           zombie.timer.attack =
-            this.attackSpeed *
-            (1 / (this.model.runeEffects.attackSpeed * this.model.ShockPCMod));
+            this.attackSpeed * (1 / this.model.runeEffects.attackSpeed);
         }
 
         if (
