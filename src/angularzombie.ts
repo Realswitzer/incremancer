@@ -992,58 +992,63 @@ angular
           return (
             skeleton.persistent.skeletons > 0 &&
             zm.model.persistentData.trophies.length >=
-              (skeleton.persistent.xpRate < 8
+              (skeleton.persistent.xpRate < 4
                 ? 20 * skeleton.persistent.xpRate
-                : skeleton.persistent.xpRate < 16
-                  ? 130
-                  : skeleton.persistent.xpRate < 32
-                    ? 190
-                    : skeleton.persistent.xpRate < 64
-                      ? 260
-                      : skeleton.persistent.xpRate < 128
-                        ? 340
-                        : skeleton.persistent.xpRate < 256
-                          ? 430
-                          : skeleton.persistent.xpRate < 512
-                            ? 530
-                            : skeleton.persistent.xpRate < 1024
-                              ? 640
-                              : skeleton.persistent.xpRate < 2048
-                                ? 760
-                                : 720 +
-                                  (Math.log2(skeleton.persistent.xpRate) - 7) *
-                                    (Math.log2(skeleton.persistent.xpRate) -
-                                      7) *
-                                    10)
-          );
-        },
-        trophies() {
-          return skeleton.persistent.skeletons > 0
-            ? ` - ${zm.model.persistentData.trophies.length} / ${
-                i.persistent.xpRate < 8
-                  ? 20 * i.persistent.xpRate
+                : skeleton.persistent.xpRate < 8
+                  ? 70
                   : skeleton.persistent.xpRate < 16
-                    ? 130
+                    ? 110
                     : skeleton.persistent.xpRate < 32
-                      ? 190
+                      ? 160
                       : skeleton.persistent.xpRate < 64
-                        ? 260
+                        ? 220
                         : skeleton.persistent.xpRate < 128
-                          ? 340
+                          ? 290
                           : skeleton.persistent.xpRate < 256
-                            ? 430
+                            ? 370
                             : skeleton.persistent.xpRate < 512
-                              ? 530
+                              ? 460
                               : skeleton.persistent.xpRate < 1024
-                                ? 640
+                                ? 560
                                 : skeleton.persistent.xpRate < 2048
-                                  ? 760
+                                  ? 670
                                   : 720 +
                                     (Math.log2(skeleton.persistent.xpRate) -
                                       7) *
                                       (Math.log2(skeleton.persistent.xpRate) -
                                         7) *
-                                      10
+                                      10)
+          );
+        },
+        trophies() {
+          return skeleton.persistent.skeletons > 0
+            ? ` - ${zm.model.persistentData.trophies.length} / ${
+                skeleton.persistent.xpRate < 4
+                  ? 20 * skeleton.persistent.xpRate
+                  : skeleton.persistent.xpRate < 8
+                    ? 70
+                    : skeleton.persistent.xpRate < 16
+                      ? 110
+                      : skeleton.persistent.xpRate < 32
+                        ? 160
+                        : skeleton.persistent.xpRate < 64
+                          ? 220
+                          : skeleton.persistent.xpRate < 128
+                            ? 290
+                            : skeleton.persistent.xpRate < 256
+                              ? 370
+                              : skeleton.persistent.xpRate < 512
+                                ? 460
+                                : skeleton.persistent.xpRate < 1024
+                                  ? 560
+                                  : skeleton.persistent.xpRate < 2048
+                                    ? 670
+                                    : 720 +
+                                      (Math.log2(skeleton.persistent.xpRate) -
+                                        7) *
+                                        (Math.log2(skeleton.persistent.xpRate) -
+                                          7) *
+                                        10
               } Trophies`
             : "";
         },

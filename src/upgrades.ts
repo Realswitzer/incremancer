@@ -2623,7 +2623,7 @@ export class Upgrades {
       this.types.talentPoint,
       this.costs.prestigePoints,
       100,
-      1.2,
+      1.175,
       1,
       0,
       "Additional skeleton talent point",

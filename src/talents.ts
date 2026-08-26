@@ -116,7 +116,7 @@ export const TalentData = [
     2,
     "Thrifty",
     golemMastery,
-    10,
+    12,
     function (this: Talent) {
       skeleton.killingBlowParts = 0;
       const rank = skeleton.talents[this.id];
@@ -137,7 +137,7 @@ export const TalentData = [
     3,
     "Fatal Bargain",
     golemMastery,
-    10,
+    12,
     function (this: Talent) {
       creatures.refundChance = 0;
       zombies.refundChance = 0;
@@ -160,7 +160,7 @@ export const TalentData = [
     4,
     "Recovery",
     spellMastery,
-    10,
+    12,
     function (this: Talent) {
       spells.cooldownReduction = 1;
       const rank = skeleton.talents[this.id];
@@ -181,7 +181,7 @@ export const TalentData = [
     5,
     "Endurance",
     spellMastery,
-    10,
+    12,
     function (this: Talent) {
       spells.timeExtension = 0;
       const rank = skeleton.talents[this.id];
@@ -225,7 +225,7 @@ export const TalentData = [
     6,
     "Opportunist",
     spellMastery,
-    10,
+    12,
     function () {
       spells.costReduction = 0;
       skeleton.increaseChance = 0;
@@ -310,7 +310,7 @@ export const TalentData = [
     10,
     "Gigamutagen",
     zombieMastery,
-    10,
+    12,
     function (this: Talent) {
       zombies.gigamutagen = 0;
       const rank = skeleton.talents[this.id];
@@ -331,7 +331,7 @@ export const TalentData = [
     11,
     "Blood Pact",
     zombieMastery,
-    10,
+    12,
     function (this: Talent) {
       zombies.bloodpact = 0;
       const rank = skeleton.talents[this.id];
@@ -352,7 +352,7 @@ export const TalentData = [
     12,
     "Blood Born",
     zombieMastery,
-    10,
+    12,
     function (this: Talent) {
       zombies.bloodborn = 0;
       const rank = skeleton.talents[this.id];
