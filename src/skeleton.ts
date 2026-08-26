@@ -213,6 +213,7 @@ export class Skeleton {
       this.model.zombieDamagePCMod *= multiplier;
       this.model.zombieHealthPCMod *= multiplier;
       this.model.PlagueVatPCMod *= scalingFactor;
+      this.model.plagueDamageMod *= scalingFactor;
     }
   }
 
