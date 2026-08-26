@@ -204,7 +204,7 @@ export class Skeleton {
   applyUpgrades(): void {
     if (this.persistent.skeletons > 0) {
       this.applyItemUpgrades();
-      const scalingFactor = Math.pow(1.001, this.persistent.level);
+      const scalingFactor = Math.pow(1.01, this.persistent.level);
       const multiplier = 1 + this.persistent.level / 100;
       this.model.bloodPCMod *= multiplier;
       this.model.brainsPCMod *= multiplier;
