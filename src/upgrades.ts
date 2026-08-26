@@ -336,6 +336,8 @@ export class Upgrades {
         this.gameModel.EnergyCostMod -= upgrade.effect * rank;
         return;
       case this.types.prest_multPC:
+        this.gameModel.zombieDamagePCMod *= Math.pow(1 + upgrade.effect, rank);
+        this.gameModel.zombieHealthPCMod *= Math.pow(1 + upgrade.effect, rank);
         this.gameModel.prest_multPCMod *= Math.pow(1 + upgrade.effect, rank);
         return;
       case this.types.golemDamagePC:
@@ -627,9 +629,9 @@ export class Upgrades {
         );
       case this.types.prest_multPC:
         return (
-          "Prestige per kill multiplier: " +
-          Math.round(this.gameModel.prest_multPCMod) +
-          "x"
+          "Zombie Health and Damage: " +
+          Math.round(100 * this.gameModel.prest_multPCMod) +
+          "%"
         );
       case this.types.EnergyCost:
         return (
@@ -2475,7 +2477,7 @@ export class Upgrades {
       1.25,
       0.03,
       0,
-      "Astouding levels of blood sacrificed can enhance your reputation with dark entities in the Void. +3% Prestige point gain per kill per rank",
+      "Astouding levels of blood sacrificed can enhance your reputation with dark entities in the Void. +3% Zombie Health and Damage per rank",
       null,
       304
     ),
