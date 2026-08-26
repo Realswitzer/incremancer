@@ -628,7 +628,8 @@ export class Upgrades {
       case this.types.prest_multPC:
         return (
           "Prestige per kill multiplier: " +
-          Math.round(100 * this.gameModel.prest_multPCMod)
+          Math.round(this.gameModel.prest_multPCMod) +
+          "x"
         );
       case this.types.EnergyCost:
         return (
