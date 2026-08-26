@@ -63,7 +63,7 @@ export class CreatureFactory {
   ];
 
   creatureScaling = 1.75;
-  creatureCostScaling = 2;
+  creatureCostScaling = 1.8;
   creatureCostReduction = 1;
 
   update(timeDiff: number): void {
