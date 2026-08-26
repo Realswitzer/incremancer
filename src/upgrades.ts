@@ -556,61 +556,61 @@ export class Upgrades {
       case this.types.zombieDmgPC:
         return (
           "Zombie Damage: " +
-          Math.round(this.gameModel.zombieDamagePCMod * 100) +
+          Math.round(this.gameModel.zombieDamagePCMod * 100 - 100) +
           "%"
         );
       case this.types.zombieHealthPC:
         return (
           "Zombie Health: " +
-          Math.round(this.gameModel.zombieHealthPCMod * 100) +
+          Math.round(this.gameModel.zombieHealthPCMod * 100 - 100) +
           "%"
         );
       case this.types.HstrengthDmgPC:
         return (
           "Zombie Damage: " +
-          Math.round(100 * this.gameModel.HstrengthDmgPCMod) +
+          Math.round(100 * this.gameModel.HstrengthDmgPCMod - 100) +
           "%"
         );
       case this.types.HshellHealthPC:
         return (
           "Zombie Health: " +
-          Math.round(100 * this.gameModel.HshellHealthPCMod) +
+          Math.round(100 * this.gameModel.HshellHealthPCMod - 100) +
           "%"
         );
       case this.types.CyroVatPC:
         return (
           "Brains Storage: " +
-          Math.round(100 * this.gameModel.CyroVatPCMod) +
+          Math.round(100 * this.gameModel.CyroVatPCMod - 100) +
           "%"
         );
       case this.types.PlagueVatPC:
         return (
           "Plague Damage: " +
-          Math.round(100 * this.gameModel.PlagueVatPCMod) +
+          Math.round(100 * this.gameModel.PlagueVatPCMod - 100) +
           "%"
         );
       case this.types.CloningRep1PC:
         return (
           "Additional Brain Income: " +
-          Math.round(100 * this.gameModel.CloningRep1PCMod) +
+          Math.round(100 * this.gameModel.CloningRep1PCMod - 100) +
           "%"
         );
       case this.types.BloodSynPC:
         return (
           "Additional Blood Income: " +
-          Math.round(100 * this.gameModel.BloodSynPCMod) +
+          Math.round(100 * this.gameModel.BloodSynPCMod - 100) +
           "%"
         );
       case this.types.SynBonePC:
         return (
           "Additional Bone Income: " +
-          Math.round(100 * this.gameModel.SynBonePCMod) +
+          Math.round(100 * this.gameModel.SynBonePCMod - 100) +
           "%"
         );
       case this.types.SmolPartsPC:
         return (
           "Additional Parts Income: " +
-          Math.round(100 * this.gameModel.SmolPartsPCMod) +
+          Math.round(100 * this.gameModel.SmolPartsPCMod - 100) +
           "%"
         );
       case this.types.AvionicsPC:
@@ -618,7 +618,7 @@ export class Upgrades {
       case this.types.ShockPC:
         return (
           "Attack Speed multiplier: " +
-          Math.round(100 * this.gameModel.ShockPCMod) +
+          Math.round(100 * this.gameModel.ShockPCMod - 100) +
           "%"
         );
       case this.types.EnergyCost:
