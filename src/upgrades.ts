@@ -2477,7 +2477,7 @@ export class Upgrades {
       1.25,
       0.03,
       0,
-      "Astouding levels of blood sacrificed can enhance your reputation with dark entities in the Void. +3% Zombie Health and Damage per rank",
+      "Astounding levels of blood sacrificed can enhance your reputation with dark entities in the Void. +3% Zombie Health and Damage per rank",
       null,
       304
     ),
