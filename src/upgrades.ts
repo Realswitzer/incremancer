@@ -2472,7 +2472,7 @@ export class Upgrades {
       this.costs.blood,
       1e20,
       1.25,
-      1,
+      0.03,
       0,
       "Astouding levels of blood sacrificed can enhance your reputation. +3% Prestige point gain per level",
       null,
