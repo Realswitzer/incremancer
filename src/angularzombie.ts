@@ -780,7 +780,7 @@ angular
       };
 
       zm.howToPlay = [
-        "This is my (Chalice & CirusDane) mod for incremancer I hope you enjoy the qol changes!",
+        "This is Chalice's Mod, expandied by CirusDane, for incremancer - We hope you enjoy the qol changes!",
         "Energy refills over time. You need 10 energy to spawn a zombie by clicking on the ground.",
         "Hold shift or control to spawn multiple zombies with a single click.",
         "Whenever one of your zombies attacks a human you will collect some blood.",
