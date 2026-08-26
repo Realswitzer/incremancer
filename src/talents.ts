@@ -127,9 +127,9 @@ export const TalentData = [
     function (this: Talent) {
       const rank = skeleton.talents[this.id];
       if (rank && rank > 0) {
-        return `Skeleton killing blows reward ${rank * 10}% of your current parts per second`;
+        return `Skeleton killing blows reward ${rank * 10}x of your current parts per second`;
       } else {
-        return "Skeleton killing blows reward 10% of your current parts per second";
+        return "Skeleton killing blows reward 10x of your current parts per second";
       }
     }
   ),
