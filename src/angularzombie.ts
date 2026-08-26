@@ -988,12 +988,33 @@ angular
           this.isShown = false;
         },
         anotherOffer() {
+          // TODO: figure out how to format this without prettier freaking out
           return (
             skeleton.persistent.skeletons > 0 &&
             zm.model.persistentData.trophies.length >=
-              (skeleton.persistent.xpRate < 15
+              (skeleton.persistent.xpRate < 8
                 ? 20 * skeleton.persistent.xpRate
-                : 160 + (Math.log2(skeleton.persistent.xpRate) - 3) * 80)
+                : skeleton.persistent.xpRate < 16
+                  ? 130
+                  : skeleton.persistent.xpRate < 32
+                    ? 190
+                    : skeleton.persistent.xpRate < 64
+                      ? 260
+                      : skeleton.persistent.xpRate < 128
+                        ? 340
+                        : skeleton.persistent.xpRate < 256
+                          ? 430
+                          : skeleton.persistent.xpRate < 512
+                            ? 530
+                            : skeleton.persistent.xpRate < 1024
+                              ? 640
+                              : skeleton.persistent.xpRate < 2048
+                                ? 760
+                                : 720 +
+                                  (Math.log2(skeleton.persistent.xpRate) - 7) *
+                                    (Math.log2(skeleton.persistent.xpRate) -
+                                      7) *
+                                    10)
           );
         },
         trophies() {
