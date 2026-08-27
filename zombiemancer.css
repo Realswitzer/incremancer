@@ -761,11 +761,17 @@ div.skeleton > div.lvl {
 div.skeleton > div.lvl.dead {
   color: #fd5252;
 }
+
+#new-gear-set {
+  min-width: 30%;
+}
+
 .inventory {
   margin: 0.5em 0;
   height: 400px;
   overflow: visible;
 }
+.inventory .gear-sets,
 .inventory .equipped,
 .inventory .items {
   float: left;
@@ -774,11 +780,14 @@ div.skeleton > div.lvl.dead {
   overflow-x: hidden;
 }
 
+.inventory .gear-sets {
+  width: 20%;
+}
 .inventory .equipped {
   width: 40%;
 }
 .inventory .items {
-  width: 60%;
+  width: 40%;
 }
 
 .inventory .item {
@@ -800,6 +809,21 @@ div.skeleton > div.lvl.dead {
   image-rendering: -webkit-crisp-edges;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
+}
+
+.inventory .gear-sets ul {
+  list-style-type: none;
+}
+
+.inventory .gear-sets .gear-sets-list {
+  max-height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.inventory .gear-sets .gear-sets-list button {
+  width: 95%;
+  margin-top: 5px;
 }
 
 .inventory .items .item,

@@ -25,6 +25,18 @@
     </div>
     <div ng-if="zm.skeleton().skeletons > 0">
       <div class="inventory">
+        <div class="gear-sets">
+          Gear Sets ({{zm.skeletonMenu.gearSets().length}}/{{zm.skeletonMenu.maxGearSet}})
+          <button ng-click="zm.skeletonMenu.showNewGearSet()" ng-disabled="!zm.skeletonMenu.canCreateGearSets()">+</button>
+          <button ng-click="zm.skeletonMenu.deleteGearSet()" ng-disabled="!zm.skeletonMenu.canDeleteGearSets()">-</button>
+          <div class="gear-sets-list">
+            <ul>
+              <li ng-repeat="set in zm.skeletonMenu.gearSets() track by $index">
+                <button ng-click="zm.skeletonMenu.selectGearSet($index)" class="{{zm.skeletonMenu.gearSetEquipped() == $index ? 'active' : ''}}">{{set.name}}</button>
+              </li>
+            </ul>
+          </div>
+        </div>
         <div class="equipped">
           <div class="row" ng-repeat="itemRow in zm.skeletonMenu.equipped track by $index">
             <div class="item {{zm.skeletonMenu.itemClass(item)}} {{zm.skeletonMenu.itemType(item)}} droppable" ng-repeat="item in itemRow track by item.id" ng-mousemove="zm.moveTooltip($event, $event.currentTarget);" 
@@ -81,5 +93,21 @@
         </div>
       </div>
     </div>
+  </div>
+</div>
+<div class="level-select" ng-if="zm.skeletonMenu.isNewGearSetShown" id="new-gear-set">
+  <div class="shop-title">
+    <h2>Create New Gear Set</h2>
+    <div style="clear: both;"></div>
+  </div>
+  <div class="ranges">
+    <ng-form name="newgearset">
+      <p>Name: <input type="text" name="name" ng-model="zm.skeletonMenu.newGearSetName" ng-pattern="/^[\w ]*$/" required ng-minlength="1" ng-maxlength="16"/></p>
+      <p ng-show="newgearset.name.$error.pattern">The name must be alphanumeric.</p>
+      <p ng-show="newgearset.name.$error.required || newgearset.name.$error.maxlength">The name must contain between 1 and 16 characters.</p>
+    </ng-form>
+    
+    <button ng-click="zm.skeletonMenu.createGearSet()" ng-disabled="!newgearset.name.$valid">Create</button>
+    <button ng-click="zm.skeletonMenu.showNewGearSet()">Cancel</button>
   </div>
 </div>
