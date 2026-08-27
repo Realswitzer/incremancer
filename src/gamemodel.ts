@@ -96,6 +96,8 @@ export class GameModel {
   AvionicsPCMod = 1;
   ShockPCMod = 1;
   EnergyCostMod = 0;
+  moveSpeed = 0;
+  SkeleMoveMod = 0;
   zombieDamage = 10;
   zombieDamagePCMod = 1;
   HstrengthDmgPCMod = 1;
@@ -233,6 +235,8 @@ export class GameModel {
     this.golemHealthPCMod = 1;
     this.golemDamagePCMod = 1;
     this.prest_multPCMod = 1;
+    this.moveSpeed = 0;
+    this.SkeleMoveMod = 0;
     this.plagueDamageMod = 0;
     this.plagueticks = 2;
     this.burningSpeedMod = 1;

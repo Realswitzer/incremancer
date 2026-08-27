@@ -79,6 +79,7 @@ export class Upgrades {
     golemHealthPC: "golemHealthPC",
     golemDamagePC: "golemDamagePC",
     prest_multPC: "prest_multPC",
+    SkeleMove: "SkeleMove",
     startingPC: "startingPC",
     energyCost: "energyCost",
     autoconstruction: "autoconstruction",
@@ -326,6 +327,9 @@ export class Upgrades {
       case this.types.AvionicsPC:
         this.gameModel.harpySpeed += upgrade.effect * rank;
         this.gameModel.AvionicsPCMod += upgrade.effect * rank;
+        return;
+      case this.types.SkeleMove:
+        this.skeleton.moveSpeed += upgrade.effect * rank;
         return;
       case this.types.ShockPC:
         this.attackSpeed *= Math.pow(1 + upgrade.effect, rank);
@@ -621,6 +625,8 @@ export class Upgrades {
         );
       case this.types.AvionicsPC:
         return "Harpy speed: " + formatWhole(this.gameModel.harpySpeed);
+      case this.types.SkeleMove:
+        return "Skeleton speed: " + this.gameModel.SkeleMoveMod;
       case this.types.ShockPC:
         return (
           "Attack Speed multiplier: " +
@@ -2470,7 +2476,7 @@ export class Upgrades {
     ),
     new Upgrade(
       73,
-      "Abyssal Reputation",
+      "Sephirin's Reputation",
       this.types.prest_multPC,
       this.costs.blood,
       1e20,
@@ -2478,6 +2484,19 @@ export class Upgrades {
       0.03,
       0,
       "Astounding levels of blood sacrificed can enhance your reputation with dark entities in the Void. +3% Zombie Health and Damage per rank",
+      null,
+      304
+    ),
+    new Upgrade(
+      74,
+      "Strider's Mathemagics",
+      this.types.SkeleMove,
+      this.costs.parts,
+      1e18,
+      8,
+      1,
+      10,
+      "Using arcane mathemagics you impart golem based ligaments to your Skeleton Champion. +1 Movement Speed per rank.",
       null,
       304
     ),
