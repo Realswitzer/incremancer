@@ -511,6 +511,20 @@ div.generator-progress.active > span.percent {
   }
 }
 
+@media screen and (min-width: 1800px) {
+  div.shop div.tabs button {
+    margin-right: 0;
+  }
+  div.start-game button,
+  div.end-level button,
+  div.shop button {
+    padding: 6px 6px;
+  }
+  div.level-select {
+    width: 60%;
+  }
+}
+
 @media screen and (max-width: 1800px) {
   div.shop div.tabs button {
     margin-right: 0;
