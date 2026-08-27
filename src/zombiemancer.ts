@@ -471,6 +471,7 @@ const KeysPressed = {
   s: false,
   d: false,
   shift: false,
+  canType: false,
 };
 
 window.onblur = function () {
@@ -479,6 +480,9 @@ window.onblur = function () {
 };
 
 window.onkeydown = function (e) {
+  if (KeysPressed.canType) {
+    return true;
+  }
   switch (e.keyCode) {
     case 16:
     case 17:
@@ -506,6 +510,9 @@ window.onkeydown = function (e) {
   return false;
 };
 window.onkeyup = function (e) {
+  if (KeysPressed.canType) {
+    return true;
+  }
   switch (e.keyCode) {
     case 16:
     case 17:

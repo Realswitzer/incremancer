@@ -149,6 +149,8 @@ export class Skeleton {
     level: 1,
     xp: 0,
     items: [] as Loot[],
+    gearSetEquipped: -1,
+    gearSets: [],
     currItemId: 0,
     talentReset: false,
   };

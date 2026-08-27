@@ -960,7 +960,10 @@ angular
       // ---- Skeleton Functions ---- //
       zm.skeletonMenu = {
         isShown: false,
+        isNewGearSetShown = false,
         tab: "inventory",
+        newGearSetName: "New Set",
+        maxGearSet: 5,
         changeTab(tab: string) {
           this.tab = tab;
         },
@@ -981,6 +984,161 @@ angular
                 // elements[i].style.animationDelay = (Math.random() * 4).toFixed(2) + "s";
               }
             }, 100);
+          }
+        },
+        showNewGearSet() {
+          this.newGearSetName = "New Set";
+          this.isNewGearSetShown = !this.isNewGearSetShown;
+          KeysPressed.canType = this.isNewGearSetShown;
+        },
+        selectGearSet(index) {
+          skeleton.persistent.gearSetEquipped = index;
+          if (skeleton.persistent.gearSetEquipped == -1) {
+            return;
+          }
+          skeleton.persistent.gearSets[
+            skeleton.persistent.gearSetEquipped
+          ].slots.forEach((slot) => {
+            skeleton.persistent.items.filter(
+              (item) => item.s == slot.s && (item.q = slot.id == item.id)
+            );
+          });
+          upgrades.applyUpgrades();
+          this.updateEquippedItems();
+        },
+        canCreateGearSets() {
+          return skeleton.persistent.gearSets.length < this.maxGearSet;
+        },
+        canDeleteGearSets: () =>
+          skeleton.persistent.gearSets.length > 0 &&
+          skeleton.persistent.gearSetEquipped != -1,
+        gearSets: () => skeleton.persistent.gearSets,
+        gearSetEquipped: () => skeleton.persistent.gearSetEquipped,
+        createGearSet() {
+          if (this.newGearSetName == null) {
+            return;
+          }
+          let name: string = this.newGearSetName.replace(/[^\w^\S]*$/gi, "");
+          if (name.length == 0) {
+            return;
+          }
+          let newGearSet = {
+            name,
+            slots: [] as { s: number; id: number },
+          };
+          const helmetItems = skeleton.persistent.items.filter(
+            (item) => item.q && item.s == skeleton.lootPositions.helmet.id
+          );
+          if (helmetItems.length > 0) {
+            newGearSet.slots.push({
+              s: helmetItems[0].s,
+              id: helmetItems[0].id,
+            });
+          } else {
+            newGearSet.slots.push([
+              {
+                s: skeleton.lootPositions.helmet.id,
+                id: -1,
+              },
+            ]);
+          }
+          const swordItems = skeleton.persistent.items.filter(
+            (e) => e.q && e.s == skeleton.lootPositions.sword.id
+          );
+          if (swordItems.length > 0) {
+            newGearSet.slots.push({
+              s: swordItems[0].s,
+              id: swordItems[0].id,
+            });
+          } else {
+            newGearSet.slots.push({
+              s: skeleton.lootPositions.sword.id,
+              id: -2,
+            });
+          }
+          const chestItems = skeleton.persistent.items.filter(
+            (e) => e.q && e.s == skeleton.lootPositions.chest.id
+          );
+          if (chestItems.length > 0) {
+            newGearSet.slots.push({
+              s: chestItems[0].s,
+              id: chestItems[0].id,
+            });
+          } else {
+            newGearSet.slots.push({
+              s: skeleton.lootPositions.chest.id,
+              id: -3,
+            });
+          }
+          const shieldItems = skeleton.persistent.items.filter(
+            (e) => e.q && e.s == skeleton.lootPositions.shield.id
+          );
+          if (shieldItems.length > 0) {
+            newGearSet.slots.push({
+              s: shieldItems[0].s,
+              id: shieldItems[0].id,
+            });
+          } else {
+            newGearSet.slots.push({
+              s: skeleton.lootPositions.shield.id,
+              id: -4,
+            });
+          }
+          const gloveItems = skeleton.persistent.items.filter(
+            (e) => e.q && e.s == skeleton.lootPositions.gloves.id
+          );
+          if (gloveItems.length > 0) {
+            newGearSet.slots.push({
+              s: gloveItems[0].s,
+              id: gloveItems[0].id,
+            });
+          } else {
+            newGearSet.slots.push({
+              s: skeleton.lootPositions.gloves.id,
+              id: -5,
+            });
+          }
+          const legItems = skeleton.persistent.items.filter(
+            (e) => e.q && e.s == skeleton.lootPositions.legs.id
+          );
+          if (legItems.length > 0) {
+            newGearSet.slots.push({
+              s: legItems[0].s,
+              id: legItems[0].id,
+            });
+          } else {
+            newGearSet.slots.push({
+              s: skeleton.lootPositions.legs.id,
+              id: -6,
+            });
+          }
+          const bootItems = skeleton.persistent.items.filter(
+            (e) => e.q && e.s == skeleton.lootPositions.boots.id
+          );
+          if (bootItems.length > 0) {
+            newGearSet.slots.push({
+              s: bootItems[0].s,
+              id: bootItems[0].id,
+            });
+          } else {
+            newGearSet.slots.push({
+              s: skeleton.lootPositions.boots.id,
+              id: -7,
+            });
+          }
+          skeleton.persistent.gearSets.push(newGearSet);
+          this.selectGearSet(skeleton.persistent.gearSets.length - 1);
+          this.showNewGearSet();
+        },
+        deleteGearSet() {
+          skeleton.persistent.gearSets.splice(
+            skeleton.persistent.gearSetEquipped,
+            1
+          );
+          if (skeleton.persistent.gearSets.length > 0) {
+            this.selectGearSet(0);
+          } else {
+            this.selectGearSet(-1);
           }
         },
         acceptOffer() {
@@ -1275,6 +1433,15 @@ angular
             }
             this.updateEquippedItems();
           }
+          if (skeleton.persistent.gearSetEquipped != -1 && -1 != target) {
+            skeleton.persistent.gearSets[
+              skeleton.persistent.gearSetEquipped
+            ].slots.forEach((slot) => {
+              if (slot.s == draggedItem.s) {
+                slot.id = draggedItem.id;
+              }
+            });
+          }
         },
         equipItem(itemClicked) {
           skeleton.persistent.items.forEach(function (item) {
@@ -1285,6 +1452,15 @@ angular
           itemClicked.q = true;
           upgrades.applyUpgrades();
           this.updateEquippedItems();
+          if (skeleton.persistent.gearSetEquipped != -1) {
+            skeleton.persistent.gearSets[
+              skeleton.persistent.gearSetEquipped
+            ].slots.forEach((slot) => {
+              if (slot.s == itemClicked.s) {
+                slot.id = itemClicked.id;
+              }
+            });
+          }
         },
         trashAll() {
           zm.confirmMessage =

@@ -769,6 +769,12 @@ export class GameModel {
           this.skeleton.persistent = JSON.parse(
             localStorage.getItem(this.skeleton.storageName)
           );
+          if (!("gearSetEquipped" in this.skeleton.persistent)) {
+            this.skeleton.persistent.gearSetEquipped = -1;
+          }
+          if (!("gearSets" in this.skeleton.persistent)) {
+            this.skeleton.persistent.gearSets = [];
+          }
         } else {
           this.skeleton.persistent = {
             xpRate: 0,
@@ -776,6 +782,8 @@ export class GameModel {
             level: 1,
             xp: 0,
             items: [],
+            gearSetEquipped: -1,
+            gearSets: [],
             currItemId: 0,
             talentReset: false,
           };
@@ -909,6 +917,12 @@ export class GameModel {
           if (savegame.skeleton) {
             model.skeleton.persistent = savegame.skeleton;
             delete savegame.skeleton;
+            if (!("gearSetEquipped" in model.skeleton.persistent)) {
+              model.skeleton.persistent.gearSetEquipped = -1;
+            }
+            if (!("gearSets" in model.skeleton.persistent)) {
+              model.skeleton.persistent.gearSets = [];
+            }
           }
           if (savegame.skeletonTalents) {
             model.skeleton.talents = savegame.skeletonTalents;
