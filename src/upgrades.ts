@@ -306,7 +306,6 @@ export class Upgrades {
         this.gameModel.CyroVatPCMod *= Math.pow(1 + upgrade.effect, rank);
         return;
       case this.types.PlagueVatPC:
-        this.gameModel.plagueDamageMod *= Math.pow(1 + upgrade.effect, rank);
         this.gameModel.PlagueVatPCMod *= Math.pow(1 + upgrade.effect, rank);
       case this.types.CloningRep1PC:
         this.gameModel.brainsPCMod *= Math.pow(1 + upgrade.effect, rank);

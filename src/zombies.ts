@@ -614,13 +614,13 @@ export class Zombies {
     if (!human.flags.infected) {
       this.exclamations.newPoison(human);
       human.plagueDamage =
-        (this.model.zombieDamage / 2 + this.model.plagueDamageMod) *
-        this.model.PlagueVatPCMod;
+        (this.model.zombieDamage * this.model.PlagueVatPCMod) / 2 +
+        this.model.plagueDamageMod;
       human.plagueTicks = this.model.plagueticks;
     } else {
-      human.plagueDamage +=
-        (this.model.zombieDamage / 2 + this.model.plagueDamageMod) *
-        this.model.PlagueVatPCMod;
+      human.plagueDamage =
+        (this.model.zombieDamage * this.model.PlagueVatPCMod) / 2 +
+        this.model.plagueDamageMod;
       human.plagueTicks = this.model.plagueticks;
     }
     human.flags.infected = true;
