@@ -2004,9 +2004,9 @@ export class Upgrades {
       this.types.spitDistance,
       this.costs.blood,
       500000,
-      1.6,
+      1.8,
       5,
-      10,
+      15,
       "The first rank gives your zombies the ability to spit plague at enemies beyond normal attack range. Spit attacks do 50% zombie damage and infect the victim with plague. Subsequent ranks will increase the range of spit attacks.",
       null,
       218
