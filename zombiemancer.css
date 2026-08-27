@@ -764,6 +764,11 @@ div.skeleton > div.lvl.dead {
 
 #new-gear-set {
   min-width: 30%;
+  max-width: 30%;
+}
+
+#new-gear-set .ranges .error {
+  color: #fd5252;
 }
 
 .inventory {

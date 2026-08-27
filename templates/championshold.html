@@ -103,8 +103,8 @@
   <div class="ranges">
     <ng-form name="newgearset">
       <p>Name: <input type="text" name="name" ng-model="zm.skeletonMenu.newGearSetName" ng-pattern="/^[\w ]*$/" required ng-minlength="1" ng-maxlength="16"/></p>
-      <p ng-show="newgearset.name.$error.pattern">The name must be alphanumeric.</p>
-      <p ng-show="newgearset.name.$error.required || newgearset.name.$error.maxlength">The name must contain between 1 and 16 characters.</p>
+      <p class="error" ng-show="newgearset.name.$error.pattern">The name must be alphanumeric.</p>
+      <p class="error" ng-show="newgearset.name.$error.required || newgearset.name.$error.maxlength">The name must contain between 1 and 16 characters.</p>
     </ng-form>
     
     <button ng-click="zm.skeletonMenu.createGearSet()" ng-disabled="!newgearset.name.$valid">Create</button>
