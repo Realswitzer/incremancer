@@ -2284,7 +2284,7 @@ export class Upgrades {
       60000,
       1.6,
       0.05,
-      5,
+      15,
       "Craft your earth golems from much harder stone. Each rank gives them 5% chance to reflect bullets back to their source.",
       null,
       220
