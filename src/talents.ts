@@ -289,7 +289,7 @@ export const TalentData = [
     9,
     "Bone Shield",
     skeletonMastery,
-    10,
+    12,
     function (this: Talent) {
       skeleton.boneshield = 0;
       const rank = skeleton.talents[this.id];
