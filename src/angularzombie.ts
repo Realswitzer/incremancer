@@ -1012,12 +1012,14 @@ angular
                                 ? 560
                                 : skeleton.persistent.xpRate < 2048
                                   ? 670
-                                  : 720 +
-                                    (Math.log2(skeleton.persistent.xpRate) -
-                                      7) *
+                                  : skeleton.persistent.xpRate < 4096
+                                    ? 790
+                                    : 720 +
                                       (Math.log2(skeleton.persistent.xpRate) -
                                         7) *
-                                      10)
+                                        (Math.log2(skeleton.persistent.xpRate) -
+                                          7) *
+                                        10)
           );
         },
         trophies() {
@@ -1043,12 +1045,16 @@ angular
                                   ? 560
                                   : skeleton.persistent.xpRate < 2048
                                     ? 670
-                                    : 720 +
-                                      (Math.log2(skeleton.persistent.xpRate) -
-                                        7) *
+                                    : skeleton.persistent.xpRate < 4096
+                                      ? 790
+                                      : 720 +
                                         (Math.log2(skeleton.persistent.xpRate) -
                                           7) *
-                                        10
+                                          (Math.log2(
+                                            skeleton.persistent.xpRate
+                                          ) -
+                                            7) *
+                                          10
               } Trophies`
             : "";
         },
