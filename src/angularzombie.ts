@@ -1529,6 +1529,10 @@ angular
           }
         },
         equipItem(itemClicked) {
+          if (this.isShown && KeysPressed.shift) {
+            this.itemDropped(itemClicked.id, -1);
+            return;
+          }
           skeleton.persistent.items.forEach(function (item) {
             if (item.s == itemClicked.s) {
               item.q = false;
@@ -1678,6 +1682,24 @@ angular
               $rootScope.$emit("item-drag-end", itemId);
             });
           }
+        },
+      };
+    },
+  ])
+  .directive("shiftDeleteItem", [
+    "$rootScope",
+    function ($rootScope) {
+      return {
+        restrict: "A",
+        link: function (scope: any, el, attrs, controller) {
+          (el.bind("mouseenter", function () {
+            if (KeysPressed.shift) {
+              el.addClass("shift-trash");
+            }
+          }),
+            el.bind("mouseleave", function () {
+              el.removeClass("shift-trash");
+            }));
         },
       };
     },
