@@ -765,7 +765,7 @@ export class Skeleton {
 
   applyItemUpgrades(): void {
     this.model = GameModel.getInstance();
-    this.moveSpeed = 40;
+    this.moveSpeed = 40 + this.model.SkeleMoveMod;
     this.respawnTime = 10;
     this.randomSpells = [];
     this.persistent.items
