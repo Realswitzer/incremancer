@@ -1465,7 +1465,7 @@ angular
         trashAll() {
           zm.confirmMessage =
             "Are you sure you want to destroy all non-equipped items? You will earn " +
-            n(i.xpForItems()) +
+            formatWhole(skeleton.xpForItems()) +
             " xp";
           zm.confirmCallback = function () {
             zm.confirmCallback = false;
