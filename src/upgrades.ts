@@ -270,22 +270,40 @@ export class Upgrades {
         return;
       // prestige items
       case this.types.bonesGainPC:
-        this.gameModel.bonesPCMod *= Math.pow(1 + upgrade.effect, rank);
+        this.gameModel.bonesPCMod *=
+          upgrade.costType == this.costs.prestigePoints
+            ? this.calculateWithPrestigeRankBonus(upgrade, rank)
+            : Math.pow(1 + upgrade.effect, rank);
         return;
       case this.types.partsGainPC:
-        this.gameModel.partsPCMod *= Math.pow(1 + upgrade.effect, rank);
+        this.gameModel.partsPCMod *=
+          upgrade.costType == this.costs.prestigePoints
+            ? this.calculateWithPrestigeRankBonus(upgrade, rank)
+            : Math.pow(1 + upgrade.effect, rank);
         return;
       case this.types.bloodGainPC:
-        this.gameModel.bloodPCMod *= Math.pow(1 + upgrade.effect, rank);
+        this.gameModel.bloodPCMod *=
+          upgrade.costType == this.costs.prestigePoints
+            ? this.calculateWithPrestigeRankBonus(upgrade, rank)
+            : Math.pow(1 + upgrade.effect, rank);
         return;
       case this.types.bloodStoragePC:
-        this.gameModel.bloodStorePCMod *= Math.pow(1 + upgrade.effect, rank);
+        this.gameModel.bloodStorePCMod *=
+          upgrade.costType == this.costs.prestigePoints
+            ? this.calculateWithPrestigeRankBonus(upgrade, rank)
+            : Math.pow(1 + upgrade.effect, rank);
         return;
       case this.types.brainsGainPC:
-        this.gameModel.brainsPCMod *= Math.pow(1 + upgrade.effect, rank);
+        this.gameModel.brainsPCMod *=
+          upgrade.costType == this.costs.prestigePoints
+            ? this.calculateWithPrestigeRankBonus(upgrade, rank)
+            : Math.pow(1 + upgrade.effect, rank);
         return;
       case this.types.brainsStoragePC:
-        this.gameModel.brainsStorePCMod *= Math.pow(1 + upgrade.effect, rank);
+        this.gameModel.brainsStorePCMod *=
+          upgrade.costType == this.costs.prestigePoints
+            ? this.calculateWithPrestigeRankBonus(upgrade, rank)
+            : Math.pow(1 + upgrade.effect, rank);
         return;
       case this.types.zombieDmgPC:
         this.gameModel.zombieDamagePCMod *= Math.pow(1 + upgrade.effect, rank);
@@ -368,6 +386,20 @@ export class Upgrades {
         this.skeleton.talentPoints = rank;
         return;
     }
+  }
+
+  calculateWithPrestigeRankBonus(upgrade: UpgradeEffect, rank: number) {
+    if (rank <= 60) {
+      return Math.pow(1 + upgrade.effect, rank);
+    }
+
+    let multiplier = Math.pow(1 + upgrade.effect, 60);
+
+    for (let i = 1; i <= rank - 60; i++) {
+      multiplier *= 1 + upgrade.effect * Math.pow(1 + 0.05, i);
+    }
+
+    return multiplier;
   }
 
   applyConstructionUpgrade(upgrade: Upgrade): void {
