@@ -418,6 +418,17 @@ angular
         select(level) {
           this.level = level;
         },
+        setMaxHarpies() {
+          let maxHarpies = Math.floor(
+            this.getEnergyRate() + this.persistentData.harpies
+          );
+          if (
+            (maxHarpies >= 0 && maxHarpies < this.persistentData.harpies) ||
+            (this.getEnergyRate() >= 1 && maxHarpies > 0)
+          ) {
+            this.persistentData.harpies = maxHarpies;
+          }
+        },
         startLevel() {
           zm.model.startLevel(this.level.level);
           this.shown = false;

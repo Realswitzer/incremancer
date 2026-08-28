@@ -43,11 +43,12 @@
       <h4>Harpies <button ng-click="zm.hpinfo = ! zm.hpinfo" class="{{zm.hpinfo ? 'active' : ''}}">Info</button></h4>
       <p ng-show="zm.hpinfo">Release harpies that drop barrels of plague infected zombie flesh on unsuspecting humans. Each harpy consumes 1 energy per second. Harpy bombs infect humans with plague and cause {{zm.model.zombieHealth * 0.2|whole}} damage. The damage scales with zombie health.</p>
       <h4>Energy rate {{zm.model.getEnergyRate()|decimal}} per second</h4>
-      <button ng-click="zm.setHarpies(0);">0</button>
-      <button ng-click="zm.setHarpies(zm.model.persistentData.harpies - 1);">-</button>
+      <button ng-click="zm.setHarpies(0);zm.model.persistentData.autoMaxHarpies = false;">0</button>
+      <button ng-click="zm.setHarpies(zm.model.persistentData.harpies - 1);zm.model.persistentData.autoMaxHarpies = false;">-</button>
       <label>{{zm.model.persistentData.harpies|whole}} harpies</label>
-      <button ng-click="zm.setHarpies(zm.model.persistentData.harpies + 1);">+</button>
-      <button ng-click="zm.setHarpies(zm.maxHarpies());">{{zm.maxHarpies()}}</button>
+      <button ng-click="zm.setHarpies(zm.model.persistentData.harpies + 1);zm.model.persistentData.autoMaxHarpies = false;">+</button>
+      <button ng-click="zm.setHarpies(zm.maxHarpies());zm.model.persistentData.autoMaxHarpies = false;">{{zm.maxHarpies()}}</button>
+      <button ng-click="zm.model.persistentData.autoMaxHarpies = !zm.model.persistentData.autoMaxHarpies" class="{{zm.model.persistentData.autoMaxHarpies ? 'active' : ''}}">Auto Max Harpies</button>
     </div>
     <!-- <div class="bone-collectors bones" ng-if="zm.model.gigazombies">
       <h4>Gigazombies <button ng-click="zm.gzinfo = ! zm.gzinfo" class="{{zm.gzinfo ? 'active' : ''}}">Info</button></h4>

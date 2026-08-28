@@ -84,9 +84,15 @@ export class Spells {
       50,
       function () {
         GameModel.getInstance().energySpellMultiplier = 5;
+        if (GameModel.getInstance().persistentData.autoMaxHarpies) {
+          GameModel.getInstance().setMaxHarpies();
+        }
       },
       function () {
         GameModel.getInstance().energySpellMultiplier = 1;
+        if (GameModel.getInstance().persistentData.autoMaxHarpies) {
+          GameModel.getInstance().setMaxHarpies();
+        }
       }
     ),
     new Spell(
