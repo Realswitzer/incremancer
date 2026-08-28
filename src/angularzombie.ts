@@ -1161,8 +1161,8 @@ angular
         isFiltered(loot) {
           // TODO: rewrite in a sensical way, this is webcrack output to unmangle
           if (
-            (loot.se.length > 0
-              ? this.itemsFilters.se.length > 0
+            (this.itemsFilters.se.length > 0
+              ? loot.se.length > 0
                 ? this.itemsFilters.se.includes(loot.se[0])
                 : true
               : false) &&
