@@ -1289,6 +1289,9 @@ angular
         xpRate() {
           return skeleton.persistent.xpRate * 100;
         },
+        prestigePointsPerKill() {
+          return zm.skeleton().level * 1.00025 ** zm.skeleton().level;
+        },
         isAlive() {
           return skeleton.isAlive();
         },

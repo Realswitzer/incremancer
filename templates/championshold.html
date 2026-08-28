@@ -117,7 +117,7 @@
         </div>
       </div>
       <p>Level: {{zm.skeleton().level}} - {{zm.skeleton().xp|whole}} / {{zm.skeletonMenu.xpForNextLevel()|whole}} xp ({{zm.skeletonMenu.xpRate()}}% xp rate)<br/>Earn xp by killing humans while the Champion is alive, higher level humans reward more xp</p>
-      <p>Increases zombie health and damage by {{zm.skeleton().level}}%, all resource generation by {{zm.skeleton().level}}%,<br/>and receive {{zm.skeleton().level}} prestige points when the Skeleton Champion lands a killing blow. (20 second cooldown)</p>
+      <p>Increases zombie health and damage by {{zm.skeleton().level}}%, all resource generation by {{zm.skeleton().level}}%,<br/>and receive {{zm.skeletonMenu().prestigePointsPerKill()|whole}} prestige points when the Skeleton Champion lands a killing blow. (20 second cooldown)</p>
     </div>
   </div>
   <div ng-if="zm.skeletonMenu.tab == 'talents'" class="talents">
