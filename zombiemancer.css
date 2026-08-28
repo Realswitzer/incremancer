@@ -1050,7 +1050,7 @@ div.skeleton > div.lvl.dead {
 }
 
 .items-filter {
-  position: fixed;
+  position: absolute;
   top: 0;
   right: 0;
   width: 20%;
@@ -1058,10 +1058,8 @@ div.skeleton > div.lvl.dead {
   padding: 1.5em 1em;
   background: #0d1f1f;
   box-shadow: -4px 0 8px rgba(0, 0, 0, 0.7);
-  transform: translateX(calc(100% * 5));
-  transition: transform 0.3s ease-in-out;
   z-index: 1000;
-  overflow-y: auto;
+  display: auto;
 }
 
 .items-filter span.title {
@@ -1070,7 +1068,7 @@ div.skeleton > div.lvl.dead {
 }
 
 .items-filter.open {
-  transform: translateX(0);
+  display: block;
 }
 
 .items-filter .close-filter {
