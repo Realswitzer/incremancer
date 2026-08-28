@@ -706,6 +706,7 @@ export class Skeleton {
     legendary: 4,
     ancient: 5,
     divine: 6,
+    chaos: 7,
   };
 
   prefixes = {
@@ -752,6 +753,7 @@ export class Skeleton {
     ],
     ancientQuality: ["Grim", "Miserable", "Luxurious"],
     divineQuality: ["Divine"],
+    chaosQuality: ["Chaotic", "Corrupted", "Fractured", "Twisted"],
   };
 
   stats = {
@@ -823,6 +825,8 @@ export class Skeleton {
         case this.rarity.divine:
           prefix = this.prefixes.divineQuality[loot.p];
           break;
+        case this.rarity.chaos:
+          prefix = this.prefixes.chaosQuality[loot.p];
       }
     } catch (e: unknown) {
       // NOTE: This exists to *hopefully* reduce risk of errors
@@ -881,6 +885,8 @@ export class Skeleton {
         return "ancient";
       case this.rarity.divine:
         return "divine";
+      case this.rarity.chaos:
+        return "chaos";
     }
   }
 
@@ -1010,6 +1016,11 @@ export class Skeleton {
       );
       specialEffects.push(spell.id);
     }
+    if (rarity == ancient) {
+      if (Math.random() < 0.2) {
+        rarity = this.rarity.chaos;
+      }
+    }
     let prefixIndex = 0;
     switch (rarity) {
       case this.rarity.common:
@@ -1042,19 +1053,29 @@ export class Skeleton {
           Math.random() * this.prefixes.divineQuality.length
         );
         break;
+      case this.rarity.chaos:
+        prefixIndex = Math.floor(
+          Math.random() * this.prefixes.chaosQuality.length
+        );
     }
-    const effects = [
-      Math.random() > 0.5
-        ? this.stats.zombieHealth.id
-        : this.stats.zombieDamage.id,
-    ];
-    for (let i = 0; i < rarity - 1; i++) {
-      // NOTE: needs to be updated IF new item effect added
-      let effect = Math.ceil(Math.random() * 6);
-      while (effects.indexOf(effect) > -1) {
-        effect = Math.ceil(Math.random() * 6);
+    if (rarity == this.rarity.chaos) {
+      for (let e = 0; e < 5; e++) {
+        n.push(Math.ceil(6 * Math.random()));
       }
-      effects.push(effect);
+    } else {
+      const effects = [
+        Math.random() > 0.5
+          ? this.stats.zombieHealth.id
+          : this.stats.zombieDamage.id,
+      ];
+      for (let i = 0; i < rarity - 1; i++) {
+        // NOTE: needs to be updated IF new item effect added
+        let effect = Math.ceil(Math.random() * 6);
+        while (effects.indexOf(effect) > -1) {
+          effect = Math.ceil(Math.random() * 6);
+        }
+        effects.push(effect);
+      }
     }
     return {
       id: this.persistent.currItemId++,
@@ -1078,11 +1099,14 @@ export class Skeleton {
   }
   destroyAllItems(): void {
     this.addXp(
-      this.xpForItems() - this.xpForAncient() - this.xpForDivine(),
+      this.xpForItems() -
+        this.xpForAncient() -
+        this.xpForDivine() -
+        this.xpForChaos(),
       true
     );
     this.persistent.items = this.persistent.items.filter(
-      (i) => i.q || i.r == this.rarity.legendary
+      (i) => i.q || i.r >= this.rarity.legendary
     );
   }
   destroyAllItemsLegendary() {
@@ -1094,7 +1118,8 @@ export class Skeleton {
         i.r == this.rarity.rare ||
         i.r == this.rarity.epic ||
         i.r == this.rarity.ancient ||
-        i.r == this.rarity.divine
+        i.r == this.rarity.divine ||
+        i.r == this.rarity.chaos
     );
   }
   xpForItems(): number {
@@ -1133,10 +1158,25 @@ export class Skeleton {
       });
     return xp;
   }
+  xpForChaos() {
+    let xp = 0;
+    this.persistent.items
+      .filter((i) => !i.q && i.r == this.rarity.chaos)
+      .forEach(function (item) {
+        xp += item.l * item.r * 10;
+      });
+    return xp;
+  }
   xpTotal() {
     // NOTE: in the original version, xpForAncient and xpForDivine are not called (-this.xpForAncient)
     // I assume this is a bug, and has been fixed here.
-    return this.xpForItems() - this.xpForAncient() - this.xpForDivine();
+    // though, after checking DM, this continues without calls. maybe ill test eventually
+    return (
+      this.xpForItems() -
+      this.xpForAncient() -
+      this.xpForDivine() -
+      this.xpForChaos()
+    );
   }
 }
 

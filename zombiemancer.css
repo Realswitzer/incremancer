@@ -920,6 +920,14 @@ div.skeleton > div.lvl.dead {
   background: linear-gradient(#e66465, #9198e5);
   background-size: 190% 200%;
 }
+.inventory .item.chaos {
+  background: linear-gradient(270deg, #5500aa, #000000, #5500aa);
+  background-size: 190% 200%;
+
+  -webkit-animation: levelup-animation 4s linear infinite;
+  -moz-animation: levelup-animation 4s linear infinite;
+  animation: levelup-animation 4s linear infinite;
+}
 .inventory .item.divine {
   background: linear-gradient(
     90deg,
@@ -1213,6 +1221,14 @@ div.skeleton > div.lvl.dead {
 .inventory .items-filter li .icon.ancient {
   background: linear-gradient(#e66465, #9198e5);
   background-size: 190% 200%;
+}
+.inventory .items-filter li .icon.chaos {
+  background: linear-gradient(270deg, #5500aa, #000000, #5500aa);
+  background-size: 190% 200%;
+
+  -webkit-animation: levelup-animation 4s linear infinite;
+  -moz-animation: levelup-animation 4s linear infinite;
+  animation: levelup-animation 4s linear infinite;
 }
 .inventory .items-filter li .icon.divine {
   background: linear-gradient(

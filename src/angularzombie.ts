@@ -1415,6 +1415,8 @@ angular
                 return "Ancient level " + item.l + " " + this.itemType(item);
               case skeleton.rarity.divine:
                 return "Divine level " + item.l + " " + this.itemType(item);
+              case skeleton.rarity.chaos:
+                return "Chaos level " + item.l + " " + this.itemType(item);
             }
           }
           if (item.s == -1) {
@@ -1466,6 +1468,8 @@ angular
               return "Ancient";
             case skeleton.rarity.divine:
               return "Divine";
+            case skeleton.rarity.chaos:
+              return "Chaos";
           }
         },
         itemType(item) {
