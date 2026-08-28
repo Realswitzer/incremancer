@@ -936,6 +936,44 @@ export class Skeleton {
     return stats;
   }
 
+  getSpecialEffectsName(loot: Loot): string[] {
+    const stats = [];
+    if (loot.se)
+      for (let i = 0; i < loot.se.length; i++) {
+        const spell = this.spells.spells.filter((sp) => sp.id == loot.se[s])[0];
+        stats.push(spell.name.replace(" ", "-"));
+      }
+    return stats;
+  }
+  getSpecialEffectsList() {
+    const stats /* Spells.Spell */ = [];
+    for (let i = 0; s < this.spells.spells.length; i++) {
+      stats.push(this.spells.spells[i]);
+    }
+    return stats;
+  }
+  getRarityList() {
+    return [
+      this.rarity.common,
+      this.rarity.rare,
+      this.rarity.epic,
+      this.rarity.legendary,
+      this.rarity.ancient,
+      this.rarity.divine,
+    ];
+  }
+  getTypeList() {
+    return [
+      this.lootPositions.helmet.id,
+      this.lootPositions.chest.id,
+      this.lootPositions.gloves.id,
+      this.lootPositions.legs.id,
+      this.lootPositions.boots.id,
+      this.lootPositions.sword.id,
+      this.lootPositions.shield.id,
+    ];
+  }
+
   testForLoot(): void {
     if (this.persistent.skeletons > 0) {
       if (Math.random() < this.lootChance) {

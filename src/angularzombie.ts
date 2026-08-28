@@ -961,9 +961,11 @@ angular
       zm.skeletonMenu = {
         isShown: false,
         isNewGearSetShown = false,
+        showFilters = false,
         tab: "inventory",
         newGearSetName: "New Set",
         maxGearSet: 5,
+        itemsFilters: { se: [], r: [], t: [] },
         changeTab(tab: string) {
           this.tab = tab;
         },
@@ -1140,6 +1142,45 @@ angular
           } else {
             this.selectGearSet(-1);
           }
+        },
+        filterItemsBySpecialEffect(sp) {
+          this.itemsFilters.se.includes(sp)
+            ? this.itemsFilters.se.splice(this.itemsFilters.se.indexOf(sp), 1)
+            : this.itemsFilters.se.push(sp);
+        },
+        filterItemsByRarity(ra) {
+          this.itemsFilters.r.includes(ra)
+            ? this.itemsFilters.r.splice(this.itemsFilters.r.indexOf(ra), 1)
+            : this.itemsFilters.r.push(ra);
+        },
+        filterItemsByType(ty) {
+          this.itemsFilters.t.includes(ty)
+            ? this.itemsFilters.t.splice(this.itemsFilters.t.indexOf(ty), 1)
+            : this.itemsFilters.t.push(ty);
+        },
+        isFiltered(loot) {
+          // TODO: rewrite in a sensical way, this is webcrack output to unmangle
+          if (
+            (loot.se.length > 0
+              ? this.itemsFilters.se.length > 0
+                ? this.itemsFilters.se.includes(loot.se[0])
+                : true
+              : false) &&
+            (this.itemsFilters.r.length > 0
+              ? this.itemsFilters.r.includes(loot.r)
+              : true)
+          ) {
+            if (this.itemsFilters.t.length > 0) {
+              return this.itemsFilters.t.includes(loot.s);
+            } else {
+              return true;
+            }
+          }
+        },
+        resetFilter() {
+          ((this.itemsFilters.se = []),
+            (this.itemsFilters.r = []),
+            (this.itemsFilters.t = []));
         },
         acceptOffer() {
           skeleton.acceptOffer();
@@ -1382,6 +1423,47 @@ angular
         },
         itemEffects(item) {
           return skeleton.getSpecialEffects(item);
+        },
+        itemEffectsNamesClass(e) {
+          skeleton.getSpecialEffectsName(e).join(" ").toLowerCase();
+        },
+        itemEffectsList() {
+          skeleton.getSpecialEffectsList();
+        },
+        itemEffectsListClass(e) {
+          e.replace(" ", "-").toLowerCase();
+        },
+        itemRarityList() {
+          skeleton.getRarityList();
+        },
+        itemRarityClass(r) {
+          skeleton.getLootClass({
+            r,
+          });
+        },
+        itemTypeList() {
+          skeleton.getTypeList();
+        },
+        itemTypeClass(s) {
+          return this.itemType({
+            s,
+          });
+        },
+        itemRarityName(r) {
+          switch (r) {
+            case skeleton.rarity.common:
+              return "Common";
+            case skeleton.rarity.rare:
+              return "Rare";
+            case skeleton.rarity.epic:
+              return "Epic";
+            case skeleton.rarity.legendary:
+              return "Legendary";
+            case skeleton.rarity.ancient:
+              return "Ancient";
+            case skeleton.rarity.divine:
+              return "Divine";
+          }
         },
         itemType(item) {
           switch (item.s) {

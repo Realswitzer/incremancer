@@ -348,6 +348,47 @@ div.spells > button.spell {
   font-size: 1em;
 }
 
+div.spells > button.spell span.se {
+  position: relative;
+  float: left;
+  width: 1em;
+  height: 1em;
+  pointer-events: none;
+  filter: drop-shadow(0 0 2px rgba(0, 0, 0, 1));
+}
+
+div.spells > button.spell span.se.detonate {
+  background: url("images/detonate.png") no-repeat center/contain;
+}
+
+div.spells > button.spell span.se.earth-freeze {
+  background: url("images/earthfreeze.png") no-repeat center/contain;
+}
+
+div.spells > button.spell span.se.energy-charge {
+  background: url("images/energy-charge.png") no-repeat center/contain;
+}
+
+div.spells > button.spell span.se.gigazombies {
+  background: url("images/gigazombies.png") no-repeat center/contain;
+}
+
+div.spells > button.spell span.se.incinerate {
+  background: url("images/incinerate.png") no-repeat center/contain;
+}
+
+div.spells > button.spell span.se.pandemic {
+  background: url("images/pandemic.png") no-repeat center/contain;
+}
+
+div.spells > button.spell span.se.time-warp {
+  background: url("images/time-warp.png") no-repeat center/contain;
+}
+
+div.spells > button.spell span.se.part-storm {
+  background: url("images/part-storm.png") no-repeat center/contain;
+}
+
 div.spells > button.spell.active {
   color: #fff;
 }
@@ -946,6 +987,240 @@ div.skeleton > div.lvl.dead {
   margin-right: 0.2em;
   font-size: 1em;
 }
+.inventory .item .spell {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 1.5em;
+  height: 1.5em;
+  pointer-events: none;
+  filter: drop-shadow(0 0 2px rgba(0, 0, 0, 1));
+}
+
+.inventory .item .spell.detonate {
+  background: url("images/detonate.png") no-repeat center/contain;
+}
+
+.inventory .item .spell.earth-freeze {
+  background: url("images/earthfreeze.png") no-repeat center/contain;
+}
+
+.inventory .item .spell.energy-charge {
+  background: url("images/energy-charge.png") no-repeat center/contain;
+}
+
+.inventory .item .spell.gigazombies {
+  background: url("images/gigazombies.png") no-repeat center/contain;
+}
+
+.inventory .item .spell.incinerate {
+  background: url("images/incinerate.png") no-repeat center/contain;
+}
+
+.inventory .item .spell.pandemic {
+  background: url("images/pandemic.png") no-repeat center/contain;
+}
+
+.inventory .item .spell.time-warp {
+  background: url("images/time-warp.png") no-repeat center/contain;
+}
+
+.inventory .item .spell.part-storm {
+  background: url("images/part-storm.png") no-repeat center/contain;
+}
+
+.filter-toggle {
+  float: left;
+  border: none;
+  color: #fff;
+  padding: 0.5em 1em;
+  cursor: pointer;
+  font-size: 1em;
+  border-radius: 4px;
+}
+
+.filter-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 250;
+}
+
+.items-filter {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 20%;
+  height: 100%;
+  padding: 1.5em 1em;
+  background: #0d1f1f;
+  box-shadow: -4px 0 8px rgba(0, 0, 0, 0.7);
+  transform: translateX(calc(100% * 5));
+  transition: transform 0.3s ease-in-out;
+  z-index: 1000;
+  overflow-y: auto;
+}
+
+.items-filter span.title {
+  text-align: left;
+  float: left;
+}
+
+.items-filter.open {
+  transform: translateX(0);
+}
+
+.items-filter .close-filter {
+  position: absolute;
+  top: 0.5em;
+  right: 0.5em;
+  background: none;
+  border: none;
+  font-size: 1.5em;
+  color: #fff;
+  cursor: pointer;
+}
+
+.items-filter ul {
+  display: block;
+  margin: 0.5em 0;
+  padding: 0;
+  list-style: none;
+}
+
+.items-filter li {
+  display: inline-block;
+  margin-left: 0.25em;
+  position: relative;
+}
+
+.items-filter li .tooltip {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: none;
+  background-color: rgb(12, 55, 55);
+  box-shadow: 0 0 15px rgba(0, 0, 0, 1);
+  border-radius: 5px;
+  padding: 0.5em;
+  z-index: 150;
+  max-width: 200px;
+  white-space: normal;
+  overflow-x: hidden;
+}
+
+.items-filter li:hover .tooltip {
+  display: block;
+}
+
+.items-filter li .icon {
+  width: 1.2em;
+  height: 1.2em;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+.items-filter li .icon:hover {
+  opacity: 1;
+}
+
+.inventory .items-filter-toggle {
+  float: right;
+  width: 50%;
+}
+
+.inventory .items-filter li .icon.detonate {
+  background: url("images/detonate.png") no-repeat center/contain;
+}
+
+.inventory .items-filter li .icon.earth-freeze {
+  background: url("images/earthfreeze.png") no-repeat center/contain;
+}
+
+.inventory .items-filter li .icon.energy-charge {
+  background: url("images/energy-charge.png") no-repeat center/contain;
+}
+
+.inventory .items-filter li .icon.gigazombies {
+  background: url("images/gigazombies.png") no-repeat center/contain;
+}
+
+.inventory .items-filter li .icon.incinerate {
+  background: url("images/incinerate.png") no-repeat center/contain;
+}
+
+.inventory .items-filter li .icon.pandemic {
+  background: url("images/pandemic.png") no-repeat center/contain;
+}
+
+.inventory .items-filter li .icon.time-warp {
+  background: url("images/time-warp.png") no-repeat center/contain;
+}
+
+.inventory .items-filter li .icon.part-storm {
+  background: url("images/part-storm.png") no-repeat center/contain;
+}
+
+.inventory .items-filter li .icon.helmet {
+  background: url("images/helmet.png") no-repeat center/contain;
+}
+.inventory .items-filter li .icon.chest {
+  background: url("images/chest.png") no-repeat center/contain;
+}
+.inventory .items-filter li .icon.legs {
+  background: url("images/legs.png") no-repeat center/contain;
+}
+.inventory .items-filter li .icon.gloves {
+  background: url("images/gloves.png") no-repeat center/contain;
+}
+.inventory .items-filter li .icon.boots {
+  background: url("images/boots.png") no-repeat center/contain;
+}
+.inventory .items-filter li .icon.sword {
+  background: url("images/sword.png") no-repeat center/contain;
+}
+.inventory .items-filter li .icon.shield {
+  background: url("images/shield.png") no-repeat center/contain;
+}
+
+#champ-hold:not(.no-tooltip) .inventory .items-filter li:hover .tooltip {
+  display: inline-block;
+}
+
+.inventory .items-filter li .icon.common {
+  background-color: mediumseagreen;
+}
+.inventory .items-filter li .icon.rare {
+  background-color: dodgerblue;
+}
+.inventory .items-filter li .icon.epic {
+  background-color: #fb2;
+}
+.inventory .items-filter li .icon.legendary {
+  background: linear-gradient(270deg, #6b1610, #fc3503, #6b1610);
+  background-size: 190% 200%;
+
+  -webkit-animation: levelup-animation 4s linear infinite;
+  -moz-animation: levelup-animation 4s linear infinite;
+  animation: levelup-animation 4s linear infinite;
+}
+.inventory .items-filter li .icon.ancient {
+  background: linear-gradient(#e66465, #9198e5);
+  background-size: 190% 200%;
+}
+.inventory .items-filter li .icon.divine {
+  background: linear-gradient(
+    90deg,
+    rgba(2, 0, 36, 1) 0%,
+    rgba(187, 210, 210, 1) 35%,
+    rgba(0, 212, 255, 1) 100%
+  );
+  background-size: 190% 200%;
+}
+
 .inventory .item .tooltip {
   position: fixed;
   display: none;
