@@ -659,6 +659,7 @@ export class GameModel {
     trophies: [],
     vipEscaped: [],
     autoRelease: false,
+    autoMaxHarpies: false,
     skeleton: null,
     skeletonTalents: [],
   };
