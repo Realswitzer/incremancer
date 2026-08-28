@@ -21,6 +21,11 @@ replicate the base game, mod, etc.
   - [github: realswitzer/incremancer:Chalice12](https://github.com/Realswitzer/incremancer/tree/Chalice12)
   - [github: Chalice12/incremancer](https://github.com/Chalice12/incremancer)
   - [site: chalice12.github.io/incremancer](https://chalice12.github.io/incremancer)
+- danemancer: Danemancer (DM)
+  - [github: realswitzer/incremancer:danemancer](https://github.com/Realswitzer/incremancer/tree/danemancer)
+  - [github: CirusDane/incremancer](https://github.com/CirusDane/incremancer)
+  - [site: cirusdane.github.io/incremancer](https://cirusdane.github.io/incremancer)
+  - Originally by CirusDane and Temp0ralAnomaly
 
 ## Build instructions
 
