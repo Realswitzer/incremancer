@@ -697,7 +697,7 @@ export class Skeleton {
     boots: { id: 5, name: "Boots" },
     sword: { id: 6, name: "Sword" },
     shield: { id: 7, name: "Shield" },
-  };
+  } as const;
 
   rarity = {
     common: 1,
@@ -707,7 +707,7 @@ export class Skeleton {
     ancient: 5,
     divine: 6,
     chaos: 7,
-  };
+  } as const;
 
   prefixes = {
     commonQuality: [
@@ -754,7 +754,7 @@ export class Skeleton {
     ancientQuality: ["Grim", "Miserable", "Luxurious"],
     divineQuality: ["Divine"],
     chaosQuality: ["Chaotic", "Corrupted", "Fractured", "Twisted"],
-  };
+  } as const;
 
   stats = {
     respawnTime: { id: 1, scaling: 1 },
@@ -763,7 +763,7 @@ export class Skeleton {
     zombieDamage: { id: 4, scaling: 3 },
     zombieSpeed: { id: 5, scaling: 1 },
     harpySpeed: { id: 6, scaling: 1 },
-  };
+  } as const;
 
   applyItemUpgrades(): void {
     this.model = GameModel.getInstance();
@@ -1059,8 +1059,9 @@ export class Skeleton {
         );
     }
     if (rarity == this.rarity.chaos) {
+      const effects = [];
       for (let e = 0; e < 5; e++) {
-        n.push(Math.ceil(6 * Math.random()));
+        effects.push(Math.ceil(6 * Math.random()));
       }
     } else {
       const effects = [
