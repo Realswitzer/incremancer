@@ -8,3 +8,4 @@ Folders:
 
 - `/docs/build` - Builds, deployments, non-game content
 - `/docs/modding` - Guides for adding new items, content, etc.
+- `/docs/modding/reference` - Reference materials, mostly code put in table format
