@@ -1189,9 +1189,8 @@ angular
           }
         },
         resetFilter() {
-          ((this.itemsFilters.se = []),
-            (this.itemsFilters.r = []),
-            (this.itemsFilters.t = []));
+          ((this.itemsFilters.se = []), (this.itemsFilters.r = []));
+          this.itemsFilters.t = [];
         },
         acceptOffer() {
           skeleton.acceptOffer();
