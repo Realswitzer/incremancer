@@ -971,8 +971,8 @@ angular
       // ---- Skeleton Functions ---- //
       zm.skeletonMenu = {
         isShown: false,
-        isNewGearSetShown = false,
-        showFilters = false,
+        isNewGearSetShown: false,
+        showFilters: false,
         tab: "inventory",
         newGearSetName: "New Set",
         maxGearSet: 5,
