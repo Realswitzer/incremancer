@@ -17,7 +17,7 @@ export class CreatureFactory {
     airGolem: 2,
     fireGolem: 3,
     waterGolem: 4,
-  };
+  } as const;
 
   creatures = [
     new Creature(
@@ -60,11 +60,11 @@ export class CreatureFactory {
       1100,
       "A calming golem that restores health to nearby units"
     ),
-  ];
+  ] as const;
 
-  creatureScaling = 1.75;
-  creatureCostScaling = 1.9;
-  creatureCostReduction = 1;
+  creatureScaling = 1.75 as const;
+  creatureCostScaling = 1.9 as const;
+  creatureCostReduction = 1 as const;
 
   update(timeDiff: number): void {
     const creatures = new Creatures();
