@@ -90,7 +90,7 @@ class TalentUpgrade {
     this.class = currency;
   }
 }
-export const TalentData = [
+export const TalentData: Talent[] = [
   new Talent(
     1,
     "Efficiency",
