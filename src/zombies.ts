@@ -584,12 +584,12 @@ export class Zombies {
     }
   }
 
-  healZombie(zombie: Creature, healingDone: number): void {
+  healZombie(zombie: Creature, healingDone: number, overhealPercent: number = 1): void {
     if (zombie.health < zombie.maxHealth) {
       zombie.health += healingDone;
       this.exclamations.newHealing(zombie);
-      if (zombie.health > zombie.maxHealth) {
-        zombie.health = zombie.maxHealth;
+      if (zombie.health > (zombie.maxHealth * overhealPercent)) {
+        zombie.health = zombie.maxHealth * overhealPercent;
       }
       this.setSpeedMultiplier(zombie);
     }

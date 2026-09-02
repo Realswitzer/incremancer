@@ -474,7 +474,11 @@ export class Creatures {
         if (
           Math.abs(this.aliveZombies[i].y - creature.y) < this.targetDistance
         ) {
-          this.healZombie(this.aliveZombies[i], healingDone);
+          this.healZombie(
+            this.aliveZombies[i],
+            healingDone,
+            1 + 0.01 * creature.level
+          );
         }
       }
     }
@@ -484,7 +488,11 @@ export class Creatures {
           if (
             Math.abs(this.creatures[i].y - creature.y) < this.targetDistance
           ) {
-            this.healZombie(this.creatures[i], healingDone);
+            this.healZombie(
+              this.creatures[i],
+              healingDone,
+              1 + 0.01 * creature.level
+            );
           }
         }
       }
