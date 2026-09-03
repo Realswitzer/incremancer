@@ -584,11 +584,21 @@ export class Zombies {
     }
   }
 
-  healZombie(zombie: Creature, healingDone: number, overhealPercent: number = 1): void {
+  healZombie(
+    zombie: Creature,
+    healingDone: number,
+    overhealPercent: number = 1
+  ): void {
+    // Necessary check in order to prevent healing (plague, etc) stripping overheal
+    // Potentially, if this water golem thing causes more bugs, I'll just have to add
+    // a maxOverheal.
+    if (zombie.health > zombie.maxHealth) {
+      return;
+    }
     if (zombie.health < zombie.maxHealth) {
       zombie.health += healingDone;
       this.exclamations.newHealing(zombie);
-      if (zombie.health > (zombie.maxHealth * overhealPercent)) {
+      if (zombie.health > zombie.maxHealth * overhealPercent) {
         zombie.health = zombie.maxHealth * overhealPercent;
       }
       this.setSpeedMultiplier(zombie);
