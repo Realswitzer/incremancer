@@ -4,16 +4,17 @@
   "workspaces": {
     "": {
       "dependencies": {
+        "@types/angular": "1.7",
         "angular": "1.7.8",
         "lz-string": "^1.5.0",
         "pixi.js-legacy": "5.3.8",
       },
       "devDependencies": {
-        "eslint": "^10.3.0",
+        "eslint": "^10.4.0",
         "globals": "^17.6.0",
         "prettier": "^3.8.3",
         "typescript": "^6.0.3",
-        "vite": "^8.0.12",
+        "vite": "^8.0.13",
       },
     },
   },
@@ -173,6 +174,8 @@
     "@rolldown/pluginutils": ["@rolldown/pluginutils@1.0.0", "", {}, "sha512-aKs/3GSWyV0mrhNmt/96/Z3yczC3yvrzYATCiCXQebBsGyYzjNdUphRVLeJQ67ySKVXRfMxt2lm12pmXvbPFQQ=="],
 
     "@tybys/wasm-util": ["@tybys/wasm-util@0.10.2", "", { "dependencies": { "tslib": "^2.4.0" } }, "sha512-RoBvJ2X0wuKlWFIjrwffGw1IqZHKQqzIchKaadZZfnNpsAYp2mM0h36JtPCjNDAHGgYez/15uMBpfGwchhiMgg=="],
+
+    "@types/angular": ["@types/angular@1.7.4", "", {}, "sha512-ZcBdve7BszuzwtgDiaYuHhEGPkA0gKhBRMckGZVfZ6M4L8Jt/rqQTV4I3koQg8ZPf9sdDExs3xx9GpZIkAyyjg=="],
 
     "@types/esrecurse": ["@types/esrecurse@4.3.1", "", {}, "sha512-xJBAbDifo5hpffDBuHl0Y8ywswbiAp/Wi7Y/GtAgSlZyIABppyurxVueOPE8LUQOxdlgi6Zqce7uoEpqNTeiUw=="],
 
