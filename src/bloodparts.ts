@@ -1,5 +1,6 @@
-import { critTexts } from "./classes/creatureclasses";
+import { Creature, critTexts } from "./classes/creatureclasses";
 import { GameObject, SpritePool } from "./classes/gameobject";
+import { type Human } from "./classes/humanclasses";
 import {
   GameModel,
   Graveyard,
@@ -64,10 +65,10 @@ export class PrestigePoints extends SpritePool<GameObject> {
     this.create = (tex) => new GameObject(tex);
   }
   zmMap = new ZmMap();
-  gameModel: GameModel;
+  gameModel!: GameModel;
   speed = 20;
-  targetElement: HTMLElement;
-  animElement: HTMLElement;
+  targetElement!: HTMLElement;
+  animElement!: HTMLElement;
 
   initialize(): void {
     this.gameModel = GameModel.getInstance();
@@ -75,8 +76,8 @@ export class PrestigePoints extends SpritePool<GameObject> {
       this.setup(new PIXI.Container(), PIXI.Texture.from("pp.png"));
       foregroundContainer.addChild(this.container);
     }
-    this.targetElement = document.getElementById("prestige-button");
-    this.animElement = document.getElementById("prestige-bg");
+    this.targetElement = document.getElementById("prestige-button")!;
+    this.animElement = document.getElementById("prestige-bg")!;
   }
 
   update(timeDiff: number): void {
@@ -155,22 +156,22 @@ export class Blood {
   partCounter = 0;
   partsPerSplatter = 6;
   ecoPartsPerSplatter = 3;
-  container = null;
+  container = null as unknown as PIXI.Container;
   sprites: Fragment[] = [];
   gravity = 100;
   spraySpeed = 20;
   fadeSpeed = 0.7;
   visibleParts = 0;
-  viewableArea = null;
-  gameModel: GameModel;
-  texture: PIXI.Texture;
-  plagueTexture: PIXI.Texture;
+  viewableArea = null as unknown as typeof viewableArea;
+  gameModel!: GameModel;
+  texture!: PIXI.Texture;
+  plagueTexture!: PIXI.Texture;
 
   getTexture(color: string): PIXI.Texture {
     const blast = document.createElement("canvas");
     blast.width = 1;
     blast.height = 1;
-    const blastCtx = blast.getContext("2d");
+    const blastCtx = blast.getContext("2d")!;
 
     // draw shape
     blastCtx.fillStyle = color;
@@ -289,7 +290,7 @@ class Bone extends GameObject {
   floor = 0;
   rotSpeed = 0;
   value = 1;
-  collector = null;
+  collector = null as unknown as boolean;
   hitFloor = false;
 }
 
@@ -302,7 +303,7 @@ export class Bones {
 
   partsLimit = 100;
   partsPerSplatter = 3;
-  container = null;
+  container = null as unknown as PIXI.Container;
   sprites: Bone[] = [];
   discardedSprites: Bone[] = [];
   uncollected: Bone[] = [];
@@ -311,14 +312,14 @@ export class Bones {
   fadeTime = 40;
   fadeSpeed = 0.2;
   fadeBones = false;
-  texture = null as PIXI.Texture;
-  gameModel = null;
+  texture = null as unknown as PIXI.Texture;
+  gameModel = null as unknown as GameModel;
 
   getTexture(): PIXI.Texture {
     const blast = document.createElement("canvas");
     blast.width = 4;
     blast.height = 1;
-    const blastCtx = blast.getContext("2d");
+    const blastCtx = blast.getContext("2d")!;
 
     // draw shape
     blastCtx.fillStyle = "#dddddd";
@@ -385,9 +386,9 @@ export class Bones {
   }
 
   newPart(x: number, y: number, value: number): void {
-    let sprite = null;
+    let sprite = null as unknown as Bone;
     if (this.discardedSprites.length > 0) {
-      sprite = this.discardedSprites.pop();
+      sprite = this.discardedSprites.pop()!;
     } else {
       sprite = new Bone(this.texture);
       this.sprites.push(sprite);
@@ -426,7 +427,11 @@ export class Bones {
 
 class Exclamation extends PIXI.Sprite {
   time = 0;
-  target = null;
+  target = null as unknown as {
+    x: number;
+    y: number;
+    hasIcon: boolean;
+  };
 }
 
 export class Exclamations {
@@ -438,15 +443,15 @@ export class Exclamations {
   sprites: Exclamation[] = [];
   discardedSprites: Exclamation[] = [];
   maxSprites = 10;
-  container: PIXI.Container;
+  container!: PIXI.Container;
   height = 20;
   fadeSpeed = 4;
-  healTexture: PIXI.Texture;
-  exclamationTexture: PIXI.Texture;
-  radioTexture: PIXI.Texture;
-  fireTexture: PIXI.Texture;
-  shieldTexture: PIXI.Texture;
-  poisonTexture: PIXI.Texture;
+  healTexture!: PIXI.Texture;
+  exclamationTexture!: PIXI.Texture;
+  radioTexture!: PIXI.Texture;
+  fireTexture!: PIXI.Texture;
+  shieldTexture!: PIXI.Texture;
+  poisonTexture!: PIXI.Texture;
 
   initialize(): void {
     if (!this.container) {
@@ -485,7 +490,7 @@ export class Exclamations {
     if (target.hasIcon) return;
     let sprite: Exclamation;
     if (this.discardedSprites.length > 0) {
-      sprite = this.discardedSprites.pop();
+      sprite = this.discardedSprites.pop()!;
     } else {
       sprite = new Exclamation(this.exclamationTexture);
       sprite.anchor.set(0.5, 1);
@@ -577,15 +582,16 @@ export class Bullets {
   sprites: Bullet[] = [];
   discardedSprites: Bullet[] = [];
   fadeSpeed = 0.2;
-  texture: PIXI.Texture;
-  fireballTexture: PIXI.Texture;
-  container: PIXI.Container;
+  texture!: PIXI.Texture;
+  fireballTexture!: PIXI.Texture;
+  darkOrbTexture!: PIXI.Texture;
+  container!: PIXI.Container;
 
   getTexture(): PIXI.Texture {
     const blast = document.createElement("canvas");
     blast.width = 1;
     blast.height = 1;
-    const blastCtx = blast.getContext("2d");
+    const blastCtx = blast.getContext("2d")!;
 
     // draw shape
     blastCtx.fillStyle = "#ffffff";
@@ -597,7 +603,7 @@ export class Bullets {
     const blast = document.createElement("canvas");
     blast.width = 8;
     blast.height = 8;
-    const blastCtx = blast.getContext("2d");
+    const blastCtx = blast.getContext("2d")!;
 
     const radgrad = blastCtx.createRadialGradient(4, 4, 0, 4, 4, 4);
     radgrad.addColorStop(0, "rgba(255,255,0,1)");
@@ -656,11 +662,13 @@ export class Bullets {
     }
   }
 
+  // TODO: fix types here, this gets extremely messy super fast.
   updatePart(sprite: Bullet, timeDiff: number): void {
     if (
       fastDistance(sprite.x, sprite.y + 8, sprite.target.x, sprite.target.y) <
       sprite.hitbox
     ) {
+      sprite.target = sprite.target as unknown as Human;
       if (sprite.plague) {
         this.zombies.inflictPlague(sprite.target);
         this.humans.damageHuman(sprite.target, sprite.damage);
@@ -672,6 +680,7 @@ export class Bullets {
         sprite.target.timer.dogStun = 5;
         new Skeleton().orbHit(sprite.target);
       } else {
+        sprite.target = sprite.target as unknown as Creature;
         if (
           !sprite.rocket &&
           sprite.target.bulletReflect &&
@@ -702,6 +711,7 @@ export class Bullets {
                 sprite.damage,
                 sprite.source,
               );
+            sprite.target = sprite.target as unknown as Human;
             if (sprite.target.human)
               this.humans.damageHuman(sprite.target, sprite.damage);
           }
@@ -739,7 +749,7 @@ export class Bullets {
   ): void {
     let sprite: Bullet;
     if (this.discardedSprites.length > 0) {
-      sprite = this.discardedSprites.pop();
+      sprite = this.discardedSprites.pop()!;
     } else {
       sprite = new Bullet(this.texture);
       sprite.scale.x = sprite.scale.y = 2;
@@ -796,13 +806,13 @@ export class Blasts extends SpritePool<GameObject> {
     Blasts.instance = this;
     this.create = (texture) => new GameObject(texture);
   }
-  viewableArea = null;
+  viewableArea = null as unknown as typeof viewableArea;
 
   getTexture(): PIXI.Texture {
     const blast = document.createElement("canvas");
     blast.width = 32;
     blast.height = 32;
-    const blastCtx = blast.getContext("2d");
+    const blastCtx = blast.getContext("2d")!;
 
     const radgrad = blastCtx.createRadialGradient(16, 16, 0, 16, 16, 16);
     radgrad.addColorStop(0, "rgba(255,255,255,1)");
@@ -899,16 +909,16 @@ export class Smoke extends SpritePool<GameObject> {
     this.create = (texture) => new GameObject(texture);
   }
   tint = 0xffffff;
-  viewableArea = null;
+  viewableArea = null as unknown as typeof viewableArea;
   allowTint = false;
-  gameModel = null;
+  gameModel = null as unknown as GameModel;
 
   getTexture(): PIXI.Texture {
     const size = 8;
     const blast = document.createElement("canvas");
     blast.width = size + 4;
     blast.height = size + 4;
-    const blastCtx = blast.getContext("2d");
+    const blastCtx = blast.getContext("2d")!;
     blastCtx.shadowBlur = 5;
     blastCtx.shadowColor = "white";
     const radgrad = blastCtx.createRadialGradient(
@@ -1042,14 +1052,14 @@ export class Fragments extends SpritePool<Fragment> {
   gravity = 100;
   spraySpeed = 50;
   fadeSpeed = 0.7;
-  texture: PIXI.Texture;
+  declare texture: PIXI.Texture;
   viewableArea = viewableArea;
-  gameModel: GameModel;
+  gameModel!: GameModel;
   getTexture(): PIXI.Texture {
     const blast = document.createElement("canvas");
     blast.width = 5;
     blast.height = 1;
-    const blastCtx = blast.getContext("2d");
+    const blastCtx = blast.getContext("2d")!;
 
     // draw shape
     blastCtx.fillStyle = "#FFFFFF";

@@ -19,6 +19,7 @@ import {
   Humans,
   Police,
   formatWhole,
+  Creature,
 } from "./internal";
 
 export class GameModel {
@@ -463,7 +464,7 @@ export class GameModel {
       for (let i = 0; i < this.zombiesInCages; i++) {
         this.zombies.createZombie(
           this.graveyard.sprite.x,
-          this.graveyard.sprite.y
+          this.graveyard.sprite.y,
         );
       }
       this.zombiesInCages = 0;
@@ -638,10 +639,10 @@ export class GameModel {
     particles: true,
     generators: [],
     currentConstruction: null,
-    creatureLevels: [],
-    creatures: [],
-    creatureAutobuild: [],
-    savedCreatures: [],
+    creatureLevels: [] as number[], // index = creature.id, value = creature.level
+    creatures: [] as Creature[],
+    creatureAutobuild: [] as number[], // index = creature.id, value = creature.autobuild
+    savedCreatures: [] as { t: number; l: number }[], // t: creatureType, l: level
     levelsCompleted: [],
     showfps: false,
     runeshatter: 0,
@@ -684,7 +685,7 @@ export class GameModel {
       this.persistentData.generators = [];
       this.persistentData.bonesTotal = 0;
       this.persistentData.upgrades = this.persistentData.upgrades.filter(
-        (upgrade) => upgrade.costType == this.upgrades.costs.prestigePoints
+        (upgrade) => upgrade.costType == this.upgrades.costs.prestigePoints,
       );
       this.persistentData.constructions = [];
       this.persistentData.boneCollectors = 0;
@@ -745,15 +746,15 @@ export class GameModel {
     try {
       localStorage.setItem(
         this.storageName,
-        JSON.stringify(this.persistentData)
+        JSON.stringify(this.persistentData),
       );
       localStorage.setItem(
         this.skeleton.storageName,
-        JSON.stringify(this.skeleton.persistent)
+        JSON.stringify(this.skeleton.persistent),
       );
       localStorage.setItem(
         this.skeleton.talentsStorageName,
-        JSON.stringify(this.skeleton.talents)
+        JSON.stringify(this.skeleton.talents),
       );
     } catch (e) {
       console.log(e);
@@ -764,12 +765,12 @@ export class GameModel {
     try {
       if (localStorage.getItem(this.storageName) !== null) {
         this.persistentData = JSON.parse(
-          localStorage.getItem(this.storageName)
+          localStorage.getItem(this.storageName),
         );
         this.level = this.persistentData.levelUnlocked;
         if (localStorage.getItem(this.skeleton.storageName) !== null) {
           this.skeleton.persistent = JSON.parse(
-            localStorage.getItem(this.skeleton.storageName)
+            localStorage.getItem(this.skeleton.storageName),
           );
           if (!("gearSetEquipped" in this.skeleton.persistent)) {
             this.skeleton.persistent.gearSetEquipped = -1;
@@ -792,7 +793,7 @@ export class GameModel {
         }
         if (localStorage.getItem(this.skeleton.talentsStorageName) !== null) {
           this.skeleton.talents = JSON.parse(
-            localStorage.getItem(this.skeleton.talentsStorageName)
+            localStorage.getItem(this.skeleton.talentsStorageName),
           );
         } else {
           this.skeleton.talents = [];
@@ -883,7 +884,7 @@ export class GameModel {
     this.app.renderer.plugins.interaction.resolution = resolution;
     this.app.renderer.resize(
       document.body.clientWidth,
-      document.body.clientHeight
+      document.body.clientHeight,
     );
   }
 
@@ -893,10 +894,10 @@ export class GameModel {
     this.blob = new Blob(
       [
         LZString.compressToEncodedURIComponent(
-          JSON.stringify(this.persistentData)
+          JSON.stringify(this.persistentData),
         ),
       ],
-      { type: "octet/stream" }
+      { type: "octet/stream" },
     );
     delete this.persistentData.skeleton;
     this.encodedContent = window.URL.createObjectURL(this.blob);
@@ -913,7 +914,7 @@ export class GameModel {
       const model = GameModel.getInstance();
       reader.onload = function (event) {
         const savegame = JSON.parse(
-          LZString.decompressFromEncodedURIComponent(event.target.result)
+          LZString.decompressFromEncodedURIComponent(event.target.result),
         );
         if (savegame.dateOfSave) {
           if (savegame.skeleton) {

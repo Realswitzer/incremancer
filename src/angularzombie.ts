@@ -16,6 +16,7 @@ import {
   applyTalents,
   resetTalents,
 } from "./internal";
+import { type Creature } from "./creaturefactory";
 
 angular
   .module("zombieApp", [])
@@ -29,7 +30,7 @@ angular
     "$compileProvider",
     function ($compileProvider) {
       $compileProvider.aHrefSanitizationWhitelist(
-        /^\s*(https?|ftp|mailto|javascript|data|blob):/
+        /^\s*(https?|ftp|mailto|javascript|data|blob):/,
       );
       $compileProvider.debugInfoEnabled(false);
     },
@@ -115,13 +116,13 @@ angular
           case "prestige":
             zm.upgrades = upgrades.prestigeUpgrades.filter(
               (upgrade) =>
-                upgrade.cap == 0 || zm.currentRank(upgrade) < upgrade.cap
+                upgrade.cap == 0 || zm.currentRank(upgrade) < upgrade.cap,
             );
             zm.upgrades.push(
               ...upgrades.prestigeUpgrades.filter(
                 (upgrade) =>
-                  upgrade.cap !== 0 && zm.currentRank(upgrade) >= upgrade.cap
-              )
+                  upgrade.cap !== 0 && zm.currentRank(upgrade) >= upgrade.cap,
+              ),
             );
             zm.upgrades = zm.upgrades.filter((upg) => upg.id !== 115);
             zm.sidePanels.prestige = true;
@@ -201,7 +202,7 @@ angular
       };
       zm.maxBoneCollectors = function () {
         return Math.floor(
-          zm.model.getEnergyRate() + zm.model.persistentData.boneCollectors
+          zm.model.getEnergyRate() + zm.model.persistentData.boneCollectors,
         );
       };
       zm.setBoneCollectors = function (number: number) {
@@ -224,7 +225,7 @@ angular
       };
       zm.maxHarpies = function () {
         return Math.floor(
-          zm.model.getEnergyRate() + zm.model.persistentData.harpies
+          zm.model.getEnergyRate() + zm.model.persistentData.harpies,
         );
       };
       zm.setGraveyardZombies = function (number: number) {
@@ -266,45 +267,45 @@ angular
         generatorPrice(upgrade) {
           return partFactory.purchasePrice(upgrade);
         },
-        creaturePrice(creature) {
+        creaturePrice(creature: Creature) {
           return creatureFactory.purchasePrice(creature);
         },
-        creatureLevelPrice(creature) {
+        creatureLevelPrice(creature: Creature) {
           return creatureFactory.levelPrice(creature);
         },
-        creaturePercent(creature) {
+        creaturePercent(creature: Creature) {
           return Math.min(
             Math.round(
               (zm.model.persistentData.parts / this.creaturePrice(creature)) *
-                100
+                100,
             ),
-            100
+            100,
           );
         },
-        creatureLevelPercent(creature) {
+        creatureLevelPercent(creature: Creature) {
           return Math.min(
             Math.round(
               (zm.model.persistentData.parts /
                 this.creatureLevelPrice(creature)) *
-                100
+                100,
             ),
-            100
+            100,
           );
         },
-        buyCreature(creature) {
+        buyCreature(creature: Creature) {
           return creatureFactory.startBuilding(creature);
         },
-        creatureTooExpensive(creature) {
+        creatureTooExpensive(creature: Creature) {
           return !creatureFactory.canAffordCreature(creature);
         },
-        creatureButtonText(creature) {
+        creatureButtonText(creature: Creature) {
           if (creature.building) {
             return "Building...";
           }
           if (this.creatureTooExpensive(creature)) {
             return (
               formatWhole(
-                this.creaturePrice(creature) - zm.model.persistentData.parts
+                this.creaturePrice(creature) - zm.model.persistentData.parts,
               ) + " parts required"
             );
           } else {
@@ -313,7 +314,7 @@ angular
             );
           }
         },
-        creatureLevelButtonText(creature) {
+        creatureLevelButtonText(creature: Creature) {
           if (this.canLevelCreature(creature)) {
             return (
               "Upgrade Level " +
@@ -325,11 +326,11 @@ angular
           }
           return (
             formatWhole(
-              this.creatureLevelPrice(creature) - zm.model.persistentData.parts
+              this.creatureLevelPrice(creature) - zm.model.persistentData.parts,
             ) + " parts required"
           );
         },
-        canBuildCreature(creature) {
+        canBuildCreature(creature: Creature) {
           if (this.creatureTooExpensive(creature)) return false;
           if (creature.building) return false;
           return (
@@ -337,15 +338,15 @@ angular
             zm.model.creatureLimit
           );
         },
-        canLevelCreature(creature) {
+        canLevelCreature(creature: Creature) {
           return (
             this.creatureLevelPrice(creature) < zm.model.persistentData.parts
           );
         },
-        levelCreature(creature) {
+        levelCreature(creature: Creature) {
           creatureFactory.levelCreature(creature);
         },
-        autoBuild(creature, number) {
+        autoBuild(creature: Creature, number: number) {
           if (
             creature.autobuild + number >= 0 &&
             creature.autobuild + number <= zm.model.creatureLimit
@@ -353,7 +354,7 @@ angular
             creatureFactory.creatureAutoBuildNumber(creature, number);
           }
         },
-        creatureStats(creature) {
+        creatureStats(creature: Creature) {
           return creatureFactory.creatureStats(creature);
         },
         updateDelays() {
@@ -420,7 +421,7 @@ angular
         },
         setMaxHarpies() {
           let maxHarpies = Math.floor(
-            this.getEnergyRate() + this.persistentData.harpies
+            this.getEnergyRate() + this.persistentData.harpies,
           );
           if (
             (maxHarpies >= 0 && maxHarpies < this.persistentData.harpies) ||
@@ -448,7 +449,7 @@ angular
             zm.model.persistentData.currentConstruction.time -
             zm.model.persistentData.currentConstruction.timeRemaining;
           return Math.round(
-            (time / zm.model.persistentData.currentConstruction.time) * 100
+            (time / zm.model.persistentData.currentConstruction.time) * 100,
           );
         }
         return 0;
@@ -632,7 +633,7 @@ angular
           case upgrades.costs.prestigePoints:
             return (
               formatWhole(
-                cost - zm.model.persistentData.prestigePointsToSpend
+                cost - zm.model.persistentData.prestigePointsToSpend,
               ) + " prestige points required"
             );
           case partFactory.costs.parts:
@@ -874,21 +875,21 @@ angular
       zm.energyPercent = function () {
         return Math.min(
           Math.round((zm.model.energy / zm.model.energyMax) * 100),
-          100
+          100,
         );
       };
       zm.bloodPercent = function () {
         return Math.min(
           Math.round((zm.model.persistentData.blood / zm.model.bloodMax) * 100),
-          100
+          100,
         );
       };
       zm.brainsPercent = function () {
         return Math.min(
           Math.round(
-            (zm.model.persistentData.brains / zm.model.brainsMax) * 100
+            (zm.model.persistentData.brains / zm.model.brainsMax) * 100,
           ),
-          100
+          100,
         );
       };
 
@@ -929,37 +930,37 @@ angular
             return Math.round(
               Math.min(
                 1,
-                zm.model.persistentData.blood / zm.upgradePrice(upgrade)
-              ) * 100
+                zm.model.persistentData.blood / zm.upgradePrice(upgrade),
+              ) * 100,
             );
           case "brains":
             return Math.round(
               Math.min(
                 1,
-                zm.model.persistentData.brains / zm.upgradePrice(upgrade)
-              ) * 100
+                zm.model.persistentData.brains / zm.upgradePrice(upgrade),
+              ) * 100,
             );
           case "bones":
             return Math.round(
               Math.min(
                 1,
-                zm.model.persistentData.bones / zm.upgradePrice(upgrade)
-              ) * 100
+                zm.model.persistentData.bones / zm.upgradePrice(upgrade),
+              ) * 100,
             );
           case "parts":
             return Math.round(
               Math.min(
                 1,
-                zm.model.persistentData.parts / zm.upgradePrice(upgrade)
-              ) * 100
+                zm.model.persistentData.parts / zm.upgradePrice(upgrade),
+              ) * 100,
             );
           case "prestigePoints":
             return Math.round(
               Math.min(
                 1,
                 zm.model.persistentData.prestigePointsToSpend /
-                  zm.upgradePrice(upgrade)
-              ) * 100
+                  zm.upgradePrice(upgrade),
+              ) * 100,
             );
         }
       };
@@ -984,7 +985,7 @@ angular
         show() {
           this.tab = "inventory";
           this.upgrade = upgrades.prestigeUpgrades.filter(
-            (upg) => upg.id === 115
+            (upg) => upg.id === 115,
           )[0];
           this.upgrades = TalentUpgrades;
           this.isShown = !this.isShown;
@@ -1013,7 +1014,7 @@ angular
             skeleton.persistent.gearSetEquipped
           ].slots.forEach((slot) => {
             skeleton.persistent.items.filter(
-              (item) => item.s == slot.s && (item.q = slot.id == item.id)
+              (item) => item.s == slot.s && (item.q = slot.id == item.id),
             );
           });
           upgrades.applyUpgrades();
@@ -1040,7 +1041,7 @@ angular
             slots: [] as { s: number; id: number },
           };
           const helmetItems = skeleton.persistent.items.filter(
-            (item) => item.q && item.s == skeleton.lootPositions.helmet.id
+            (item) => item.q && item.s == skeleton.lootPositions.helmet.id,
           );
           if (helmetItems.length > 0) {
             newGearSet.slots.push({
@@ -1056,7 +1057,7 @@ angular
             ]);
           }
           const swordItems = skeleton.persistent.items.filter(
-            (e) => e.q && e.s == skeleton.lootPositions.sword.id
+            (e) => e.q && e.s == skeleton.lootPositions.sword.id,
           );
           if (swordItems.length > 0) {
             newGearSet.slots.push({
@@ -1070,7 +1071,7 @@ angular
             });
           }
           const chestItems = skeleton.persistent.items.filter(
-            (e) => e.q && e.s == skeleton.lootPositions.chest.id
+            (e) => e.q && e.s == skeleton.lootPositions.chest.id,
           );
           if (chestItems.length > 0) {
             newGearSet.slots.push({
@@ -1084,7 +1085,7 @@ angular
             });
           }
           const shieldItems = skeleton.persistent.items.filter(
-            (e) => e.q && e.s == skeleton.lootPositions.shield.id
+            (e) => e.q && e.s == skeleton.lootPositions.shield.id,
           );
           if (shieldItems.length > 0) {
             newGearSet.slots.push({
@@ -1098,7 +1099,7 @@ angular
             });
           }
           const gloveItems = skeleton.persistent.items.filter(
-            (e) => e.q && e.s == skeleton.lootPositions.gloves.id
+            (e) => e.q && e.s == skeleton.lootPositions.gloves.id,
           );
           if (gloveItems.length > 0) {
             newGearSet.slots.push({
@@ -1112,7 +1113,7 @@ angular
             });
           }
           const legItems = skeleton.persistent.items.filter(
-            (e) => e.q && e.s == skeleton.lootPositions.legs.id
+            (e) => e.q && e.s == skeleton.lootPositions.legs.id,
           );
           if (legItems.length > 0) {
             newGearSet.slots.push({
@@ -1126,7 +1127,7 @@ angular
             });
           }
           const bootItems = skeleton.persistent.items.filter(
-            (e) => e.q && e.s == skeleton.lootPositions.boots.id
+            (e) => e.q && e.s == skeleton.lootPositions.boots.id,
           );
           if (bootItems.length > 0) {
             newGearSet.slots.push({
@@ -1146,7 +1147,7 @@ angular
         deleteGearSet() {
           skeleton.persistent.gearSets.splice(
             skeleton.persistent.gearSetEquipped,
-            1
+            1,
           );
           if (skeleton.persistent.gearSets.length > 0) {
             this.selectGearSet(0);
@@ -1260,7 +1261,7 @@ angular
                                         (Math.log2(skeleton.persistent.xpRate) -
                                           7) *
                                           (Math.log2(
-                                            skeleton.persistent.xpRate
+                                            skeleton.persistent.xpRate,
                                           ) -
                                             7) *
                                           10
@@ -1290,7 +1291,7 @@ angular
         },
         xpPercent() {
           return Math.round(
-            Math.min(1, zm.skeleton().xp / skeleton.xpForNextLevel()) * 100
+            Math.min(1, zm.skeleton().xp / skeleton.xpForNextLevel()) * 100,
           );
         },
         xpForNextLevel() {
@@ -1311,7 +1312,7 @@ angular
         updateEquippedItems() {
           this.equipped = [];
           const helmetItems = skeleton.persistent.items.filter(
-            (i) => i.q && i.s == skeleton.lootPositions.helmet.id
+            (i) => i.q && i.s == skeleton.lootPositions.helmet.id,
           );
           if (helmetItems.length > 0) {
             this.equipped.push([helmetItems[0]]);
@@ -1326,7 +1327,7 @@ angular
           }
           const row2 = [];
           const swordItems = skeleton.persistent.items.filter(
-            (i) => i.q && i.s == skeleton.lootPositions.sword.id
+            (i) => i.q && i.s == skeleton.lootPositions.sword.id,
           );
           if (swordItems.length > 0) {
             row2.push(swordItems[0]);
@@ -1338,7 +1339,7 @@ angular
             });
           }
           const chestItems = skeleton.persistent.items.filter(
-            (i) => i.q && i.s == skeleton.lootPositions.chest.id
+            (i) => i.q && i.s == skeleton.lootPositions.chest.id,
           );
           if (chestItems.length > 0) {
             row2.push(chestItems[0]);
@@ -1350,7 +1351,7 @@ angular
             });
           }
           const shieldItems = skeleton.persistent.items.filter(
-            (i) => i.q && i.s == skeleton.lootPositions.shield.id
+            (i) => i.q && i.s == skeleton.lootPositions.shield.id,
           );
           if (shieldItems.length > 0) {
             row2.push(shieldItems[0]);
@@ -1364,7 +1365,7 @@ angular
           this.equipped.push(row2);
           const row3 = [];
           const gloveItems = skeleton.persistent.items.filter(
-            (i) => i.q && i.s == skeleton.lootPositions.gloves.id
+            (i) => i.q && i.s == skeleton.lootPositions.gloves.id,
           );
           if (gloveItems.length > 0) {
             row3.push(gloveItems[0]);
@@ -1376,7 +1377,7 @@ angular
             });
           }
           const legItems = skeleton.persistent.items.filter(
-            (i) => i.q && i.s == skeleton.lootPositions.legs.id
+            (i) => i.q && i.s == skeleton.lootPositions.legs.id,
           );
           if (legItems.length > 0) {
             row3.push(legItems[0]);
@@ -1388,7 +1389,7 @@ angular
             });
           }
           const bootItems = skeleton.persistent.items.filter(
-            (i) => i.q && i.s == skeleton.lootPositions.boots.id
+            (i) => i.q && i.s == skeleton.lootPositions.boots.id,
           );
           if (bootItems.length > 0) {
             row3.push(bootItems[0]);
@@ -1681,7 +1682,7 @@ angular
               e.dataTransfer.setDragImage(
                 el[0],
                 rect.width / 2,
-                rect.height / 2
+                rect.height / 2,
               );
               $rootScope.$emit("item-drag-start", itemId);
               setTimeout(function () {
