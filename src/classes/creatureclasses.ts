@@ -1,14 +1,14 @@
 import { foregroundContainer, format2Places, GameModel } from "../internal";
-import { CharacterObject } from "./gameobject";
+import { type Building, CharacterObject } from "./gameobject";
 import { Human } from "./humanclasses";
 
 export class Creature extends CharacterObject {
   currentDirection = 0;
   bulletReflect = 0;
   zombieId = 0;
-  target: Human;
-  state: CreatureState;
-  lastKnownBuilding = null;
+  target = null as Human | null;
+  state!: CreatureState;
+  lastKnownBuilding = null as unknown as Building | false | null; // ? humanclasses sets it to a Building, though every usage is setting it to null, undefined, or false
   maxSpeed = 0;
   graveyard = false;
   regenTimer = 0;
@@ -21,15 +21,16 @@ export class Creature extends CharacterObject {
   price = 0;
   immuneToBurns = false;
   zombie = true;
-  deadTexture: PIXI.Texture[];
+  deadTexture!: PIXI.Texture[];
   textureSet = {
     set: false,
-    down: [],
-    up: [],
-    left: [],
-    right: [],
-    dead: [],
+    down: [] as PIXI.Texture[],
+    up: [] as PIXI.Texture[],
+    left: [] as PIXI.Texture[],
+    right: [] as PIXI.Texture[],
+    dead: [] as PIXI.Texture[],
   };
+  dogStun: number = 0; // possible boolean
 }
 
 export enum CreatureState {

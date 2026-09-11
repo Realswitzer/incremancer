@@ -4,6 +4,7 @@ import {
   spawnCritText,
 } from "./classes/creatureclasses";
 import { CharacterFlags } from "./classes/gameobject";
+import { type Human } from "./classes/humanclasses";
 import {
   Bullets,
   Smoke,
@@ -41,12 +42,12 @@ export class Creatures {
   bones!: Bones;
   blasts!: Blasts;
   creatures: Creature[] = [];
-  creatureCount = [];
+  creatureCount = [] as number[]; // index = creature.type, value = count
   aliveCreatures: Creature[] = [];
   aliveZombies = [] as Creature[];
   graveyardAttackers = [];
   discardedSprites: Creature[] = [];
-  aliveHumans = [];
+  aliveHumans = [] as Human[];
   scaling = 1.6;
   moveTargetDistance = 15;
   attackDistance = 20;
@@ -147,7 +148,7 @@ export class Creatures {
     speed: number,
     type: number,
     level: number,
-    price: number,
+    price: number
   ): void {
     if (this.model.creatureCount >= this.model.creatureLimit) {
       return;
@@ -155,7 +156,7 @@ export class Creatures {
 
     let creature: Creature;
     if (this.discardedSprites.length > 0) {
-      creature = this.discardedSprites.pop();
+      creature = this.discardedSprites.pop()!;
       creature.textures = this.golemTextures.down;
     } else {
       creature = new Creature(this.golemTextures.down);
@@ -192,7 +193,7 @@ export class Creatures {
     creature.anchor.set(8.5 / 16, 1);
     creature.position.set(
       this.graveyard.sprite.x,
-      this.graveyard.sprite.y + (this.graveyard.level > 2 ? 8 : 0),
+      this.graveyard.sprite.y + (this.graveyard.level > 2 ? 8 : 0)
     );
     creature.target = null;
     creature.zIndex = creature.position.y;
@@ -311,8 +312,8 @@ export class Creatures {
         const distanceToHumanTarget = this.fastDistance(
           creature.position.x,
           creature.position.y,
-          creature.target.x,
-          creature.target.y,
+          creature.target!.x, // implied due to if statement above
+          creature.target!.y
         );
 
         if (distanceToHumanTarget < this.attackDistance) {
@@ -334,21 +335,24 @@ export class Creatures {
         const distanceToTarget = this.fastDistance(
           creature.position.x,
           creature.position.y,
-          creature.target.x,
-          creature.target.y,
+          creature.target!.x,
+          creature.target!.y
         );
         if (distanceToTarget < this.attackDistance) {
           creature.scale.x =
-            creature.target.x > creature.x
+            creature.target!.x > creature.x
               ? creature.scaling
               : -creature.scaling;
           if (creature.timer.attack < 0) {
             this.humans.damageHuman(
-              creature.target,
-              this.calculateDamage(creature),
+              creature.target!,
+              this.calculateDamage(creature)
             );
             if (creature.creatureType == this.creatureTypes.fireGolem) {
-              this.humans.burnHuman(creature.target, creature.attackDamage / 2);
+              this.humans.burnHuman(
+                creature.target!,
+                creature.attackDamage / 2
+              );
             }
             creature.timer.attack =
               this.attackSpeed *
@@ -424,7 +428,7 @@ export class Creatures {
     if (creature.timer.target <= 0) {
       creature.targetVector = this.map.howDoIGetToMyTarget(
         creature,
-        creature.target,
+        creature.target!
       );
       creature.timer.target = 0.2;
     }
@@ -477,7 +481,7 @@ export class Creatures {
           this.healZombie(
             this.aliveZombies[i],
             healingDone,
-            1 + 0.01 * creature.level,
+            1 + 0.01 * creature.level
           );
         }
       }
@@ -491,7 +495,7 @@ export class Creatures {
             this.healZombie(
               this.creatures[i],
               healingDone,
-              1 + 0.01 * creature.level,
+              1 + 0.01 * creature.level
             );
           }
         }
@@ -516,7 +520,7 @@ export class Creatures {
               creature.attackDamage / 2,
               false,
               false,
-              true,
+              true
             );
           }
         }

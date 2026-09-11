@@ -1,9 +1,10 @@
 import { Creature } from "./creatureclasses";
 import {
-  Building,
+  type Building,
   CharacterFlags,
   CharacterObject,
   CharacterTimers,
+  type Position,
 } from "./gameobject";
 
 export enum HumanState {
@@ -15,7 +16,7 @@ export enum HumanState {
 }
 
 export class VIPText extends PIXI.Text {
-  human = null;
+  human: null | Human = null;
   yOffset = 0;
 }
 
@@ -37,16 +38,16 @@ export class HumanFlags extends CharacterFlags {
 
 export class Human extends CharacterObject {
   maxSpeed = 0;
-  deadTexture: PIXI.Texture[];
+  deadTexture!: PIXI.Texture[];
   flags = new HumanFlags();
-  target = null;
+  target: null | false | Human | Position | undefined | Creature = null; // TODO: refactor game to remove the inconsistencies heree
   speedMod = 0;
   human = true;
   plagueTicks = 0;
   plagueDamage = 0;
   visionDistance = 0;
-  lastKnownBuilding: Building;
-  zombieTarget: Creature;
-  state: HumanState;
+  lastKnownBuilding: Building | null | undefined = null; // unused?
+  zombieTarget: Creature | null | undefined = null;
+  state!: HumanState;
   timer = new HumanTimers();
 }

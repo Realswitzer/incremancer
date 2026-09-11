@@ -106,7 +106,7 @@ export class PrestigePoints extends SpritePool<GameObject> {
   updatePart(
     sprite: GameObject,
     timeDiff: number,
-    target: { x: number; y: number },
+    target: { x: number; y: number }
   ): void {
     const vector = this.zmMap.normalizeVector({
       x: target.x - sprite.x,
@@ -485,7 +485,7 @@ export class Exclamations {
   newIcon(
     target: { x: number; y: number; hasIcon: boolean },
     texture: PIXI.Texture,
-    displayTime: number,
+    displayTime: number
   ): void {
     if (target.hasIcon) return;
     let sprite: Exclamation;
@@ -692,7 +692,7 @@ export class Bullets {
             sprite.damage,
             false,
             false,
-            false,
+            false
           );
         } else {
           if (sprite.rocket) {
@@ -702,14 +702,14 @@ export class Bullets {
               sprite.target.x,
               sprite.target.y,
               null,
-              sprite.damage,
+              sprite.damage
             );
           } else {
             if (sprite.target.zombie)
               this.zombies.damageZombie(
                 sprite.target,
                 sprite.damage,
-                sprite.source,
+                sprite.source
               );
             sprite.target = sprite.target as unknown as Human;
             if (sprite.target.human)
@@ -745,7 +745,7 @@ export class Bullets {
     plague = false,
     rocket = false,
     fireball = false,
-    darkorb = false,
+    darkorb = false
   ): void {
     let sprite: Bullet;
     if (this.discardedSprites.length > 0) {
@@ -927,7 +927,7 @@ export class Smoke extends SpritePool<GameObject> {
       0,
       size / 2 + 2,
       size / 2 + 2,
-      size / 2,
+      size / 2
     );
     radgrad.addColorStop(0, "rgba(255,255,255,0.05)");
     radgrad.addColorStop(0.5, "rgba(255,255,255,0.1)");
@@ -1036,8 +1036,8 @@ export class Smoke extends SpritePool<GameObject> {
 
 class Fragment extends GameObject {
   hitFloor = false;
-  floor: number;
-  rotSpeed: number;
+  floor!: number;
+  rotSpeed!: number;
 }
 
 export class Fragments extends SpritePool<Fragment> {

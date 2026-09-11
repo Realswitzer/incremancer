@@ -40,21 +40,21 @@ export class Zombie extends Creature {
 
 export class Zombies {
   private static instance: Zombies;
-  creatureFactory: CreatureFactory;
+  creatureFactory!: CreatureFactory;
   constructor() {
     if (Zombies.instance) return Zombies.instance;
     Zombies.instance = this;
   }
-  map: ZmMap;
-  model: GameModel;
-  humans: Humans;
-  graveyard: Graveyard;
-  smoke: Smoke;
-  blood: Blood;
-  bones: Bones;
-  exclamations: Exclamations;
-  blasts: Blasts;
-  bullets: Bullets;
+  map!: ZmMap;
+  model!: GameModel;
+  humans!: Humans;
+  graveyard!: Graveyard;
+  smoke!: Smoke;
+  blood!: Blood;
+  bones!: Bones;
+  exclamations!: Exclamations;
+  blasts!: Blasts;
+  bullets!: Bullets;
   zombies: Zombie[] = [];
   discardedZombies: Zombie[] = [];
   aliveZombies: Creature[] = [];
@@ -69,12 +69,12 @@ export class Zombies {
   refundChance = 0;
   currId = 1;
   scanTime = 3;
-  textures = [];
-  dogTexture = [];
-  deadDogTexture = [];
+  textures = [] as { animated: PIXI.Texture[]; dead: PIXI.Texture[] }[];
+  dogTexture = [] as PIXI.Texture[];
+  deadDogTexture = [] as PIXI.Texture[];
   maxSpeed = 10;
-  zombieCursor = null;
-  zombieCursorText = null;
+  zombieCursor = null as unknown as PIXI.Container;
+  zombieCursorText = null as unknown as PIXI.Text;
   zombieCursorScale = 3;
   mouseOutOfBounds = false;
   burnTickTimer = 5;
@@ -143,7 +143,7 @@ export class Zombies {
         strokeThickness: 0,
         align: "center",
       });
-      this.zombieCursorText.anchor = { x: 0.5, y: 1 };
+      this.zombieCursorText.anchor = { x: 0.5, y: 1 } as PIXI.ObservablePoint;
       this.zombieCursorText.scale.x = this.zombieCursorText.scale.y = 0.1;
       this.zombieCursorText.y = -9;
       this.zombieCursorText.visible = false;
@@ -159,7 +159,7 @@ export class Zombies {
     const textureId = Math.floor(Math.random() * this.textures.length);
     let zombie: Zombie;
     if (this.discardedZombies.length > 0) {
-      zombie = this.discardedZombies.pop();
+      zombie = this.discardedZombies.pop()!;
       if (isDog) {
         zombie.textures = this.dogTexture;
       } else {
