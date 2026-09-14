@@ -28,19 +28,19 @@ export class Graveyard {
     if (Graveyard.instance) return Graveyard.instance;
     Graveyard.instance = this;
   }
-  spikeTexture: PIXI.Texture;
-  boneCollectors: BoneCollectors;
-  bones: Bones;
-  gameModel: GameModel;
-  zmMap: ZmMap;
-  zombies: Zombies;
-  smoke: Smoke;
-  harpies: Harpies;
-  blood: Blood;
-  humans: Humans;
+  spikeTexture!: PIXI.Texture;
+  boneCollectors!: BoneCollectors;
+  bones!: Bones;
+  gameModel!: GameModel;
+  zmMap!: ZmMap;
+  zombies!: Zombies;
+  smoke!: Smoke;
+  harpies!: Harpies;
+  blood!: Blood;
+  humans!: Humans;
 
-  sprite: GraveyardSprite;
-  fortSprite: PIXI.Sprite;
+  sprite!: GraveyardSprite;
+  fortSprite!: PIXI.Sprite;
   spikeSprites = [];
   level = 1;
   spikeTimer = 5;
@@ -55,7 +55,12 @@ export class Graveyard {
     y: 0,
   };
 
-  healthBar = null;
+  healthBar = null as unknown as {
+    container: PIXI.Container;
+    background: PIXI.Graphics;
+    foreground: PIXI.Graphics;
+    percentage: number;
+  };
 
   initialize(): void {
     this.boneCollectors = new BoneCollectors();
@@ -156,7 +161,7 @@ export class Graveyard {
     }
     if (this.fortSprite) {
       characterContainer.removeChild(this.fortSprite);
-      this.fortSprite = null;
+      this.fortSprite = null as unknown as PIXI.Sprite; // TODO: hacky fix instead of proper typing
     }
     this.level = 1;
     let textureName = "graveyard1.png";

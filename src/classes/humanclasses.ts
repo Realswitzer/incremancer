@@ -50,4 +50,5 @@ export class Human extends CharacterObject {
   zombieTarget: Creature | null | undefined = null;
   state!: HumanState;
   timer = new HumanTimers();
+  vip?: boolean;
 }

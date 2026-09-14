@@ -1,4 +1,6 @@
+import { Creature } from "./classes/creatureclasses";
 import { Position, Wall, Building } from "./classes/gameobject";
+import { Human } from "./classes/humanclasses";
 import {
   gameFieldSize,
   characterContainer,
@@ -26,17 +28,17 @@ export class ZmMap {
   buildings: Building[] = [];
   buildingsByPopularity: Building[] = [];
   buildingMap: Building[] = [];
-  mapCols: number;
-  mapRows: number;
-  buildingTextures: PIXI.Texture[];
-  roadSprite = null as PIXI.TilingSprite;
-  roadTexture = null as PIXI.Texture;
+  mapCols!: number;
+  mapRows!: number;
+  buildingTextures!: PIXI.Texture[];
+  roadSprite = null as unknown as PIXI.TilingSprite;
+  roadTexture = null as unknown as PIXI.Texture;
   entranceWidth = 16;
   entranceDepth = 16;
   cornerDistance = 16;
   minBuildings = 3;
   wallWidth = 4;
-  graveyardCollision = null;
+  graveyardCollision = null as unknown as Wall;
   graveYardLocation = { x: 0, y: 0 };
   graveYardPosition = null;
 
@@ -46,16 +48,23 @@ export class ZmMap {
 
   roomNoOverlap(position1: Position, position2: Position): boolean {
     const buffer = 50;
+    position1.width = position1.width!;
+    position1.height = position1.height!;
+    position2.width = position2.width!;
+    position2.height = position2.height!;
     if (
       position1.x > position2.x + position2.width + buffer ||
       position1.x + position1.width + buffer < position2.x
-    )
+    ) {
       return true;
+    }
     if (
       position1.y > position2.y + position2.height + buffer ||
       position1.y + position1.height + buffer < position2.y
-    )
+    ) {
       return true;
+    }
+    return false;
   }
 
   isValidPosition(position: Position): boolean {
@@ -883,8 +892,8 @@ export class ZmMap {
   insideBuilding = false;
 
   howDoIGetToMyTarget(
-    currentPosition: Position,
-    targetPosition: Position,
+    currentPosition: Position | Creature | Human,
+    targetPosition: Position | Creature | Human,
   ): Position {
     this.distanceToTarget = this.fastDistance(
       currentPosition.x,

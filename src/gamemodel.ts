@@ -133,7 +133,7 @@ export class GameModel {
   harpySpeed = 75;
   tankBuster = false;
   harpyBombs = 1;
-  stats = null;
+  stats: stats = null as unknown as stats;
   runicSyphon = {
     percentage: 0,
     blood: 0,
@@ -1018,4 +1018,17 @@ export class GameModel {
       trophy: this.trophies.doesLevelHaveTrophy(level),
     };
   }
+}
+
+interface stats {
+  zombie: {
+    health: number;
+    damage: number;
+    speed: number;
+    count: number;
+  };
+  skeleton: { health: number; damage: number; speed: number };
+  human: { count: number };
+  police: { count: number };
+  army: { count: number };
 }

@@ -106,7 +106,7 @@ export class PrestigePoints extends SpritePool<GameObject> {
   updatePart(
     sprite: GameObject,
     timeDiff: number,
-    target: { x: number; y: number }
+    target: { x: number; y: number },
   ): void {
     const vector = this.zmMap.normalizeVector({
       x: target.x - sprite.x,
@@ -485,7 +485,7 @@ export class Exclamations {
   newIcon(
     target: { x: number; y: number; hasIcon: boolean },
     texture: PIXI.Texture,
-    displayTime: number
+    displayTime: number,
   ): void {
     if (target.hasIcon) return;
     let sprite: Exclamation;
@@ -560,8 +560,8 @@ class Bullet extends GameObject {
   rocket = false;
   fireball = false;
   darkorb = false;
-  target = null;
-  source = null;
+  target = null as unknown as Human | Creature;
+  source = null as unknown as Human | Creature;
   hitbox = 0;
   damage = 0;
 }
@@ -692,7 +692,7 @@ export class Bullets {
             sprite.damage,
             false,
             false,
-            false
+            false,
           );
         } else {
           if (sprite.rocket) {
@@ -702,14 +702,14 @@ export class Bullets {
               sprite.target.x,
               sprite.target.y,
               null,
-              sprite.damage
+              sprite.damage,
             );
           } else {
             if (sprite.target.zombie)
               this.zombies.damageZombie(
                 sprite.target,
                 sprite.damage,
-                sprite.source
+                sprite.source as Human,
               );
             sprite.target = sprite.target as unknown as Human;
             if (sprite.target.human)
@@ -739,13 +739,13 @@ export class Bullets {
   }
 
   newBullet(
-    source: { x: number; y: number },
-    target: { x: number; y: number },
+    source: Human | Creature,
+    target: Human | Creature,
     damage: number,
     plague = false,
     rocket = false,
     fireball = false,
-    darkorb = false
+    darkorb = false,
   ): void {
     let sprite: Bullet;
     if (this.discardedSprites.length > 0) {
@@ -927,7 +927,7 @@ export class Smoke extends SpritePool<GameObject> {
       0,
       size / 2 + 2,
       size / 2 + 2,
-      size / 2
+      size / 2,
     );
     radgrad.addColorStop(0, "rgba(255,255,255,0.05)");
     radgrad.addColorStop(0.5, "rgba(255,255,255,0.1)");

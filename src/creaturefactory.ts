@@ -90,6 +90,7 @@ export class CreatureFactory {
     }
   }
   refundParts(golem: Creature, refundPercent: number): void {
+    // TODO: .price does not exist, maybe .cost?
     this.gameModel.persistentData.parts += golem.price * refundPercent;
   }
 
@@ -273,6 +274,7 @@ export class Creature {
   timeLeft: number;
   autobuild: number;
   level: number;
+  price: number;
   constructor(
     id: number,
     type: number,
@@ -296,5 +298,6 @@ export class Creature {
     this.timeLeft = 10;
     this.autobuild = 0;
     this.level = 1;
+    this.price = 0;
   }
 }

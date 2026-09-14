@@ -21,6 +21,8 @@ import {
   Exclamations,
   characterContainer,
   Zombies,
+  type ArmyMan,
+  type Tank,
 } from "./internal";
 
 export class Creatures {
@@ -45,7 +47,7 @@ export class Creatures {
   creatureCount = [] as number[]; // index = creature.type, value = count
   aliveCreatures: Creature[] = [];
   aliveZombies = [] as Creature[];
-  graveyardAttackers = [];
+  graveyardAttackers = [] as (ArmyMan | Tank)[];
   discardedSprites: Creature[] = [];
   aliveHumans = [] as Human[];
   scaling = 1.6;
@@ -148,7 +150,7 @@ export class Creatures {
     speed: number,
     type: number,
     level: number,
-    price: number
+    price: number,
   ): void {
     if (this.model.creatureCount >= this.model.creatureLimit) {
       return;
@@ -193,7 +195,7 @@ export class Creatures {
     creature.anchor.set(8.5 / 16, 1);
     creature.position.set(
       this.graveyard.sprite.x,
-      this.graveyard.sprite.y + (this.graveyard.level > 2 ? 8 : 0)
+      this.graveyard.sprite.y + (this.graveyard.level > 2 ? 8 : 0),
     );
     creature.target = null;
     creature.zIndex = creature.position.y;
@@ -313,7 +315,7 @@ export class Creatures {
           creature.position.x,
           creature.position.y,
           creature.target!.x, // implied due to if statement above
-          creature.target!.y
+          creature.target!.y,
         );
 
         if (distanceToHumanTarget < this.attackDistance) {
@@ -336,7 +338,7 @@ export class Creatures {
           creature.position.x,
           creature.position.y,
           creature.target!.x,
-          creature.target!.y
+          creature.target!.y,
         );
         if (distanceToTarget < this.attackDistance) {
           creature.scale.x =
@@ -346,12 +348,12 @@ export class Creatures {
           if (creature.timer.attack < 0) {
             this.humans.damageHuman(
               creature.target!,
-              this.calculateDamage(creature)
+              this.calculateDamage(creature),
             );
             if (creature.creatureType == this.creatureTypes.fireGolem) {
               this.humans.burnHuman(
                 creature.target!,
-                creature.attackDamage / 2
+                creature.attackDamage / 2,
               );
             }
             creature.timer.attack =
@@ -428,7 +430,7 @@ export class Creatures {
     if (creature.timer.target <= 0) {
       creature.targetVector = this.map.howDoIGetToMyTarget(
         creature,
-        creature.target!
+        creature.target!,
       );
       creature.timer.target = 0.2;
     }
@@ -481,7 +483,7 @@ export class Creatures {
           this.healZombie(
             this.aliveZombies[i],
             healingDone,
-            1 + 0.01 * creature.level
+            1 + 0.01 * creature.level,
           );
         }
       }
@@ -495,7 +497,7 @@ export class Creatures {
             this.healZombie(
               this.creatures[i],
               healingDone,
-              1 + 0.01 * creature.level
+              1 + 0.01 * creature.level,
             );
           }
         }
@@ -520,7 +522,7 @@ export class Creatures {
               creature.attackDamage / 2,
               false,
               false,
-              true
+              true,
             );
           }
         }

@@ -4,7 +4,7 @@ import {
   spawnCritText,
 } from "./classes/creatureclasses";
 import { CharacterFlags } from "./classes/gameobject";
-import { Human as Creature, Human } from "./classes/humanclasses";
+import { Human } from "./classes/humanclasses";
 import {
   characterContainer,
   GameModel,
@@ -26,9 +26,11 @@ import {
   Exclamations,
   Bullets,
   PartFactory,
+  type ArmyMan,
+  type Tank,
 } from "./internal";
 
-class SkeletonCharacter extends Creature {
+export class SkeletonCharacter extends Creature {
   boneshieldTimer = 3;
   boneshield = 0;
   boneshieldContainer = new BoneshieldContainer();
@@ -76,29 +78,29 @@ class BoneshieldContainer extends PIXI.Container {
 
 export class Skeleton {
   private static instance: Skeleton;
-  partFactory: PartFactory;
+  partFactory!: PartFactory;
   constructor() {
     if (Skeleton.instance) return Skeleton.instance;
     Skeleton.instance = this;
   }
-  map: ZmMap;
-  model: GameModel;
-  graveyard: Graveyard;
-  spells: Spells;
-  smoke: Smoke;
-  upgrades: Upgrades;
-  humans: Humans;
-  zombies: Zombies;
-  prestigePoints: PrestigePoints;
-  exclamations: Exclamations;
-  bullets: Bullets;
-  bones: Bones;
-  blasts: Blasts;
-  blood: Blood;
+  map!: ZmMap;
+  model!: GameModel;
+  graveyard!: Graveyard;
+  spells!: Spells;
+  smoke!: Smoke;
+  upgrades!: Upgrades;
+  humans!: Humans;
+  zombies!: Zombies;
+  prestigePoints!: PrestigePoints;
+  exclamations!: Exclamations;
+  bullets!: Bullets;
+  bones!: Bones;
+  blasts!: Blasts;
+  blood!: Blood;
   skeletons: SkeletonCharacter[] = [];
   aliveSkeletons: SkeletonCharacter[] = [];
   discardedSprites: SkeletonCharacter[] = [];
-  aliveHumans = [];
+  aliveHumans: Human[] = [];
   scaling = 1;
   moveTargetDistance = 15;
   attackDistance = 25;
@@ -111,7 +113,7 @@ export class Skeleton {
   respawnTime = 10;
   moveSpeed = 40;
   lastKillingBlow = 0;
-  randomSpells = [];
+  randomSpells: number[] = [];
   lootChance = 0.001;
   spellTimer = 3;
   textures = {
@@ -133,14 +135,17 @@ export class Skeleton {
   smokeTimer = 0.3;
   fastDistance = fastDistance;
   magnitude = magnitude;
-  damageZombie = null;
-  searchClosestTarget = null;
-  updateBurns = null;
-  updateZombieRegen = null;
-  causePlagueExplosion = null;
-  inflictPlague = null;
-  healZombie = null;
-  setSpeedMultiplier = null;
+  damageZombie = null as unknown as typeof this.zombies.damageZombie;
+  searchClosestTarget =
+    null as unknown as typeof this.zombies.searchClosestTarget;
+  updateBurns = null as unknown as typeof this.zombies.updateBurns;
+  updateZombieRegen = null as unknown as typeof this.zombies.updateZombieRegen;
+  causePlagueExplosion =
+    null as unknown as typeof this.zombies.causePlagueExplosion;
+  inflictPlague = null as unknown as typeof this.zombies.inflictPlague;
+  healZombie = null as unknown as typeof this.zombies.healZombie;
+  setSpeedMultiplier =
+    null as unknown as typeof this.zombies.setSpeedMultiplier;
   storageName = "incremancerskele";
   talentsStorageName = "incremancertalents";
   persistent = {
@@ -181,7 +186,7 @@ export class Skeleton {
         this.persistent.level++;
         this.upgrades.applyUpgrades();
         this.model.sendMessage(
-          "Skeleton Champion reached level " + this.persistent.level + "!"
+          "Skeleton Champion reached level " + this.persistent.level + "!",
         );
         const skeletonElement = document.getElementById("skeleton");
         if (skeletonElement) {
@@ -302,7 +307,7 @@ export class Skeleton {
   spawnCreature(): void {
     let creature: SkeletonCharacter;
     if (this.discardedSprites.length > 0) {
-      creature = this.discardedSprites.pop();
+      creature = this.discardedSprites.pop()!;
       creature.textures = this.textures.down;
     } else {
       creature = new SkeletonCharacter(this.textures.down);
@@ -324,7 +329,7 @@ export class Skeleton {
     creature.anchor.set(8.5 / 16, 1);
     creature.position.set(
       this.graveyard.sprite.x,
-      this.graveyard.sprite.y + (this.graveyard.level > 2 ? 8 : 0)
+      this.graveyard.sprite.y + (this.graveyard.level > 2 ? 8 : 0),
     );
     creature.target = null;
     creature.zIndex = creature.position.y;
@@ -359,7 +364,7 @@ export class Skeleton {
   }
 
   aliveZombies: Creature[] = [];
-  graveyardAttackers = [];
+  graveyardAttackers: (ArmyMan | Tank)[] = [];
 
   update(timeDiff: number): void {
     this.aliveHumans = this.humans.aliveHumans;
@@ -444,7 +449,7 @@ export class Skeleton {
           false,
           false,
           false,
-          true
+          true,
         );
       }
     }
@@ -481,11 +486,12 @@ export class Skeleton {
         break;
 
       case CreatureState.movingToTarget: {
+        creature.target = creature.target as Human;
         const distanceToHumanTarget = this.fastDistance(
           creature.position.x,
           creature.position.y,
           creature.target.x,
-          creature.target.y
+          creature.target.y,
         );
 
         if (distanceToHumanTarget < this.attackDistance) {
@@ -504,17 +510,18 @@ export class Skeleton {
         break;
       }
       case CreatureState.attackingTarget: {
+        creature.target = creature.target as Human;
         const distanceToTarget = this.fastDistance(
           creature.position.x,
           creature.position.y,
           creature.target.x,
-          creature.target.y
+          creature.target.y,
         );
         if (distanceToTarget < this.attackDistance) {
           if (creature.timer.attack < 0 && !creature.target.flags.dead) {
             this.humans.damageHuman(
               creature.target,
-              this.calculateDamage(creature)
+              this.calculateDamage(creature),
             );
             if (creature.target.flags.dead) {
               this.killingBlow(creature.target);
@@ -557,7 +564,7 @@ export class Skeleton {
     if (this.lastKillingBlow <= 0) {
       this.model.addPrestigePoints(
         Math.round(this.persistent.level) *
-          Math.pow(1.00025, this.persistent.level)
+          Math.pow(1.00025, this.persistent.level),
       );
       this.lastKillingBlow = 20;
       this.prestigePoints.newPart(creature.x, creature.y);
@@ -579,7 +586,7 @@ export class Skeleton {
   }
 
   incinerate(): void {
-    let creature: Creature;
+    let creature: Creature | undefined = undefined;
     for (let i = 0; i < this.skeletons.length; i++) {
       if (this.skeletons[i].visible) {
         creature = this.skeletons[i];
@@ -638,6 +645,7 @@ export class Skeleton {
   }
 
   updateCreatureSpeed(creature: SkeletonCharacter, timeDiff: number): void {
+    creature.target = creature.target as Human;
     if (creature.timer.dogStun > 0) {
       creature.timer.dogStun -= timeDiff;
       return;
@@ -650,7 +658,7 @@ export class Skeleton {
     if (creature.timer.target <= 0) {
       creature.targetVector = this.map.howDoIGetToMyTarget(
         creature,
-        creature.target
+        creature.target,
       );
       creature.timer.target = 0.2;
     }
@@ -661,11 +669,11 @@ export class Skeleton {
         creature.x,
         creature.y,
         creature.target.x,
-        creature.target.y
+        creature.target.y,
       );
     const speedMod = Math.min(
       creature.speedMultiplier * creature.maxSpeed,
-      distanceToTarget
+      distanceToTarget,
     );
 
     creature.xSpeed = creature.targetVector.x * speedMod;
@@ -887,6 +895,8 @@ export class Skeleton {
         return "divine";
       case this.rarity.chaos:
         return "chaos";
+      default:
+        return "unknown";
     }
   }
 
@@ -905,14 +915,14 @@ export class Skeleton {
             stats.push(
               "+" +
                 formatWhole(this.stats.zombieHealth.scaling * loot.l) +
-                " zombie health"
+                " zombie health",
             );
             break;
           case this.stats.zombieDamage.id:
             stats.push(
               "+" +
                 formatWhole(this.stats.zombieDamage.scaling * loot.l) +
-                " zombie damage"
+                " zombie damage",
             );
             break;
           case this.stats.zombieSpeed.id:
@@ -936,7 +946,7 @@ export class Skeleton {
           spell.itemText ||
             "Has a chance to cast " +
               spell.name +
-              " when attacking, this does not cost energy or trigger a cooldown"
+              " when attacking, this does not cost energy or trigger a cooldown",
         );
       }
     return stats;
@@ -946,14 +956,14 @@ export class Skeleton {
     const stats = [];
     if (loot.se)
       for (let i = 0; i < loot.se.length; i++) {
-        const spell = this.spells.spells.filter((sp) => sp.id == loot.se[s])[0];
+        const spell = this.spells.spells.filter((sp) => sp.id == loot.se[i])[0];
         stats.push(spell.name.replace(" ", "-"));
       }
     return stats;
   }
   getSpecialEffectsList() {
     const stats /* Spells.Spell */ = [];
-    for (let i = 0; s < this.spells.spells.length; i++) {
+    for (let i = 0; i < this.spells.spells.length; i++) {
       stats.push(this.spells.spells[i]);
     }
     return stats;
@@ -966,6 +976,7 @@ export class Skeleton {
       this.rarity.legendary,
       this.rarity.ancient,
       this.rarity.divine,
+      this.rarity.chaos,
     ];
   }
   getTypeList() {
@@ -992,7 +1003,7 @@ export class Skeleton {
 
   generateLoot(level: number): Loot {
     const position = Math.round(Math.random() * 6) + 1;
-    let rarity = this.rarity.common;
+    let rarity: number = this.rarity.common;
     const specialEffects = [];
     if (Math.random() < this.lootChanceMod * 0.2) {
       rarity = this.rarity.rare;
@@ -1012,11 +1023,11 @@ export class Skeleton {
     if (rarity >= this.rarity.legendary) {
       const spell = getRandomElementFromArray(
         this.spells.spells,
-        Math.random()
+        Math.random(),
       );
       specialEffects.push(spell.id);
     }
-    if (rarity == ancient) {
+    if (rarity == this.rarity.ancient) {
       if (Math.random() < 0.2) {
         rarity = this.rarity.chaos;
       }
@@ -1025,46 +1036,47 @@ export class Skeleton {
     switch (rarity) {
       case this.rarity.common:
         prefixIndex = Math.floor(
-          Math.random() * this.prefixes.commonQuality.length
+          Math.random() * this.prefixes.commonQuality.length,
         );
         break;
       case this.rarity.rare:
         prefixIndex = Math.floor(
-          Math.random() * this.prefixes.rareQuality.length
+          Math.random() * this.prefixes.rareQuality.length,
         );
         break;
       case this.rarity.epic:
         prefixIndex = Math.floor(
-          Math.random() * this.prefixes.epicQuality.length
+          Math.random() * this.prefixes.epicQuality.length,
         );
         break;
       case this.rarity.legendary:
         prefixIndex = Math.floor(
-          Math.random() * this.prefixes.legendaryQuality.length
+          Math.random() * this.prefixes.legendaryQuality.length,
         );
         break;
       case this.rarity.ancient:
         prefixIndex = Math.floor(
-          Math.random() * this.prefixes.ancientQuality.length
+          Math.random() * this.prefixes.ancientQuality.length,
         );
         break;
       case this.rarity.divine:
         prefixIndex = Math.floor(
-          Math.random() * this.prefixes.divineQuality.length
+          Math.random() * this.prefixes.divineQuality.length,
         );
         break;
       case this.rarity.chaos:
         prefixIndex = Math.floor(
-          Math.random() * this.prefixes.chaosQuality.length
+          Math.random() * this.prefixes.chaosQuality.length,
         );
     }
+    let effects = [] as number[];
     if (rarity == this.rarity.chaos) {
-      const effects = [];
+      effects = [];
       for (let e = 0; e < 5; e++) {
         effects.push(Math.ceil(6 * Math.random()));
       }
     } else {
-      const effects = [
+      effects = [
         Math.random() > 0.5
           ? this.stats.zombieHealth.id
           : this.stats.zombieDamage.id,
@@ -1078,6 +1090,7 @@ export class Skeleton {
         effects.push(effect);
       }
     }
+
     return {
       id: this.persistent.currItemId++,
       l: level,
@@ -1104,10 +1117,10 @@ export class Skeleton {
         this.xpForAncient() -
         this.xpForDivine() -
         this.xpForChaos(),
-      true
+      true,
     );
     this.persistent.items = this.persistent.items.filter(
-      (i) => i.q || i.r >= this.rarity.legendary
+      (i) => i.q || i.r >= this.rarity.legendary,
     );
   }
   destroyAllItemsLegendary() {
@@ -1120,7 +1133,7 @@ export class Skeleton {
         i.r == this.rarity.epic ||
         i.r == this.rarity.ancient ||
         i.r == this.rarity.divine ||
-        i.r == this.rarity.chaos
+        i.r == this.rarity.chaos,
     );
   }
   xpForItems(): number {
