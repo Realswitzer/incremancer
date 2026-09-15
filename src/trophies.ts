@@ -85,6 +85,7 @@ export class Trophies {
         return this.trophyStats[i].percentage == true;
       }
     }
+    return false;
   }
 
   doesLevelHaveTrophy(level: number): boolean {
@@ -126,7 +127,7 @@ export class Trophies {
       this.gameModel.saveData();
       this.upgrades.applyUpgrades();
       this.gameModel.sendMessage(
-        "The VIP has been killed! - New Trophy Aquired"
+        "The VIP has been killed! - New Trophy Aquired",
       );
     } else {
       this.gameModel.sendMessage("The VIP has been killed!");
@@ -154,8 +155,8 @@ export class Trophies {
         this.createTrophy(
           i,
           this.gameModel.persistentData.trophies.indexOf(i) > -1,
-          this.gameModel.persistentData.vipEscaped.indexOf(i) > -1
-        )
+          this.gameModel.persistentData.vipEscaped.indexOf(i) > -1,
+        ),
       );
     }
     return trophies;
@@ -163,7 +164,7 @@ export class Trophies {
 
   getTrophyTotals(): Trophy[] {
     const trophiesCollected = this.getTrophyList().filter(
-      (trophy) => trophy.owned
+      (trophy) => trophy.owned,
     );
     const trophies: Trophy[] = [];
     for (let i = 0; i < trophiesCollected.length; i++) {
@@ -175,17 +176,17 @@ export class Trophies {
       } else {
         if (this.isPercentage(trophiesCollected[i].type)) {
           trophies.filter(
-            (trophy) => trophy.type == trophiesCollected[i].type
+            (trophy) => trophy.type == trophiesCollected[i].type,
           )[0].effect =
             (trophies.filter(
-              (trophy) => trophy.type == trophiesCollected[i].type
+              (trophy) => trophy.type == trophiesCollected[i].type,
             )[0].effect +
               1) *
               (1 + trophiesCollected[i].effect) -
             1;
         } else {
           trophies.filter(
-            (trophy) => trophy.type == trophiesCollected[i].type
+            (trophy) => trophy.type == trophiesCollected[i].type,
           )[0].effect += trophiesCollected[i].effect;
         }
       }
@@ -203,8 +204,8 @@ export class Trophies {
         this.createTrophy(
           this.gameModel.persistentData.trophies[i],
           true,
-          false
-        )
+          false,
+        ),
       );
     }
     return trophies;

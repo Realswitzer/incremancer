@@ -564,7 +564,7 @@ export class ZmMap {
     ];
   }
 
-  randomPositionInBuilding(building: Building): Position {
+  randomPositionInBuilding(building: Building | null): Position {
     if (!building) {
       const xMod = Math.random() > 0.5 ? -1 : 1;
       const yMod = Math.random() > 0.5 ? -1 : 1;

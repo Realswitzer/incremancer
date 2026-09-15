@@ -6,7 +6,7 @@ export function distanceBetweenPoints(
   x1: number,
   y1: number,
   x2: number,
-  y2: number
+  y2: number,
 ): number {
   return Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
 }
@@ -15,7 +15,7 @@ export function fastDistance(
   x1: number,
   y1: number,
   x2: number,
-  y2: number
+  y2: number,
 ): number {
   const dx = Math.abs(x1 - x2);
   const dy = Math.abs(y1 - y2);
@@ -25,7 +25,7 @@ export function fastDistance(
 export function RotateVector2d(
   x: number,
   y: number,
-  radians: number
+  radians: number,
 ): { x: number; y: number } {
   return {
     x: x * Math.cos(radians) - y * Math.sin(radians),
@@ -69,7 +69,7 @@ export function getMaxUpgrades(
   basePrice: number,
   exponent: number,
   numberOwned: number,
-  resourcesOwned: number
+  resourcesOwned: number,
 ): number {
   if (exponent == 1) {
     return Math.floor(resourcesOwned / basePrice);
@@ -78,8 +78,8 @@ export function getMaxUpgrades(
     Math.log(
       (resourcesOwned * (exponent - 1)) /
         (basePrice * Math.pow(exponent, numberOwned)) +
-        1
-    ) / Math.log(exponent)
+        1,
+    ) / Math.log(exponent),
   );
 }
 
@@ -87,7 +87,7 @@ export function getCostForUpgrades(
   basePrice: number,
   exponent: number,
   numberOwned: number,
-  numberToBuy: number
+  numberToBuy: number,
 ): number {
   if (exponent == 1) {
     return basePrice * numberToBuy;
@@ -101,7 +101,7 @@ export function getCostForUpgrades(
 
 export function moveToolTip(event: MouseEvent, element: HTMLElement): void {
   const menuRect = document
-    .getElementById("champ-hold")
+    .getElementById("champ-hold")!
     .getBoundingClientRect();
   let x = event.clientX - menuRect.x;
   const y = event.clientY - menuRect.y;
@@ -128,7 +128,7 @@ const saveType = {
  */
 export function getSaveType(saveData: object) {
   const keys = Object.keys(saveData);
-  let type = saveType.base;
+  let type: keyof typeof saveType = saveType.base;
   // settings added in CM
   if (
     "autoStartWait" in keys ||

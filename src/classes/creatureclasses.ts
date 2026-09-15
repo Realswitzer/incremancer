@@ -31,6 +31,7 @@ export class Creature extends CharacterObject {
     dead: [] as PIXI.Texture[],
   };
   dogStun: number = 0; // possible boolean
+  dead?: boolean; // autogen
 }
 
 export enum CreatureState {

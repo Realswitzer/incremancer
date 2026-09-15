@@ -420,15 +420,7 @@ angular
           this.level = level;
         },
         setMaxHarpies() {
-          let maxHarpies = Math.floor(
-            this.getEnergyRate() + this.persistentData.harpies,
-          );
-          if (
-            (maxHarpies >= 0 && maxHarpies < this.persistentData.harpies) ||
-            (this.getEnergyRate() >= 1 && maxHarpies > 0)
-          ) {
-            this.persistentData.harpies = maxHarpies;
-          }
+          zm.model.setMaxHarpies();
         },
         startLevel() {
           zm.model.startLevel(this.level.level);
@@ -681,7 +673,7 @@ angular
         );
       };
 
-      ((zm.costTranslate = function (costType) {
+      (zm.costTranslate = function (costType) {
         if (costType == upgrades.costs.prestigePoints) {
           return "points";
         }
@@ -693,7 +685,7 @@ angular
           } else {
             upgrades.purchaseUpgrade(upgrade);
           }
-        }));
+        });
 
       zm.destroyUpgrade = function (upgrade) {
         upgrades.removeUpgrade(upgrade);
@@ -1190,7 +1182,7 @@ angular
           }
         },
         resetFilter() {
-          ((this.itemsFilters.se = []), (this.itemsFilters.r = []));
+          (this.itemsFilters.se = []), (this.itemsFilters.r = []);
           this.itemsFilters.t = [];
         },
         acceptOffer() {
@@ -1707,14 +1699,14 @@ angular
       return {
         restrict: "A",
         link: function (scope: any, el, attrs, controller) {
-          (el.bind("mouseenter", function () {
+          el.bind("mouseenter", function () {
             if (KeysPressed.shift) {
               el.addClass("shift-trash");
             }
           }),
             el.bind("mouseleave", function () {
               el.removeClass("shift-trash");
-            }));
+            });
         },
       };
     },

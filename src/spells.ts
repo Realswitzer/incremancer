@@ -14,7 +14,7 @@ class Spell {
   active: boolean;
   cooldownLeft: number;
   timer: number;
-  unlocked: boolean;
+  unlocked!: boolean;
   constructor(
     id: number,
     name: string,
@@ -24,7 +24,7 @@ class Spell {
     duration: number,
     energyCost: number,
     start: () => void,
-    end: () => void
+    end: () => void,
   ) {
     this.id = id;
     this.name = name;
@@ -72,7 +72,7 @@ export class Spells {
       },
       function () {
         GameModel.getInstance().gameSpeed = 1;
-      }
+      },
     ),
     new Spell(
       2,
@@ -99,7 +99,7 @@ export class Spells {
         ) {
           GameModel.getInstance().setMaxHarpies();
         }
-      }
+      },
     ),
     new Spell(
       3,
@@ -114,7 +114,7 @@ export class Spells {
       },
       function () {
         new Spells().zombies.detonate = false;
-      }
+      },
     ),
     new Spell(
       4,
@@ -129,7 +129,7 @@ export class Spells {
       },
       function () {
         new Spells().humans.frozen = false;
-      }
+      },
     ),
     new Spell(
       5,
@@ -144,7 +144,7 @@ export class Spells {
       },
       function () {
         new Spells().zombies.super = false;
-      }
+      },
     ),
     new Spell(
       6,
@@ -160,7 +160,7 @@ export class Spells {
       },
       function () {
         //
-      }
+      },
     ),
     new Spell(
       7,
@@ -175,7 +175,7 @@ export class Spells {
       },
       function () {
         new Spells().humans.pandemic = false;
-      }
+      },
     ),
     new Spell(
       8,
@@ -190,7 +190,7 @@ export class Spells {
       },
       function () {
         new Spells().storm = false;
-      }
+      },
     ),
   ];
 

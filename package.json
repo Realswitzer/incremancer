@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "@types/angular": "1.7",
+    "@types/pixi.js": "^5.0.0",
     "angular": "1.7.8",
     "lz-string": "^1.5.0",
     "pixi.js-legacy": "5.3.8"

@@ -1303,10 +1303,11 @@ export class ArmyMan extends Human {
   minigun = false;
   rocketlauncher = false;
   attackingGraveyard = false;
-  armyState: ArmyState;
-  graveYardTarget: { graveyard: boolean; x: number; y: number };
+  armyState!: ArmyState;
+  graveYardTarget?: { graveyard: boolean; x: number; y: number } | null;
   shotsLeft = 0;
   shotTimer = 0;
+  dead?: boolean; // autogen
 }
 
 enum ArmyState {
@@ -1317,20 +1318,30 @@ enum ArmyState {
   standing,
 }
 
+interface iDroneStrike {
+  text: PIXI.Text;
+  laser: PIXI.Graphics;
+  timer: number;
+  caller: ArmyMan;
+  startedBombing: boolean;
+  bombsLeft: number;
+  target: Creature;
+}
+
 export class Army {
   private static instance: Army;
   constructor() {
     if (Army.instance) return Army.instance;
     Army.instance = this;
   }
-  map: ZmMap;
-  zombies: Zombies;
-  humans: Humans;
-  gameModel: GameModel;
-  graveyard: Graveyard;
-  bullets: Bullets;
-  blasts: Blasts;
-  exclamations: Exclamations;
+  map!: ZmMap;
+  zombies!: Zombies;
+  humans!: Humans;
+  gameModel!: GameModel;
+  graveyard!: Graveyard;
+  bullets!: Bullets;
+  blasts!: Blasts;
+  exclamations!: Exclamations;
   maxWalkSpeed = 20;
   maxRunSpeed = 50;
   armymen: ArmyMan[] = [];
@@ -1384,17 +1395,7 @@ export class Army {
     this.attackDamage = Math.round(this.getMaxHealth() / 10);
   }
 
-  droneStrike:
-    | false
-    | {
-        text: PIXI.Text;
-        laser: PIXI.Graphics;
-        timer: number;
-        caller: ArmyMan;
-        startedBombing: boolean;
-        bombsLeft: number;
-        target: Creature;
-      } = null;
+  droneStrike: false | iDroneStrike = null as unknown as false;
   droneActive = false;
 
   populate(): void {
@@ -1424,7 +1425,7 @@ export class Army {
     }
 
     if (this.droneStrike && this.droneStrike.laser) {
-      foregroundContainer.removeChild(this.droneStrike.text);
+      foregroundContainer.removeChild(this.droneStrike.text!);
       foregroundContainer.removeChild(this.droneStrike.laser);
     }
 
@@ -1537,6 +1538,7 @@ export class Army {
       (armyman.zombieTarget && !armyman.zombieTarget.flags.dead)
     ) {
       armyman.target = armyman.graveYardTarget ?? armyman.zombieTarget;
+      armyman.target = armyman.target as Position;
       const distanceToTarget = fastDistance(
         armyman.position.x,
         armyman.position.y,
@@ -1633,6 +1635,7 @@ export class Army {
 
         break;
       case ArmyState.walking:
+        armyman.target = armyman.target as Position;
         if (
           fastDistance(
             armyman.position.x,
@@ -1684,6 +1687,7 @@ export class Army {
           (armyman.zombieTarget && !armyman.zombieTarget.flags.dead)
         ) {
           armyman.target = armyman.graveYardTarget ?? armyman.zombieTarget;
+          armyman.target = armyman.target as Creature;
           armyman.scale.x =
             armyman.target.x > armyman.x ? this.scaling : -this.scaling;
           if (armyman.timer.attack < 0) {
@@ -1708,7 +1712,7 @@ export class Army {
               }
               this.bullets.newBullet(
                 armyman,
-                armyman.target,
+                armyman.target as Creature,
                 armyman.rocketlauncher
                   ? this.attackDamage * 1.2
                   : armyman.minigun
@@ -1731,6 +1735,7 @@ export class Army {
   droneBlastRadius = 35;
 
   callDroneStrike(armyman: ArmyMan, aliveZombies: Creature[]): void {
+    armyman.zombieTarget = armyman.zombieTarget as Creature;
     let zombiesInArea = 0;
     for (let i = 0; i < aliveZombies.length; i++) {
       if (
@@ -1769,12 +1774,13 @@ export class Army {
         target: armyman.zombieTarget as Creature,
         timer: 3,
         bombsLeft: 3,
-      };
+      } as iDroneStrike;
     }
   }
 
   droneBomb(aliveZombies: Creature[]): void {
     const variance = 32;
+    this.droneStrike = this.droneStrike as iDroneStrike;
     this.droneExplosion(
       this.droneStrike.target.x + (Math.random() - 1) * variance,
       this.droneStrike.target.y + (Math.random() - 1) * variance,
@@ -1835,7 +1841,9 @@ export class Army {
           this.droneStrike.laser = new PIXI.Graphics();
           foregroundContainer.addChild(this.droneStrike.laser);
         }
-        this.droneStrike.text.text = Math.ceil(this.droneStrike.timer);
+        this.droneStrike.text.text = Math.ceil(
+          this.droneStrike.timer,
+        ).toString();
         this.droneStrike.text.x = this.droneStrike.target.x;
         this.droneStrike.text.y = this.droneStrike.target.y - 30;
 
@@ -2109,7 +2117,7 @@ export class Tanks {
             tank.timer.attack = this.attackSpeed;
             this.bullets.newBullet(
               tank,
-              tank.graveYardTarget || tank.zombieTarget,
+              (tank.graveYardTarget || tank.zombieTarget) as Creature,
               this.attackDamage,
               false,
               true,

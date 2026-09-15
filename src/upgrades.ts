@@ -101,7 +101,7 @@ export class Upgrades {
     if (
       upgrade.requires &&
       this.gameModel.persistentData.constructions.filter(
-        (built) => built.id == upgrade.requires
+        (built) => built.id == upgrade.requires,
       ).length == 0
     ) {
       return false;
@@ -119,12 +119,12 @@ export class Upgrades {
           (upgrade) =>
             upgrade.costType == type &&
             (upgrade.cap == 0 || this.currentRank(upgrade) < upgrade.cap) &&
-            this.hasRequirement(upgrade)
+            this.hasRequirement(upgrade),
         );
       case "completed":
         return this.upgrades.filter(
           (upgrade) =>
-            upgrade.cap > 0 && this.currentRank(upgrade) >= upgrade.cap
+            upgrade.cap > 0 && this.currentRank(upgrade) >= upgrade.cap,
         );
     }
   }
@@ -134,17 +134,17 @@ export class Upgrades {
     this.spells.lockAllSpells();
     for (let i = 0; i < this.gameModel.persistentData.upgrades.length; i++) {
       let upgrade = this.upgrades.filter(
-        (up) => up.id == this.gameModel.persistentData.upgrades[i].id
+        (up) => up.id == this.gameModel.persistentData.upgrades[i].id,
       )[0];
       if (!upgrade) {
         upgrade = this.prestigeUpgrades.filter(
-          (up) => up.id == this.gameModel.persistentData.upgrades[i].id
+          (up) => up.id == this.gameModel.persistentData.upgrades[i].id,
         )[0];
       }
       if (upgrade) {
         this.applyUpgrade(
           upgrade,
-          this.gameModel.persistentData.upgrades[i].rank
+          this.gameModel.persistentData.upgrades[i].rank,
         );
       }
     }
@@ -154,7 +154,7 @@ export class Upgrades {
       i++
     ) {
       this.applyConstructionUpgrade(
-        this.gameModel.persistentData.constructions[i]
+        this.gameModel.persistentData.constructions[i],
       );
     }
     const trophies = new Trophies().getAquiredTrophyList();
@@ -788,7 +788,7 @@ export class Upgrades {
   upgradePrice(upgrade: Upgrade): number {
     return Math.round(
       upgrade.basePrice *
-        Math.pow(upgrade.multiplier, this.currentRank(upgrade))
+        Math.pow(upgrade.multiplier, this.currentRank(upgrade)),
     );
   }
 
@@ -801,7 +801,7 @@ export class Upgrades {
           upgrade.basePrice,
           upgrade.multiplier,
           currentRank,
-          this.gameModel.persistentData.blood
+          this.gameModel.persistentData.blood,
         );
         break;
       case this.costs.brains:
@@ -809,7 +809,7 @@ export class Upgrades {
           upgrade.basePrice,
           upgrade.multiplier,
           currentRank,
-          this.gameModel.persistentData.brains
+          this.gameModel.persistentData.brains,
         );
         break;
       case this.costs.bones:
@@ -817,7 +817,7 @@ export class Upgrades {
           upgrade.basePrice,
           upgrade.multiplier,
           currentRank,
-          this.gameModel.persistentData.bones
+          this.gameModel.persistentData.bones,
         );
         break;
       case this.costs.parts:
@@ -825,7 +825,7 @@ export class Upgrades {
           upgrade.basePrice,
           upgrade.multiplier,
           currentRank,
-          this.gameModel.persistentData.parts
+          this.gameModel.persistentData.parts,
         );
         break;
       case this.costs.prestigePoints:
@@ -833,7 +833,7 @@ export class Upgrades {
           upgrade.basePrice,
           upgrade.multiplier,
           currentRank,
-          this.gameModel.persistentData.prestigePointsToSpend
+          this.gameModel.persistentData.prestigePointsToSpend,
         );
         break;
     }
@@ -848,7 +848,7 @@ export class Upgrades {
       upgrade.basePrice,
       upgrade.multiplier,
       this.currentRank(upgrade),
-      number
+      number,
     );
   }
 
@@ -1046,7 +1046,7 @@ export class Upgrades {
   completeConstruction(): void {
     const upgrade = this.constructionUpgrades.filter(
       (upgrade) =>
-        upgrade.id == this.gameModel.persistentData.currentConstruction.id
+        upgrade.id == this.gameModel.persistentData.currentConstruction.id,
     )[0];
     let ownedUpgrade;
     for (
@@ -1073,7 +1073,7 @@ export class Upgrades {
     this.applyUpgrades();
     this.angularModel.updateConstructionUpgrades();
     this.gameModel.sendMessage(
-      "Construction of " + upgrade.name + " complete!"
+      "Construction of " + upgrade.name + " complete!",
     );
     if (upgrade.completeMessage) {
       this.gameModel.sendMessage(upgrade.completeMessage);
@@ -1092,7 +1092,7 @@ export class Upgrades {
           if (this.partFactory.generators[i].auto) {
             this.partFactory.purchaseGenerator(
               this.partFactory.generators[i],
-              false
+              false,
             );
           }
         }
@@ -1118,7 +1118,7 @@ export class Upgrades {
         this.constructionTickTimer = 1;
         if (
           this.consumeResources(
-            this.gameModel.persistentData.currentConstruction.costPerTick
+            this.gameModel.persistentData.currentConstruction.costPerTick,
           )
         ) {
           this.gameModel.persistentData.currentConstruction.state =
@@ -1230,7 +1230,7 @@ export class Upgrades {
     if (
       construction.requires &&
       this.gameModel.persistentData.constructions.filter(
-        (built) => built.id == construction.requires
+        (built) => built.id == construction.requires,
       ).length == 0
     )
       return false;
@@ -1244,13 +1244,13 @@ export class Upgrades {
 
   getAvailableConstructions(): Construction[] {
     return this.constructionUpgrades.filter((construction) =>
-      this.constructionAvailable(construction)
+      this.constructionAvailable(construction),
     );
   }
 
   getCompletedConstructions(): Construction[] {
     return this.constructionUpgrades.filter((construction) =>
-      this.constructionComplete(construction)
+      this.constructionComplete(construction),
     );
   }
 
@@ -1360,7 +1360,7 @@ export class Upgrades {
     return Math.max(
       0,
       100000000 * Math.pow(1.5, this.gameModel.persistentData.runeshatter) -
-        rune.blood
+        rune.blood,
     );
   }
 
@@ -1492,7 +1492,7 @@ export class Upgrades {
       1,
       null,
       "Construct a Cursed Graveyard in the town that will automatically spawn zombies when your energy is at its maximum!",
-      "Graveyard menu now available!"
+      "Graveyard menu now available!",
     ),
     new Construction(
       205,
@@ -1505,7 +1505,7 @@ export class Upgrades {
       1,
       201,
       "Construct a Crypt in your graveyard. This will give you a nice dark and quiet place to think. The additional space will also allow you to store 50% more blood and brains!",
-      null
+      null,
     ),
     new Construction(
       206,
@@ -1518,7 +1518,7 @@ export class Upgrades {
       1,
       205,
       "Turn your crypt into a fort. The additional space will also allow you to store 60% more blood and brains.",
-      "New upgrades are available in the shop!"
+      "New upgrades are available in the shop!",
     ),
     new Construction(
       207,
@@ -1531,7 +1531,7 @@ export class Upgrades {
       1,
       206,
       "Turn your fort into a fortress. The additional space will also allow you to store 70% more blood and brains.",
-      null
+      null,
     ),
     new Construction(
       211,
@@ -1544,7 +1544,7 @@ export class Upgrades {
       1,
       207,
       "Turn your fortress into a towering citadel that looms over the town. The additional space will also allow you to store 80% more blood and brains.",
-      "New upgrades are available in the shop!"
+      "New upgrades are available in the shop!",
     ),
     new Construction(
       202,
@@ -1557,7 +1557,7 @@ export class Upgrades {
       1,
       201,
       "Build a protective fence around the graveyard that will reduce damage taken by zombies inside by 50%.",
-      null
+      null,
     ),
     new Construction(
       203,
@@ -1570,7 +1570,7 @@ export class Upgrades {
       5,
       202,
       "Enlarge the fence so a greater area is protected.",
-      null
+      null,
     ),
     new Construction(
       204,
@@ -1583,7 +1583,7 @@ export class Upgrades {
       1,
       205,
       "Build a laboratory to study the effects of plague. This will unlock new upgrades in the shop.",
-      "Plague upgrades now available!"
+      "Plague upgrades now available!",
     ),
     new Construction(
       208,
@@ -1596,7 +1596,7 @@ export class Upgrades {
       1,
       204,
       "Booby trap the area around your graveyard with cruel spikes that infect trespassing humans with the plague.",
-      null
+      null,
     ),
     new Construction(
       209,
@@ -1609,7 +1609,7 @@ export class Upgrades {
       1,
       206,
       "Dedicate one tower of your fort to the study of spellcraft. Perhaps you can learn some new spells?",
-      "Spells now available in the shop!"
+      "Spells now available in the shop!",
     ),
     new Construction(
       210,
@@ -1622,7 +1622,7 @@ export class Upgrades {
       1,
       207,
       "Build a runesmith's workshop in order to fortify your zombies with powerful runes.",
-      null
+      null,
     ),
     new Construction(
       212,
@@ -1635,7 +1635,7 @@ export class Upgrades {
       1,
       211,
       "Construct an aviary on top of your citadel so you can release wicked harpies to bomb the townspeople.",
-      "Harpies available for hire in the graveyard menu"
+      "Harpies available for hire in the graveyard menu",
     ),
     new Construction(
       213,
@@ -1648,7 +1648,7 @@ export class Upgrades {
       1,
       201,
       "Build a cage to contain surplus zombies once a town is defeated.",
-      null
+      null,
     ),
     new Construction(
       214,
@@ -1661,7 +1661,7 @@ export class Upgrades {
       1,
       205,
       "Build an additional cage to contain surplus zombies once a town is defeated.",
-      null
+      null,
     ),
     new Construction(
       215,
@@ -1674,7 +1674,7 @@ export class Upgrades {
       1,
       206,
       "Build an additional cage to contain surplus zombies once a town is defeated.",
-      null
+      null,
     ),
     new Construction(
       216,
@@ -1687,7 +1687,7 @@ export class Upgrades {
       1,
       207,
       "Build an additional cage to contain surplus zombies once a town is defeated.",
-      null
+      null,
     ),
     new Construction(
       217,
@@ -1700,7 +1700,7 @@ export class Upgrades {
       1,
       211,
       "Build an additional cage to contain surplus zombies once a town is defeated.",
-      null
+      null,
     ),
     new Construction(
       218,
@@ -1713,7 +1713,7 @@ export class Upgrades {
       1,
       211,
       "Expand the plague workshop into a well equipped laboratory in order to unlock additional plague upgrades.",
-      null
+      null,
     ),
     new Construction(
       219,
@@ -1726,7 +1726,7 @@ export class Upgrades {
       1,
       218,
       "Build a factory to create parts that can be used to construct more powerful beings for your army.",
-      "Factory menu now available!"
+      "Factory menu now available!",
     ),
     new Construction(
       220,
@@ -1739,7 +1739,7 @@ export class Upgrades {
       1,
       219,
       "Build a factory to turn creature parts into living entities of destruction",
-      "Creatures now available in factory menu!"
+      "Creatures now available in factory menu!",
     ),
     new Construction(
       221,
@@ -1752,7 +1752,7 @@ export class Upgrades {
       10,
       219,
       "A bottomless pit with walls made from creature parts. Drastically increases your capacity to store blood and brains.",
-      null
+      null,
     ),
     new Construction(
       222,
@@ -1765,7 +1765,7 @@ export class Upgrades {
       1,
       220,
       "Build an outfitter to upgrade the abilities of your harpies.",
-      "Harpy upgrades now available in the shop!"
+      "Harpy upgrades now available in the shop!",
     ),
     new Construction(
       301,
@@ -1781,7 +1781,7 @@ export class Upgrades {
       1,
       222,
       "Build a new laboratory to unlock the potential of Zombie-Golem Hybrids.  Deep storage tanks for Blood and Brains are needed for research, doubling storage",
-      "New upgrades are available in the shop!"
+      "New upgrades are available in the shop!",
     ),
     new Construction(
       302,
@@ -1797,7 +1797,7 @@ export class Upgrades {
       1,
       301,
       "Build an advanced laboratory to further unlock the secrets of Zombie-Golem Hybridization. Even deeper storage tanks for Blood and Brains are needed for research. Doubles storage",
-      "New upgrades are available in the shop!"
+      "New upgrades are available in the shop!",
     ),
     new Construction(
       303,
@@ -1813,7 +1813,7 @@ export class Upgrades {
       1,
       302,
       "Build a new way to create everything faster!  How deep can these storage tanks go? Doubles storage.",
-      "New upgrades are available in the shop!"
+      "New upgrades are available in the shop!",
     ),
     new Construction(
       304,
@@ -1829,7 +1829,7 @@ export class Upgrades {
       1,
       303,
       "Using all these stored brains allows us to harness their raw computational power for even more innovations!  Storage tanks resting on bedrock is as far as we can go, doubling storage",
-      "New upgrades are available in the shop!"
+      "New upgrades are available in the shop!",
     ),
   ];
 
@@ -1846,7 +1846,7 @@ export class Upgrades {
       40,
       "Your zombies thirst for blood and do +1 damage for each rank of Bloodthirst.",
       null,
-      null
+      null,
     ),
     new Upgrade(
       9,
@@ -1859,7 +1859,7 @@ export class Upgrades {
       50,
       "Your zombies bites do +3 damage with each rank of Sharpened Teeth.",
       null,
-      206
+      206,
     ),
     new Upgrade(
       11,
@@ -1872,7 +1872,7 @@ export class Upgrades {
       0,
       "Your zombies attacks do +5 damage with each rank of Razor Claws.",
       null,
-      211
+      211,
     ),
     new Upgrade(
       16,
@@ -1885,7 +1885,7 @@ export class Upgrades {
       0,
       "Your zombies attacks do +8 damage with each rank of Killer Instinct.",
       null,
-      220
+      220,
     ),
     new Upgrade(
       2,
@@ -1898,7 +1898,7 @@ export class Upgrades {
       40,
       "Your zombies gain tougher skin and +10 health with each rank.",
       null,
-      null
+      null,
     ),
     new Upgrade(
       10,
@@ -1911,7 +1911,7 @@ export class Upgrades {
       50,
       "Your zombies gain +25 health with each rank.",
       null,
-      206
+      206,
     ),
     new Upgrade(
       12,
@@ -1924,7 +1924,7 @@ export class Upgrades {
       0,
       "Your zombies gain +40 health with each rank of Battle Hardened.",
       null,
-      211
+      211,
     ),
     new Upgrade(
       17,
@@ -1937,7 +1937,7 @@ export class Upgrades {
       0,
       "Your zombies gain +100 health with each rank of Tough as Nails.",
       null,
-      220
+      220,
     ),
     new Upgrade(
       3,
@@ -1950,7 +1950,7 @@ export class Upgrades {
       20,
       "Turns out you can use all of your spare blood to store brains and keep them fresh. Each rank increases your maximum brain capacity by 50.",
       null,
-      null
+      null,
     ),
     new Upgrade(
       4,
@@ -1963,7 +1963,7 @@ export class Upgrades {
       10,
       "Why are we wasting so many good brains on this project? Each rank increases your chance to get a brain back from a dead zombie by 10%",
       null,
-      null
+      null,
     ),
     new Upgrade(
       5,
@@ -1976,7 +1976,7 @@ export class Upgrades {
       10,
       "Using your most powerful blood magic you command the bodies of the dead to rise as your servants! Each rank grants 10% chance that dead humans will turn into zombies.",
       null,
-      null
+      null,
     ),
     new Upgrade(
       6,
@@ -1989,7 +1989,7 @@ export class Upgrades {
       10,
       "Your zombies are now infected with plague and could infect their victims too. Each rank adds 10% chance to inflict damage over time when a zombie attacks a target.",
       null,
-      204
+      204,
     ),
     new Upgrade(
       7,
@@ -2002,7 +2002,7 @@ export class Upgrades {
       1,
       "Learn the Detonate spell which can explode all of your zombies into a cloud of plague. Not exactly sure how useful that will be.",
       "New spell learned, Detonate!",
-      209
+      209,
     ),
     new Upgrade(
       8,
@@ -2015,7 +2015,7 @@ export class Upgrades {
       1,
       "Learn the Gigazombies spell which will turn some of your zombies into hulking monstrosities with increased health and damage.",
       "New spell learned, Gigazombies!",
-      209
+      209,
     ),
     new Upgrade(
       13,
@@ -2028,7 +2028,7 @@ export class Upgrades {
       10,
       "The humans are using torches to set your zombies on fire. Perhaps we can turn the tables on them? Each rank increases the movement and attack speed of burning zombies by 5%",
       null,
-      207
+      207,
     ),
     new Upgrade(
       14,
@@ -2041,7 +2041,7 @@ export class Upgrades {
       15,
       "The first rank gives your zombies the ability to spit plague at enemies beyond normal attack range. Spit attacks do 50% zombie damage and infect the victim with plague. Subsequent ranks will increase the range of spit attacks.",
       null,
-      218
+      218,
     ),
     new Upgrade(
       15,
@@ -2054,7 +2054,7 @@ export class Upgrades {
       10,
       "Infuse your runes for free! Each rank gives your Runesmith the ability to infuse 1% of your resource income, without consuming it. Additionally when blood and brains reach their storage limit, any additional resources will be infused automatically.",
       null,
-      210
+      210,
     ),
     // new Upgrades.Upgrade(18, "More Gigazombies", this.types.gigazombies, this.costs.blood, 100000000, 1.27, 1, 1, "We need more gigazombies! This will unlock the ability for all zombies to be gigazombies. They gain health and damage but the energy cost also increases. This can be toggled in the graveyard.", false, 220),
     new Upgrade(
@@ -2068,7 +2068,7 @@ export class Upgrades {
       20,
       "These harpies are way too slow! We have to make them faster. Each rank increases harpy speed by 2",
       null,
-      222
+      222,
     ),
 
     // brain upgrades
@@ -2083,7 +2083,7 @@ export class Upgrades {
       20,
       "Melting brains down in your cauldron to make smoothies can be beneficial for your health. It also increases your energy rate by 0.5 per second for each rank.",
       null,
-      null
+      null,
     ),
     new Upgrade(
       21,
@@ -2096,7 +2096,7 @@ export class Upgrades {
       20,
       "All the brains you harvested have proved fruitful in your experiments. Each rank raises your maximum energy by 5.",
       null,
-      null
+      null,
     ),
     new Upgrade(
       22,
@@ -2109,7 +2109,7 @@ export class Upgrades {
       20,
       "The zombies retain more of their human agility increasing run speed by 1 for each rank.",
       null,
-      null
+      null,
     ),
     new Upgrade(
       23,
@@ -2122,7 +2122,7 @@ export class Upgrades {
       0,
       "All this brain power has enabled you to devise some superior blood storage methods. Each rank increases your maximum blood by 10%.",
       null,
-      null
+      null,
     ),
     new Upgrade(
       24,
@@ -2135,7 +2135,7 @@ export class Upgrades {
       1,
       "Learn the art of Unholy Construction in order to build structures that will solidify your foothold on the town.",
       "Construction menu now available!",
-      null
+      null,
     ),
     new Upgrade(
       25,
@@ -2148,7 +2148,7 @@ export class Upgrades {
       10,
       "Fill your zombies with so much plague they are ready to explode! Each rank adds 10% chance for a zombie to explode into a cloud of plague upon death.",
       null,
-      204
+      204,
     ),
     new Upgrade(
       26,
@@ -2161,7 +2161,7 @@ export class Upgrades {
       1,
       "Learn the Energy Charge spell which can drastically increase your energy rate for a short time.",
       "New spell learned, Energy Charge!",
-      209
+      209,
     ),
     new Upgrade(
       27,
@@ -2174,7 +2174,7 @@ export class Upgrades {
       20,
       "Plague explosions from zombies and harpies will also heal nearby zombies for 10% of the explosion damage with each rank.",
       null,
-      218
+      218,
     ),
     new Upgrade(
       28,
@@ -2187,7 +2187,7 @@ export class Upgrades {
       15,
       "We're definitely going to need more than one golem to finish the job. Each rank increases your creature limit by 1",
       null,
-      220
+      220,
     ),
     new Upgrade(
       29,
@@ -2200,7 +2200,7 @@ export class Upgrades {
       1,
       "Teach your harpies some new tricks. Once bought this upgrade will make your harpies drop fire bombs on tanks during boss stages.",
       null,
-      222
+      222,
     ),
     new Upgrade(
       30,
@@ -2213,7 +2213,7 @@ export class Upgrades {
       4,
       "Each rank reduces the delay between plague spike activation by 20%",
       null,
-      208
+      208,
     ),
 
     // bone upgrades
@@ -2228,7 +2228,7 @@ export class Upgrades {
       15,
       "Sitting atop your throne of bones you can finally think clearly. Each rank increases maximum energy by 10.",
       null,
-      null
+      null,
     ),
     new Upgrade(
       41,
@@ -2241,7 +2241,7 @@ export class Upgrades {
       25,
       "Not just dapper, these spikes help channel your energy. Each rank increases energy rate by 0.2 per second.",
       null,
-      null
+      null,
     ),
     new Upgrade(
       42,
@@ -2254,7 +2254,7 @@ export class Upgrades {
       20,
       "Your bone collectors are struggling to carry all these bones. Maybe it's time we gave them an upgrade? Each rank increases their carrying capacity by 5.",
       null,
-      null
+      null,
     ),
     new Upgrade(
       43,
@@ -2267,7 +2267,7 @@ export class Upgrades {
       0,
       "Finally! Now that we have a solid construction material we can get to work building better storage for our other resources. Each rank increases blood storage by 2000.",
       null,
-      null
+      null,
     ),
     new Upgrade(
       44,
@@ -2280,7 +2280,7 @@ export class Upgrades {
       0,
       "There's nothing I love more than a mind enslaved. Now we can put these brains where they belong. In cages! Each rank increases brain storage by 500.",
       null,
-      null
+      null,
     ),
     new Upgrade(
       45,
@@ -2293,7 +2293,7 @@ export class Upgrades {
       1,
       "Learn the Earth Freeze spell which can freeze all humans in place for a short time.",
       "New spell learned, Earth Freeze!",
-      209
+      209,
     ),
     new Upgrade(
       46,
@@ -2306,7 +2306,7 @@ export class Upgrades {
       10,
       "The best defense is a good offense? True in the case of Plague Armor which reduces the damage done by infected humans by 2% per rank.",
       null,
-      218
+      218,
     ),
     new Upgrade(
       47,
@@ -2319,7 +2319,7 @@ export class Upgrades {
       15,
       "Craft your earth golems from much harder stone. Each rank gives them 5% chance to reflect bullets back to their source.",
       null,
-      220
+      220,
     ),
     new Upgrade(
       48,
@@ -2332,7 +2332,7 @@ export class Upgrades {
       3,
       "Upgrade your harpies so they can carry more than just one bomb at a time.",
       null,
-      222
+      222,
     ),
 
     // parts upgrades
@@ -2347,7 +2347,7 @@ export class Upgrades {
       0,
       "Your golems gain +2% damage with each rank of Extra Limbs.",
       null,
-      220
+      220,
     ),
     new Upgrade(
       61,
@@ -2360,7 +2360,7 @@ export class Upgrades {
       0,
       "Your golems gain +2% health with each rank of Big Boned.",
       null,
-      220
+      220,
     ),
     new Upgrade(
       62,
@@ -2373,7 +2373,7 @@ export class Upgrades {
       0,
       "Animating Golem parts fused with zombie flesh creates a terrifyingly strong Hybrid. Your zombies gain +1% damage with each rank of Hybrid Strength.",
       null,
-      301
+      301,
     ),
     new Upgrade(
       63,
@@ -2386,7 +2386,7 @@ export class Upgrades {
       0,
       "Golem armor shell provides extra protection for your fleshy zombies. Your zombies gain +1% health with each rank of Hybrid Shell.",
       null,
-      301
+      301,
     ),
     new Upgrade(
       64,
@@ -2399,7 +2399,7 @@ export class Upgrades {
       0,
       "Cooling these Brains further makes them last much longer. Your brain storage increases +10% with each rank of Advanced Cyrogenic Vats.",
       null,
-      302
+      302,
     ),
     new Upgrade(
       65,
@@ -2412,7 +2412,7 @@ export class Upgrades {
       0,
       "Using specialized Golem Parts allows for advancements in plague research. Plague Damage increases +1% with each rank of Golem Part Plague Vats.",
       null,
-      302
+      302,
     ),
     new Upgrade(
       66,
@@ -2425,7 +2425,7 @@ export class Upgrades {
       0,
       "Mass produced Cloning Replicators allows for much greater use out of each Brain obtained. Brain Income increases +5% with each rank of Cloning Replicator.",
       null,
-      303
+      303,
     ),
     new Upgrade(
       67,
@@ -2438,7 +2438,7 @@ export class Upgrades {
       0,
       "Artificial Blood can augment what we already get allowing for more of everything. Blood Income increases +5% with each rank of Blood Synthesizer.",
       null,
-      303
+      303,
     ),
     new Upgrade(
       68,
@@ -2451,7 +2451,7 @@ export class Upgrades {
       0,
       "Synthetic Bones made from Golem Parts?  Genius! Bone Income increases +5% with each rank of Synthetic Bone Fabricator.",
       null,
-      303
+      303,
     ),
     new Upgrade(
       69,
@@ -2464,7 +2464,7 @@ export class Upgrades {
       0,
       "Insect sized and shaped assemblers are far more efficient at maufacturing Golem parts. Parts Income increases +5% with each rank of Insectoid Parts Assemblers.",
       null,
-      303
+      303,
     ),
     new Upgrade(
       70,
@@ -2477,7 +2477,7 @@ export class Upgrades {
       50,
       "Building on the success of hybrid zombies, small golem parts can enhance Harpy-Golem Hybrids. Harpy Speed +2 with each rank of Golem Avionics.",
       null,
-      304
+      304,
     ),
     new Upgrade(
       71,
@@ -2490,7 +2490,7 @@ export class Upgrades {
       0,
       "Using shock collars tuned to the Hybrid Zombie's nervous system causes them to attack at blinding speeds! Attack Speed +0.25% with each rank of Electro-Shock Collars.",
       null,
-      304
+      304,
     ),
     new Upgrade(
       72,
@@ -2503,7 +2503,7 @@ export class Upgrades {
       30,
       "Golem parts assembled around the graveyard can help regulate and attune necrotic power. Reduces zombie summoning cost by 1 with each rank of Power Regulators.",
       null,
-      304
+      304,
     ),
     new Upgrade(
       73,
@@ -2516,7 +2516,7 @@ export class Upgrades {
       0,
       "Astounding levels of blood sacrificed can enhance your reputation with dark entities in the Void. +3% Zombie Health and Damage per rank",
       null,
-      304
+      304,
     ),
     new Upgrade(
       74,
@@ -2529,7 +2529,7 @@ export class Upgrades {
       10,
       "Using arcane mathemagics you impart golem based ligaments to your Skeleton Champion. +1 Movement Speed per rank.",
       null,
-      304
+      304,
     ),
   ];
 
@@ -2545,7 +2545,7 @@ export class Upgrades {
       0,
       "Each rank gives you an additional 500 blood, 50 brains, and 200 bones when starting a new level.",
       null,
-      null
+      null,
     ),
     new Upgrade(
       109,
@@ -2558,7 +2558,7 @@ export class Upgrades {
       1,
       "Unlock the Time Warp spell in order to speed up the flow of time.",
       null,
-      null
+      null,
     ),
     new Upgrade(
       110,
@@ -2571,7 +2571,7 @@ export class Upgrades {
       5,
       "Each rank reduces the energy cost of summoning a zombie by 1",
       null,
-      null
+      null,
     ),
     new Upgrade(
       101,
@@ -2584,7 +2584,7 @@ export class Upgrades {
       0,
       "Additional 20% blood storage for each rank.",
       null,
-      null
+      null,
     ),
     new Upgrade(
       102,
@@ -2597,7 +2597,7 @@ export class Upgrades {
       0,
       "Additional 20% blood income rate for each rank.",
       null,
-      null
+      null,
     ),
     new Upgrade(
       103,
@@ -2610,7 +2610,7 @@ export class Upgrades {
       0,
       "Additional 20% brain storage for each rank.",
       null,
-      null
+      null,
     ),
     new Upgrade(
       104,
@@ -2623,7 +2623,7 @@ export class Upgrades {
       0,
       "Additional 20% brain income rate for each rank.",
       null,
-      null
+      null,
     ),
     new Upgrade(
       105,
@@ -2636,7 +2636,7 @@ export class Upgrades {
       0,
       "Additional 20% bones income rate for each rank.",
       null,
-      null
+      null,
     ),
     // new Upgrades.Upgrade(106, "Zombie Health", this.types.zombieHealthPC, this.costs.prestigePoints, 10, 1.25, 0.2, 0, "Additional 20% zombie health for each rank"),
     // new Upgrades.Upgrade(107, "Zombie Damage", this.types.zombieDmgPC, this.costs.prestigePoints, 10, 1.25, 0.2, 0, "Additional 20% zombie damage for each rank")
@@ -2651,7 +2651,7 @@ export class Upgrades {
       0,
       "Additional 20% creature parts income rate for each rank.",
       null,
-      null
+      null,
     ),
     new Upgrade(
       112,
@@ -2664,7 +2664,7 @@ export class Upgrades {
       1,
       "Unlock the ability to automatically start construction of the cheapest available building option.",
       null,
-      null
+      null,
     ),
     new Upgrade(
       114,
@@ -2677,7 +2677,7 @@ export class Upgrades {
       1,
       "Unlock the ability to automatically purchase items from the shop.",
       null,
-      null
+      null,
     ),
     new Upgrade(
       113,
@@ -2690,7 +2690,7 @@ export class Upgrades {
       0,
       "Additional 10% graveyard health during boss levels with each rank.",
       null,
-      null
+      null,
     ),
     new Upgrade(
       115,
@@ -2703,7 +2703,7 @@ export class Upgrades {
       0,
       "Additional skeleton talent point",
       null,
-      null
+      null,
     ),
   ];
 }
@@ -2741,7 +2741,7 @@ class Construction {
     cap: number,
     requires: number,
     description: string,
-    completeMessage: string
+    completeMessage: string,
   ) {
     this.id = id;
     this.name = name;
@@ -2789,7 +2789,7 @@ class Upgrade {
     cap: number,
     description: string,
     purchaseMessage: string,
-    requires
+    requires,
   ) {
     this.id = id;
     this.name = name;

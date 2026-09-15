@@ -49,22 +49,22 @@ export class GameModel {
 
     return GameModel.instance;
   }
-  particles: Particles;
-  trophies: Trophies;
-  bones: Bones;
-  creatureFactory: CreatureFactory;
-  creatures: Creatures;
-  boneCollectors: BoneCollectors;
-  graveyard: Graveyard;
-  spells: Spells;
-  partFactory: PartFactory;
-  skeleton: Skeleton;
-  upgrades: Upgrades;
-  zombies: Zombies;
-  humans: Humans;
-  police: Police;
-  army: Army;
-  app: PIXI.Application;
+  particles!: Particles;
+  trophies!: Trophies;
+  bones!: Bones;
+  creatureFactory!: CreatureFactory;
+  creatures!: Creatures;
+  boneCollectors!: BoneCollectors;
+  graveyard!: Graveyard;
+  spells!: Spells;
+  partFactory!: PartFactory;
+  skeleton!: Skeleton;
+  upgrades!: Upgrades;
+  zombies!: Zombies;
+  humans!: Humans;
+  police!: Police;
+  army!: Army;
+  app!: PIXI.Application;
   storageName = "ZombieData";
   hidden = false;
   autoShatter = false;
@@ -155,7 +155,7 @@ export class GameModel {
   };
   encodedContent = "";
   savefilename = "";
-  blob: Blob;
+  blob!: Blob;
   autoUpgrades = false;
   autoconstruction = false;
   autoconstructionUnlocked = false;
@@ -643,7 +643,7 @@ export class GameModel {
     creatures: [] as Creature[],
     creatureAutobuild: [] as number[], // index = creature.id, value = creature.autobuild
     savedCreatures: [] as { t: number; l: number }[], // t: creatureType, l: level
-    levelsCompleted: [],
+    levelsCompleted: [] as number[],
     showfps: false,
     runeshatter: 0,
     runes: {
@@ -658,8 +658,8 @@ export class GameModel {
         bones: 0,
       },
     },
-    trophies: [],
-    vipEscaped: [],
+    trophies: [] as number[],
+    vipEscaped: [] as number[],
     autoRelease: false,
     autoMaxHarpies: false,
     skeleton: null,
@@ -1017,6 +1017,17 @@ export class GameModel {
       locked: this.levelLocked(level),
       trophy: this.trophies.doesLevelHaveTrophy(level),
     };
+  }
+  setMaxHarpies() {
+    let maxHarpies = Math.floor(
+      this.getEnergyRate() + this.persistentData.harpies,
+    );
+    if (
+      (maxHarpies >= 0 && maxHarpies < this.persistentData.harpies) ||
+      (this.getEnergyRate() >= 1 && maxHarpies > 0)
+    ) {
+      this.persistentData.harpies = maxHarpies;
+    }
   }
 }
 
